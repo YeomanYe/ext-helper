@@ -1,6 +1,6 @@
-import { Search, Settings, X } from "lucide-react"
+import { Search, Settings, X, LayoutGrid, List } from "lucide-react"
 import { cn } from "@/utils"
-import type { FilterType } from "@/types"
+import type { FilterType, ViewMode } from "@/types"
 
 interface SearchBarProps {
   value: string
@@ -70,9 +70,11 @@ export function QuickFilters({ activeFilter, onFilterChange }: QuickFiltersProps
 
 interface HeaderProps {
   onSettingsClick?: () => void
+  viewMode?: ViewMode
+  onViewModeChange?: (mode: ViewMode) => void
 }
 
-export function Header({ onSettingsClick }: HeaderProps) {
+export function Header({ onSettingsClick, viewMode = "card", onViewModeChange }: HeaderProps) {
   return (
     <header className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-3 dark:border-gray-700 dark:bg-gray-900">
       <div className="flex items-center gap-2">
@@ -83,12 +85,42 @@ export function Header({ onSettingsClick }: HeaderProps) {
           ExtHelper
         </h1>
       </div>
-      <button
-        onClick={onSettingsClick}
-        className="flex h-8 w-8 items-center justify-center rounded-md text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-gray-800 dark:hover:text-gray-300"
-      >
-        <Settings className="h-4 w-4" />
-      </button>
+      <div className="flex items-center gap-1">
+        {/* View Mode Toggle */}
+        <div className="flex rounded-md border border-gray-200 dark:border-gray-700">
+          <button
+            onClick={() => onViewModeChange?.("card")}
+            className={cn(
+              "flex items-center justify-center p-1.5 rounded-l-md",
+              viewMode === "card"
+                ? "bg-primary text-white"
+                : "text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
+            )}
+            title="Card view"
+          >
+            <LayoutGrid className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => onViewModeChange?.("compact")}
+            className={cn(
+              "flex items-center justify-center p-1.5 rounded-r-md",
+              viewMode === "compact"
+                ? "bg-primary text-white"
+                : "text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
+            )}
+            title="Compact view"
+          >
+            <List className="h-4 w-4" />
+          </button>
+        </div>
+
+        <button
+          onClick={onSettingsClick}
+          className="flex h-8 w-8 items-center justify-center rounded-md text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-gray-800 dark:hover:text-gray-300"
+        >
+          <Settings className="h-4 w-4" />
+        </button>
+      </div>
     </header>
   )
 }

@@ -2,7 +2,7 @@ import * as React from "react"
 import { X, FolderOpen, Plus } from "lucide-react"
 import { ExtensionCard } from "@/components/extension"
 import { cn } from "@/utils"
-import type { Group, Extension } from "@/types"
+import type { Group, Extension, ViewMode } from "@/types"
 
 interface GroupChipProps {
   group: Group
@@ -68,6 +68,7 @@ export function CreateGroupChip({ onClick }: CreateGroupChipProps) {
 interface GroupDetailModalProps {
   group: Group
   extensions: Extension[]
+  viewMode?: ViewMode
   onClose: () => void
   onToggleExtension: (id: string) => void
   onOpenOptions?: (id: string) => void
@@ -77,6 +78,7 @@ interface GroupDetailModalProps {
 export function GroupDetailModal({
   group,
   extensions,
+  viewMode = "card",
   onClose,
   onToggleExtension,
   onOpenOptions,
@@ -90,6 +92,10 @@ export function GroupDetailModal({
     document.addEventListener("keydown", handleEsc)
     return () => document.removeEventListener("keydown", handleEsc)
   }, [onClose])
+
+  const gridClass = viewMode === "compact"
+    ? "grid grid-cols-1 gap-2"
+    : "grid grid-cols-1 gap-2"
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onClose}>
@@ -118,17 +124,20 @@ export function GroupDetailModal({
         </div>
 
         {/* Extension List */}
-        <div className="p-3 space-y-2 max-h-[380px] overflow-y-auto">
+        <div className={cn("p-3 max-h-[380px] overflow-y-auto", viewMode === "compact" ? "space-y-1" : "space-y-2")}>
           {extensions.length > 0 ? (
-            extensions.map((ext) => (
-              <ExtensionCard
-                key={ext.id}
-                extension={ext}
-                onToggle={() => onToggleExtension(ext.id)}
-                onOpenOptions={() => onOpenOptions?.(ext.id)}
-                onRemove={() => onRemove?.(ext.id)}
-              />
-            ))
+            <div className={gridClass}>
+              {extensions.map((ext) => (
+                <ExtensionCard
+                  key={ext.id}
+                  extension={ext}
+                  viewMode={viewMode}
+                  onToggle={() => onToggleExtension(ext.id)}
+                  onOpenOptions={() => onOpenOptions?.(ext.id)}
+                  onRemove={() => onRemove?.(ext.id)}
+                />
+              ))}
+            </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-8 text-center">
               <FolderOpen className="h-8 w-8 text-gray-300 dark:text-gray-600" />

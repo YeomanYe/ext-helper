@@ -27,12 +27,14 @@ export interface Group {
 
 export type FilterType = 'all' | 'enabled' | 'disabled' | 'favorites'
 export type SortType = 'name' | 'enabled' | 'recentlyUsed'
+export type ViewMode = 'card' | 'compact'
 
 export interface Preferences {
   theme: 'light' | 'dark' | 'system'
   compactMode: boolean
   showDisabled: boolean
   sortBy: SortType
+  viewMode: ViewMode
 }
 
 export interface ExtensionStore {
@@ -69,8 +71,10 @@ export interface UIStore {
   theme: 'light' | 'dark' | 'system'
   compactMode: boolean
   showDisabled: boolean
+  viewMode: ViewMode
   lastUpdate: number
   setTheme: (theme: 'light' | 'dark' | 'system') => void
   toggleCompactMode: () => void
   toggleShowDisabled: () => void
+  setViewMode: (mode: ViewMode) => void
 }

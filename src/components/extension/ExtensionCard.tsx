@@ -4,11 +4,14 @@ import { Switch } from "@/components/common"
 import { cn } from "@/utils"
 import type { Extension } from "@/types"
 
+type ViewMode = "card" | "compact"
+
 interface ExtensionCardProps {
   extension: Extension
   onToggle: () => void
   onOpenOptions?: () => void
   onRemove?: () => void
+  viewMode?: ViewMode
   className?: string
 }
 
@@ -17,6 +20,7 @@ export function ExtensionCard({
   onToggle,
   onOpenOptions,
   onRemove,
+  viewMode = "card",
   className
 }: ExtensionCardProps) {
   const [showMenu, setShowMenu] = React.useState(false)
@@ -38,6 +42,49 @@ export function ExtensionCard({
     setShowMenu(true)
   }
 
+  // Compact mode - only show icon and name
+  if (viewMode === "compact") {
+    return (
+      <div
+        className={cn(
+          "group relative flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2",
+          "hover:border-gray-300 hover:shadow-sm",
+          "dark:border-gray-700 dark:bg-gray-800",
+          !extension.enabled && "opacity-60",
+          className
+        )}
+        onContextMenu={handleContextMenu}
+      >
+        {/* Extension Icon */}
+        <div className="flex-shrink-0">
+          {extension.iconUrl ? (
+            <img
+              src={extension.iconUrl}
+              alt={extension.name}
+              className="h-8 w-8 rounded object-cover"
+              loading="lazy"
+            />
+          ) : (
+            <div className="flex h-8 w-8 items-center justify-center rounded bg-gray-100 dark:bg-gray-700">
+              <Package className="h-4 w-4 text-gray-400" />
+            </div>
+          )}
+        </div>
+
+        {/* Extension Name */}
+        <div className="flex-1 min-w-0">
+          <h3 className="truncate text-sm font-medium text-gray-900 dark:text-gray-100">
+            {extension.name}
+          </h3>
+        </div>
+
+        {/* Toggle */}
+        <Switch checked={extension.enabled} onCheckedChange={onToggle} />
+      </div>
+    )
+  }
+
+  // Card mode - full info
   return (
     <div
       className={cn(

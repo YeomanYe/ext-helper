@@ -6,6 +6,7 @@ import {
   useExtensionStore,
   useFilteredExtensions,
   useGroupStore,
+  useUIStore,
   initializeUIStore
 } from "@/stores"
 import { browserAdapter } from "@/services/browser/adapter"
@@ -29,6 +30,11 @@ export function PopupPage() {
     selectGroup,
     createGroup
   } = useGroupStore()
+
+  const {
+    viewMode,
+    setViewMode
+  } = useUIStore()
 
   const filteredExtensions = useFilteredExtensions()
   const devMode = isDevMode()
@@ -101,9 +107,17 @@ export function PopupPage() {
   const enabledCount = displayedExtensions.filter((e) => e.enabled).length
   const totalCount = devMode ? MOCK_EXTENSIONS.length : filteredExtensions.length
 
+  // Determine grid columns based on view mode
+  const gridClass = viewMode === "compact"
+    ? "grid grid-cols-1 gap-2"
+    : "grid grid-cols-2 gap-3"
+
   return (
     <div className="flex h-[600px] flex-col bg-white dark:bg-gray-900">
-      <Header />
+      <Header
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
+      />
 
       {/* Search */}
       <div className="flex-shrink-0 p-3 border-b border-gray-200 dark:border-gray-700">
@@ -171,11 +185,12 @@ export function PopupPage() {
           </div>
         ) : devMode || !activeGroupId ? (
           // Show all filtered extensions
-          <div className="grid grid-cols-2 gap-3">
+          <div className={gridClass}>
             {displayedExtensions.map((ext) => (
               <ExtensionCard
                 key={ext.id}
                 extension={ext}
+                viewMode={viewMode}
                 onToggle={() => handleToggleExtension(ext.id)}
                 onOpenOptions={() => handleOpenOptions(ext.id)}
                 onRemove={() => handleRemove(ext.id)}
@@ -184,7 +199,7 @@ export function PopupPage() {
           </div>
         ) : (
           // Show only group extensions
-          <div className="grid grid-cols-2 gap-3">
+          <div className={gridClass}>
             {displayedExtensions
               .filter(ext => {
                 const group = displayGroups.find(g => g.id === activeGroupId)
@@ -194,6 +209,7 @@ export function PopupPage() {
                 <ExtensionCard
                   key={ext.id}
                   extension={ext}
+                  viewMode={viewMode}
                   onToggle={() => handleToggleExtension(ext.id)}
                   onOpenOptions={() => handleOpenOptions(ext.id)}
                   onRemove={() => handleRemove(ext.id)}
@@ -210,6 +226,7 @@ export function PopupPage() {
         <GroupDetailModal
           group={selectedGroup}
           extensions={selectedGroupExtensions}
+          viewMode={viewMode}
           onClose={() => setSelectedGroupId(null)}
           onToggleExtension={handleToggleExtension}
           onOpenOptions={handleOpenOptions}
