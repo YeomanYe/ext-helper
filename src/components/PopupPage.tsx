@@ -1,7 +1,7 @@
 import * as React from "react"
 import { Header, Footer, SearchBar, QuickFilters } from "@/components/popup"
-import { ExtensionList, ExtensionCard } from "@/components/extension"
-import { GroupCard, CreateGroupCard } from "@/components/group"
+import { ExtensionCard } from "@/components/extension"
+import { GroupChip, CreateGroupChip, GroupDetailModal } from "@/components/group"
 import {
   useExtensionStore,
   useFilteredExtensions,
@@ -13,7 +13,6 @@ import { MOCK_EXTENSIONS, MOCK_GROUPS, isDevMode } from "@/services/mockData"
 
 export function PopupPage() {
   const {
-    loading,
     error,
     searchQuery,
     filter,
@@ -26,11 +25,9 @@ export function PopupPage() {
   const {
     groups,
     activeGroupId,
-    expandedGroups,
     fetchGroups,
-    toggleGroupExpanded,
-    createGroup,
-    deleteGroup
+    selectGroup,
+    createGroup
   } = useGroupStore()
 
   const filteredExtensions = useFilteredExtensions()
@@ -40,35 +37,30 @@ export function PopupPage() {
   const displayExtensions = devMode ? MOCK_EXTENSIONS : filteredExtensions
   const displayGroups = devMode ? MOCK_GROUPS : groups
 
-  // Filter extensions by active group
+  // Modal state
+  const [selectedGroupId, setSelectedGroupId] = React.useState<string | null>(null)
+
+  // Get selected group
+  const selectedGroup = React.useMemo(() => {
+    if (!selectedGroupId) return null
+    return displayGroups.find(g => g.id === selectedGroupId) || null
+  }, [selectedGroupId, displayGroups])
+
+  // Get extensions in selected group
+  const selectedGroupExtensions = React.useMemo(() => {
+    if (!selectedGroup) return []
+    return displayExtensions.filter(ext => selectedGroup.extensionIds.includes(ext.id))
+  }, [selectedGroup, displayExtensions])
+
+  // Filter extensions based on filter
   const displayedExtensions = React.useMemo(() => {
-    if (!activeGroupId) return displayExtensions
-    const group = displayGroups.find((g) => g.id === activeGroupId)
-    if (!group) return displayExtensions
-    return displayExtensions.filter((ext) => group.extensionIds.includes(ext.id))
-  }, [displayExtensions, activeGroupId, displayGroups])
-
-  // Group extensions by their groups
-  const extensionsByGroup = React.useMemo(() => {
-    const map = new Map<string, typeof displayExtensions>()
-
-    // Add grouped extensions
-    displayGroups.forEach(group => {
-      const groupExts = displayExtensions.filter(ext => group.extensionIds.includes(ext.id))
-      if (groupExts.length > 0) {
-        map.set(group.id, groupExts)
-      }
-    })
-
-    return map
-  }, [displayExtensions, displayGroups])
-
-  // Get ungrouped extensions
-  const ungroupedExtensions = React.useMemo(() => {
-    const groupedIds = new Set<string>()
-    displayGroups.forEach(g => g.extensionIds.forEach(id => groupedIds.add(id)))
-    return displayExtensions.filter(ext => !groupedIds.has(ext.id))
-  }, [displayExtensions, displayGroups])
+    if (filter === "enabled") {
+      return displayExtensions.filter(e => e.enabled)
+    } else if (filter === "disabled") {
+      return displayExtensions.filter(e => !e.enabled)
+    }
+    return displayExtensions
+  }, [displayExtensions, filter])
 
   // Initialize on mount
   React.useEffect(() => {
@@ -102,28 +94,71 @@ export function PopupPage() {
     if (!devMode) {
       toggleExtension(id)
     } else {
-      // Toggle in mock data
       console.log("Toggle extension:", id)
     }
   }, [devMode, toggleExtension])
 
   const enabledCount = displayedExtensions.filter((e) => e.enabled).length
-
-  // Calculate total for footer
   const totalCount = devMode ? MOCK_EXTENSIONS.length : filteredExtensions.length
 
   return (
     <div className="flex h-[600px] flex-col bg-white dark:bg-gray-900">
       <Header />
 
-      {/* Search and Filters */}
-      <div className="flex-shrink-0 space-y-2 border-b border-gray-200 p-3 dark:border-gray-700">
+      {/* Search */}
+      <div className="flex-shrink-0 p-3 border-b border-gray-200 dark:border-gray-700">
         <SearchBar value={searchQuery} onChange={setSearchQuery} />
+      </div>
+
+      {/* Group Chips */}
+      <div className="flex-shrink-0 px-3 py-2 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex flex-wrap gap-2">
+          {/* All extensions chip */}
+          <button
+            onClick={() => selectGroup(null)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+              !activeGroupId
+                ? "bg-primary text-white"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+            }`}
+          >
+            <span>全部</span>
+            <span className={`text-xs px-1.5 py-0.5 rounded-full ${
+              !activeGroupId ? "bg-white/20" : "bg-gray-200 dark:bg-gray-600"
+            }`}>
+              {displayExtensions.length}
+            </span>
+          </button>
+
+          {/* Group chips */}
+          {displayGroups.map((group) => {
+            const count = displayExtensions.filter(ext => group.extensionIds.includes(ext.id)).length
+            return (
+              <GroupChip
+                key={group.id}
+                group={group}
+                isActive={activeGroupId === group.id}
+                extensionCount={count}
+                onClick={() => {
+                  selectGroup(group.id)
+                  setSelectedGroupId(group.id)
+                }}
+              />
+            )
+          })}
+
+          {/* Create group chip */}
+          <CreateGroupChip onClick={() => createGroup("新分组", "#6366F1")} />
+        </div>
+      </div>
+
+      {/* Filters */}
+      <div className="flex-shrink-0 px-3 py-2 border-b border-gray-200 dark:border-gray-700">
         <QuickFilters activeFilter={filter} onFilterChange={setFilter} />
       </div>
 
-      {/* Main Content - Scrollable */}
-      <div className="flex-1 overflow-y-auto p-3 space-y-3">
+      {/* Main Content */}
+      <div className="flex-1 overflow-y-auto p-3">
         {error ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <p className="text-sm text-error">{error}</p>
@@ -134,66 +169,53 @@ export function PopupPage() {
               重试
             </button>
           </div>
-        ) : devMode ? (
-          // Dev mode: Show groups with horizontal cards
-          <>
-            {/* Group Cards */}
-            {displayGroups.map((group) => (
-              <GroupCard
-                key={group.id}
-                group={group}
-                extensions={extensionsByGroup.get(group.id) || []}
-                isExpanded={expandedGroups.has(group.id)}
-                onToggleExpand={() => toggleGroupExpanded(group.id)}
-                onDelete={() => deleteGroup(group.id)}
-                onRename={() => {}}
-                onToggleExtension={handleToggleExtension}
+        ) : devMode || !activeGroupId ? (
+          // Show all filtered extensions
+          <div className="grid grid-cols-2 gap-3">
+            {displayedExtensions.map((ext) => (
+              <ExtensionCard
+                key={ext.id}
+                extension={ext}
+                onToggle={() => handleToggleExtension(ext.id)}
+                onOpenOptions={() => handleOpenOptions(ext.id)}
+                onRemove={() => handleRemove(ext.id)}
               />
             ))}
-
-            {/* Ungrouped Extensions */}
-            {ungroupedExtensions.length > 0 && (
-              <div className="rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800 overflow-hidden">
-                <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-                  <span className="flex-1 truncate text-sm font-medium text-gray-900 dark:text-gray-100">
-                    未分组
-                  </span>
-                  <span className="text-xs text-gray-500 dark:text-gray-400">
-                    ({ungroupedExtensions.length})
-                  </span>
-                </div>
-                <div className="p-3">
-                  <div className="grid grid-cols-2 gap-3">
-                    {ungroupedExtensions.map((ext) => (
-                      <ExtensionCard
-                        key={ext.id}
-                        extension={ext}
-                        onToggle={() => handleToggleExtension(ext.id)}
-                        onOpenOptions={() => handleOpenOptions(ext.id)}
-                        onRemove={() => handleRemove(ext.id)}
-                      />
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Create Group Button */}
-            <CreateGroupCard onClick={() => createGroup("新分组", "#6366F1")} />
-          </>
+          </div>
         ) : (
-          // Production mode: Show extension list
-          <ExtensionList
-            extensions={displayedExtensions}
-            onToggle={toggleExtension}
-            onOpenOptions={handleOpenOptions}
-            onRemove={handleRemove}
-            loading={loading}
-          />
+          // Show only group extensions
+          <div className="grid grid-cols-2 gap-3">
+            {displayedExtensions
+              .filter(ext => {
+                const group = displayGroups.find(g => g.id === activeGroupId)
+                return group?.extensionIds.includes(ext.id)
+              })
+              .map((ext) => (
+                <ExtensionCard
+                  key={ext.id}
+                  extension={ext}
+                  onToggle={() => handleToggleExtension(ext.id)}
+                  onOpenOptions={() => handleOpenOptions(ext.id)}
+                  onRemove={() => handleRemove(ext.id)}
+                />
+              ))}
+          </div>
         )}
       </div>
 
       <Footer totalCount={totalCount} enabledCount={enabledCount} />
+
+      {/* Group Detail Modal */}
+      {selectedGroup && (
+        <GroupDetailModal
+          group={selectedGroup}
+          extensions={selectedGroupExtensions}
+          onClose={() => setSelectedGroupId(null)}
+          onToggleExtension={handleToggleExtension}
+          onOpenOptions={handleOpenOptions}
+          onRemove={handleRemove}
+        />
+      )}
     </div>
   )
 }
