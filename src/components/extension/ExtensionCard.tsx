@@ -1,10 +1,7 @@
 import * as React from "react"
-import { Settings, Trash2, MoreVertical, Package } from "lucide-react"
-import { Switch } from "@/components/common"
+import { Settings, Trash2, MoreVertical, Package, Power, PowerOff } from "lucide-react"
 import { cn } from "@/utils"
-import type { Extension } from "@/types"
-
-type ViewMode = "card" | "compact"
+import type { Extension, ViewMode } from "@/types"
 
 interface ExtensionCardProps {
   extension: Extension
@@ -42,6 +39,11 @@ export function ExtensionCard({
     setShowMenu(true)
   }
 
+  const handleIconClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    onToggle()
+  }
+
   // Compact mode - only show icon and name
   if (viewMode === "compact") {
     return (
@@ -55,8 +57,12 @@ export function ExtensionCard({
         )}
         onContextMenu={handleContextMenu}
       >
-        {/* Extension Icon */}
-        <div className="flex-shrink-0">
+        {/* Extension Icon - clickable to toggle */}
+        <div
+          className="flex-shrink-0 cursor-pointer"
+          onClick={handleIconClick}
+          title={extension.enabled ? "Click to disable" : "Click to enable"}
+        >
           {extension.iconUrl ? (
             <img
               src={extension.iconUrl}
@@ -78,13 +84,19 @@ export function ExtensionCard({
           </h3>
         </div>
 
-        {/* Toggle */}
-        <Switch checked={extension.enabled} onCheckedChange={onToggle} />
+        {/* Status indicator */}
+        <div className="flex items-center gap-1">
+          {extension.enabled ? (
+            <Power className="h-4 w-4 text-green-500" />
+          ) : (
+            <PowerOff className="h-4 w-4 text-gray-400" />
+          )}
+        </div>
       </div>
     )
   }
 
-  // Card mode - full info
+  // Card mode - click icon to toggle
   return (
     <div
       className={cn(
@@ -96,8 +108,12 @@ export function ExtensionCard({
       )}
       onContextMenu={handleContextMenu}
     >
-      {/* Extension Icon */}
-      <div className="flex-shrink-0">
+      {/* Extension Icon - clickable to toggle */}
+      <div
+        className="flex-shrink-0 cursor-pointer relative"
+        onClick={handleIconClick}
+        title={extension.enabled ? "Click to disable" : "Click to enable"}
+      >
         {extension.iconUrl ? (
           <img
             src={extension.iconUrl}
@@ -110,6 +126,19 @@ export function ExtensionCard({
             <Package className="h-6 w-6 text-gray-400" />
           </div>
         )}
+        {/* Status badge on icon */}
+        <div
+          className={cn(
+            "absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full border-2 border-white dark:border-gray-800",
+            extension.enabled ? "bg-green-500" : "bg-gray-400"
+          )}
+        >
+          {extension.enabled ? (
+            <Power className="h-2.5 w-2.5 text-white" />
+          ) : (
+            <PowerOff className="h-2.5 w-2.5 text-white" />
+          )}
+        </div>
       </div>
 
       {/* Extension Info */}
@@ -137,10 +166,8 @@ export function ExtensionCard({
         </div>
       </div>
 
-      {/* Actions */}
-      <div className="flex items-center gap-2">
-        <Switch checked={extension.enabled} onCheckedChange={onToggle} />
-
+      {/* Actions - only menu button */}
+      <div className="flex items-start">
         <div className="relative" ref={menuRef}>
           <button
             onClick={() => setShowMenu(!showMenu)}
@@ -151,6 +178,25 @@ export function ExtensionCard({
 
           {showMenu && (
             <div className="absolute right-0 top-full z-50 mt-1 w-48 rounded-md border border-gray-200 bg-white py-1 shadow-lg dark:border-gray-700 dark:bg-gray-800">
+              <button
+                onClick={() => {
+                  onToggle()
+                  setShowMenu(false)
+                }}
+                className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+              >
+                {extension.enabled ? (
+                  <>
+                    <PowerOff className="h-4 w-4" />
+                    禁用
+                  </>
+                ) : (
+                  <>
+                    <Power className="h-4 w-4" />
+                    启用
+                  </>
+                )}
+              </button>
               {extension.optionsUrl && (
                 <button
                   onClick={() => {
@@ -160,7 +206,7 @@ export function ExtensionCard({
                   className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
                 >
                   <Settings className="h-4 w-4" />
-                  Open Settings
+                  设置页面
                 </button>
               )}
               <button
@@ -171,7 +217,7 @@ export function ExtensionCard({
                 className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-error hover:bg-red-50 dark:hover:bg-red-900/20"
               >
                 <Trash2 className="h-4 w-4" />
-                Uninstall
+                卸载
               </button>
             </div>
           )}
