@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Settings, Trash2, MoreVertical, Package, Power, PowerOff } from "lucide-react"
+import { Settings, Trash2, Package, Power, PowerOff } from "lucide-react"
 import { cn } from "@/utils"
 import type { Extension, ViewMode } from "@/types"
 
@@ -39,190 +39,100 @@ export function ExtensionCard({
     setShowMenu(true)
   }
 
-  const handleIconClick = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    onToggle()
-  }
+  // Both modes now show minimal info - icon + name only
+  // All other functions via right-click menu
+  const isCompact = viewMode === "compact"
+  const iconSize = isCompact ? 8 : 12
+  const iconClass = isCompact ? "h-4 w-4" : "h-6 w-6"
+  const containerClass = isCompact
+    ? "flex items-center gap-2 px-3 py-2"
+    : "flex items-center gap-3 px-3 py-2"
 
-  // Compact mode - only show icon and name
-  if (viewMode === "compact") {
-    return (
-      <div
-        className={cn(
-          "group relative flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2",
-          "hover:border-gray-300 hover:shadow-sm",
-          "dark:border-gray-700 dark:bg-gray-800",
-          !extension.enabled && "opacity-60",
-          className
-        )}
-        onContextMenu={handleContextMenu}
-      >
-        {/* Extension Icon - clickable to toggle */}
-        <div
-          className="flex-shrink-0 cursor-pointer"
-          onClick={handleIconClick}
-          title={extension.enabled ? "Click to disable" : "Click to enable"}
-        >
-          {extension.iconUrl ? (
-            <img
-              src={extension.iconUrl}
-              alt={extension.name}
-              className="h-8 w-8 rounded object-cover"
-              loading="lazy"
-            />
-          ) : (
-            <div className="flex h-8 w-8 items-center justify-center rounded bg-gray-100 dark:bg-gray-700">
-              <Package className="h-4 w-4 text-gray-400" />
-            </div>
-          )}
-        </div>
-
-        {/* Extension Name */}
-        <div className="flex-1 min-w-0">
-          <h3 className="truncate text-sm font-medium text-gray-900 dark:text-gray-100">
-            {extension.name}
-          </h3>
-        </div>
-
-        {/* Status indicator */}
-        <div className="flex items-center gap-1">
-          {extension.enabled ? (
-            <Power className="h-4 w-4 text-green-500" />
-          ) : (
-            <PowerOff className="h-4 w-4 text-gray-400" />
-          )}
-        </div>
-      </div>
-    )
-  }
-
-  // Card mode - click icon to toggle
   return (
     <div
       className={cn(
-        "group relative flex items-start gap-3 rounded-lg border border-gray-200 bg-white p-3",
+        "group relative rounded-lg border border-gray-200 bg-white",
         "hover:border-gray-300 hover:shadow-sm",
         "dark:border-gray-700 dark:bg-gray-800",
         !extension.enabled && "opacity-60",
+        containerClass,
         className
       )}
       onContextMenu={handleContextMenu}
     >
-      {/* Extension Icon - clickable to toggle */}
-      <div
-        className="flex-shrink-0 cursor-pointer relative"
-        onClick={handleIconClick}
-        title={extension.enabled ? "Click to disable" : "Click to enable"}
-      >
+      {/* Extension Icon */}
+      <div className="flex-shrink-0">
         {extension.iconUrl ? (
           <img
             src={extension.iconUrl}
             alt={extension.name}
-            className="h-12 w-12 rounded-lg object-cover"
+            className={cn("rounded object-cover", `h-${iconSize} w-${iconSize}`)}
             loading="lazy"
           />
         ) : (
-          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-700">
-            <Package className="h-6 w-6 text-gray-400" />
+          <div className={cn("flex items-center justify-center rounded bg-gray-100 dark:bg-gray-700", iconClass)}>
+            <Package className={cn("text-gray-400", isCompact ? "h-4 w-4" : "h-6 w-6")} />
           </div>
         )}
-        {/* Status badge on icon */}
-        <div
-          className={cn(
-            "absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full border-2 border-white dark:border-gray-800",
-            extension.enabled ? "bg-green-500" : "bg-gray-400"
-          )}
-        >
-          {extension.enabled ? (
-            <Power className="h-2.5 w-2.5 text-white" />
-          ) : (
-            <PowerOff className="h-2.5 w-2.5 text-white" />
-          )}
-        </div>
       </div>
 
-      {/* Extension Info */}
+      {/* Extension Name */}
       <div className="flex-1 min-w-0">
         <h3 className="truncate text-sm font-medium text-gray-900 dark:text-gray-100">
           {extension.name}
         </h3>
-        <p className="mt-0.5 truncate text-xs text-gray-500 dark:text-gray-400">
-          {extension.description || `Version ${extension.version}`}
-        </p>
-        <div className="mt-1 flex items-center gap-2">
-          <span className="text-xs text-gray-400 dark:text-gray-500">
-            v{extension.version}
-          </span>
-          <span
-            className={cn(
-              "inline-flex items-center rounded-full px-1.5 py-0.5 text-xs font-medium",
-              extension.enabled
-                ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                : "bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400"
-            )}
-          >
-            {extension.enabled ? "Enabled" : "Disabled"}
-          </span>
-        </div>
       </div>
 
-      {/* Actions - only menu button */}
-      <div className="flex items-start">
-        <div className="relative" ref={menuRef}>
+      {/* Context Menu */}
+      {showMenu && (
+        <div
+          ref={menuRef}
+          className="absolute left-0 top-full z-50 mt-1 w-40 rounded-md border border-gray-200 bg-white py-1 shadow-lg dark:border-gray-700 dark:bg-gray-800"
+          onClick={(e) => e.stopPropagation()}
+        >
           <button
-            onClick={() => setShowMenu(!showMenu)}
-            className="inline-flex h-8 w-8 items-center justify-center rounded-md text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-gray-700 dark:hover:text-gray-300"
+            onClick={() => {
+              onToggle()
+              setShowMenu(false)
+            }}
+            className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
           >
-            <MoreVertical className="h-4 w-4" />
+            {extension.enabled ? (
+              <>
+                <PowerOff className="h-4 w-4" />
+                禁用
+              </>
+            ) : (
+              <>
+                <Power className="h-4 w-4" />
+                启用
+              </>
+            )}
           </button>
-
-          {showMenu && (
-            <div className="absolute right-0 top-full z-50 mt-1 w-48 rounded-md border border-gray-200 bg-white py-1 shadow-lg dark:border-gray-700 dark:bg-gray-800">
-              <button
-                onClick={() => {
-                  onToggle()
-                  setShowMenu(false)
-                }}
-                className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-              >
-                {extension.enabled ? (
-                  <>
-                    <PowerOff className="h-4 w-4" />
-                    禁用
-                  </>
-                ) : (
-                  <>
-                    <Power className="h-4 w-4" />
-                    启用
-                  </>
-                )}
-              </button>
-              {extension.optionsUrl && (
-                <button
-                  onClick={() => {
-                    onOpenOptions?.()
-                    setShowMenu(false)
-                  }}
-                  className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-                >
-                  <Settings className="h-4 w-4" />
-                  设置页面
-                </button>
-              )}
-              <button
-                onClick={() => {
-                  onRemove?.()
-                  setShowMenu(false)
-                }}
-                className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-error hover:bg-red-50 dark:hover:bg-red-900/20"
-              >
-                <Trash2 className="h-4 w-4" />
-                卸载
-              </button>
-            </div>
+          {extension.optionsUrl && (
+            <button
+              onClick={() => {
+                onOpenOptions?.()
+                setShowMenu(false)
+              }}
+              className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+            >
+              <Settings className="h-4 w-4" />
+              设置页面
+            </button>
           )}
+          <button
+            onClick={() => {
+              onRemove?.()
+              setShowMenu(false)
+            }}
+            className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-error hover:bg-red-50 dark:hover:bg-red-900/20"
+          >
+            <Trash2 className="h-4 w-4" />
+            卸载
+          </button>
         </div>
-      </div>
+      )}
     </div>
   )
 }
