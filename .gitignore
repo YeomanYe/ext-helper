@@ -1,0 +1,72 @@
+# Dependencies
+node_modules/
+vendor/
+bower_components/
+jspm_packages/
+
+# Build outputs
+dist/
+build/
+out/
+target/
+*.egg-info/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.dylib
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+.env.*.local
+*.env
+
+# Testing
+coverage/
+.nyc_output/
+.cache/
+*.tsbuildinfo
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.orig
+
+# OS generated
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Package managers lock files (optional - uncomment if needed)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+# Gemfile.lock
+# composer.lock
+# Cargo.lock
