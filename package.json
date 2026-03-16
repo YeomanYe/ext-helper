@@ -4,8 +4,8 @@
   "description": "Browser extension manager with enable/disable and grouping",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
+    "dev": "plasmo dev",
+    "build": "plasmo build",
     "preview": "vite preview",
     "test": "vitest"
   },
@@ -13,6 +13,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.469.0",
+    "plasmo": "^0.90.5",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "tailwind-merge": "^2.6.0",
@@ -31,5 +32,20 @@
     "vite": "^5.4.0",
     "vite-plugin-static-copy": "^1.0.0",
     "vitest": "^2.1.0"
+  },
+  "manifest": {
+    "name": "Ext Helper",
+    "version": "1.0.0",
+    "description": "Browser extension manager with enable/disable and grouping",
+    "action": {
+      "default_popup": "popup.html"
+    },
+    "permissions": [
+      "storage",
+      "management"
+    ],
+    "host_permissions": [
+      "<all_urls>"
+    ]
   }
 }
