@@ -21,14 +21,15 @@
 
 | 类别 | 技术选型 | 说明 |
 |------|----------|------|
-| 框架 | React 18 | UI框架 |
-| 构建 | Vite 5.x | 快速开发体验和构建 |
+| 框架 | Plasmo 0.90.x | 浏览器扩展开发框架 |
+| 前端 | React 18 | UI框架 |
+| 构建 | Plasmo CLI | 内置Vite构建 |
 | 包管理 | pnpm | 高效的包管理 |
 | 状态管理 | Zustand 4.x | 轻量级状态管理 |
 | 样式 | Tailwind CSS 3.x | 原子化CSS框架 |
 | 图标 | Lucide React | 图标库 |
 
-**注**：由于 Plasmo 框架在包管理方面存在问题，改用纯 Vite + React 实现，浏览器适配通过自定义 BrowserAdapter 实现。
+**注**：使用 Plasmo 框架进行浏览器扩展开发，提供声明式 Manifest、跨浏览器支持、Live-reloading 等特性。
 
 ### 2.2 浏览器兼容性
 
@@ -43,8 +44,8 @@
 ```
 
 **兼容性策略**：
-- 使用自定义 BrowserAdapter 适配不同浏览器API
-- 检测浏览器类型，动态使用对应API (chrome vs browser命名空间)
+- 使用 Plasmo 内置的跨浏览器抽象层
+- 支持 Chrome、Firefox、Safari、Edge 等主流浏览器
 - 遵循 Manifest V3
 
 ### 2.3 项目结构
