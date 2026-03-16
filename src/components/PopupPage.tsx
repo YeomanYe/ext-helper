@@ -108,9 +108,11 @@ export function PopupPage() {
   const totalCount = devMode ? MOCK_EXTENSIONS.length : filteredExtensions.length
 
   // Determine grid columns based on view mode
+  // Card mode: 4 columns (130px cards fit in 600px width)
+  // Compact mode: single column
   const gridClass = viewMode === "compact"
     ? "grid grid-cols-1 gap-2"
-    : "grid grid-cols-2 gap-3"
+    : "grid grid-cols-4 gap-3"
 
   return (
     <div className="flex h-[600px] flex-col bg-white dark:bg-gray-900">
