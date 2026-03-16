@@ -9,8 +9,8 @@ dist/
 build/
 out/
 target/
-*.egg-info/
-__pycache__/
+.plasmo/
+*.egg-info__pycache__/
 *.pyc
 *.pyo
 *.pyd
