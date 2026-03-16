@@ -21,13 +21,14 @@
 
 | 类别 | 技术选型 | 说明 |
 |------|----------|------|
-| 框架 | Plasmo | 跨浏览器扩展开发框架，支持Chrome、Firefox、Safari |
-| 前端 | React 19 | 最新React版本，支持并发特性 |
-| 构建 | Vite | 快速开发体验和构建 |
-| 包管理 | pnpm | 高效的Monorepo支持 |
-| 状态管理 | Zustand | 轻量级状态管理 |
-| UI组件 | shadcn/ui | 可定制化组件库 |
-| 样式 | Tailwind CSS | 原子化CSS框架 |
+| 框架 | React 18 | UI框架 |
+| 构建 | Vite 5.x | 快速开发体验和构建 |
+| 包管理 | pnpm | 高效的包管理 |
+| 状态管理 | Zustand 4.x | 轻量级状态管理 |
+| 样式 | Tailwind CSS 3.x | 原子化CSS框架 |
+| 图标 | Lucide React | 图标库 |
+
+**注**：由于 Plasmo 框架在包管理方面存在问题，改用纯 Vite + React 实现，浏览器适配通过自定义 BrowserAdapter 实现。
 
 ### 2.2 浏览器兼容性
 
@@ -42,9 +43,9 @@
 ```
 
 **兼容性策略**：
-- 使用 Plasmo 的跨浏览器API抽象层
-- 检测浏览器类型，动态加载对应适配器
-- 遵循各浏览器Manifest版本（MV3为主）
+- 使用自定义 BrowserAdapter 适配不同浏览器API
+- 检测浏览器类型，动态使用对应API (chrome vs browser命名空间)
+- 遵循 Manifest V3
 
 ### 2.3 项目结构
 
@@ -52,25 +53,28 @@
 ext-helper/
 ├── src/
 │   ├── components/           # React组件
-│   │   ├── common/           # 通用组件
-│   │   ├── extension/        # 扩展相关组件
-│   │   ├── group/            # 分组相关组件
-│   │   └── popup/             # Popup页面组件
-│   ├── hooks/                # 自定义Hooks
-│   ├── stores/               # Zustand状态存储
-│   ├── services/             # 业务逻辑服务
-│   │   ├── browser/          # 浏览器适配层
-│   │   ├── extension/        # 扩展管理服务
-│   │   └── storage/          # 存储服务
-│   ├── types/                # TypeScript类型定义
-│   ├── utils/                # 工具函数
-│   └── styles/               # 全局样式
+│   │   ├── common/          # 通用组件 (Button, Switch, Input)
+│   │   ├── extension/       # 扩展组件 (ExtensionCard, ExtensionList)
+│   │   ├── group/          # 分组组件 (GroupChip, GroupModal)
+│   │   └── popup/           # Popup页面组件 (Header, Footer)
+│   ├── stores/              # Zustand状态管理
+│   │   ├── extensionStore.ts
+│   │   ├── groupStore.ts
+│   │   └── uiStore.ts
+│   ├── services/            # 业务逻辑服务
+│   │   ├── browser/        # 浏览器适配层
+│   │   └── mockData.ts     # 开发模式Mock数据
+│   ├── types/               # TypeScript类型定义
+│   ├── utils/               # 工具函数
+│   └── styles/              # 全局样式
+├── public/
+│   └── manifest.json         # 扩展清单
 ├── docs/                     # 文档
-├── plasmo.config.ts          # Plasmo配置
+├── index.html               # 入口HTML
+├── vite.config.ts           # Vite配置
+├── tailwind.config.ts       # Tailwind配置
 ├── package.json
-├── tailwind.config.ts
-├── tsconfig.json
-└── vite.config.ts
+└── tsconfig.json
 ```
 
 ---
@@ -81,17 +85,17 @@ ext-helper/
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                     Presentation Layer                      │
-│         (React Components + shadcn/ui + Tailwind)          │
+│                     Presentation Layer                        │
+│              (React Components + Tailwind CSS)               │
 ├─────────────────────────────────────────────────────────────┤
-│                     Application Layer                        │
-│                   (Zustand Stores + Hooks)                   │
+│                     Application Layer                         │
+│                   (Zustand Stores)                           │
 ├─────────────────────────────────────────────────────────────┤
 │                      Service Layer                           │
-│     (Extension Service + Browser Adapter + Storage)         │
+│        (BrowserAdapter + MockData + Storage Service)         │
 ├─────────────────────────────────────────────────────────────┤
 │                       Data Layer                             │
-│           (chrome.storage + browser.runtime)                 │
+│          (chrome.storage / browser.storage)                 │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -101,35 +105,40 @@ ext-helper/
 // src/services/browser/adapter.ts
 interface BrowserAdapter {
   // 扩展管理
-  getExtensions(): Promise<ExtensionInfo[]>;
+  getExtensions(): Promise<Extension[]>;
   setExtensionEnabled(id: string, enabled: boolean): Promise<void>;
+  uninstallExtension(id: string): Promise<void>;
+  openOptionsPage(id: string): Promise<void>;
 
   // 存储
   getStorage(key: string): Promise<any>;
   setStorage(key: string, value: any): Promise<void>;
 
-  // 监听
-  onExtensionInstalled(callback: (info: ExtensionInfo) => void): void;
-  onExtensionUninstalled(callback: (id: string) => void): void;
+  // 事件监听
+  onExtensionInstalled(callback: (info: Extension) => void): () => void;
+  onExtensionUninstalled(callback: (id: string) => void): () => void;
+  onExtensionEnabledChanged(callback: (info: Extension) => void): () => void;
 }
-
-// 实现：
-// - ChromeAdapter (Chrome/Edge/Brave)
-// - FirefoxAdapter (Firefox)
-// - SafariAdapter (Safari)
 ```
 
 ### 3.3 状态管理架构
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                      Root Store                              │
-│                    (Zustand Store)                          │
+│                     ExtensionStore                          │
+│  - extensions[]                                            │
+│  - loading, error                                          │
+│  - filter, searchQuery, sortBy                             │
+│  - fetchExtensions(), toggleExtension()                    │
 ├─────────────────────────────────────────────────────────────┤
-│  extensionStore    │  groupStore    │  uiStore             │
-│  - extensions[]    │  - groups[]    │  - activeGroup       │
-│  - loading         │  - expanded    │  - searchQuery       │
-│  - error           │  - dragOver    │  - theme             │
+│                      GroupStore                             │
+│  - groups[]                                               │
+│  - activeGroupId, expandedGroups                          │
+│  - createGroup(), deleteGroup(), renameGroup()            │
+├─────────────────────────────────────────────────────────────┤
+│                       UIStore                                │
+│  - theme, viewMode, compactMode                            │
+│  - setTheme(), setViewMode()                              │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -140,34 +149,41 @@ interface BrowserAdapter {
 ### 4.1 单向数据流
 
 ```
-User Action → Component → Hook → Store → Service → Browser API
+User Action → Component → Store → Service → Browser API
                 ↑                                    │
                 └──────────── State Update ←────────┘
 ```
 
-### 4.2 关键数据流
+### 4.2 开发模式数据流
+
+```
+isDevMode() → MOCK_EXTENSIONS → displayExtensions
+                ↓
+            MOCK_GROUPS → displayGroups
+```
+
+### 4.3 关键数据流
 
 1. **加载扩展列表**
    ```
-   Popup打开 → useExtensionStore.getExtensions()
-   → ExtensionService.getExtensions()
+   Popup打开 → fetchExtensions()
    → BrowserAdapter.getExtensions()
    → chrome.management.getAll()
    → 更新Store → 渲染UI
    ```
 
-2. **启用/禁用扩展**
+2. **启用/禁用扩展 (乐观更新)**
    ```
-   用户点击 toggle → toggleExtension(id)
-   → BrowserAdapter.setExtensionEnabled()
-   → chrome.management.setEnabled()
-   → 更新Store → 重新渲染
+   用户点击图标 → toggleExtension(id)
+   → 立即更新Store状态
+   → 调用BrowserAdapter.setEnabled()
+   → 失败则回滚状态
    ```
 
 3. **分组管理**
    ```
-   用户操作分组 → groupStore.update()
-   → StorageService.save()
+   用户操作分组 → groupStore方法
+   → BrowserAdapter.setStorage()
    → chrome.storage.local.set()
    ```
 
@@ -175,14 +191,14 @@ User Action → Component → Hook → Store → Service → Browser API
 
 ## 5. 关键技术决策
 
-### 5.1 为什么选择 Plasmo？
+### 5.1 为什么选择纯 Vite + React？
 
 | 特性 | 优势 |
 |------|------|
-| 跨浏览器 | 统一API抽象，自动适配Chrome/Firefox/Safari |
-| 零配置 | 内置TypeScript、Vite、Hot Reload支持 |
-| MV3优先 | 支持Manifest V3最新特性 |
-| 开发体验 | 实时重载、错误提示 |
+| 轻量 | 无多余框架负担 |
+| 灵活 | 可完全控制构建配置 |
+| 快速 | Vite极速开发体验 |
+| 兼容 | 容易适配各种浏览器 |
 
 ### 5.2 为什么选择 Zustand？
 
@@ -193,40 +209,39 @@ User Action → Component → Hook → Store → Service → Browser API
 | 异步原生 | 内置异步支持 |
 | TypeScript | 优秀的类型推断 |
 
-### 5.3 为什么选择 shadcn/ui？
+### 5.3 为什么手动实现UI组件？
 
 | 特性 | 优势 |
 |------|------|
-| 可定制 | 完全控制源码 |
-| 无运行时 | 零依赖bundle |
-| 一致性 | 统一的设计语言 |
-| 可访问 | WCAG 2.1 AA |
+| 轻量 | 无额外依赖 |
+| 控制 | 完全掌控样式和行为 |
+| 定制 | 按需实现功能 |
 
 ---
 
-## 6. 扩展性设计
+## 6. 开发模式支持
 
-### 6.1 插件化设计
+### 6.1 本地Web访问
 
+开发模式下 (`pnpm dev`) 可通过 `http://localhost:3000` 访问页面，方便UI开发和调试。
+
+### 6.2 Mock数据
+
+```typescript
+// src/services/mockData.ts
+export const MOCK_EXTENSIONS: Extension[] = [
+  // 15个模拟扩展，包含各种类型
+]
+
+export const MOCK_GROUPS: Group[] = [
+  // 3个模拟分组
+]
+
+export function isDevMode(): boolean {
+  return typeof window !== "undefined" &&
+    !window.location.href.includes("chrome-extension")
+}
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                     Core (不可变)                            │
-├─────────────────────────────────────────────────────────────┤
-│  ExtensionLoader │ GroupManager │ StorageService            │
-├─────────────────────────────────────────────────────────────┤
-│                    Plugins (可扩展)                          │
-│  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐          │
-│  │ QuickAccess  │ │  Shortcuts  │ │   Themes    │          │
-│  └─────────────┘ └─────────────┘ └─────────────┘          │
-└─────────────────────────────────────────────────────────────┘
-```
-
-### 6.2 预留扩展点
-
-1. **自定义主题** - 支持动态主题切换
-2. **快捷键** - 全局快捷键支持
-3. **数据导出** - 扩展配置导出/导入
-4. **云同步** - 跨设备配置同步（可选）
 
 ---
 
@@ -248,7 +263,7 @@ User Action → Component → Hook → Store → Service → Browser API
 
 - 本地存储优先，不收集用户数据
 - 扩展ID和名称本地处理，不上传
-- 分组配置加密存储（可选）
+- 用户偏好存储在 chrome.storage.local
 
 ---
 
@@ -260,17 +275,17 @@ User Action → Component → Hook → Store → Service → Browser API
 |------|--------|
 | Popup打开时间 | < 200ms |
 | 扩展列表渲染 | < 100ms |
-| 启用/禁用响应 | < 50ms |
+| 启用/禁用响应 | < 50ms (乐观更新) |
 
 ### 8.2 优化策略
 
-1. **虚拟列表** - 扩展数量 > 50 时使用虚拟滚动
-2. **懒加载** - 非关键组件延迟加载
-3. **缓存** - 扩展信息缓存，减少API调用
-4. **增量更新** - 只更新变化的UI部分
+1. **乐观更新** - 操作立即响应，后台同步
+2. **状态持久化** - 视图模式等偏好本地缓存
+3. **按需渲染** - 只渲染可见区域
+4. **Memoization** - useMemo/useCallback 减少重渲染
 
 ---
 
 ## 9. 总结
 
-本架构采用**分层 + 适配器**模式，通过Plasmo框架实现跨浏览器兼容，同时保持代码的简洁性和可维护性。技术栈选型遵循"现代、轻量、可定制"原则，确保最佳的开发体验和用户体验。
+本架构采用**分层 + 适配器**模式，通过自定义BrowserAdapter实现跨浏览器兼容。技术栈选型遵循"简洁、轻量、可维护"原则，开发体验通过Vite和Mock数据得到保障。
