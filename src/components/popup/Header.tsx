@@ -96,7 +96,7 @@ export function Header({ onSettingsClick, viewMode = "compact", onViewModeChange
                 ? "bg-primary text-white"
                 : "text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
             )}
-            title="Card view"
+            title="Grid view"
           >
             <LayoutGrid className="h-4 w-4" />
           </button>
@@ -108,7 +108,7 @@ export function Header({ onSettingsClick, viewMode = "compact", onViewModeChange
                 ? "bg-primary text-white"
                 : "text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
             )}
-            title="Compact view"
+            title="List view"
           >
             <List className="h-4 w-4" />
           </button>

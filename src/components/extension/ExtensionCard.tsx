@@ -2,6 +2,7 @@ import * as React from "react"
 import { Settings, Trash2, Package, Power, PowerOff } from "lucide-react"
 import { cn } from "@/utils"
 import type { Extension, ViewMode } from "@/types"
+import { Switch } from "@/components/common"
 
 interface ExtensionCardProps {
   extension: Extension
@@ -41,25 +42,24 @@ export function ExtensionCard({
 
   const isCard = viewMode === "card"
 
-  // Card mode: vertical layout with fixed size
+  // Card mode: horizontal layout with icon, info, and toggle switch
   // Compact mode: horizontal layout
   if (isCard) {
-    // Card mode - vertical layout
+    // Card mode - horizontal layout with more details
     return (
       <div
         className={cn(
-          "group relative flex flex-col items-center justify-center p-4 rounded-xl border border-gray-200 bg-white",
+          "group relative flex items-center gap-3 p-3 rounded-xl border border-gray-200 bg-white",
           "hover:border-gray-300 hover:shadow-md",
           "dark:border-gray-700 dark:bg-gray-800",
           !extension.enabled && "opacity-60",
-          "w-[130px] h-[120px]",
+          "w-full min-h-[80px]",
           className
         )}
         onContextMenu={handleContextMenu}
-        onClick={() => onToggle()}
       >
         {/* Extension Icon */}
-        <div className="flex-shrink-0 mb-2">
+        <div className="flex-shrink-0">
           {extension.iconUrl ? (
             <img
               src={extension.iconUrl}
@@ -74,11 +74,27 @@ export function ExtensionCard({
           )}
         </div>
 
-        {/* Extension Name - truncated */}
-        <div className="w-full">
-          <h3 className="text-xs font-medium text-gray-900 dark:text-gray-100 text-center truncate" title={extension.name}>
+        {/* Extension Info */}
+        <div className="flex-1 min-w-0">
+          <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate" title={extension.name}>
             {extension.name}
           </h3>
+          {extension.description && (
+            <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5" title={extension.description}>
+              {extension.description}
+            </p>
+          )}
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+            v{extension.version}
+          </p>
+        </div>
+
+        {/* Toggle Switch */}
+        <div className="flex-shrink-0" onClick={(e) => e.stopPropagation()}>
+          <Switch
+            checked={extension.enabled}
+            onCheckedChange={() => onToggle()}
+          />
         </div>
 
         {/* Context Menu */}
