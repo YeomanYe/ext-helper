@@ -130,30 +130,9 @@ export function PopupPage() {
       {/* Group Chips */}
       <div className="flex-shrink-0 px-3 py-2 border-b border-gray-200 dark:border-gray-700">
         <div className="flex flex-wrap gap-2">
-          {/* All extensions chip */}
-          <button
-            onClick={() => selectGroup(null)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
-              !activeGroupId
-                ? "bg-primary text-white"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
-            }`}
-          >
-            <span>全部</span>
-            <span className={`text-xs px-1.5 py-0.5 rounded-full ${
-              !activeGroupId ? "bg-white/20" : "bg-gray-200 dark:bg-gray-600"
-            }`}>
-              {displayExtensions.length}
-            </span>
-          </button>
-
           {/* Group chips */}
           {displayGroups.map((group) => {
             const count = displayExtensions.filter(ext => group.extensionIds.includes(ext.id)).length
-            const allEnabled = group.extensionIds.every(id => {
-              const ext = displayExtensions.find(e => e.id === id)
-              return ext?.enabled ?? false
-            })
             return (
               <GroupChip
                 key={group.id}
@@ -193,7 +172,7 @@ export function PopupPage() {
               重试
             </button>
           </div>
-        ) : devMode || !activeGroupId ? (
+        ) : (
           // Show all filtered extensions
           <div className={gridClass}>
             {displayedExtensions.map((ext) => (
@@ -206,25 +185,6 @@ export function PopupPage() {
                 onRemove={() => handleRemove(ext.id)}
               />
             ))}
-          </div>
-        ) : (
-          // Show only group extensions
-          <div className={gridClass}>
-            {displayedExtensions
-              .filter(ext => {
-                const group = displayGroups.find(g => g.id === activeGroupId)
-                return group?.extensionIds.includes(ext.id)
-              })
-              .map((ext) => (
-                <ExtensionCard
-                  key={ext.id}
-                  extension={ext}
-                  viewMode={viewMode}
-                  onToggle={() => handleToggleExtension(ext.id)}
-                  onOpenOptions={() => handleOpenOptions(ext.id)}
-                  onRemove={() => handleRemove(ext.id)}
-                />
-              ))}
           </div>
         )}
       </div>
