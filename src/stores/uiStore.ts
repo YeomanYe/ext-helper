@@ -8,7 +8,7 @@ export const useUIStore = create<UIStore>((set, get) => ({
   theme: "system",
   compactMode: false,
   showDisabled: true,
-  viewMode: "card",
+  viewMode: "compact",
   lastUpdate: Date.now(),
 
   setTheme: async (theme: "light" | "dark" | "system") => {

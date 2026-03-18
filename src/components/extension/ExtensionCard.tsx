@@ -17,7 +17,7 @@ export function ExtensionCard({
   onToggle,
   onOpenOptions,
   onRemove,
-  viewMode = "card",
+  viewMode = "compact",
   className
 }: ExtensionCardProps) {
   const [showMenu, setShowMenu] = React.useState(false)
@@ -39,11 +39,11 @@ export function ExtensionCard({
     setShowMenu(true)
   }
 
-  const isCompact = viewMode === "compact"
+  const isCard = viewMode === "card"
 
   // Card mode: vertical layout with fixed size
   // Compact mode: horizontal layout
-  if (!isCompact) {
+  if (isCard) {
     // Card mode - vertical layout
     return (
       <div

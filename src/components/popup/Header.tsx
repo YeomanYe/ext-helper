@@ -74,7 +74,7 @@ interface HeaderProps {
   onViewModeChange?: (mode: ViewMode) => void
 }
 
-export function Header({ onSettingsClick, viewMode = "card", onViewModeChange }: HeaderProps) {
+export function Header({ onSettingsClick, viewMode = "compact", onViewModeChange }: HeaderProps) {
   return (
     <header className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-3 dark:border-gray-700 dark:bg-gray-900">
       <div className="flex items-center gap-2">
@@ -89,10 +89,10 @@ export function Header({ onSettingsClick, viewMode = "card", onViewModeChange }:
         {/* View Mode Toggle */}
         <div className="flex rounded-md border border-gray-200 dark:border-gray-700">
           <button
-            onClick={() => onViewModeChange?.("card")}
+            onClick={() => onViewModeChange?.("compact")}
             className={cn(
               "flex items-center justify-center p-1.5 rounded-l-md",
-              viewMode === "card"
+              viewMode === "compact"
                 ? "bg-primary text-white"
                 : "text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
             )}
@@ -101,10 +101,10 @@ export function Header({ onSettingsClick, viewMode = "card", onViewModeChange }:
             <LayoutGrid className="h-4 w-4" />
           </button>
           <button
-            onClick={() => onViewModeChange?.("compact")}
+            onClick={() => onViewModeChange?.("card")}
             className={cn(
               "flex items-center justify-center p-1.5 rounded-r-md",
-              viewMode === "compact"
+              viewMode === "card"
                 ? "bg-primary text-white"
                 : "text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
             )}
