@@ -1,7 +1,7 @@
 import * as React from "react"
 import { Header, Footer, SearchBar, QuickFilters } from "@/components/popup"
 import { ExtensionCard } from "@/components/extension"
-import { GroupChip, CreateGroupChip, GroupDetailModal } from "@/components/group"
+import { GroupChip, CreateGroupChip } from "@/components/group"
 import {
   useExtensionStore,
   useFilteredExtensions,
@@ -25,9 +25,7 @@ export function PopupPage() {
 
   const {
     groups,
-    activeGroupId,
     fetchGroups,
-    selectGroup,
     createGroup
   } = useGroupStore()
 
@@ -42,21 +40,6 @@ export function PopupPage() {
   // Use mock data in dev mode
   const displayExtensions = devMode ? MOCK_EXTENSIONS : filteredExtensions
   const displayGroups = devMode ? MOCK_GROUPS : groups
-
-  // Modal state
-  const [selectedGroupId, setSelectedGroupId] = React.useState<string | null>(null)
-
-  // Get selected group
-  const selectedGroup = React.useMemo(() => {
-    if (!selectedGroupId) return null
-    return displayGroups.find(g => g.id === selectedGroupId) || null
-  }, [selectedGroupId, displayGroups])
-
-  // Get extensions in selected group
-  const selectedGroupExtensions = React.useMemo(() => {
-    if (!selectedGroup) return []
-    return displayExtensions.filter(ext => selectedGroup.extensionIds.includes(ext.id))
-  }, [selectedGroup, displayExtensions])
 
   // Filter extensions based on filter
   const displayedExtensions = React.useMemo(() => {
@@ -104,6 +87,24 @@ export function PopupPage() {
     }
   }, [devMode, toggleExtension])
 
+  // Toggle all extensions in a group
+  const handleToggleGroup = React.useCallback((group: Group) => {
+    const groupExtIds = group.extensionIds
+    const allEnabled = groupExtIds.every(id => {
+      const ext = displayExtensions.find(e => e.id === id)
+      return ext?.enabled ?? false
+    })
+
+    // Toggle all to opposite state
+    groupExtIds.forEach(id => {
+      if (!devMode) {
+        toggleExtension(id)
+      } else {
+        console.log("Toggle extension in group:", id, !allEnabled)
+      }
+    })
+  }, [devMode, toggleExtension, displayExtensions])
+
   const enabledCount = displayedExtensions.filter((e) => e.enabled).length
   const totalCount = devMode ? MOCK_EXTENSIONS.length : filteredExtensions.length
 
@@ -149,15 +150,22 @@ export function PopupPage() {
           {/* Group chips */}
           {displayGroups.map((group) => {
             const count = displayExtensions.filter(ext => group.extensionIds.includes(ext.id)).length
+            const allEnabled = group.extensionIds.every(id => {
+              const ext = displayExtensions.find(e => e.id === id)
+              return ext?.enabled ?? false
+            })
             return (
               <GroupChip
                 key={group.id}
                 group={group}
-                isActive={activeGroupId === group.id}
                 extensionCount={count}
-                onClick={() => {
-                  selectGroup(group.id)
-                  setSelectedGroupId(group.id)
+                onToggle={() => {
+                  // Toggle all extensions in the group
+                  group.extensionIds.forEach(id => {
+                    if (!devMode) {
+                      toggleExtension(id)
+                    }
+                  })
                 }}
               />
             )
@@ -222,19 +230,6 @@ export function PopupPage() {
       </div>
 
       <Footer totalCount={totalCount} enabledCount={enabledCount} />
-
-      {/* Group Detail Modal */}
-      {selectedGroup && (
-        <GroupDetailModal
-          group={selectedGroup}
-          extensions={selectedGroupExtensions}
-          viewMode={viewMode}
-          onClose={() => setSelectedGroupId(null)}
-          onToggleExtension={handleToggleExtension}
-          onOpenOptions={handleOpenOptions}
-          onRemove={handleRemove}
-        />
-      )}
     </div>
   )
 }

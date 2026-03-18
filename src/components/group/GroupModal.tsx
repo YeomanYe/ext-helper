@@ -3,29 +3,24 @@ import { X, FolderOpen, Plus } from "lucide-react"
 import { ExtensionCard } from "@/components/extension"
 import { cn } from "@/utils"
 import type { Group, Extension, ViewMode } from "@/types"
+import { Switch } from "@/components/common"
 
 interface GroupChipProps {
   group: Group
-  isActive: boolean
   extensionCount: number
-  onClick: () => void
+  onToggle: () => void
 }
 
 export function GroupChip({
   group,
-  isActive,
   extensionCount,
-  onClick
+  onToggle
 }: GroupChipProps) {
   return (
-    <button
-      onClick={onClick}
+    <div
       className={cn(
         "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-colors",
-        "border",
-        isActive
-          ? "bg-primary text-white border-primary"
-          : "bg-white text-gray-700 border-gray-200 hover:border-primary hover:text-primary",
+        "border border-gray-200 bg-white text-gray-700 hover:border-primary hover:text-primary",
         "dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 dark:hover:border-primary"
       )}
     >
@@ -34,13 +29,17 @@ export function GroupChip({
         style={{ backgroundColor: group.color }}
       />
       <span>{group.name}</span>
-      <span className={cn(
-        "text-xs px-1.5 py-0.5 rounded-full",
-        isActive ? "bg-white/20" : "bg-gray-100 dark:bg-gray-700"
-      )}>
+      <span className="text-xs px-1.5 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700">
         {extensionCount}
       </span>
-    </button>
+      <div onClick={(e) => e.stopPropagation()}>
+        <Switch
+          checked={true}
+          onCheckedChange={onToggle}
+          className="h-4 w-8"
+        />
+      </div>
+    </div>
   )
 }
 
