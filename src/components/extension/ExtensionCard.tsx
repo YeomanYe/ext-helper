@@ -154,37 +154,39 @@ export function ExtensionCard({
     )
   }
 
-  // Compact mode - horizontal layout (original)
+  // Compact mode - vertical layout with fixed size
   return (
     <div
       className={cn(
-        "group relative flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-200 bg-white",
-        "hover:border-gray-300 hover:shadow-sm",
+        "group relative flex flex-col items-center justify-center p-4 rounded-xl border border-gray-200 bg-white",
+        "hover:border-gray-300 hover:shadow-md",
         "dark:border-gray-700 dark:bg-gray-800",
         !extension.enabled && "opacity-60",
+        "w-[130px] h-[120px]",
         className
       )}
       onContextMenu={handleContextMenu}
+      onClick={() => onToggle()}
     >
       {/* Extension Icon */}
-      <div className="flex-shrink-0">
+      <div className="flex-shrink-0 mb-2">
         {extension.iconUrl ? (
           <img
             src={extension.iconUrl}
             alt={extension.name}
-            className="w-8 h-8 rounded object-cover"
+            className="w-12 h-12 rounded-lg object-cover shadow-sm"
             loading="lazy"
           />
         ) : (
-          <div className="w-8 h-8 flex items-center justify-center rounded bg-gray-100 dark:bg-gray-700">
-            <Package className="w-4 h-4 text-gray-400" />
+          <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-700">
+            <Package className="w-6 h-6 text-gray-400" />
           </div>
         )}
       </div>
 
-      {/* Extension Name */}
-      <div className="flex-1 min-w-0">
-        <h3 className="truncate text-sm font-medium text-gray-900 dark:text-gray-100">
+      {/* Extension Name - truncated */}
+      <div className="w-full">
+        <h3 className="text-xs font-medium text-gray-900 dark:text-gray-100 text-center truncate" title={extension.name}>
           {extension.name}
         </h3>
       </div>
