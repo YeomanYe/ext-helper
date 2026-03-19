@@ -1,9 +1,8 @@
 import * as React from "react"
-import { X, FolderOpen, Plus } from "lucide-react"
+import { X, FolderOpen, Plus, Power, PowerOff } from "lucide-react"
 import { ExtensionCard } from "@/components/extension"
 import { cn } from "@/utils"
 import type { Group, Extension, ViewMode } from "@/types"
-import { Switch } from "@/components/common"
 
 interface GroupChipProps {
   group: Group
@@ -16,6 +15,8 @@ export function GroupChip({
   extensionCount,
   onToggle
 }: GroupChipProps) {
+  const allEnabled = true // Toggle all by default
+
   return (
     <div
       className={cn(
@@ -32,13 +33,19 @@ export function GroupChip({
       <span className="text-xs px-1.5 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700">
         {extensionCount}
       </span>
-      <div onClick={(e) => e.stopPropagation()}>
-        <Switch
-          checked={true}
-          onCheckedChange={onToggle}
-          className="h-4 w-8"
-        />
-      </div>
+      <button
+        onClick={(e) => {
+          e.stopPropagation()
+          onToggle()
+        }}
+        className={cn(
+          "p-0.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700",
+          "text-gray-500 hover:text-primary"
+        )}
+        title={allEnabled ? "禁用分组内所有扩展" : "启用分组内所有扩展"}
+      >
+        <Power className="h-3.5 w-3.5" />
+      </button>
     </div>
   )
 }
