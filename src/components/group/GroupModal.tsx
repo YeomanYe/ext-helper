@@ -7,12 +7,14 @@ import type { Group, Extension, ViewMode } from "@/types"
 interface GroupChipProps {
   group: Group
   extensionCount: number
+  onClick: () => void
   onToggle: () => void
 }
 
 export function GroupChip({
   group,
   extensionCount,
+  onClick,
   onToggle
 }: GroupChipProps) {
   const allEnabled = true // Toggle all by default
@@ -24,6 +26,7 @@ export function GroupChip({
         "border border-gray-200 bg-white text-gray-700 hover:border-primary hover:text-primary",
         "dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 dark:hover:border-primary"
       )}
+      onClick={onClick}
     >
       <div
         className="h-2 w-2 rounded-full"
