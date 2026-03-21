@@ -170,7 +170,7 @@ export function ExtensionCard({
         "bg-punk-bg-alt",
         "hover:border-punk-primary hover:shadow-[0_0_15px_rgba(124,58,237,0.3)]",
         !extension.enabled && "opacity-50",
-        "min-w-[88px] w-[88px] h-[100px]",
+        "min-w-[84px] w-[84px] h-[84px]",
         "punk-border",
         className
       )}
@@ -178,7 +178,7 @@ export function ExtensionCard({
       onClick={() => onToggle()}
     >
       {/* Extension Icon */}
-      <div className="relative flex-shrink-0 mb-1.5">
+      <div className="relative flex-shrink-0">
         {extension.iconUrl ? (
           <img
             src={extension.iconUrl}
@@ -201,9 +201,9 @@ export function ExtensionCard({
       </div>
 
       {/* Extension Name - truncated */}
-      <div className="w-full">
-        <h3 className="font-punk-heading text-[7px] text-punk-text-primary text-center uppercase tracking-wide truncate" title={extension.name}>
-          {extension.name.substring(0, 12)}
+      <div className="w-full mt-1">
+        <h3 className="font-punk-heading text-[6px] text-punk-text-primary text-center uppercase tracking-wide truncate" title={extension.name}>
+          {extension.name.substring(0, 14)}
         </h3>
       </div>
 
