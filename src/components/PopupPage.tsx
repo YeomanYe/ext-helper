@@ -121,10 +121,10 @@ export function PopupPage() {
 
   // Determine grid columns based on view mode
   // Card mode: single column (full-width cards with toggle switch)
-  // Compact mode: 4 columns (smaller cards)
+  // Compact mode: flexible horizontal layout
   const gridClass = viewMode === "card"
     ? "grid grid-cols-1 gap-2"
-    : "grid grid-cols-4 gap-2"
+    : "flex flex-wrap gap-2"
 
   return (
     <div className="flex h-[600px] flex-col bg-punk-bg">

@@ -170,7 +170,7 @@ export function ExtensionCard({
         "bg-punk-bg-alt",
         "hover:border-punk-primary hover:shadow-[0_0_15px_rgba(124,58,237,0.3)]",
         !extension.enabled && "opacity-50",
-        "w-[88px] h-[100px]",
+        "min-w-[88px] min-h-[100px] flex-1",
         "punk-border",
         className
       )}
