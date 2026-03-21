@@ -26,7 +26,9 @@ export function PopupPage() {
   const {
     groups,
     fetchGroups,
-    createGroup
+    createGroup,
+    addToGroup,
+    removeFromGroup
   } = useGroupStore()
 
   const {
@@ -199,11 +201,14 @@ export function PopupPage() {
         <GroupDetailModal
           group={selectedGroup}
           extensions={selectedGroupExtensions}
+          allExtensions={displayExtensions}
           viewMode={viewMode}
           onClose={() => setSelectedGroupId(null)}
           onToggleExtension={handleToggleExtension}
           onOpenOptions={handleOpenOptions}
           onRemove={handleRemove}
+          onAddExtension={addToGroup}
+          onRemoveFromGroup={removeFromGroup}
         />
       )}
     </div>
