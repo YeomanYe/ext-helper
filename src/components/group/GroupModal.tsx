@@ -1,7 +1,7 @@
 import * as React from "react"
-import { X, FolderOpen, Plus, Power, Search, Check } from "lucide-react"
+import { X, Plus, Search } from "lucide-react"
 import { cn } from "@/utils"
-import type { Group, Extension, ViewMode } from "@/types"
+import type { Group, Extension } from "@/types"
 
 interface GroupChipProps {
   group: Group
@@ -47,7 +47,10 @@ export function GroupChip({
         )}
         title="Toggle all in sector"
       >
-        <Power className="h-3.5 w-3.5" />
+        <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M18.36 6.64a9 9 0 1 1-12.73 0" />
+          <line x1="12" y1="2" x2="12" y2="12" />
+        </svg>
       </button>
     </div>
   )
@@ -77,7 +80,6 @@ interface GroupDetailModalProps {
   group: Group
   extensions: Extension[]
   allExtensions: Extension[]
-  viewMode?: ViewMode
   onClose: () => void
   onToggleExtension: (id: string) => void
   onOpenOptions?: (id: string) => void
@@ -90,7 +92,6 @@ export function GroupDetailModal({
   group,
   extensions,
   allExtensions,
-  viewMode = "card",
   onClose,
   onToggleExtension,
   onOpenOptions,
@@ -98,57 +99,65 @@ export function GroupDetailModal({
   onAddExtension,
   onRemoveFromGroup
 }: GroupDetailModalProps) {
-  const [isAddMode, setIsAddMode] = React.useState(false)
   const [searchQuery, setSearchQuery] = React.useState("")
 
-  // Get extensions NOT in this group (available to add)
-  const availableExtensions = React.useMemo(() => {
-    const groupExtIds = new Set(extensions.map(e => e.id))
-    return allExtensions.filter(ext => !groupExtIds.has(ext.id))
-  }, [allExtensions, extensions])
+  // Create a set of extension IDs in this group for fast lookup
+  const groupExtIds = React.useMemo(() => {
+    return new Set(extensions.map(e => e.id))
+  }, [extensions])
 
-  // Filter available extensions by search
-  const filteredAvailable = React.useMemo(() => {
-    if (!searchQuery.trim()) return availableExtensions
+  // Get all extensions with their group membership status
+  const extensionsWithStatus = React.useMemo(() => {
+    return allExtensions.map(ext => ({
+      ...ext,
+      isInGroup: groupExtIds.has(ext.id)
+    }))
+  }, [allExtensions, groupExtIds])
+
+  // Filter by search query
+  const filteredExtensions = React.useMemo(() => {
+    if (!searchQuery.trim()) return extensionsWithStatus
     const query = searchQuery.toLowerCase()
-    return availableExtensions.filter(ext =>
+    return extensionsWithStatus.filter(ext =>
       ext.name.toLowerCase().includes(query) ||
       ext.description.toLowerCase().includes(query)
     )
-  }, [availableExtensions, searchQuery])
+  }, [extensionsWithStatus, searchQuery])
+
+  // Separate into in-group and not-in-group
+  const inGroupExtensions = filteredExtensions.filter(e => e.isInGroup)
+  const notInGroupExtensions = filteredExtensions.filter(e => !e.isInGroup)
 
   // Close on escape
   React.useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        if (isAddMode) {
-          setIsAddMode(false)
-          setSearchQuery("")
-        } else {
-          onClose()
-        }
-      }
+      if (e.key === "Escape") onClose()
     }
     document.addEventListener("keydown", handleEsc)
     return () => document.removeEventListener("keydown", handleEsc)
-  }, [onClose, isAddMode])
+  }, [onClose])
 
-  const handleAddExtension = (extId: string) => {
-    onAddExtension(group.id, extId)
+  const handleToggleExtensionMembership = (ext: typeof filteredExtensions[0]) => {
+    if (ext.isInGroup) {
+      onRemoveFromGroup(group.id, ext.id)
+    } else {
+      onAddExtension(group.id, ext.id)
+    }
   }
 
-  const handleRemoveFromGroup = (extId: string) => {
-    onRemoveFromGroup(group.id, extId)
+  const handleToggleEnabled = (e: React.MouseEvent, extId: string) => {
+    e.stopPropagation()
+    onToggleExtension(extId)
   }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-punk-bg/80 backdrop-blur-sm" onClick={onClose}>
       <div
-        className="w-[360px] max-h-[520px] border border-punk-border bg-punk-bg-alt shadow-[0_0_30px_rgba(124,58,237,0.4)] overflow-hidden"
+        className="w-[400px] max-h-[560px] border border-punk-border bg-punk-bg-alt shadow-[0_0_30px_rgba(124,58,237,0.4)] overflow-hidden flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
-        <div className="flex items-center gap-2 px-4 py-3 border-b border-punk-border/30 bg-punk-bg">
+        <div className="flex items-center gap-2 px-4 py-3 border-b border-punk-border/30 bg-punk-bg shrink-0">
           <div
             className="h-3 w-3"
             style={{ backgroundColor: group.color }}
@@ -159,18 +168,6 @@ export function GroupDetailModal({
           <span className="font-punk-code text-[10px] text-punk-accent">
             [{extensions.length}]
           </span>
-          {!isAddMode && (
-            <button
-              onClick={() => setIsAddMode(true)}
-              className={cn(
-                "px-2 py-1 text-[8px] font-punk-heading uppercase transition-all",
-                "border border-punk-accent/50 text-punk-accent",
-                "hover:bg-punk-accent/10 hover:shadow-[0_0_10px_rgba(34,211,238,0.3)]"
-              )}
-            >
-              + ADD
-            </button>
-          )}
           <button
             onClick={onClose}
             className="p-1 text-punk-text-muted hover:text-punk-cta transition-colors"
@@ -179,156 +176,137 @@ export function GroupDetailModal({
           </button>
         </div>
 
-        {/* Add Extension Mode */}
-        {isAddMode && (
-          <div className="p-3 border-b border-punk-border/30">
-            {/* Search */}
-            <div className="relative mb-3">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-punk-accent" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="SEARCH_EXTENSIONS..."
-                className="punk-input w-full h-10 pl-10 pr-3 text-sm"
-                autoFocus
-              />
-            </div>
+        {/* Search */}
+        <div className="px-4 py-3 border-b border-punk-border/30 bg-punk-bg shrink-0">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-punk-accent" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="SEARCH..."
+              className="punk-input w-full h-10 pl-10 pr-3 text-sm"
+            />
+          </div>
+        </div>
 
-            {/* Available Extensions List */}
-            <div className="max-h-[200px] overflow-y-auto space-y-1">
-              {filteredAvailable.length > 0 ? (
-                filteredAvailable.map((ext) => (
-                  <button
+        {/* Extension List */}
+        <div className="flex-1 overflow-y-auto p-3 space-y-4">
+          {/* In Group Section */}
+          {inGroupExtensions.length > 0 && (
+            <div>
+              <p className="font-punk-heading text-[8px] text-punk-success uppercase tracking-wide mb-2">
+                IN SECTOR [{inGroupExtensions.length}]
+              </p>
+              <div className="space-y-1">
+                {inGroupExtensions.map((ext) => (
+                  <div
                     key={ext.id}
-                    onClick={() => handleAddExtension(ext.id)}
+                    onClick={() => handleToggleExtensionMembership(ext)}
                     className={cn(
-                      "w-full flex items-center gap-3 p-2 text-left transition-all",
-                      "border border-punk-border/30 bg-punk-bg",
-                      "hover:border-punk-success hover:bg-punk-success/5",
-                      "hover:shadow-[0_0_8px_rgba(16,185,129,0.2)]"
+                      "flex items-center gap-3 p-2.5 cursor-pointer transition-all",
+                      "border bg-punk-bg",
+                      "border-punk-success/50 hover:border-punk-success hover:bg-punk-success/5",
+                      !ext.enabled && "opacity-50"
                     )}
                   >
                     {ext.iconUrl ? (
-                      <img src={ext.iconUrl} className="h-6 w-6 object-cover border border-punk-border/30" alt="" />
+                      <img src={ext.iconUrl} className="h-8 w-8 object-cover border border-punk-border/30" alt="" />
                     ) : (
-                      <div className="h-6 w-6 border border-punk-border/30 bg-punk-bg-alt flex items-center justify-center">
-                        <span className="text-[8px] text-punk-text-muted">{ext.name[0]}</span>
+                      <div className="h-8 w-8 border border-punk-border/30 bg-punk-bg-alt flex items-center justify-center">
+                        <span className="font-punk-heading text-[8px] text-punk-text-muted">{ext.name[0]}</span>
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
-                      <p className="font-punk-heading text-[8px] text-punk-text-primary truncate">
+                      <p className="font-punk-heading text-[8px] text-punk-text-primary truncate uppercase">
                         {ext.name}
                       </p>
                       <p className="font-punk-code text-[9px] text-punk-text-muted">
                         v{ext.version}
                       </p>
                     </div>
-                    <Plus className="h-4 w-4 text-punk-success shrink-0" />
-                  </button>
-                ))
-              ) : (
-                <div className="text-center py-6">
-                  <p className="font-punk-body text-sm text-punk-text-muted">
-                    {searchQuery ? "NO_MATCH_FOUND" : "ALL_ADDED"}
-                  </p>
-                </div>
-              )}
-            </div>
-
-            {/* Cancel Add Mode */}
-            <button
-              onClick={() => {
-                setIsAddMode(false)
-                setSearchQuery("")
-              }}
-              className={cn(
-                "w-full mt-3 px-3 py-2 text-[8px] font-punk-heading uppercase",
-                "border border-punk-text-muted/30 text-punk-text-muted",
-                "hover:border-punk-cta hover:text-punk-cta transition-colors"
-              )}
-            >
-              CANCEL
-            </button>
-          </div>
-        )}
-
-        {/* Extension List */}
-        <div className="p-3 max-h-[320px] overflow-y-auto">
-          {extensions.length > 0 ? (
-            <div className="space-y-2">
-              {extensions.map((ext) => (
-                <div
-                  key={ext.id}
-                  className={cn(
-                    "flex items-center gap-3 p-2.5 transition-all",
-                    "border border-punk-border/30 bg-punk-bg-alt",
-                    "hover:border-punk-primary/50"
-                  )}
-                >
-                  {ext.iconUrl ? (
-                    <img src={ext.iconUrl} className="h-8 w-8 object-cover border border-punk-border/30" alt="" />
-                  ) : (
-                    <div className="h-8 w-8 border border-punk-border/30 bg-punk-bg flex items-center justify-center">
-                      <span className="font-punk-heading text-[8px] text-punk-text-muted">{ext.name[0]}</span>
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={(e) => handleToggleEnabled(e, ext.id)}
+                        className={cn(
+                          "px-2 py-1 text-[8px] font-punk-heading transition-all",
+                          ext.enabled
+                            ? "text-punk-success border border-punk-success/50 bg-punk-success/10"
+                            : "text-punk-text-muted border border-punk-border/30"
+                        )}
+                      >
+                        {ext.enabled ? "1" : "0"}
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          onRemoveFromGroup(group.id, ext.id)
+                        }}
+                        className={cn(
+                          "p-1.5 text-punk-text-muted transition-all",
+                          "hover:text-punk-cta hover:bg-punk-cta/10"
+                        )}
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
                     </div>
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <p className="font-punk-heading text-[8px] text-punk-text-primary truncate">
-                      {ext.name}
-                    </p>
-                    <p className="font-punk-code text-[9px] text-punk-text-muted">
-                      v{ext.version}
-                    </p>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <button
-                      onClick={() => onToggleExtension(ext.id)}
-                      className={cn(
-                        "p-1.5 transition-all",
-                        ext.enabled
-                          ? "text-punk-success bg-punk-success/10 hover:bg-punk-success/20"
-                          : "text-punk-text-muted bg-punk-bg hover:bg-punk-bg-alt"
-                      )}
-                      title={ext.enabled ? "Disable" : "Enable"}
-                    >
-                      <Power className="h-3.5 w-3.5" />
-                    </button>
-                    <button
-                      onClick={() => handleRemoveFromGroup(ext.id)}
-                      className={cn(
-                        "p-1.5 text-punk-text-muted transition-all",
-                        "hover:text-punk-cta hover:bg-punk-cta/10"
-                      )}
-                      title="Remove from group"
-                    >
-                      <X className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          ) : (
+          )}
+
+          {/* Not In Group Section */}
+          {notInGroupExtensions.length > 0 && (
+            <div>
+              <p className="font-punk-heading text-[8px] text-punk-text-muted uppercase tracking-wide mb-2">
+                NOT IN SECTOR [{notInGroupExtensions.length}]
+              </p>
+              <div className="space-y-1">
+                {notInGroupExtensions.map((ext) => (
+                  <div
+                    key={ext.id}
+                    onClick={() => handleToggleExtensionMembership(ext)}
+                    className={cn(
+                      "flex items-center gap-3 p-2.5 cursor-pointer transition-all opacity-40",
+                      "border border-punk-border/20 bg-punk-bg-alt",
+                      "hover:border-punk-primary/50 hover:opacity-70"
+                    )}
+                  >
+                    {ext.iconUrl ? (
+                      <img src={ext.iconUrl} className="h-8 w-8 object-cover border border-punk-border/30 grayscale" alt="" />
+                    ) : (
+                      <div className="h-8 w-8 border border-punk-border/30 bg-punk-bg-alt flex items-center justify-center grayscale">
+                        <span className="font-punk-heading text-[8px] text-punk-text-muted">{ext.name[0]}</span>
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="font-punk-heading text-[8px] text-punk-text-muted truncate uppercase">
+                        {ext.name}
+                      </p>
+                      <p className="font-punk-code text-[9px] text-punk-text-muted">
+                        v{ext.version}
+                      </p>
+                    </div>
+                    <button
+                      className={cn(
+                        "p-1.5 text-punk-text-muted transition-all"
+                      )}
+                    >
+                      <Plus className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Empty state */}
+          {filteredExtensions.length === 0 && (
             <div className="flex flex-col items-center justify-center py-8 text-center">
-              <FolderOpen className="h-10 w-10 text-punk-text-muted/50" />
-              <p className="mt-3 font-punk-body text-base text-punk-text-muted">
-                NO EXTENSIONS IN SECTOR
+              <p className="font-punk-body text-base text-punk-text-muted">
+                NO_MATCH_FOUND
               </p>
-              <p className="font-punk-code text-[10px] text-punk-text-muted/50 mt-1">
-                // Sector empty
-              </p>
-              {availableExtensions.length > 0 && (
-                <button
-                  onClick={() => setIsAddMode(true)}
-                  className={cn(
-                    "mt-4 px-4 py-2 text-[8px] font-punk-heading uppercase",
-                    "border border-punk-accent text-punk-accent",
-                    "hover:bg-punk-accent/10 hover:shadow-[0_0_10px_rgba(34,211,238,0.3)]"
-                  )}
-                >
-                  + ADD EXTENSION
-                </button>
-              )}
             </div>
           )}
         </div>
