@@ -17,23 +17,24 @@ export function GroupChip({
   onClick,
   onToggle
 }: GroupChipProps) {
-  const allEnabled = true // Toggle all by default
-
   return (
     <div
       className={cn(
-        "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-colors",
-        "border border-gray-200 bg-white text-gray-700 hover:border-primary hover:text-primary",
-        "dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 dark:hover:border-primary"
+        "flex items-center gap-2 px-3 py-2 transition-all duration-200 cursor-pointer",
+        "border border-punk-border/50 bg-punk-bg-alt",
+        "hover:border-punk-primary hover:shadow-[0_0_10px_rgba(124,58,237,0.3)]",
+        "active:shadow-[0_0_15px_rgba(124,58,237,0.5)]"
       )}
       onClick={onClick}
     >
       <div
-        className="h-2 w-2 rounded-full"
+        className="h-2 w-2"
         style={{ backgroundColor: group.color }}
       />
-      <span>{group.name}</span>
-      <span className="text-xs px-1.5 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700">
+      <span className="font-punk-heading text-[9px] text-punk-text-primary uppercase tracking-wide">
+        {group.name}
+      </span>
+      <span className="font-punk-code text-[10px] text-punk-accent px-1.5 py-0.5 border border-punk-accent/30 bg-punk-accent/5">
         {extensionCount}
       </span>
       <button
@@ -42,10 +43,10 @@ export function GroupChip({
           onToggle()
         }}
         className={cn(
-          "p-0.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700",
-          "text-gray-500 hover:text-primary"
+          "p-0.5 transition-colors",
+          "text-punk-text-muted hover:text-punk-success hover:bg-punk-success/10"
         )}
-        title={allEnabled ? "禁用分组内所有扩展" : "启用分组内所有扩展"}
+        title="Toggle all in sector"
       >
         <Power className="h-3.5 w-3.5" />
       </button>
@@ -62,14 +63,13 @@ export function CreateGroupChip({ onClick }: CreateGroupChipProps) {
     <button
       onClick={onClick}
       className={cn(
-        "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium",
-        "border-2 border-dashed border-gray-300 text-gray-500",
-        "hover:border-primary hover:text-primary",
-        "dark:border-gray-600 dark:hover:border-primary"
+        "flex items-center gap-2 px-3 py-2 transition-all duration-200",
+        "border border-dashed border-punk-border/30 text-punk-text-muted",
+        "hover:border-punk-accent hover:text-punk-accent hover:bg-punk-accent/5"
       )}
     >
       <Plus className="h-3.5 w-3.5" />
-      <span>新建分组</span>
+      <span className="font-punk-heading text-[8px] uppercase tracking-wide">+ SECTOR</span>
     </button>
   )
 }
@@ -102,40 +102,36 @@ export function GroupDetailModal({
     return () => document.removeEventListener("keydown", handleEsc)
   }, [onClose])
 
-  const gridClass = viewMode === "compact"
-    ? "grid grid-cols-1 gap-2"
-    : "grid grid-cols-1 gap-2"
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-punk-bg/80 backdrop-blur-sm" onClick={onClose}>
       <div
-        className="w-[360px] max-h-[500px] rounded-xl bg-white dark:bg-gray-900 shadow-xl overflow-hidden"
+        className="w-[340px] max-h-[480px] border border-punk-border bg-punk-bg-alt shadow-[0_0_30px_rgba(124,58,237,0.4)] overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
-        <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex items-center gap-2 px-4 py-3 border-b border-punk-border/30 bg-punk-bg">
           <div
-            className="h-3 w-3 rounded-full"
+            className="h-3 w-3"
             style={{ backgroundColor: group.color }}
           />
-          <h3 className="flex-1 text-sm font-semibold text-gray-900 dark:text-gray-100">
+          <h3 className="flex-1 font-punk-heading text-[10px] text-punk-text-primary uppercase tracking-wide">
             {group.name}
           </h3>
-          <span className="text-xs text-gray-500">
-            {extensions.length} 个扩展
+          <span className="font-punk-code text-[10px] text-punk-accent">
+            [{extensions.length}]
           </span>
           <button
             onClick={onClose}
-            className="p-1 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
+            className="p-1 text-punk-text-muted hover:text-punk-cta transition-colors"
           >
             <X className="h-4 w-4" />
           </button>
         </div>
 
         {/* Extension List */}
-        <div className={cn("p-3 max-h-[380px] overflow-y-auto", viewMode === "compact" ? "space-y-1" : "space-y-2")}>
+        <div className="p-3 max-h-[380px] overflow-y-auto">
           {extensions.length > 0 ? (
-            <div className={gridClass}>
+            <div className="space-y-2">
               {extensions.map((ext) => (
                 <ExtensionCard
                   key={ext.id}
@@ -149,9 +145,12 @@ export function GroupDetailModal({
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-8 text-center">
-              <FolderOpen className="h-8 w-8 text-gray-300 dark:text-gray-600" />
-              <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                该分组暂无扩展
+              <FolderOpen className="h-10 w-10 text-punk-text-muted/50" />
+              <p className="mt-3 font-punk-body text-base text-punk-text-muted">
+                NO EXTENSIONS IN SECTOR
+              </p>
+              <p className="font-punk-code text-[10px] text-punk-text-muted/50 mt-1">
+                // Sector empty
               </p>
             </div>
           )}

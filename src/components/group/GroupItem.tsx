@@ -42,13 +42,13 @@ export function GroupItem({
   }, [])
 
   return (
-    <div className={cn("rounded-lg border border-gray-200 dark:border-gray-700", className)}>
+    <div className={cn("border punk-border", className)}>
       {/* Group Header */}
       <div
         className={cn(
-          "flex items-center gap-2 px-3 py-2 cursor-pointer",
-          "hover:bg-gray-50 dark:hover:bg-gray-800",
-          isActive && "bg-primary-light dark:bg-primary/20"
+          "flex items-center gap-2 px-3 py-2 cursor-pointer transition-colors",
+          "hover:bg-punk-bg-alt",
+          isActive && "bg-punk-primary/20"
         )}
         onClick={onSelect}
       >
@@ -57,7 +57,7 @@ export function GroupItem({
             e.stopPropagation()
             onToggleExpand()
           }}
-          className="flex-shrink-0 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+          className="flex-shrink-0 text-punk-text-muted hover:text-punk-accent transition-colors"
         >
           {isExpanded ? (
             <ChevronRight className="h-4 w-4 rotate-90 transition-transform" />
@@ -67,22 +67,22 @@ export function GroupItem({
         </button>
 
         <div
-          className="flex-shrink-0 h-4 w-4 rounded"
+          className="flex-shrink-0 h-3 w-3"
           style={{ backgroundColor: group.color }}
         />
 
         {isExpanded ? (
-          <FolderOpen className="h-4 w-4 text-gray-500" />
+          <FolderOpen className="h-4 w-4 text-punk-accent" />
         ) : (
-          <Folder className="h-4 w-4 text-gray-500" />
+          <Folder className="h-4 w-4 text-punk-text-muted" />
         )}
 
-        <span className="flex-1 truncate text-sm font-medium text-gray-900 dark:text-gray-100">
+        <span className="flex-1 truncate font-punk-heading text-[9px] text-punk-text-primary uppercase tracking-wide">
           {group.name}
         </span>
 
-        <span className="text-xs text-gray-500 dark:text-gray-400">
-          ({extensionCount})
+        <span className="font-punk-code text-[10px] text-punk-accent">
+          [{extensionCount}]
         </span>
 
         <div className="relative" ref={menuRef}>
@@ -91,23 +91,23 @@ export function GroupItem({
               e.stopPropagation()
               setShowMenu(!showMenu)
             }}
-            className="flex h-6 w-6 items-center justify-center rounded text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-gray-700 dark:hover:text-gray-300"
+            className="flex h-6 w-6 items-center justify-center text-punk-text-muted hover:text-punk-accent transition-colors"
           >
             <MoreVertical className="h-4 w-4" />
           </button>
 
           {showMenu && (
-            <div className="absolute right-0 top-full z-50 mt-1 w-40 rounded-md border border-gray-200 bg-white py-1 shadow-lg dark:border-gray-700 dark:bg-gray-800">
+            <div className="absolute right-0 top-full z-50 mt-1 w-40 border border-punk-border bg-punk-bg-alt py-1 shadow-[0_0_20px_rgba(124,58,237,0.3)]">
               <button
                 onClick={(e) => {
                   e.stopPropagation()
                   onRename()
                   setShowMenu(false)
                 }}
-                className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                className="flex w-full items-center gap-2 px-3 py-2 text-left font-punk-body text-sm text-punk-text-secondary hover:text-punk-accent hover:bg-punk-bg transition-colors"
               >
                 <Pencil className="h-4 w-4" />
-                Rename
+                RENAME
               </button>
               <button
                 onClick={(e) => {
@@ -115,10 +115,10 @@ export function GroupItem({
                   onDelete()
                   setShowMenu(false)
                 }}
-                className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-error hover:bg-red-50 dark:hover:bg-red-900/20"
+                className="flex w-full items-center gap-2 px-3 py-2 text-left font-punk-body text-sm text-punk-cta hover:bg-punk-cta/10 transition-colors"
               >
                 <Trash2 className="h-4 w-4" />
-                Delete
+                DELETE
               </button>
             </div>
           )}
@@ -138,14 +138,13 @@ export function CreateGroupButton({ onClick, className }: CreateGroupButtonProps
     <button
       onClick={onClick}
       className={cn(
-        "flex w-full items-center gap-2 px-3 py-2 text-sm text-gray-500",
-        "hover:text-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800",
-        "dark:text-gray-400 dark:hover:text-gray-300",
+        "flex w-full items-center gap-2 px-3 py-2 font-punk-body text-sm text-punk-text-muted",
+        "hover:text-punk-accent hover:bg-punk-bg-alt transition-colors border border-dashed border-punk-border/30 hover:border-punk-accent",
         className
       )}
     >
       <Plus className="h-4 w-4" />
-      Create new group
+      + NEW SECTOR
     </button>
   )
 }

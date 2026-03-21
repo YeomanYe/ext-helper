@@ -18,18 +18,31 @@ const Switch = React.forwardRef<HTMLButtonElement, SwitchProps>(
         disabled={disabled}
         onClick={() => !disabled && onCheckedChange(!checked)}
         className={cn(
-          "relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
+          "relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-none transition-all duration-200",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-punk-neon-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-punk-bg",
           "disabled:cursor-not-allowed disabled:opacity-50",
-          checked ? "bg-primary" : "bg-gray-300 dark:bg-gray-600",
+          checked
+            ? "bg-punk-success/20 border-2 border-punk-success shadow-[0_0_10px_rgba(16,185,129,0.5)]"
+            : "bg-punk-bg border-2 border-punk-text-muted",
           className
         )}
         ref={ref}
       >
+        {/* Labels */}
         <span
           className={cn(
-            "pointer-events-none block h-5 w-5 rounded-full bg-white shadow-lg ring-0 transition-transform duration-200 ease-in-out",
-            checked ? "translate-x-5" : "translate-x-0"
+            "absolute font-punk-code text-[8px] transition-all duration-200",
+            checked ? "left-1 text-punk-success" : "right-1 text-punk-text-muted"
+          )}
+        >
+          {checked ? "1" : "0"}
+        </span>
+
+        {/* Thumb - Binary display */}
+        <span
+          className={cn(
+            "pointer-events-none block h-4 w-4 rounded-none bg-punk-text-primary shadow-lg transition-all duration-200",
+            checked ? "translate-x-5 bg-punk-success shadow-[0_0_10px_rgba(16,185,129,0.8)]" : "translate-x-0.5"
           )}
         />
       </button>

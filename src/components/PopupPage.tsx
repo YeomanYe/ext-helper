@@ -103,22 +103,16 @@ export function PopupPage() {
   }, [devMode, toggleExtension])
 
   // Toggle all extensions in a group
-  const handleToggleGroup = React.useCallback((group: Group) => {
+  const handleToggleGroup = React.useCallback((group: typeof displayGroups[0]) => {
     const groupExtIds = group.extensionIds
-    const allEnabled = groupExtIds.every(id => {
-      const ext = displayExtensions.find(e => e.id === id)
-      return ext?.enabled ?? false
-    })
-
-    // Toggle all to opposite state
     groupExtIds.forEach(id => {
       if (!devMode) {
         toggleExtension(id)
       } else {
-        console.log("Toggle extension in group:", id, !allEnabled)
+        console.log("Toggle extension in group:", id)
       }
     })
-  }, [devMode, toggleExtension, displayExtensions])
+  }, [devMode, toggleExtension])
 
   const enabledCount = displayedExtensions.filter((e) => e.enabled).length
   const totalCount = devMode ? MOCK_EXTENSIONS.length : filteredExtensions.length
@@ -128,22 +122,22 @@ export function PopupPage() {
   // Compact mode: 4 columns (smaller cards)
   const gridClass = viewMode === "card"
     ? "grid grid-cols-1 gap-2"
-    : "grid grid-cols-4 gap-3"
+    : "grid grid-cols-4 gap-2"
 
   return (
-    <div className="flex h-[600px] flex-col bg-white dark:bg-gray-900">
+    <div className="flex h-[600px] flex-col bg-punk-bg">
       <Header
         viewMode={viewMode}
         onViewModeChange={setViewMode}
       />
 
       {/* Search */}
-      <div className="flex-shrink-0 p-3 border-b border-gray-200 dark:border-gray-700">
+      <div className="flex-shrink-0 p-3 border-b border-punk-border/30">
         <SearchBar value={searchQuery} onChange={setSearchQuery} />
       </div>
 
       {/* Group Chips */}
-      <div className="flex-shrink-0 px-3 py-2 border-b border-gray-200 dark:border-gray-700">
+      <div className="flex-shrink-0 px-3 py-2 border-b border-punk-border/30">
         <div className="flex flex-wrap gap-2">
           {/* Group chips */}
           {displayGroups.map((group) => {
@@ -154,25 +148,18 @@ export function PopupPage() {
                 group={group}
                 extensionCount={count}
                 onClick={() => setSelectedGroupId(group.id)}
-                onToggle={() => {
-                  // Toggle all extensions in the group
-                  group.extensionIds.forEach(id => {
-                    if (!devMode) {
-                      toggleExtension(id)
-                    }
-                  })
-                }}
+                onToggle={() => handleToggleGroup(group)}
               />
             )
           })}
 
           {/* Create group chip */}
-          <CreateGroupChip onClick={() => createGroup("新分组", "#6366F1")} />
+          <CreateGroupChip onClick={() => createGroup("新分组", "#7C3AED")} />
         </div>
       </div>
 
       {/* Filters */}
-      <div className="flex-shrink-0 px-3 py-2 border-b border-gray-200 dark:border-gray-700">
+      <div className="flex-shrink-0 px-3 py-2 border-b border-punk-border/30">
         <QuickFilters activeFilter={filter} onFilterChange={setFilter} />
       </div>
 
@@ -180,12 +167,12 @@ export function PopupPage() {
       <div className="flex-1 overflow-y-auto p-3">
         {error ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
-            <p className="text-sm text-error">{error}</p>
+            <p className="font-punk-body text-base text-punk-cta">ERROR: {error}</p>
             <button
               onClick={() => fetchExtensions()}
-              className="mt-2 text-sm text-primary hover:underline"
+              className="mt-3 font-punk-btn px-4 py-2 punk-btn-primary"
             >
-              重试
+              RETRY
             </button>
           </div>
         ) : (

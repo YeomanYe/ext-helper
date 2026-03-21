@@ -1,32 +1,30 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Fira+Code:wght@400;500&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --color-primary: #6366F1;
-  --color-primary-hover: #4F46E5;
-  --color-primary-light: #EEF2FF;
-  --color-success: #22C55E;
-  --color-warning: #F59E0B;
-  --color-error: #EF4444;
-  --color-info: #3B82F6;
-  --color-background: #FFFFFF;
-  --color-background-alt: #F8FAFC;
-  --color-border: #E2E8F0;
-  --color-text-primary: #0F172A;
-  --color-text-secondary: #64748B;
-  --color-text-muted: #94A3B8;
+  /* Punk Color System */
+  --punk-primary: #7C3AED;
+  --punk-secondary: #A78BFA;
+  --punk-cta: #F43F5E;
+  --punk-accent: #22D3EE;
+  --punk-success: #10B981;
+  --punk-warning: #FBBF24;
+  --punk-error: #F43F5E;
+  --punk-bg: #0F0F23;
+  --punk-bg-alt: #1A1A2E;
+  --punk-border: #7C3AED;
+  --punk-text-primary: #E2E8F0;
+  --punk-text-secondary: #94A3B8;
+  --punk-text-muted: #64748B;
+  --punk-neon-pink: #FF00FF;
+  --punk-neon-cyan: #00FFFF;
+  --punk-neon-yellow: #FFFF00;
 }
 
-.dark {
-  --color-background: #0F172A;
-  --color-background-alt: #1E293B;
-  --color-border: #334155;
-  --color-text-primary: #F8FAFC;
-  --color-text-secondary: #94A3B8;
-  --color-text-muted: #64748B;
-}
-
+/* Base Punk Theme */
 * {
   margin: 0;
   padding: 0;
@@ -34,28 +32,255 @@
 }
 
 body {
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background-color: var(--color-background);
-  color: var(--color-text-primary);
-  min-width: 600px;
-  max-width: 600px;
+  font-family: "VT323", monospace;
+  background-color: var(--punk-bg);
+  color: var(--punk-text-primary);
+  min-width: 380px;
+  max-width: 380px;
   min-height: 200px;
   max-height: 600px;
+  overflow: hidden;
 }
 
+/* Scanline Effect Overlay */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.15),
+    rgba(0, 0, 0, 0.15) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* CRT Flicker Effect */
+body::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(124, 58, 237, 0.03);
+  pointer-events: none;
+  z-index: 9998;
+  animation: flicker 0.15s infinite;
+}
+
+/* Scrollbar Styling */
 ::-webkit-scrollbar {
   width: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: var(--punk-bg);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-border);
+  background: var(--punk-primary);
   border-radius: 3px;
+  box-shadow: 0 0 10px var(--punk-primary);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-text-muted);
+  background: var(--punk-secondary);
+  box-shadow: 0 0 15px var(--punk-secondary);
+}
+
+/* Neon Glow Text */
+.neon-text {
+  text-shadow:
+    0 0 5px var(--punk-primary),
+    0 0 10px var(--punk-primary),
+    0 0 20px var(--punk-primary);
+}
+
+.neon-text-cyan {
+  text-shadow:
+    0 0 5px var(--punk-neon-cyan),
+    0 0 10px var(--punk-neon-cyan),
+    0 0 20px var(--punk-neon-cyan);
+}
+
+.neon-text-pink {
+  text-shadow:
+    0 0 5px var(--punk-neon-pink),
+    0 0 10px var(--punk-neon-pink),
+    0 0 20px var(--punk-neon-pink);
+}
+
+/* Punk Border Glow */
+.punk-border {
+  border: 1px solid var(--punk-primary);
+  box-shadow:
+    0 0 5px var(--punk-primary),
+    inset 0 0 5px rgba(124, 58, 237, 0.1);
+}
+
+.punk-border-cyan {
+  border: 1px solid var(--punk-neon-cyan);
+  box-shadow:
+    0 0 5px var(--punk-neon-cyan),
+    inset 0 0 5px rgba(0, 255, 255, 0.1);
+}
+
+/* Glitch Effect */
+.glitch {
+  position: relative;
+}
+
+.glitch::before,
+.glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.glitch::before {
+  animation: glitch-1 0.5s infinite;
+  color: var(--punk-neon-cyan);
+  z-index: -1;
+}
+
+.glitch::after {
+  animation: glitch-2 0.5s infinite;
+  color: var(--punk-neon-pink);
+  z-index: -2;
+}
+
+@keyframes glitch-1 {
+  0%, 100% { transform: translate(0); }
+  20% { transform: translate(-2px, 2px); }
+  40% { transform: translate(-2px, -2px); }
+  60% { transform: translate(2px, 2px); }
+  80% { transform: translate(2px, -2px); }
+}
+
+@keyframes glitch-2 {
+  0%, 100% { transform: translate(0); }
+  20% { transform: translate(2px, -2px); }
+  40% { transform: translate(2px, 2px); }
+  60% { transform: translate(-2px, -2px); }
+  80% { transform: translate(-2px, 2px); }
+}
+
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.97; }
+}
+
+/* Punk Input Styling */
+input.punk-input {
+  background: var(--punk-bg);
+  border: 1px solid var(--punk-primary);
+  color: var(--punk-text-primary);
+  font-family: "VT323", monospace;
+  transition: all 0.3s ease;
+}
+
+input.punk-input:focus {
+  outline: none;
+  border-color: var(--punk-neon-cyan);
+  box-shadow:
+    0 0 10px var(--punk-neon-cyan),
+    inset 0 0 10px rgba(0, 255, 255, 0.05);
+}
+
+input.punk-input::placeholder {
+  color: var(--punk-text-muted);
+}
+
+/* Punk Button Base */
+button.punk-btn {
+  font-family: "Press Start 2P", monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+button.punk-btn-primary {
+  background: var(--punk-primary);
+  color: white;
+  border: 2px solid var(--punk-primary);
+  box-shadow:
+    0 0 10px var(--punk-primary),
+    0 4px 0 0 #5B21B6;
+}
+
+button.punk-btn-primary:hover {
+  background: var(--punk-secondary);
+  border-color: var(--punk-secondary);
+  box-shadow:
+    0 0 20px var(--punk-secondary),
+    0 4px 0 0 #7C3AED;
+  transform: translateY(-2px);
+}
+
+button.punk-btn-primary:active {
+  transform: translateY(2px);
+  box-shadow:
+    0 0 5px var(--punk-primary),
+    0 2px 0 0 #5B21B6;
+}
+
+/* Terminal-style text */
+.terminal-text {
+  font-family: "Fira Code", monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--punk-success);
+}
+
+.terminal-text::before {
+  content: "> ";
+  color: var(--punk-neon-cyan);
+}
+
+/* HUD Corner Decorations */
+.hud-corner::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  width: 10px;
+  height: 10px;
+  border-top: 2px solid var(--punk-neon-cyan);
+  border-left: 2px solid var(--punk-neon-cyan);
+}
+
+.hud-corner::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 10px;
+  height: 10px;
+  border-bottom: 2px solid var(--punk-neon-cyan);
+  border-right: 2px solid var(--punk-neon-cyan);
+}
+
+/* Selection styling */
+::selection {
+  background: var(--punk-primary);
+  color: white;
+}
+
+/* Focus visible styling */
+*:focus-visible {
+  outline: 2px solid var(--punk-neon-cyan);
+  outline-offset: 2px;
+  box-shadow: 0 0 10px var(--punk-neon-cyan);
 }

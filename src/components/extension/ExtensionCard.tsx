@@ -49,48 +49,66 @@ export function ExtensionCard({
     return (
       <div
         className={cn(
-          "group relative flex items-center gap-3 p-3 rounded-xl border border-gray-200 bg-white",
-          "hover:border-gray-300 hover:shadow-md",
-          "dark:border-gray-700 dark:bg-gray-800",
-          !extension.enabled && "opacity-60",
-          "w-full min-h-[80px]",
+          "group relative flex items-center gap-3 p-2.5 border",
+          "bg-punk-bg-alt",
+          "hover:border-punk-primary hover:shadow-[0_0_15px_rgba(124,58,237,0.3)]",
+          !extension.enabled && "opacity-50",
+          "w-full min-h-[60px]",
+          "punk-border",
           className
         )}
         onContextMenu={handleContextMenu}
       >
-        {/* Extension Icon */}
-        <div className="flex-shrink-0">
+        {/* Extension Icon with status indicator */}
+        <div className="relative flex-shrink-0">
           {extension.iconUrl ? (
             <img
               src={extension.iconUrl}
               alt={extension.name}
-              className="w-12 h-12 rounded-lg object-cover shadow-sm"
+              className="w-10 h-10 border border-punk-border object-cover"
               loading="lazy"
             />
           ) : (
-            <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-700">
-              <Package className="w-6 h-6 text-gray-400" />
+            <div className="w-10 h-10 flex items-center justify-center border border-punk-border bg-punk-bg">
+              <Package className="w-5 h-5 text-punk-text-muted" />
             </div>
           )}
+          {/* Status dot */}
+          <div
+            className={cn(
+              "absolute -bottom-0.5 -right-0.5 w-3 h-3 border border-punk-bg",
+              extension.enabled ? "bg-punk-success animate-pulse-neon" : "bg-punk-text-muted"
+            )}
+          />
         </div>
 
         {/* Extension Info */}
         <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate" title={extension.name}>
+          <h3 className="font-punk-heading text-[8px] text-punk-text-primary truncate uppercase tracking-wide" title={extension.name}>
             {extension.name}
           </h3>
           {extension.description && (
-            <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5" title={extension.description}>
+            <p className="font-punk-body text-sm text-punk-text-secondary truncate mt-0.5" title={extension.description}>
               {extension.description}
             </p>
           )}
-          <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+          <p className="font-punk-code text-[10px] text-punk-accent mt-0.5">
             v{extension.version}
           </p>
         </div>
 
+        {/* Status Badge */}
+        <span className={cn(
+          "font-punk-code text-[8px] px-2 py-0.5 border",
+          extension.enabled
+            ? "text-punk-success border-punk-success bg-punk-success/10"
+            : "text-punk-text-muted border-punk-text-muted/30"
+        )}>
+          {extension.enabled ? "ON" : "OFF"}
+        </span>
+
         {/* Toggle Switch */}
-        <div className="flex-shrink-0" onClick={(e) => e.stopPropagation()}>
+        <div onClick={(e) => e.stopPropagation()}>
           <Switch
             checked={extension.enabled}
             onCheckedChange={() => onToggle()}
@@ -101,7 +119,7 @@ export function ExtensionCard({
         {showMenu && (
           <div
             ref={menuRef}
-            className="absolute left-0 top-full z-50 mt-1 w-40 rounded-md border border-gray-200 bg-white py-1 shadow-lg dark:border-gray-700 dark:bg-gray-800"
+            className="absolute right-0 top-full z-50 mt-1 w-44 border border-punk-border bg-punk-bg-alt py-1 shadow-[0_0_20px_rgba(124,58,237,0.3)]"
             onClick={(e) => e.stopPropagation()}
           >
             <button
@@ -110,17 +128,17 @@ export function ExtensionCard({
                 onToggle()
                 setShowMenu(false)
               }}
-              className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+              className="flex w-full items-center gap-2 px-3 py-2 text-left font-punk-body text-sm text-punk-text-secondary hover:text-punk-accent hover:bg-punk-bg transition-colors"
             >
               {extension.enabled ? (
                 <>
                   <PowerOff className="h-4 w-4" />
-                  禁用
+                  DISABLE
                 </>
               ) : (
                 <>
                   <Power className="h-4 w-4" />
-                  启用
+                  ENABLE
                 </>
               )}
             </button>
@@ -131,10 +149,10 @@ export function ExtensionCard({
                   onOpenOptions?.()
                   setShowMenu(false)
                 }}
-                className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                className="flex w-full items-center gap-2 px-3 py-2 text-left font-punk-body text-sm text-punk-text-secondary hover:text-punk-accent hover:bg-punk-bg transition-colors"
               >
                 <Settings className="h-4 w-4" />
-                设置页面
+                OPTIONS
               </button>
             )}
             <button
@@ -143,10 +161,10 @@ export function ExtensionCard({
                 onRemove?.()
                 setShowMenu(false)
               }}
-              className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-error hover:bg-red-50 dark:hover:bg-red-900/20"
+              className="flex w-full items-center gap-2 px-3 py-2 text-left font-punk-body text-sm text-punk-cta hover:bg-punk-cta/10 transition-colors"
             >
               <Trash2 className="h-4 w-4" />
-              卸载
+              REMOVE
             </button>
           </div>
         )}
@@ -158,44 +176,55 @@ export function ExtensionCard({
   return (
     <div
       className={cn(
-        "group relative flex flex-col items-center justify-center p-4 rounded-xl border border-gray-200 bg-white",
-        "hover:border-gray-300 hover:shadow-md",
-        "dark:border-gray-700 dark:bg-gray-800",
-        !extension.enabled && "opacity-60",
-        "w-[130px] h-[120px]",
+        "group relative flex flex-col items-center justify-center p-3 border",
+        "bg-punk-bg-alt",
+        "hover:border-punk-primary hover:shadow-[0_0_15px_rgba(124,58,237,0.3)]",
+        !extension.enabled && "opacity-50",
+        "w-[88px] h-[100px]",
+        "punk-border",
         className
       )}
       onContextMenu={handleContextMenu}
       onClick={() => onToggle()}
     >
       {/* Extension Icon */}
-      <div className="flex-shrink-0 mb-2">
+      <div className="relative flex-shrink-0 mb-1.5">
         {extension.iconUrl ? (
           <img
             src={extension.iconUrl}
             alt={extension.name}
-            className="w-12 h-12 rounded-lg object-cover shadow-sm"
+            className="w-10 h-10 border border-punk-border object-cover"
             loading="lazy"
           />
         ) : (
-          <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-700">
-            <Package className="w-6 h-6 text-gray-400" />
+          <div className="w-10 h-10 flex items-center justify-center border border-punk-border bg-punk-bg">
+            <Package className="w-5 h-5 text-punk-text-muted" />
           </div>
         )}
+        {/* Status dot */}
+        <div
+          className={cn(
+            "absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 border border-punk-bg-alt",
+            extension.enabled ? "bg-punk-success animate-pulse-neon" : "bg-punk-text-muted"
+          )}
+        />
       </div>
 
       {/* Extension Name - truncated */}
       <div className="w-full">
-        <h3 className="text-xs font-medium text-gray-900 dark:text-gray-100 text-center truncate" title={extension.name}>
-          {extension.name}
+        <h3 className="font-punk-heading text-[7px] text-punk-text-primary text-center uppercase tracking-wide truncate" title={extension.name}>
+          {extension.name.substring(0, 12)}
         </h3>
+        <p className="font-punk-code text-[8px] text-punk-accent text-center mt-0.5">
+          {extension.enabled ? "ON" : "OFF"}
+        </p>
       </div>
 
       {/* Context Menu */}
       {showMenu && (
         <div
           ref={menuRef}
-          className="absolute left-0 top-full z-50 mt-1 w-40 rounded-md border border-gray-200 bg-white py-1 shadow-lg dark:border-gray-700 dark:bg-gray-800"
+          className="absolute right-0 top-full z-50 mt-1 w-40 border border-punk-border bg-punk-bg-alt py-1 shadow-[0_0_20px_rgba(124,58,237,0.3)]"
           onClick={(e) => e.stopPropagation()}
         >
           <button
@@ -203,17 +232,17 @@ export function ExtensionCard({
               onToggle()
               setShowMenu(false)
             }}
-            className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+            className="flex w-full items-center gap-2 px-3 py-2 text-left font-punk-body text-sm text-punk-text-secondary hover:text-punk-accent hover:bg-punk-bg transition-colors"
           >
             {extension.enabled ? (
               <>
                 <PowerOff className="h-4 w-4" />
-                禁用
+                DISABLE
               </>
             ) : (
               <>
                 <Power className="h-4 w-4" />
-                启用
+                ENABLE
               </>
             )}
           </button>
@@ -223,10 +252,10 @@ export function ExtensionCard({
                 onOpenOptions?.()
                 setShowMenu(false)
               }}
-              className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+              className="flex w-full items-center gap-2 px-3 py-2 text-left font-punk-body text-sm text-punk-text-secondary hover:text-punk-accent hover:bg-punk-bg transition-colors"
             >
               <Settings className="h-4 w-4" />
-              设置页面
+              OPTIONS
             </button>
           )}
           <button
@@ -234,10 +263,10 @@ export function ExtensionCard({
               onRemove?.()
               setShowMenu(false)
             }}
-            className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-error hover:bg-red-50 dark:hover:bg-red-900/20"
+            className="flex w-full items-center gap-2 px-3 py-2 text-left font-punk-body text-sm text-punk-cta hover:bg-punk-cta/10 transition-colors"
           >
             <Trash2 className="h-4 w-4" />
-            卸载
+            REMOVE
           </button>
         </div>
       )}

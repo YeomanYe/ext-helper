@@ -1,4 +1,5 @@
-import { Search, Settings, X, LayoutGrid, List } from "lucide-react"
+import * as React from "react"
+import { Settings, X, LayoutGrid, List } from "lucide-react"
 import { cn } from "@/utils"
 import type { FilterType, ViewMode } from "@/types"
 
@@ -8,26 +9,24 @@ interface SearchBarProps {
   placeholder?: string
 }
 
-export function SearchBar({ value, onChange, placeholder = "Search extensions..." }: SearchBarProps) {
+export function SearchBar({ value, onChange, placeholder = "SEARCH_EXTENSIONS..." }: SearchBarProps) {
   return (
     <div className="relative">
-      <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+      <span className="absolute left-3 top-1/2 -translate-y-1/2 font-punk-body text-punk-accent text-lg">$</span>
       <input
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         className={cn(
-          "h-11 w-full rounded-lg border border-gray-300 bg-white pl-10 pr-10 text-sm",
-          "placeholder:text-gray-400",
-          "focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent",
-          "dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+          "punk-input h-11 w-full pl-9 pr-10 text-punk-text-primary",
+          "font-punk-body text-lg"
         )}
       />
       {value && (
         <button
           onClick={() => onChange("")}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-punk-text-muted hover:text-punk-accent transition-colors"
         >
           <X className="h-4 w-4" />
         </button>
@@ -42,9 +41,9 @@ interface QuickFiltersProps {
 }
 
 const FILTERS: { value: FilterType; label: string }[] = [
-  { value: "all", label: "All" },
-  { value: "enabled", label: "Enabled" },
-  { value: "disabled", label: "Disabled" }
+  { value: "all", label: "ALL" },
+  { value: "enabled", label: "ON" },
+  { value: "disabled", label: "OFF" }
 ]
 
 export function QuickFilters({ activeFilter, onFilterChange }: QuickFiltersProps) {
@@ -55,10 +54,10 @@ export function QuickFilters({ activeFilter, onFilterChange }: QuickFiltersProps
           key={filter.value}
           onClick={() => onFilterChange(filter.value)}
           className={cn(
-            "rounded-full px-3 py-1 text-xs font-medium transition-colors",
+            "punk-btn px-3 py-1.5 transition-all duration-200",
             activeFilter === filter.value
-              ? "bg-primary text-white"
-              : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700"
+              ? "punk-btn-primary"
+              : "bg-punk-bg-alt text-punk-text-secondary hover:text-punk-primary border border-punk-primary/30 hover:border-punk-primary"
           )}
         >
           {filter.label}
@@ -76,25 +75,30 @@ interface HeaderProps {
 
 export function Header({ onSettingsClick, viewMode = "compact", onViewModeChange }: HeaderProps) {
   return (
-    <header className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-3 dark:border-gray-700 dark:bg-gray-900">
+    <header className="flex items-center justify-between bg-punk-bg-alt px-3 py-2.5 border-b border-punk-border/30">
       <div className="flex items-center gap-2">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-          <span className="text-white font-bold text-sm">E</span>
+        <div className="relative">
+          <div className="flex h-8 w-8 items-center justify-center border-2 border-punk-primary bg-punk-bg-alt">
+            <span className="font-punk-heading text-[8px] text-punk-primary neon-text">E</span>
+          </div>
+          {/* Corner decorations */}
+          <div className="absolute -top-0.5 -left-0.5 w-2 h-2 border-t border-l border-punk-neon-cyan" />
+          <div className="absolute -bottom-0.5 -right-0.5 w-2 h-2 border-b border-r border-punk-neon-cyan" />
         </div>
-        <h1 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-          ExtHelper
+        <h1 className="font-punk-heading text-[10px] text-punk-text-primary tracking-wide">
+          EXTHELPER
         </h1>
       </div>
       <div className="flex items-center gap-1">
         {/* View Mode Toggle */}
-        <div className="flex rounded-md border border-gray-200 dark:border-gray-700">
+        <div className="flex border border-punk-border/30">
           <button
             onClick={() => onViewModeChange?.("compact")}
             className={cn(
-              "flex items-center justify-center p-1.5 rounded-l-md",
+              "flex items-center justify-center p-1.5 transition-all duration-200",
               viewMode === "compact"
-                ? "bg-primary text-white"
-                : "text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
+                ? "bg-punk-primary text-white shadow-neon-purple"
+                : "text-punk-text-muted hover:text-punk-accent hover:bg-punk-bg-alt"
             )}
             title="Grid view"
           >
@@ -103,10 +107,10 @@ export function Header({ onSettingsClick, viewMode = "compact", onViewModeChange
           <button
             onClick={() => onViewModeChange?.("card")}
             className={cn(
-              "flex items-center justify-center p-1.5 rounded-r-md",
+              "flex items-center justify-center p-1.5 transition-all duration-200",
               viewMode === "card"
-                ? "bg-primary text-white"
-                : "text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
+                ? "bg-punk-primary text-white shadow-neon-purple"
+                : "text-punk-text-muted hover:text-punk-accent hover:bg-punk-bg-alt"
             )}
             title="List view"
           >
@@ -116,7 +120,7 @@ export function Header({ onSettingsClick, viewMode = "compact", onViewModeChange
 
         <button
           onClick={onSettingsClick}
-          className="flex h-8 w-8 items-center justify-center rounded-md text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-gray-800 dark:hover:text-gray-300"
+          className="flex h-8 w-8 items-center justify-center text-punk-text-muted hover:text-punk-accent hover:bg-punk-bg-alt transition-all duration-200 border border-transparent hover:border-punk-accent/30"
         >
           <Settings className="h-4 w-4" />
         </button>
@@ -132,10 +136,15 @@ interface FooterProps {
 
 export function Footer({ totalCount, enabledCount }: FooterProps) {
   return (
-    <footer className="flex items-center justify-between border-t border-gray-200 bg-gray-50 px-4 py-2 text-xs text-gray-500 dark:border-gray-700 dark:bg-gray-800">
-      <span>
-        {enabledCount} of {totalCount} enabled
+    <footer className="flex items-center justify-between bg-punk-bg-alt px-3 py-2 border-t border-punk-border/30 font-punk-code text-[10px] text-punk-text-muted">
+      <span className="flex items-center gap-1">
+        <span className="text-punk-success">ON</span>
+        <span>[{enabledCount}]</span>
+        <span className="text-punk-text-muted">/</span>
+        <span className="text-punk-text-secondary">OFF</span>
+        <span>[{totalCount - enabledCount}]</span>
       </span>
+      <span className="text-punk-accent">SYS::ACTIVE</span>
     </footer>
   )
 }
