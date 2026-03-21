@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Header, Footer, SearchBar, QuickFilters } from "@/components/popup"
+import { Header, Footer, SearchBar } from "@/components/popup"
 import { ExtensionCard } from "@/components/extension"
 import { GroupChip, CreateGroupChip, GroupDetailModal } from "@/components/group"
 import {
@@ -135,7 +135,12 @@ export function PopupPage() {
 
       {/* Search */}
       <div className="flex-shrink-0 p-3 border-b border-punk-border/30">
-        <SearchBar value={searchQuery} onChange={setSearchQuery} />
+        <SearchBar
+          value={searchQuery}
+          onChange={setSearchQuery}
+          activeFilter={filter}
+          onFilterChange={setFilter}
+        />
       </div>
 
       {/* Group Chips */}
@@ -158,11 +163,6 @@ export function PopupPage() {
           {/* Create group chip */}
           <CreateGroupChip onClick={() => createGroup("新分组", "#7C3AED")} />
         </div>
-      </div>
-
-      {/* Filters */}
-      <div className="flex-shrink-0 px-3 py-2 border-b border-punk-border/30">
-        <QuickFilters activeFilter={filter} onFilterChange={setFilter} />
       </div>
 
       {/* Main Content */}

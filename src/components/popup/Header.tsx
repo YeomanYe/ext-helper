@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Settings, X, LayoutGrid, List } from "lucide-react"
+import { Settings, X, LayoutGrid, List, ChevronDown } from "lucide-react"
 import { cn } from "@/utils"
 import type { FilterType, ViewMode } from "@/types"
 
@@ -7,30 +7,91 @@ interface SearchBarProps {
   value: string
   onChange: (value: string) => void
   placeholder?: string
+  activeFilter?: FilterType
+  onFilterChange?: (filter: FilterType) => void
 }
 
-export function SearchBar({ value, onChange, placeholder = "SEARCH_EXTENSIONS..." }: SearchBarProps) {
+const FILTERS: { value: FilterType; label: string }[] = [
+  { value: "all", label: "ALL" },
+  { value: "enabled", label: "ON" },
+  { value: "disabled", label: "OFF" }
+]
+
+export function SearchBar({ value, onChange, placeholder = "SEARCH_EXTENSIONS...", activeFilter = "all", onFilterChange }: SearchBarProps) {
+  const [showDropdown, setShowDropdown] = React.useState(false)
+
+  const currentFilter = FILTERS.find(f => f.value === activeFilter) || FILTERS[0]
+
   return (
-    <div className="relative">
-      <span className="absolute left-3 top-1/2 -translate-y-1/2 font-punk-body text-punk-accent text-lg">$</span>
-      <input
-        type="text"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        className={cn(
-          "punk-input h-11 w-full pl-9 pr-10 text-punk-text-primary",
-          "font-punk-body text-lg"
-        )}
-      />
-      {value && (
-        <button
-          onClick={() => onChange("")}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-punk-text-muted hover:text-punk-accent transition-colors"
-        >
-          <X className="h-4 w-4" />
-        </button>
+    <div className="flex items-center gap-3">
+      {/* Filter Select */}
+      {onFilterChange && (
+        <div className="relative">
+          <button
+            onClick={() => setShowDropdown(!showDropdown)}
+            className={cn(
+              "flex items-center gap-2 px-3 h-11",
+              "border border-punk-border/50 bg-punk-bg-alt",
+              "font-punk-heading text-[9px] uppercase tracking-wide",
+              "text-punk-text-primary",
+              "hover:border-punk-primary hover:shadow-[0_0_10px_rgba(124,58,237,0.3)]",
+              "transition-all duration-200"
+            )}
+          >
+            <span>{currentFilter.label}</span>
+            <ChevronDown className={cn("h-3 w-3 transition-transform", showDropdown && "rotate-180")} />
+          </button>
+
+          {showDropdown && (
+            <>
+              <div className="fixed inset-0 z-40" onClick={() => setShowDropdown(false)} />
+              <div className="absolute top-full left-0 mt-1 z-50 w-full border border-punk-border bg-punk-bg-alt shadow-[0_0_20px_rgba(124,58,237,0.3)]">
+                {FILTERS.map((filter) => (
+                  <button
+                    key={filter.value}
+                    onClick={() => {
+                      onFilterChange(filter.value)
+                      setShowDropdown(false)
+                    }}
+                    className={cn(
+                      "w-full px-3 py-2 text-left font-punk-heading text-[9px] uppercase tracking-wide",
+                      "transition-all duration-150",
+                      activeFilter === filter.value
+                        ? "bg-punk-primary text-white"
+                        : "text-punk-text-secondary hover:bg-punk-bg hover:text-punk-text-primary"
+                    )}
+                  >
+                    {filter.label}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
       )}
+
+      {/* Search Input */}
+      <div className="relative flex-1">
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 font-punk-body text-punk-accent text-lg">$</span>
+        <input
+          type="text"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          className={cn(
+            "punk-input h-11 w-full pl-9 pr-10 text-punk-text-primary",
+            "font-punk-body text-lg"
+          )}
+        />
+        {value && (
+          <button
+            onClick={() => onChange("")}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-punk-text-muted hover:text-punk-accent transition-colors"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        )}
+      </div>
     </div>
   )
 }
@@ -39,12 +100,6 @@ interface QuickFiltersProps {
   activeFilter: FilterType
   onFilterChange: (filter: FilterType) => void
 }
-
-const FILTERS: { value: FilterType; label: string }[] = [
-  { value: "all", label: "ALL" },
-  { value: "enabled", label: "ON" },
-  { value: "disabled", label: "OFF" }
-]
 
 export function QuickFilters({ activeFilter, onFilterChange }: QuickFiltersProps) {
   return (

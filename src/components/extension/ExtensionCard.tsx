@@ -97,16 +97,6 @@ export function ExtensionCard({
           </p>
         </div>
 
-        {/* Status Badge */}
-        <span className={cn(
-          "font-punk-code text-[8px] px-2 py-0.5 border",
-          extension.enabled
-            ? "text-punk-success border-punk-success bg-punk-success/10"
-            : "text-punk-text-muted border-punk-text-muted/30"
-        )}>
-          {extension.enabled ? "ON" : "OFF"}
-        </span>
-
         {/* Toggle Switch */}
         <div onClick={(e) => e.stopPropagation()}>
           <Switch
@@ -215,9 +205,6 @@ export function ExtensionCard({
         <h3 className="font-punk-heading text-[7px] text-punk-text-primary text-center uppercase tracking-wide truncate" title={extension.name}>
           {extension.name.substring(0, 12)}
         </h3>
-        <p className="font-punk-code text-[8px] text-punk-accent text-center mt-0.5">
-          {extension.enabled ? "ON" : "OFF"}
-        </p>
       </div>
 
       {/* Context Menu */}
