@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "plasmo dev",
+    "dev:web": "vite --config vite.config.ts",
     "build": "plasmo build",
+    "build:web": "vite build --config vite.config.ts",
     "preview": "vite preview",
     "test": "vitest"
   },

@@ -1,36 +1,20 @@
 import { defineConfig } from "vite"
 import react from "@vitejs/plugin-react"
-import { viteStaticCopy } from "vite-plugin-static-copy"
 import { fileURLToPath, URL } from "node:url"
 
 export default defineConfig({
-  plugins: [
-    react(),
-    viteStaticCopy({
-      targets: [
-        {
-          src: "assets/*",
-          dest: ""
-        }
-      ]
-    })
-  ],
+  plugins: [react()],
   resolve: {
     alias: {
-      "@": fileURLToPath(new URL("./src", import.meta.url))
-    }
-  },
-  build: {
-    outDir: "dist",
-    emptyOutDir: true,
-    rollupOptions: {
-      input: {
-        popup: fileURLToPath(new URL("./index.html", import.meta.url))
-      }
+      "@": fileURLToPath(new URL("./src", import.meta.url)),
+      "~src": fileURLToPath(new URL("./src", import.meta.url))
     }
   },
   server: {
     port: 3000,
     strictPort: false
+  },
+  build: {
+    outDir: "dist-web"
   }
 })
