@@ -130,21 +130,34 @@ interface HeaderProps {
 
 export function Header({ onSettingsClick, viewMode = "compact", onViewModeChange }: HeaderProps) {
   return (
-    <header className="flex items-center justify-between bg-punk-bg-alt px-3 py-2.5 border-b border-punk-border/30">
-      <div className="flex items-center gap-2">
-        <div className="relative">
-          <div className="flex h-8 w-8 items-center justify-center border-2 border-punk-primary bg-punk-bg-alt">
-            <span className="font-punk-heading text-[8px] text-punk-primary neon-text">E</span>
-          </div>
-          {/* Corner decorations */}
-          <div className="absolute -top-0.5 -left-0.5 w-2 h-2 border-t border-l border-punk-neon-cyan" />
-          <div className="absolute -bottom-0.5 -right-0.5 w-2 h-2 border-b border-r border-punk-neon-cyan" />
-        </div>
-        <h1 className="font-punk-heading text-[10px] text-punk-text-primary tracking-wide">
-          EXTHELPER
-        </h1>
+    <header className="relative flex items-center justify-between border-b-2 border-punk-primary bg-punk-bg px-4 py-3 hud-corner">
+      {/* Decorative scanline */}
+      <div className="absolute inset-0 overflow-hidden opacity-20 pointer-events-none">
+        <div className="w-full h-1 bg-punk-accent animate-scanline" />
       </div>
-      <div className="flex items-center gap-1">
+
+      {/* Logo and Title */}
+      <div className="flex items-center gap-3 relative z-10">
+        {/* Cyberpunk Logo */}
+        <div className="relative">
+          <div className="flex h-10 w-10 items-center justify-center border-2 border-punk-neon-cyan bg-punk-bg-alt">
+            <span className="font-punk-heading text-xs text-punk-neon-cyan animate-pulse-neon">E</span>
+          </div>
+          {/* Glow effect */}
+          <div className="absolute inset-0 blur-md bg-punk-neon-cyan/30 -z-10" />
+        </div>
+
+        <div className="flex flex-col">
+          <h1 className="font-punk-heading text-xs text-punk-neon-cyan glitch" data-text="EXTHELPER">
+            EXTHELPER
+          </h1>
+          <span className="font-punk-body text-punk-text-muted text-sm tracking-wider">
+            EXTENSION_MGR_v2.0
+          </span>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-1 relative z-10">
         {/* View Mode Toggle */}
         <div className="flex border border-punk-border/30">
           <button
@@ -175,9 +188,14 @@ export function Header({ onSettingsClick, viewMode = "compact", onViewModeChange
 
         <button
           onClick={onSettingsClick}
-          className="flex h-8 w-8 items-center justify-center text-punk-text-muted hover:text-punk-accent hover:bg-punk-bg-alt transition-all duration-200 border border-transparent hover:border-punk-accent/30"
+          className="relative group"
         >
-          <Settings className="h-4 w-4" />
+          <div className="flex h-9 w-9 items-center justify-center border-2 border-punk-primary/50 bg-punk-bg-alt hover:border-punk-cta transition-all duration-200 hover:shadow-neon-cta">
+            <Settings className="h-4 w-4 text-punk-secondary group-hover:text-punk-cta" />
+          </div>
+          {/* Corner accents */}
+          <div className="absolute top-0 left-0 w-2 h-2 border-l-2 border-t-2 border-punk-cta opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute bottom-0 right-0 w-2 h-2 border-r-2 border-b-2 border-punk-cta opacity-0 group-hover:opacity-100 transition-opacity" />
         </button>
       </div>
     </header>
@@ -190,16 +208,37 @@ interface FooterProps {
 }
 
 export function Footer({ totalCount, enabledCount }: FooterProps) {
+  const percentage = Math.round((enabledCount / totalCount) * 100)
+
   return (
-    <footer className="flex items-center justify-between bg-punk-bg-alt px-3 py-2 border-t border-punk-border/30 font-punk-code text-[10px] text-punk-text-muted">
-      <span className="flex items-center gap-1">
-        <span className="text-punk-success">ON</span>
-        <span>[{enabledCount}]</span>
-        <span className="text-punk-text-muted">/</span>
-        <span className="text-punk-text-secondary">OFF</span>
-        <span>[{totalCount - enabledCount}]</span>
-      </span>
-      <span className="text-punk-accent">SYS::ACTIVE</span>
+    <footer className="relative flex items-center justify-between border-t-2 border-punk-primary bg-punk-bg-alt px-4 py-2 overflow-hidden">
+      {/* Progress bar background */}
+      <div className="absolute bottom-0 left-0 h-0.5 bg-punk-bg w-full">
+        <div
+          className="h-full bg-punk-success transition-all duration-500"
+          style={{ width: `${percentage}%` }}
+        />
+      </div>
+
+      {/* Status text */}
+      <div className="flex items-center gap-3">
+        <span className="font-punk-body text-punk-text-muted text-sm">
+          SYS_STATUS:
+        </span>
+        <span className="font-punk-body text-punk-success text-sm">
+          {enabledCount}/{totalCount} ONLINE
+        </span>
+        <span className="text-punk-text-muted">|</span>
+        <span className="font-punk-body text-punk-accent text-sm">
+          {percentage}%_ACTIVE
+        </span>
+      </div>
+
+      {/* Blinking indicator */}
+      <div className="flex items-center gap-2">
+        <div className="h-2 w-2 bg-punk-success animate-pulse shadow-neon-cyan rounded-full" />
+        <span className="font-punk-body text-punk-success text-xs">LIVE</span>
+      </div>
     </footer>
   )
 }
