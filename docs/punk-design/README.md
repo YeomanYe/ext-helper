@@ -14,6 +14,7 @@ This document describes the punk design system implemented for the ExtHelper bro
 - **Terminal Typography**: Uses monospace fonts (Press Start 2P, VT323, Fira Code) to evoke a command-line interface.
 - **Wide Panel Layout**: Information-dense layout optimized for browser extension popup (660px width).
 - **Binary Status**: Uses 1/0 instead of ON/OFF text for enabled state.
+- **Minimal Animations**: Prefer static visual effects over continuous animations for better UX.
 
 ## Color Palette
 
@@ -30,7 +31,7 @@ This document describes the punk design system implemented for the ExtHelper bro
 | Text Primary | `#E2E8F0` | Primary text |
 | Text Secondary | `#94A3B8` | Secondary text |
 | Text Muted | `#64748B` | Muted text |
-| Neon Cyan | `#00FFFF` | HUD corners, decorative |
+| Neon Cyan | `#00FFFF` | HUD corners, logo, decorative |
 | Neon Pink | `#FF00FF` | Glitch effects |
 
 ## Typography
@@ -68,11 +69,11 @@ This document describes the punk design system implemented for the ExtHelper bro
 
 ### Main Sections (Top to Bottom)
 
-1. **Header** (48px) - Logo + title + view mode toggle
+1. **Header** (~60px) - Cyberpunk logo, title, subtitle, view mode toggle
 2. **Search** (48px) - Terminal-style search bar with filter dropdown
 3. **Sectors** (auto) - Horizontal chip group filters
 4. **Content** (flex) - Extension card grid (flex-wrap)
-5. **Footer** (32px) - Status bar with ON/OFF count
+5. **Footer** (~40px) - Status bar with progress and LIVE indicator
 
 ### View Modes
 
@@ -90,6 +91,106 @@ This document describes the punk design system implemented for the ExtHelper bro
 | xl | 20px | Large gaps |
 
 ## Component Specifications
+
+### Header
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│ [E]  EXTHELPER                                    [□][□] [⚙]    │
+│      EXTENSION_MGR_v2.0                                            │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+**Specs:**
+- Border: 2px solid primary color
+- Background: punk-bg
+- Padding: px-4 py-3
+- HUD corner decorations
+
+**Logo:**
+- Size: 40x40px
+- Border: 2px solid neon-cyan
+- Content: "E" in font-punk-heading
+- Glow effect: blur-md neon-cyan/30
+
+**Title:**
+- Text: "EXTHELPER"
+- Color: neon-cyan
+- Font: font-punk-heading text-xs
+
+**Subtitle:**
+- Text: "EXTENSION_MGR_v2.0"
+- Color: text-muted
+- Font: font-punk-body
+
+**Settings Button:**
+- Size: 36x36px
+- Hover: border-cta, shadow-neon-cta
+- Corner accent decorations on hover
+
+```tsx
+<header className="relative flex items-center justify-between border-b-2 border-punk-primary bg-punk-bg px-4 py-3 hud-corner">
+  {/* Decorative scanline */}
+  <div className="absolute inset-0 overflow-hidden opacity-20 pointer-events-none">
+    <div className="w-full h-1 bg-punk-accent animate-scanline" />
+  </div>
+
+  {/* Logo */}
+  <div className="flex items-center gap-3 relative z-10">
+    <div className="relative">
+      <div className="flex h-10 w-10 items-center justify-center border-2 border-punk-neon-cyan bg-punk-bg-alt">
+        <span className="font-punk-heading text-xs text-punk-neon-cyan">E</span>
+      </div>
+      <div className="absolute inset-0 blur-md bg-punk-neon-cyan/30 -z-10" />
+    </div>
+
+    <div className="flex flex-col">
+      <h1 className="font-punk-heading text-xs text-punk-neon-cyan">
+        EXTHELPER
+      </h1>
+      <span className="font-punk-body text-punk-text-muted text-sm tracking-wider">
+        EXTENSION_MGR_v2.0
+      </span>
+    </div>
+  </div>
+</header>
+```
+
+### Footer
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│ SYS_STATUS: 3/10 ONLINE | 30%_ACTIVE                    ● LIVE    │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+**Specs:**
+- Border: 2px solid primary (top)
+- Progress bar: bottom edge, shows enabled percentage
+- LIVE indicator: green dot + text
+
+```tsx
+<footer className="relative flex items-center justify-between border-t-2 border-punk-primary bg-punk-bg-alt px-4 py-2">
+  {/* Progress bar */}
+  <div className="absolute bottom-0 left-0 h-0.5 bg-punk-bg w-full">
+    <div className="h-full bg-punk-success transition-all duration-500" style={{ width: `${percentage}%` }} />
+  </div>
+
+  {/* Status text */}
+  <div className="flex items-center gap-3">
+    <span className="font-punk-body text-punk-text-muted text-sm">SYS_STATUS:</span>
+    <span className="font-punk-body text-punk-success text-sm">{enabledCount}/{totalCount} ONLINE</span>
+    <span className="text-punk-text-muted">|</span>
+    <span className="font-punk-body text-punk-accent text-sm">{percentage}%_ACTIVE</span>
+  </div>
+
+  {/* LIVE indicator */}
+  <div className="flex items-center gap-2">
+    <div className="h-2 w-2 bg-punk-success shadow-neon-cyan rounded-full" />
+    <span className="font-punk-body text-punk-success text-xs">LIVE</span>
+  </div>
+</footer>
+```
 
 ### SearchBar with Filter
 
@@ -126,7 +227,7 @@ This document describes the punk design system implemented for the ExtHelper bro
 **Specs:**
 - Layout: flex items-center gap-3
 - Icon: 40x40px with border
-- Status dot: 12px, bottom-right of icon (pulsing green when enabled)
+- Status dot: 12px, bottom-right of icon
 - Toggle: 1/0 binary switch
 - Menu: Context menu on right-click
 
@@ -175,13 +276,13 @@ This document describes the punk design system implemented for the ExtHelper bro
   {/* IN SECTOR - Highlighted */}
   <div className="border border-punk-success/50">
     <p className="text-punk-success">IN SECTOR [n]</p>
-    <ExtensionItem /> {/* Green border, full opacity */}
+    <ExtensionItem />
   </div>
 
   {/* NOT IN SECTOR - Dimmed */}
   <div className="opacity-40">
     <p className="text-punk-text-muted">NOT IN SECTOR [n]</p>
-    <ExtensionItem /> {/* Grayscale icon, muted text */}
+    <ExtensionItem />
   </div>
 </div>
 ```
@@ -247,13 +348,16 @@ This document describes the punk design system implemented for the ExtHelper bro
 .neon-text-pink { text-shadow: 0 0 5px #FF00FF, 0 0 10px #FF00FF; }
 ```
 
-### Animations
+### Animations (Optional)
 
-| Class | Effect | Duration |
-|-------|--------|----------|
-| `animate-pulse` | Pulsing status indicator | 2s infinite |
-| `animate-glitch` | Text skew/shift | 0.5s infinite |
-| `animate-flicker` | CRT flicker | 0.15s infinite |
+Animations are optional and can be toggled. Prefer static effects for better UX.
+
+| Class | Effect | Usage |
+|-------|--------|-------|
+| `animate-pulse` | Pulsing indicator | Status dots |
+| `animate-glitch` | Text skew/shift | Decorative titles |
+| `animate-flicker` | CRT flicker | CRT effect |
+| `animate-scanline` | Moving scanline | Header decoration |
 
 ### Scanline Overlay (Global)
 
@@ -283,6 +387,7 @@ body::before {
 | `neon-text-cyan` | Cyan neon text glow |
 | `neon-text-pink` | Pink neon text glow |
 | `animate-pulse-neon` | Pulsing neon animation |
+| `animate-scanline` | Moving scanline decoration |
 
 ## File Structure
 
@@ -348,13 +453,14 @@ The punk design intentionally avoids:
 - ON/OFF text labels (use 1/0 binary)
 - Fixed grid columns in compact mode (use flex-wrap)
 - Complex add mode for groups (use edit mode directly)
+- Excessive animations (keep UI responsive)
 
 ## Accessibility Notes
 
 > **Note**: Cyberpunk style has limited accessibility:
 > - Dark theme only
 > - Neon colors with contrast limitations
-> - Decorative animations
+> - Decorative animations (respect prefers-reduced-motion)
 
 **Focus States:**
 ```css
@@ -370,12 +476,31 @@ Animations respect `prefers-reduced-motion` when implemented.
 
 ## Changelog
 
-### v2.0 - Compact Grid Redesign
+### v2.0 - Punk Redesign
+
+**Layout:**
 - Panel width expanded to 660px
+- Header with cyberpunk logo and subtitle
+- Footer with progress bar and LIVE indicator
+- Scanline decoration in header
+
+**Search & Filters:**
 - Filter moved to dropdown select in SearchBar
-- ON/OFF badge removed from ExtensionCard (status dot only)
+- Terminal "$" prompt styling
+
+**Extension Cards:**
 - Compact mode uses flex-wrap layout
 - Square cards (84x84px) instead of 88x100px
+- ON/OFF badge removed (status dot only)
+- 1/0 binary toggle switch
+
+**Group Management:**
 - Group modal redesigned with edit mode split view
 - Two sections: IN SECTOR (highlighted) / NOT IN SECTOR (dimmed)
 - Binary 1/0 toggle for enable state in group modal
+- Simplified workflow: click to toggle membership
+
+**Styling:**
+- Neon cyan color for logo and title
+- HUD corner decorations
+- Static UI preferred over animations
