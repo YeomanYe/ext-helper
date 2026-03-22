@@ -1,8 +1,16 @@
 import * as React from "react"
-import { Folder } from "lucide-react"
+import { Folder, Search, X } from "lucide-react"
 import { GroupItem, CreateGroupButton } from "./GroupItem"
 import { cn } from "@/utils"
 import type { Group, Extension } from "@/types"
+
+type GroupFilterType = "all" | "hasExtensions" | "empty"
+
+const FILTERS: { value: GroupFilterType; label: string }[] = [
+  { value: "all", label: "ALL" },
+  { value: "hasExtensions", label: "WITH EXT" },
+  { value: "empty", label: "EMPTY" }
+]
 
 interface GroupManagerProps {
   groups: Group[]
@@ -45,6 +53,28 @@ export function GroupManager({
   const [selectedColor, setSelectedColor] = React.useState(GROUP_COLORS[0])
   const [editingGroupId, setEditingGroupId] = React.useState<string | null>(null)
   const [editingName, setEditingName] = React.useState("")
+  const [searchQuery, setSearchQuery] = React.useState("")
+  const [activeFilter, setActiveFilter] = React.useState<GroupFilterType>("all")
+
+  // Filtered groups
+  const filteredGroups = React.useMemo(() => {
+    let result = groups
+
+    // Filter by status
+    if (activeFilter === "hasExtensions") {
+      result = result.filter((g) => g.extensionIds.length > 0)
+    } else if (activeFilter === "empty") {
+      result = result.filter((g) => g.extensionIds.length === 0)
+    }
+
+    // Filter by search
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase()
+      result = result.filter((g) => g.name.toLowerCase().includes(query))
+    }
+
+    return result
+  }, [groups, searchQuery, activeFilter])
 
   const handleCreateGroup = () => {
     if (newGroupName.trim()) {
@@ -70,6 +100,49 @@ export function GroupManager({
 
   return (
     <div className={cn("space-y-1", className)}>
+      {/* Search Bar */}
+      <div className="flex items-center gap-1 px-2 py-1.5">
+        <div className="relative flex-1">
+          <Search className="absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gray-400" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search groups..."
+            className="h-7 w-full rounded-md border border-gray-200 bg-gray-50 pl-7 pr-7 text-xs dark:border-gray-700 dark:bg-gray-800"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery("")}
+              className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded p-0.5 hover:bg-gray-200 dark:hover:bg-gray-700"
+            >
+              <X className="h-3 w-3 text-gray-400" />
+            </button>
+          )}
+        </div>
+        {/* Filter Dropdown */}
+        <select
+          value={activeFilter}
+          onChange={(e) => setActiveFilter(e.target.value as GroupFilterType)}
+          className="h-7 rounded-md border border-gray-200 bg-gray-50 px-1.5 text-xs dark:border-gray-700 dark:bg-gray-800"
+        >
+          {FILTERS.map((filter) => (
+            <option key={filter.value} value={filter.value}>
+              {filter.label}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Results Count */}
+      {(searchQuery || activeFilter !== "all") && (
+        <div className="px-3 py-1">
+          <span className="text-xs text-gray-500 dark:text-gray-400">
+            {filteredGroups.length} / {groups.length} groups
+          </span>
+        </div>
+      )}
+
       {/* All Extensions Button */}
       <button
         onClick={() => onSelectGroup(null)}
@@ -89,7 +162,7 @@ export function GroupManager({
       </button>
 
       {/* Groups */}
-      {groups.map((group) => (
+      {filteredGroups.map((group) => (
         <div key={group.id}>
           {editingGroupId === group.id ? (
             <div className="flex items-center gap-2 px-3 py-2">
