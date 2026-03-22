@@ -12,7 +12,8 @@ export default defineConfig({
   },
   server: {
     port: 3000,
-    strictPort: false
+    strictPort: false,
+    host: "0.0.0.0"  // 支持内网访问
   },
   build: {
     outDir: "dist-web"
