@@ -2,6 +2,7 @@ import * as React from "react"
 import { Header, Footer, SearchBar } from "@/components/popup"
 import { ExtensionCard } from "@/components/extension"
 import { GroupChip, CreateGroupChip, GroupDetailModal } from "@/components/group"
+import { RuleManager } from "@/components/rules"
 import {
   useExtensionStore,
   useFilteredExtensions,
@@ -11,6 +12,9 @@ import {
 } from "@/stores"
 import { browserAdapter } from "@/services/browser/adapter"
 import { MOCK_EXTENSIONS, MOCK_GROUPS, isDevMode } from "@/services/mockData"
+import { cn } from "@/utils"
+
+type TabType = "extensions" | "rules"
 
 export function PopupPage() {
   const {
@@ -38,6 +42,9 @@ export function PopupPage() {
 
   const filteredExtensions = useFilteredExtensions()
   const devMode = isDevMode()
+
+  // Tab state
+  const [activeTab, setActiveTab] = React.useState<TabType>("extensions")
 
   // Use mock data in dev mode
   const displayExtensions = devMode ? MOCK_EXTENSIONS : filteredExtensions
@@ -133,64 +140,101 @@ export function PopupPage() {
         onViewModeChange={setViewMode}
       />
 
-      {/* Search */}
-      <div className="flex-shrink-0 p-3 border-b border-punk-border/30">
-        <SearchBar
-          value={searchQuery}
-          onChange={setSearchQuery}
-          activeFilter={filter}
-          onFilterChange={setFilter}
-        />
-      </div>
-
-      {/* Group Chips */}
-      <div className="flex-shrink-0 px-3 py-2 border-b border-punk-border/30">
-        <div className="flex flex-wrap gap-2">
-          {/* Group chips */}
-          {displayGroups.map((group) => {
-            const count = displayExtensions.filter(ext => group.extensionIds.includes(ext.id)).length
-            return (
-              <GroupChip
-                key={group.id}
-                group={group}
-                extensionCount={count}
-                onClick={() => setSelectedGroupId(group.id)}
-                onToggle={() => handleToggleGroup(group)}
-              />
-            )
-          })}
-
-          {/* Create group chip */}
-          <CreateGroupChip onClick={() => createGroup("新分组", "#7C3AED")} />
+      {/* Tab Bar */}
+      <div className="flex-shrink-0 px-3 pt-2 border-b border-punk-border/30">
+        <div className="flex gap-1">
+          <button
+            onClick={() => setActiveTab("extensions")}
+            className={cn(
+              "px-3 py-2 text-[9px] font-punk-heading uppercase tracking-wide transition-all",
+              activeTab === "extensions"
+                ? "text-punk-accent border-b-2 border-punk-accent"
+                : "text-punk-text-muted hover:text-punk-text-primary"
+            )}
+          >
+            EXTENSIONS
+          </button>
+          <button
+            onClick={() => setActiveTab("rules")}
+            className={cn(
+              "px-3 py-2 text-[9px] font-punk-heading uppercase tracking-wide transition-all",
+              activeTab === "rules"
+                ? "text-punk-accent border-b-2 border-punk-accent"
+                : "text-punk-text-muted hover:text-punk-text-primary"
+            )}
+          >
+            AUTO_RULES
+          </button>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 overflow-y-auto p-3">
-        {error ? (
-          <div className="flex flex-col items-center justify-center py-12 text-center">
-            <p className="font-punk-body text-base text-punk-cta">ERROR: {error}</p>
-            <button
-              onClick={() => fetchExtensions()}
-              className="mt-3 font-punk-btn px-4 py-2 punk-btn-primary"
-            >
-              RETRY
-            </button>
-          </div>
-        ) : (
-          // Show all filtered extensions
-          <div className={gridClass}>
-            {displayedExtensions.map((ext) => (
-              <ExtensionCard
-                key={ext.id}
-                extension={ext}
-                viewMode={viewMode}
-                onToggle={() => handleToggleExtension(ext.id)}
-                onOpenOptions={() => handleOpenOptions(ext.id)}
-                onRemove={() => handleRemove(ext.id)}
+      <div className="flex-1 overflow-hidden">
+        {activeTab === "extensions" ? (
+          <>
+            {/* Search */}
+            <div className="flex-shrink-0 p-3 border-b border-punk-border/30">
+              <SearchBar
+                value={searchQuery}
+                onChange={setSearchQuery}
+                activeFilter={filter}
+                onFilterChange={setFilter}
               />
-            ))}
-          </div>
+            </div>
+
+            {/* Group Chips */}
+            <div className="flex-shrink-0 px-3 py-2 border-b border-punk-border/30">
+              <div className="flex flex-wrap gap-2">
+                {/* Group chips */}
+                {displayGroups.map((group) => {
+                  const count = displayExtensions.filter(ext => group.extensionIds.includes(ext.id)).length
+                  return (
+                    <GroupChip
+                      key={group.id}
+                      group={group}
+                      extensionCount={count}
+                      onClick={() => setSelectedGroupId(group.id)}
+                      onToggle={() => handleToggleGroup(group)}
+                    />
+                  )
+                })}
+
+                {/* Create group chip */}
+                <CreateGroupChip onClick={() => createGroup("新分组", "#7C3AED")} />
+              </div>
+            </div>
+
+            {/* Extension List */}
+            <div className="h-full overflow-y-auto p-3">
+              {error ? (
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  <p className="font-punk-body text-base text-punk-cta">ERROR: {error}</p>
+                  <button
+                    onClick={() => fetchExtensions()}
+                    className="mt-3 font-punk-btn px-4 py-2 punk-btn-primary"
+                  >
+                    RETRY
+                  </button>
+                </div>
+              ) : (
+                <div className={gridClass}>
+                  {displayedExtensions.map((ext) => (
+                    <ExtensionCard
+                      key={ext.id}
+                      extension={ext}
+                      viewMode={viewMode}
+                      onToggle={() => handleToggleExtension(ext.id)}
+                      onOpenOptions={() => handleOpenOptions(ext.id)}
+                      onRemove={() => handleRemove(ext.id)}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          </>
+        ) : (
+          /* Rules Panel */
+          <RuleManager />
         )}
       </div>
 
@@ -202,7 +246,6 @@ export function PopupPage() {
           group={selectedGroup}
           extensions={selectedGroupExtensions}
           allExtensions={displayExtensions}
-          viewMode={viewMode}
           onClose={() => setSelectedGroupId(null)}
           onToggleExtension={handleToggleExtension}
           onOpenOptions={handleOpenOptions}

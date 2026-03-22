@@ -1,0 +1,38 @@
+import { RuleCard } from "./RuleCard"
+import type { Rule } from "@/rules/types"
+
+interface RuleListProps {
+  rules: Rule[]
+  onToggle: (id: string) => void
+  onEdit: (rule: Rule) => void
+  onDelete: (id: string) => void
+}
+
+export function RuleList({ rules, onToggle, onEdit, onDelete }: RuleListProps) {
+  if (rules.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-8 text-center">
+        <p className="font-punk-body text-[10px] text-punk-text-muted uppercase tracking-wide">
+          NO_RULES_YET
+        </p>
+        <p className="font-punk-code text-[8px] text-punk-text-muted mt-1">
+          CREATE A NEW RULE TO GET STARTED
+        </p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-2">
+      {rules.map((rule) => (
+        <RuleCard
+          key={rule.id}
+          rule={rule}
+          onToggle={onToggle}
+          onEdit={onEdit}
+          onDelete={onDelete}
+        />
+      ))}
+    </div>
+  )
+}

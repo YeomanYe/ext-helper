@@ -78,3 +78,19 @@ export interface UIStore {
   toggleShowDisabled: () => void
   setViewMode: (mode: ViewMode) => void
 }
+
+// Re-export rule types
+export type {
+  Rule,
+  Condition,
+  Action,
+  DomainCondition,
+  TimeCondition,
+  DayOfWeekCondition,
+  MatchMode,
+  ConditionOperator,
+  ActionType,
+  RuleStore,
+  RuleSettings,
+} from "@/rules/types"
+export { DAYS_OF_WEEK, MATCH_MODES } from "@/rules/types"

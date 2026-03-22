@@ -237,6 +237,106 @@ function onExtensionEnabledChanged(callback: (info: Extension) => void): () => v
   }
 }
 
+// ---------- Tabs API ----------
+
+async function getCurrentTabUrl(): Promise<string | null> {
+  const browserType = detectBrowser()
+
+  try {
+    if (browserType === "firefox") {
+      const tabs = await browser.tabs.query({
+        active: true,
+        currentWindow: true,
+      })
+      return tabs[0]?.url || null
+    } else {
+      const [tab] = await chrome.tabs.query({
+        active: true,
+        currentWindow: true,
+      })
+      return tab?.url || null
+    }
+  } catch (error) {
+    console.error("Failed to get current tab URL:", error)
+    return null
+  }
+}
+
+async function getCurrentTabId(): Promise<number | null> {
+  const browserType = detectBrowser()
+
+  try {
+    if (browserType === "firefox") {
+      const tabs = await browser.tabs.query({
+        active: true,
+        currentWindow: true,
+      })
+      return tabs[0]?.id || null
+    } else {
+      const [tab] = await chrome.tabs.query({
+        active: true,
+        currentWindow: true,
+      })
+      return tab?.id || null
+    }
+  } catch (error) {
+    console.error("Failed to get current tab ID:", error)
+    return null
+  }
+}
+
+// ---------- Alarms API ----------
+
+async function createAlarm(
+  name: string,
+  options: { delayInMinutes?: number; periodInMinutes?: number }
+): Promise<void> {
+  const browserType = detectBrowser()
+
+  try {
+    if (browserType === "firefox") {
+      await browser.alarms.create(name, options)
+    } else {
+      await chrome.alarms.create(name, options)
+    }
+  } catch (error) {
+    console.error("Failed to create alarm:", error)
+  }
+}
+
+async function clearAlarm(name: string): Promise<void> {
+  const browserType = detectBrowser()
+
+  try {
+    if (browserType === "firefox") {
+      await browser.alarms.clear(name)
+    } else {
+      await chrome.alarms.clear(name)
+    }
+  } catch (error) {
+    console.error("Failed to clear alarm:", error)
+  }
+}
+
+// ---------- Messaging API ----------
+
+function sendMessage(
+  message: any,
+  callback?: (response: any) => void
+): void {
+  const browserType = detectBrowser()
+
+  try {
+    if (browserType === "firefox") {
+      browser.runtime.sendMessage(message).then(callback)
+    } else {
+      chrome.runtime.sendMessage(message, callback)
+    }
+  } catch (error) {
+    console.error("Failed to send message:", error)
+  }
+}
+
 export const browserAdapter = {
   detectBrowser,
   isManifestV3,
@@ -248,5 +348,11 @@ export const browserAdapter = {
   setStorage,
   onExtensionInstalled,
   onExtensionUninstalled,
-  onExtensionEnabledChanged
+  onExtensionEnabledChanged,
+  // 新增
+  getCurrentTabUrl,
+  getCurrentTabId,
+  createAlarm,
+  clearAlarm,
+  sendMessage,
 }
