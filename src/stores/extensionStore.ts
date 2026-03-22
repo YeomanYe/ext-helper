@@ -1,6 +1,9 @@
 import { create } from "zustand"
 import type { ExtensionStore, FilterType, SortType } from "@/types"
 import { browserAdapter } from "@/services/browser/adapter"
+import { devStorage } from "@/services/devStorage"
+import { isDevMode } from "@/services/mockData"
+import { MOCK_EXTENSIONS } from "@/services/mockData"
 
 export const useExtensionStore = create<ExtensionStore>((set, get) => ({
   extensions: [],
@@ -13,7 +16,17 @@ export const useExtensionStore = create<ExtensionStore>((set, get) => ({
   fetchExtensions: async () => {
     set({ loading: true, error: null })
     try {
-      const extensions = await browserAdapter.getExtensions()
+      let extensions
+      if (isDevMode()) {
+        // Initialize dev storage with mock data if empty
+        const stored = devStorage.getExtensions()
+        if (stored.length === 0) {
+          devStorage.setExtensions(MOCK_EXTENSIONS)
+        }
+        extensions = devStorage.getExtensions()
+      } else {
+        extensions = await browserAdapter.getExtensions()
+      }
       set({ extensions, loading: false })
     } catch (error) {
       set({
@@ -30,20 +43,21 @@ export const useExtensionStore = create<ExtensionStore>((set, get) => ({
 
     // Optimistic update
     const newEnabled = !ext.enabled
-    set({
-      extensions: extensions.map((e) =>
-        e.id === id ? { ...e, enabled: newEnabled } : e
-      )
-    })
+    const newExtensions = extensions.map((e) =>
+      e.id === id ? { ...e, enabled: newEnabled } : e
+    )
+    set({ extensions: newExtensions })
 
     try {
-      await browserAdapter.setExtensionEnabled(id, newEnabled)
+      if (isDevMode()) {
+        devStorage.updateExtension(id, { enabled: newEnabled })
+      } else {
+        await browserAdapter.setExtensionEnabled(id, newEnabled)
+      }
     } catch (error) {
       // Rollback on error
+      set({ extensions })
       set({
-        extensions: extensions.map((e) =>
-          e.id === id ? { ...e, enabled: ext.enabled } : e
-        ),
         error: error instanceof Error ? error.message : "Failed to toggle extension"
       })
     }

@@ -5,7 +5,8 @@
 import { create } from "zustand"
 import type { Rule, RuleStore } from "@/rules/types"
 import { browserAdapter } from "@/services/browser/adapter"
-import { generateId } from "@/utils"
+import { devStorage } from "@/services/devStorage"
+import { isDevMode } from "@/services/mockData"
 import { RULES_STORAGE_KEY } from "@/rules/constants"
 
 export const useRuleStore = create<RuleStore>((set, get) => ({
@@ -16,7 +17,12 @@ export const useRuleStore = create<RuleStore>((set, get) => ({
   fetchRules: async () => {
     set({ loading: true, error: null })
     try {
-      const rules = (await browserAdapter.getStorage(RULES_STORAGE_KEY)) || []
+      let rules
+      if (isDevMode()) {
+        rules = devStorage.getRules()
+      } else {
+        rules = (await browserAdapter.getStorage(RULES_STORAGE_KEY)) || []
+      }
       set({ rules, loading: false })
     } catch (error) {
       set({
@@ -30,7 +36,7 @@ export const useRuleStore = create<RuleStore>((set, get) => ({
     const { rules } = get()
     const newRule: Rule = {
       ...ruleData,
-      id: generateId(),
+      id: devStorage.generateId(),
       createdAt: Date.now(),
       updatedAt: Date.now(),
       triggerCount: 0,
@@ -40,7 +46,11 @@ export const useRuleStore = create<RuleStore>((set, get) => ({
     set({ rules: newRules })
 
     try {
-      await browserAdapter.setStorage(RULES_STORAGE_KEY, newRules)
+      if (isDevMode()) {
+        devStorage.setRules(newRules)
+      } else {
+        await browserAdapter.setStorage(RULES_STORAGE_KEY, newRules)
+      }
     } catch (error) {
       console.error("Failed to save rule:", error)
       set({ rules, error: "Failed to save rule" })
@@ -55,7 +65,11 @@ export const useRuleStore = create<RuleStore>((set, get) => ({
     set({ rules: newRules })
 
     try {
-      await browserAdapter.setStorage(RULES_STORAGE_KEY, newRules)
+      if (isDevMode()) {
+        devStorage.setRules(newRules)
+      } else {
+        await browserAdapter.setStorage(RULES_STORAGE_KEY, newRules)
+      }
     } catch (error) {
       console.error("Failed to update rule:", error)
       set({ rules, error: "Failed to update rule" })
@@ -68,7 +82,11 @@ export const useRuleStore = create<RuleStore>((set, get) => ({
     set({ rules: newRules })
 
     try {
-      await browserAdapter.setStorage(RULES_STORAGE_KEY, newRules)
+      if (isDevMode()) {
+        devStorage.setRules(newRules)
+      } else {
+        await browserAdapter.setStorage(RULES_STORAGE_KEY, newRules)
+      }
     } catch (error) {
       console.error("Failed to delete rule:", error)
       set({ rules, error: "Failed to delete rule" })
@@ -86,7 +104,11 @@ export const useRuleStore = create<RuleStore>((set, get) => ({
     set({ rules: newRules })
 
     try {
-      await browserAdapter.setStorage(RULES_STORAGE_KEY, newRules)
+      if (isDevMode()) {
+        devStorage.setRules(newRules)
+      } else {
+        await browserAdapter.setStorage(RULES_STORAGE_KEY, newRules)
+      }
     } catch (error) {
       console.error("Failed to toggle rule:", error)
       set({ rules, error: "Failed to toggle rule" })
@@ -100,7 +122,7 @@ export const useRuleStore = create<RuleStore>((set, get) => ({
 
     const newRule: Rule = {
       ...rule,
-      id: generateId(),
+      id: devStorage.generateId(),
       name: `${rule.name} (Copy)`,
       createdAt: Date.now(),
       updatedAt: Date.now(),
@@ -112,7 +134,11 @@ export const useRuleStore = create<RuleStore>((set, get) => ({
     set({ rules: newRules })
 
     try {
-      await browserAdapter.setStorage(RULES_STORAGE_KEY, newRules)
+      if (isDevMode()) {
+        devStorage.setRules(newRules)
+      } else {
+        await browserAdapter.setStorage(RULES_STORAGE_KEY, newRules)
+      }
     } catch (error) {
       console.error("Failed to duplicate rule:", error)
       set({ rules, error: "Failed to duplicate rule" })

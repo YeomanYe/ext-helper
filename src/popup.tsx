@@ -7,7 +7,8 @@ function App() {
   return <PopupPage />
 }
 
-const container = document.getElementById("root")
+// Support both "__plasmo" (Plasmo) and "root" (Vite preview) container IDs
+const container = document.getElementById("__plasmo") || document.getElementById("root")
 if (container) {
   const root = createRoot(container)
   root.render(
