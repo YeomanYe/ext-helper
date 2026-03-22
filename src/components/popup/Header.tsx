@@ -141,14 +141,14 @@ export function Header({ onSettingsClick, viewMode = "compact", onViewModeChange
         {/* Cyberpunk Logo */}
         <div className="relative">
           <div className="flex h-10 w-10 items-center justify-center border-2 border-punk-neon-cyan bg-punk-bg-alt">
-            <span className="font-punk-heading text-xs text-punk-neon-cyan animate-pulse-neon">E</span>
+            <span className="font-punk-heading text-xs text-punk-neon-cyan">E</span>
           </div>
           {/* Glow effect */}
           <div className="absolute inset-0 blur-md bg-punk-neon-cyan/30 -z-10" />
         </div>
 
         <div className="flex flex-col">
-          <h1 className="font-punk-heading text-xs text-punk-neon-cyan glitch" data-text="EXTHELPER">
+          <h1 className="font-punk-heading text-xs text-punk-neon-cyan" data-text="EXTHELPER">
             EXTHELPER
           </h1>
           <span className="font-punk-body text-punk-text-muted text-sm tracking-wider">
@@ -236,7 +236,7 @@ export function Footer({ totalCount, enabledCount }: FooterProps) {
 
       {/* Blinking indicator */}
       <div className="flex items-center gap-2">
-        <div className="h-2 w-2 bg-punk-success animate-pulse shadow-neon-cyan rounded-full" />
+        <div className="h-2 w-2 bg-punk-success shadow-neon-cyan rounded-full" />
         <span className="font-punk-body text-punk-success text-xs">LIVE</span>
       </div>
     </footer>
