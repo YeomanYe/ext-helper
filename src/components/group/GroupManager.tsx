@@ -22,6 +22,8 @@ interface GroupManagerProps {
   onCreateGroup: (name: string, color: string) => void
   onDeleteGroup: (id: string) => void
   onRenameGroup: (id: string, name: string) => void
+  onAddToGroup: (groupId: string, extId: string) => void
+  onRemoveFromGroup: (groupId: string, extId: string) => void
   className?: string
 }
 
@@ -46,6 +48,8 @@ export function GroupManager({
   onCreateGroup,
   onDeleteGroup,
   onRenameGroup,
+  onAddToGroup,
+  onRemoveFromGroup,
   className
 }: GroupManagerProps) {
   const [showCreateModal, setShowCreateModal] = React.useState(false)
@@ -189,6 +193,7 @@ export function GroupManager({
           ) : (
             <GroupItem
               group={group}
+              extensions={extensions}
               isExpanded={expandedGroups.has(group.id)}
               isActive={activeGroupId === group.id}
               extensionCount={group.extensionIds.length}
@@ -196,7 +201,8 @@ export function GroupManager({
               onSelect={() => onSelectGroup(group.id)}
               onRename={() => handleStartRename(group)}
               onDelete={() => onDeleteGroup(group.id)}
-              onAddExtension={() => {}}
+              onAddExtension={(extId) => onAddToGroup(group.id, extId)}
+              onRemoveExtension={(extId) => onRemoveFromGroup(group.id, extId)}
             />
           )}
         </div>

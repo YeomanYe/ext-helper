@@ -11,7 +11,7 @@ import {
   initializeUIStore
 } from "@/stores"
 import { browserAdapter } from "@/services/browser/adapter"
-import { MOCK_EXTENSIONS, MOCK_GROUPS, isDevMode } from "@/services/mockData"
+import { isDevMode } from "@/services/mockData"
 import { cn } from "@/utils"
 
 type TabType = "extensions" | "rules"
@@ -46,9 +46,9 @@ export function PopupPage() {
   // Tab state
   const [activeTab, setActiveTab] = React.useState<TabType>("extensions")
 
-  // Use mock data in dev mode
-  const displayExtensions = devMode ? MOCK_EXTENSIONS : filteredExtensions
-  const displayGroups = devMode ? MOCK_GROUPS : groups
+  // Use store data (stores use devStorage in dev mode)
+  const displayExtensions = extensions
+  const displayGroups = groups
 
   // Modal state
   const [selectedGroupId, setSelectedGroupId] = React.useState<string | null>(null)
@@ -78,11 +78,9 @@ export function PopupPage() {
   // Initialize on mount
   React.useEffect(() => {
     initializeUIStore()
-    if (!devMode) {
-      fetchExtensions()
-      fetchGroups()
-    }
-  }, [devMode, fetchExtensions, fetchGroups])
+    fetchExtensions()
+    fetchGroups()
+  }, [fetchExtensions, fetchGroups])
 
   const handleOpenOptions = React.useCallback(async (id: string) => {
     if (devMode) return
@@ -104,27 +102,19 @@ export function PopupPage() {
   }, [devMode, fetchExtensions])
 
   const handleToggleExtension = React.useCallback((id: string) => {
-    if (!devMode) {
-      toggleExtension(id)
-    } else {
-      console.log("Toggle extension:", id)
-    }
-  }, [devMode, toggleExtension])
+    toggleExtension(id)
+  }, [toggleExtension])
 
   // Toggle all extensions in a group
   const handleToggleGroup = React.useCallback((group: typeof displayGroups[0]) => {
     const groupExtIds = group.extensionIds
     groupExtIds.forEach(id => {
-      if (!devMode) {
-        toggleExtension(id)
-      } else {
-        console.log("Toggle extension in group:", id)
-      }
+      toggleExtension(id)
     })
-  }, [devMode, toggleExtension])
+  }, [toggleExtension])
 
   const enabledCount = displayedExtensions.filter((e) => e.enabled).length
-  const totalCount = devMode ? MOCK_EXTENSIONS.length : filteredExtensions.length
+  const totalCount = displayExtensions.length
 
   // Determine grid columns based on view mode
   // Card mode: single column (full-width cards with toggle switch)
