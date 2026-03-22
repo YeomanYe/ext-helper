@@ -21,6 +21,7 @@ export function PopupPage() {
     error,
     searchQuery,
     filter,
+    extensions,
     setSearchQuery,
     setFilter,
     fetchExtensions,

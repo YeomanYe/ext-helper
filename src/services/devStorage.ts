@@ -5,6 +5,7 @@ class DevStorage {
   private extensions: Extension[] = []
   private groups: Group[] = []
   private rules: Rule[] = []
+  private preferences: { theme?: string; compactMode?: boolean; showDisabled?: boolean; viewMode?: string } = {}
   private listeners: Map<string, Set<() => void>> = new Map()
 
   constructor() {
@@ -16,9 +17,11 @@ class DevStorage {
       const ext = localStorage.getItem("dev-extensions")
       const grp = localStorage.getItem("dev-groups")
       const rls = localStorage.getItem("dev-rules")
+      const prefs = localStorage.getItem("dev-preferences")
       if (ext) this.extensions = JSON.parse(ext)
       if (grp) this.groups = JSON.parse(grp)
       if (rls) this.rules = JSON.parse(rls)
+      if (prefs) this.preferences = JSON.parse(prefs)
     } catch {
       // Ignore parse errors
     }
@@ -29,6 +32,7 @@ class DevStorage {
       localStorage.setItem("dev-extensions", JSON.stringify(this.extensions))
       localStorage.setItem("dev-groups", JSON.stringify(this.groups))
       localStorage.setItem("dev-rules", JSON.stringify(this.rules))
+      localStorage.setItem("dev-preferences", JSON.stringify(this.preferences))
     } catch {
       // Ignore save errors
     }
@@ -92,6 +96,16 @@ class DevStorage {
   // Generate ID
   generateId(): string {
     return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+  }
+
+  // Preferences
+  getPreferences(): { theme?: string; compactMode?: boolean; showDisabled?: boolean; viewMode?: string } {
+    return { ...this.preferences }
+  }
+
+  setPreferences(prefs: Partial<{ theme?: string; compactMode?: boolean; showDisabled?: boolean; viewMode?: string }>) {
+    this.preferences = { ...this.preferences, ...prefs }
+    this.save()
   }
 }
 

@@ -1,8 +1,26 @@
 import { create } from "zustand"
 import type { UIStore, ViewMode } from "@/types"
 import { browserAdapter } from "@/services/browser/adapter"
+import { devStorage } from "@/services/devStorage"
+import { isDevMode } from "@/services/mockData"
 
 const STORAGE_KEY = "ext-helper-preferences"
+
+const getPrefs = async () => {
+  if (isDevMode()) {
+    return devStorage.getPreferences()
+  }
+  return browserAdapter.getStorage(STORAGE_KEY)
+}
+
+const setPrefs = async (prefs: Partial<{ theme: string; compactMode: boolean; showDisabled: boolean; viewMode: string }>) => {
+  if (isDevMode()) {
+    devStorage.setPreferences(prefs)
+    return
+  }
+  const current = await browserAdapter.getStorage(STORAGE_KEY) || {}
+  await browserAdapter.setStorage(STORAGE_KEY, { ...current, ...prefs })
+}
 
 export const useUIStore = create<UIStore>((set, get) => ({
   theme: "system",
@@ -26,8 +44,7 @@ export const useUIStore = create<UIStore>((set, get) => ({
 
     // Save to storage
     try {
-      const prefs = await browserAdapter.getStorage(STORAGE_KEY)
-      await browserAdapter.setStorage(STORAGE_KEY, { ...prefs, theme })
+      await setPrefs({ theme })
     } catch (error) {
       console.error("Failed to save theme preference:", error)
     }
@@ -38,8 +55,7 @@ export const useUIStore = create<UIStore>((set, get) => ({
     set({ compactMode: !compactMode, lastUpdate: Date.now() })
 
     try {
-      const prefs = await browserAdapter.getStorage(STORAGE_KEY)
-      await browserAdapter.setStorage(STORAGE_KEY, { ...prefs, compactMode: !compactMode })
+      await setPrefs({ compactMode: !compactMode })
     } catch (error) {
       console.error("Failed to save compact mode preference:", error)
     }
@@ -50,8 +66,7 @@ export const useUIStore = create<UIStore>((set, get) => ({
     set({ showDisabled: !showDisabled, lastUpdate: Date.now() })
 
     try {
-      const prefs = await browserAdapter.getStorage(STORAGE_KEY)
-      await browserAdapter.setStorage(STORAGE_KEY, { ...prefs, showDisabled: !showDisabled })
+      await setPrefs({ showDisabled: !showDisabled })
     } catch (error) {
       console.error("Failed to save show disabled preference:", error)
     }
@@ -61,8 +76,7 @@ export const useUIStore = create<UIStore>((set, get) => ({
     set({ viewMode, lastUpdate: Date.now() })
 
     try {
-      const prefs = await browserAdapter.getStorage(STORAGE_KEY)
-      await browserAdapter.setStorage(STORAGE_KEY, { ...prefs, viewMode })
+      await setPrefs({ viewMode })
     } catch (error) {
       console.error("Failed to save view mode preference:", error)
     }
@@ -72,14 +86,14 @@ export const useUIStore = create<UIStore>((set, get) => ({
 // Initialize theme on load
 export async function initializeUIStore() {
   try {
-    const prefs = await browserAdapter.getStorage(STORAGE_KEY)
+    const prefs = await getPrefs()
     if (prefs) {
       const { setTheme, toggleCompactMode, toggleShowDisabled, setViewMode } = useUIStore.getState()
 
-      if (prefs.theme) setTheme(prefs.theme)
+      if (prefs.theme) setTheme(prefs.theme as "light" | "dark" | "system")
       if (prefs.compactMode !== undefined && prefs.compactMode) toggleCompactMode()
       if (prefs.showDisabled !== undefined && !prefs.showDisabled) toggleShowDisabled()
-      if (prefs.viewMode) setViewMode(prefs.viewMode)
+      if (prefs.viewMode) setViewMode(prefs.viewMode as ViewMode)
     }
   } catch (error) {
     console.error("Failed to initialize UI store:", error)
