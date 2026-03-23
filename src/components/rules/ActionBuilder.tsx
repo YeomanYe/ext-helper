@@ -1,6 +1,7 @@
-import { Power, Folder, Check } from "lucide-react"
+import * as React from "react"
+import { Power, Folder, Search, X } from "lucide-react"
 import { cn } from "@/utils"
-import type { Action, ActionType } from "@/rules/types"
+import type { Action } from "@/rules/types"
 import { useExtensionStore } from "@/stores/extensionStore"
 import { useGroupStore } from "@/stores/groupStore"
 
@@ -9,9 +10,13 @@ interface ActionBuilderProps {
   onChange: (actions: Action[]) => void
 }
 
+type FilterType = "all" | "extensions" | "groups"
+
 export function ActionBuilder({ actions, onChange }: ActionBuilderProps) {
   const { extensions } = useExtensionStore()
   const { groups } = useGroupStore()
+  const [searchQuery, setSearchQuery] = React.useState("")
+  const [activeFilter, setActiveFilter] = React.useState<FilterType>("all")
 
   // Get currently selected IDs
   const enabledExtensions = actions
@@ -27,12 +32,24 @@ export function ActionBuilder({ actions, onChange }: ActionBuilderProps) {
     .filter(a => a.type === "disableGroup")
     .map(a => a.targetId)
 
+  // Filtered extensions
+  const filteredExtensions = React.useMemo(() => {
+    if (!searchQuery.trim()) return extensions
+    const query = searchQuery.toLowerCase()
+    return extensions.filter(ext => ext.name.toLowerCase().includes(query))
+  }, [extensions, searchQuery])
+
+  // Filtered groups
+  const filteredGroups = React.useMemo(() => {
+    if (!searchQuery.trim()) return groups
+    const query = searchQuery.toLowerCase()
+    return groups.filter(grp => grp.name.toLowerCase().includes(query))
+  }, [groups, searchQuery])
+
   const toggleExtensionEnable = (extId: string) => {
     if (enabledExtensions.includes(extId)) {
-      // Remove from enable list
       onChange(actions.filter(a => !(a.type === "enableExtension" && a.targetId === extId)))
     } else {
-      // Add to enable list, remove from disable if exists
       const newActions = actions.filter(a => !(a.type === "disableExtension" && a.targetId === extId))
       newActions.push({ type: "enableExtension", targetId: extId })
       onChange(newActions)
@@ -41,10 +58,8 @@ export function ActionBuilder({ actions, onChange }: ActionBuilderProps) {
 
   const toggleExtensionDisable = (extId: string) => {
     if (disabledExtensions.includes(extId)) {
-      // Remove from disable list
       onChange(actions.filter(a => !(a.type === "disableExtension" && a.targetId === extId)))
     } else {
-      // Add to disable list, remove from enable if exists
       const newActions = actions.filter(a => !(a.type === "enableExtension" && a.targetId === extId))
       newActions.push({ type: "disableExtension", targetId: extId })
       onChange(newActions)
@@ -73,24 +88,59 @@ export function ActionBuilder({ actions, onChange }: ActionBuilderProps) {
 
   return (
     <div className="space-y-3">
+      {/* Search and Filter */}
+      <div className="flex items-center gap-2">
+        <div className="relative flex-1">
+          <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-punk-accent" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search..."
+            className="punk-input w-full h-8 pl-7 pr-7 text-[9px]"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery("")}
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 text-punk-text-muted hover:text-punk-text-primary"
+            >
+              <X className="h-3 w-3" />
+            </button>
+          )}
+        </div>
+        <select
+          value={activeFilter}
+          onChange={(e) => setActiveFilter(e.target.value as FilterType)}
+          className="punk-input h-8 px-2 text-[9px]"
+        >
+          <option value="all">ALL</option>
+          <option value="extensions">EXT</option>
+          <option value="groups">SECTOR</option>
+        </select>
+      </div>
+
       {/* Extensions Section */}
-      {extensions.length > 0 && (
+      {(activeFilter === "all" || activeFilter === "extensions") && filteredExtensions.length > 0 && (
         <div>
           <p className="font-punk-heading text-[8px] text-punk-text-muted uppercase tracking-wide mb-2">
-            EXTENSIONS [{extensions.length}]
+            EXTENSIONS [{filteredExtensions.length}]
           </p>
           <div className="space-y-1 max-h-48 overflow-y-auto">
-            {extensions.map((ext) => (
+            {filteredExtensions.map((ext) => (
               <div
                 key={ext.id}
                 className="flex items-center gap-2 px-3 py-2 border border-punk-border/20 bg-punk-bg hover:border-punk-border/50 transition-colors"
               >
                 {/* Icon */}
-                <div className="h-6 w-6 border border-punk-border/30 bg-punk-bg-alt flex items-center justify-center">
-                  <span className="font-punk-heading text-[8px] text-punk-text-muted">
-                    {ext.name[0]}
-                  </span>
-                </div>
+                {ext.iconUrl ? (
+                  <img src={ext.iconUrl} className="h-6 w-6 border border-punk-border/30 object-cover" alt="" />
+                ) : (
+                  <div className="h-6 w-6 border border-punk-border/30 bg-punk-bg-alt flex items-center justify-center">
+                    <span className="font-punk-heading text-[8px] text-punk-text-muted">
+                      {ext.name[0]}
+                    </span>
+                  </div>
+                )}
 
                 {/* Name */}
                 <span className="flex-1 font-punk-heading text-[9px] text-punk-text-primary uppercase truncate">
@@ -131,13 +181,13 @@ export function ActionBuilder({ actions, onChange }: ActionBuilderProps) {
       )}
 
       {/* Groups Section */}
-      {groups.length > 0 && (
+      {(activeFilter === "all" || activeFilter === "groups") && filteredGroups.length > 0 && (
         <div>
           <p className="font-punk-heading text-[8px] text-punk-text-muted uppercase tracking-wide mb-2">
-            SECTORS [{groups.length}]
+            SECTORS [{filteredGroups.length}]
           </p>
           <div className="space-y-1 max-h-48 overflow-y-auto">
-            {groups.map((group) => (
+            {filteredGroups.map((group) => (
               <div
                 key={group.id}
                 className="flex items-center gap-2 px-3 py-2 border border-punk-border/20 bg-punk-bg hover:border-punk-border/50 transition-colors"
