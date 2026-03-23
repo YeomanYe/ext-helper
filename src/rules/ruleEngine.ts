@@ -2,7 +2,7 @@
 // 规则引擎
 // ============================================================
 
-import type { Action, Condition, ConditionOperator } from "./types"
+import type { Action, Condition, ConditionOperator, ScheduleCondition } from "./types"
 import { domainMatcher } from "./domainMatcher"
 import { browserAdapter } from "@/services/browser/adapter"
 import { RULES_STORAGE_KEY } from "./constants"
@@ -32,25 +32,18 @@ export class RuleEngine {
   }
 
   /**
-   * 评估时间条件
+   * 评估时间表条件
    */
-  evaluateTimeConditions(
+  evaluateScheduleConditions(
     conditions: Condition[],
     operator: ConditionOperator
   ): boolean {
-    const timeConditions = conditions.filter(
-      (c) => c.type === "time" || c.type === "dayOfWeek"
-    )
-    if (timeConditions.length === 0) return false
+    const scheduleConditions = conditions.filter((c) => c.type === "schedule")
+    if (scheduleConditions.length === 0) return false
 
-    const results = timeConditions.map((condition) => {
-      if (condition.type === "time") {
-        return this.isWithinTimeRange(condition.startTime, condition.endTime)
-      }
-      if (condition.type === "dayOfWeek") {
-        return this.isDayMatch(condition.days)
-      }
-      return false
+    const results = scheduleConditions.map((condition) => {
+      if (condition.type !== "schedule") return false
+      return this.isScheduleMatch(condition as ScheduleCondition)
     })
 
     return this.combineResults(results, operator)
@@ -75,19 +68,14 @@ export class RuleEngine {
       })
     results.push(...domainResults)
 
-    // 评估时间条件
-    const timeResults = conditions
-      .filter((c) => c.type === "time" || c.type === "dayOfWeek")
+    // 评估时间表条件
+    const scheduleResults = conditions
+      .filter((c) => c.type === "schedule")
       .map((c) => {
-        if (c.type === "time") {
-          return this.isWithinTimeRange(c.startTime, c.endTime)
-        }
-        if (c.type === "dayOfWeek") {
-          return this.isDayMatch(c.days)
-        }
-        return false
+        if (c.type !== "schedule") return false
+        return this.isScheduleMatch(c as ScheduleCondition)
       })
-    results.push(...timeResults)
+    results.push(...scheduleResults)
 
     if (results.length === 0) return false
 
@@ -133,6 +121,18 @@ export class RuleEngine {
   isDayMatch(days: number[]): boolean {
     const today = new Date().getDay()
     return days.includes(today)
+  }
+
+  /**
+   * 检查时间表条件 (星期 + 时间范围)
+   */
+  isScheduleMatch(schedule: ScheduleCondition): boolean {
+    // 检查星期
+    const today = new Date().getDay()
+    if (!schedule.days.includes(today)) return false
+
+    // 检查时间范围
+    return this.isWithinTimeRange(schedule.startTime, schedule.endTime)
   }
 
   /**

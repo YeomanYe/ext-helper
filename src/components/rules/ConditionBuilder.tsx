@@ -1,10 +1,10 @@
-import { Trash2, Globe, Clock, Calendar } from "lucide-react"
+import * as React from "react"
+import { Trash2, Globe, Calendar, ChevronDown } from "lucide-react"
 import { cn } from "@/utils"
 import type {
   Condition,
   DomainCondition,
-  TimeCondition,
-  DayOfWeekCondition,
+  ScheduleCondition,
   MatchMode,
 } from "@/rules/types"
 import { DAYS_OF_WEEK, MATCH_MODES } from "@/rules/types"
@@ -26,19 +26,16 @@ export function ConditionBuilder({ conditions, onChange }: ConditionBuilderProps
           matchMode: "wildcard",
         } as DomainCondition
         break
-      case "time":
+      case "schedule":
         newCondition = {
-          type: "time",
+          type: "schedule",
+          days: [1, 2, 3, 4, 5], // Mon-Fri default
           startTime: "09:00",
           endTime: "18:00",
-        } as TimeCondition
+        } as ScheduleCondition
         break
-      case "dayOfWeek":
-        newCondition = {
-          type: "dayOfWeek",
-          days: [1, 2, 3, 4, 5],
-        } as DayOfWeekCondition
-        break
+      default:
+        return
     }
 
     onChange([...conditions, newCondition])
@@ -50,9 +47,7 @@ export function ConditionBuilder({ conditions, onChange }: ConditionBuilderProps
 
     if (currentCondition.type === "domain" && updates.type !== "domain") {
       newConditions[index] = { ...currentCondition, ...updates } as Condition
-    } else if (currentCondition.type === "time" && updates.type !== "time") {
-      newConditions[index] = { ...currentCondition, ...updates } as Condition
-    } else if (currentCondition.type === "dayOfWeek" && updates.type !== "dayOfWeek") {
+    } else if (currentCondition.type === "schedule" && updates.type !== "schedule") {
       newConditions[index] = { ...currentCondition, ...updates } as Condition
     } else {
       newConditions[index] = { ...currentCondition, ...updates } as Condition
@@ -65,13 +60,13 @@ export function ConditionBuilder({ conditions, onChange }: ConditionBuilderProps
     onChange(conditions.filter((_, i) => i !== index))
   }
 
-  const toggleDay = (condition: DayOfWeekCondition, day: number) => {
+  const toggleDay = (condition: ScheduleCondition, day: number) => {
     const newDays = condition.days.includes(day)
       ? condition.days.filter((d) => d !== day)
       : [...condition.days, day].sort()
     updateCondition(
       conditions.indexOf(condition),
-      { days: newDays } as Partial<DayOfWeekCondition>
+      { days: newDays } as Partial<ScheduleCondition>
     )
   }
 
@@ -88,19 +83,12 @@ export function ConditionBuilder({ conditions, onChange }: ConditionBuilderProps
               "mt-0.5 p-1 border border-punk-border/30",
               condition.type === "domain" &&
                 "text-punk-accent bg-punk-accent/5",
-              condition.type === "time" &&
-                "text-punk-success bg-punk-success/5",
-              condition.type === "dayOfWeek" &&
-                "text-punk-warning bg-punk-warning/5"
+              condition.type === "schedule" &&
+                "text-punk-success bg-punk-success/5"
             )}
           >
-            {condition.type === "domain" && (
-              <Globe className="h-3 w-3" />
-            )}
-            {condition.type === "time" && <Clock className="h-3 w-3" />}
-            {condition.type === "dayOfWeek" && (
-              <Calendar className="h-3 w-3" />
-            )}
+            {condition.type === "domain" && <Globe className="h-3 w-3" />}
+            {condition.type === "schedule" && <Calendar className="h-3 w-3" />}
           </div>
 
           {/* Fields */}
@@ -111,16 +99,11 @@ export function ConditionBuilder({ conditions, onChange }: ConditionBuilderProps
                 onChange={(updates) => updateCondition(index, updates)}
               />
             )}
-            {condition.type === "time" && (
-              <TimeConditionFields
-                condition={condition as TimeCondition}
+            {condition.type === "schedule" && (
+              <ScheduleConditionFields
+                condition={condition as ScheduleCondition}
                 onChange={(updates) => updateCondition(index, updates)}
-              />
-            )}
-            {condition.type === "dayOfWeek" && (
-              <DayOfWeekConditionFields
-                condition={condition as DayOfWeekCondition}
-                onToggleDay={(day) => toggleDay(condition as DayOfWeekCondition, day)}
+                onToggleDay={(day) => toggleDay(condition as ScheduleCondition, day)}
               />
             )}
           </div>
@@ -149,26 +132,15 @@ export function ConditionBuilder({ conditions, onChange }: ConditionBuilderProps
           DOMAIN
         </button>
         <button
-          onClick={() => addCondition("time")}
+          onClick={() => addCondition("schedule")}
           className={cn(
             "flex items-center gap-1.5 px-2 py-1.5 text-[8px] font-punk-heading uppercase",
             "border border-dashed border-punk-success/30 text-punk-success/70",
             "hover:border-punk-success hover:text-punk-success"
           )}
         >
-          <Clock className="h-3 w-3" />
-          TIME
-        </button>
-        <button
-          onClick={() => addCondition("dayOfWeek")}
-          className={cn(
-            "flex items-center gap-1.5 px-2 py-1.5 text-[8px] font-punk-heading uppercase",
-            "border border-dashed border-punk-warning/30 text-punk-warning/70",
-            "hover:border-punk-warning hover:text-punk-warning"
-          )}
-        >
           <Calendar className="h-3 w-3" />
-          DAY
+          SCHEDULE
         </button>
       </div>
     </div>
@@ -182,6 +154,20 @@ function DomainConditionFields({
   condition: DomainCondition
   onChange: (updates: Partial<DomainCondition>) => void
 }) {
+  const [showDropdown, setShowDropdown] = React.useState(false)
+  const dropdownRef = React.useRef<HTMLDivElement>(null)
+  const currentMode = MATCH_MODES.find(m => m.value === condition.matchMode) || MATCH_MODES[0]
+
+  React.useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowDropdown(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
+
   return (
     <div className="space-y-2">
       <input
@@ -191,72 +177,95 @@ function DomainConditionFields({
         placeholder="*.example.com or github.com"
         className="punk-input w-full h-8 px-2 text-[9px]"
       />
-      <select
-        value={condition.matchMode}
-        onChange={(e) =>
-          onChange({ matchMode: e.target.value as MatchMode })
-        }
-        className="punk-input w-full h-7 px-2 text-[8px]"
-      >
-        {MATCH_MODES.map((mode) => (
-          <option key={mode.value} value={mode.value}>
-            {mode.label}
-          </option>
-        ))}
-      </select>
+
+      {/* Match Mode Dropdown - Styled */}
+      <div className="relative" ref={dropdownRef}>
+        <button
+          onClick={() => setShowDropdown(!showDropdown)}
+          className={cn(
+            "w-full h-7 px-2 text-[8px] flex items-center justify-between",
+            "border border-punk-border/50 bg-punk-bg-alt",
+            "hover:border-punk-primary hover:shadow-[0_0_10px_rgba(124,58,237,0.2)]",
+            "transition-all duration-200"
+          )}
+        >
+          <span className="font-punk-heading uppercase tracking-wide text-punk-text-primary">
+            {currentMode.label}
+          </span>
+          <ChevronDown className={cn("h-3 w-3 text-punk-text-muted transition-transform", showDropdown && "rotate-180")} />
+        </button>
+
+        {showDropdown && (
+          <div className="absolute top-full left-0 mt-1 z-50 w-full border border-punk-border bg-punk-bg-alt shadow-[0_0_15px_rgba(124,58,237,0.3)]">
+            {MATCH_MODES.map((mode) => (
+              <button
+                key={mode.value}
+                onClick={() => {
+                  onChange({ matchMode: mode.value })
+                  setShowDropdown(false)
+                }}
+                className={cn(
+                  "w-full px-2 py-1.5 text-left font-punk-heading text-[8px] uppercase tracking-wide transition-all",
+                  condition.matchMode === mode.value
+                    ? "bg-punk-primary text-white"
+                    : "text-punk-text-secondary hover:bg-punk-bg hover:text-punk-text-primary"
+                )}
+              >
+                {mode.label}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   )
 }
 
-function TimeConditionFields({
+function ScheduleConditionFields({
   condition,
   onChange,
-}: {
-  condition: TimeCondition
-  onChange: (updates: Partial<TimeCondition>) => void
-}) {
-  return (
-    <div className="flex items-center gap-2">
-      <input
-        type="time"
-        value={condition.startTime}
-        onChange={(e) => onChange({ startTime: e.target.value })}
-        className="punk-input h-7 px-2 text-[9px]"
-      />
-      <span className="text-punk-text-muted text-[8px]">TO</span>
-      <input
-        type="time"
-        value={condition.endTime}
-        onChange={(e) => onChange({ endTime: e.target.value })}
-        className="punk-input h-7 px-2 text-[9px]"
-      />
-    </div>
-  )
-}
-
-function DayOfWeekConditionFields({
-  condition,
   onToggleDay,
 }: {
-  condition: DayOfWeekCondition
+  condition: ScheduleCondition
+  onChange: (updates: Partial<ScheduleCondition>) => void
   onToggleDay: (day: number) => void
 }) {
   return (
-    <div className="flex flex-wrap gap-1">
-      {DAYS_OF_WEEK.map((day) => (
-        <button
-          key={day.value}
-          onClick={() => onToggleDay(day.value)}
-          className={cn(
-            "w-8 h-7 text-[8px] font-punk-heading transition-all",
-            condition.days.includes(day.value)
-              ? "border border-punk-warning/50 bg-punk-warning/10 text-punk-warning"
-              : "border border-punk-border/30 bg-punk-bg text-punk-text-muted"
-          )}
-        >
-          {day.label}
-        </button>
-      ))}
+    <div className="space-y-2">
+      {/* Days */}
+      <div className="flex flex-wrap gap-1">
+        {DAYS_OF_WEEK.map((day) => (
+          <button
+            key={day.value}
+            onClick={() => onToggleDay(day.value)}
+            className={cn(
+              "w-8 h-7 text-[8px] font-punk-heading transition-all",
+              condition.days.includes(day.value)
+                ? "border border-punk-success/50 bg-punk-success/10 text-punk-success"
+                : "border border-punk-border/30 bg-punk-bg text-punk-text-muted"
+            )}
+          >
+            {day.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Time Range */}
+      <div className="flex items-center gap-2">
+        <input
+          type="time"
+          value={condition.startTime}
+          onChange={(e) => onChange({ startTime: e.target.value })}
+          className="punk-input h-7 px-2 text-[9px] border border-punk-border/50"
+        />
+        <span className="text-punk-text-muted text-[8px]">TO</span>
+        <input
+          type="time"
+          value={condition.endTime}
+          onChange={(e) => onChange({ endTime: e.target.value })}
+          className="punk-input h-7 px-2 text-[9px] border border-punk-border/50"
+        />
+      </div>
     </div>
   )
 }

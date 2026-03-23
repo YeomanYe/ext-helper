@@ -4,7 +4,7 @@
 
 // ---------- 条件类型 ----------
 
-export type ConditionType = "domain" | "time" | "dayOfWeek"
+export type ConditionType = "domain" | "schedule"
 export type MatchMode = "exact" | "contains" | "wildcard" | "regex"
 export type ConditionOperator = "AND" | "OR"
 
@@ -15,21 +15,16 @@ export interface DomainCondition {
   matchMode: MatchMode
 }
 
-// 时间条件
-export interface TimeCondition {
-  type: "time"
+// 时间表条件 (合并时间和星期)
+export interface ScheduleCondition {
+  type: "schedule"
+  days: number[] // 0=周日, 1=周一, ..., 6=周六
   startTime: string // "HH:mm" 格式
   endTime: string // "HH:mm" 格式
 }
 
-// 星期条件
-export interface DayOfWeekCondition {
-  type: "dayOfWeek"
-  days: number[] // 0=周日, 1=周一, ..., 6=周六
-}
-
 // 联合条件类型
-export type Condition = DomainCondition | TimeCondition | DayOfWeekCondition
+export type Condition = DomainCondition | ScheduleCondition
 
 // ---------- 动作类型 ----------
 

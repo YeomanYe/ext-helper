@@ -1,7 +1,7 @@
 import * as React from "react"
-import { Globe, Clock, Calendar, Edit2, Trash2 } from "lucide-react"
+import { Globe, Calendar, Edit2, Trash2 } from "lucide-react"
 import { cn } from "@/utils"
-import type { Rule, Condition } from "@/rules/types"
+import type { Rule, Condition, ScheduleCondition } from "@/rules/types"
 import { DAYS_OF_WEEK } from "@/rules/types"
 
 interface RuleCardProps {
@@ -123,26 +123,15 @@ function ConditionBadge({ condition }: { condition: Condition }) {
     )
   }
 
-  if (condition.type === "time") {
-    return (
-      <div className="flex items-center gap-1 px-1.5 py-0.5 border border-punk-success/30 bg-punk-success/5">
-        <Clock className="h-2.5 w-2.5 text-punk-success" />
-        <span className="font-punk-code text-[7px] text-punk-success">
-          {condition.startTime}-{condition.endTime}
-        </span>
-      </div>
-    )
-  }
-
-  if (condition.type === "dayOfWeek") {
+  if (condition.type === "schedule") {
     const daysLabel = condition.days
-      .map((d) => DAYS_OF_WEEK[d]?.label || "")
+      .map((d) => DAYS_OF_WEEK.find(day => day.value === d)?.label || "")
       .join("")
     return (
-      <div className="flex items-center gap-1 px-1.5 py-0.5 border border-punk-warning/30 bg-punk-warning/5">
-        <Calendar className="h-2.5 w-2.5 text-punk-warning" />
-        <span className="font-punk-code text-[7px] text-punk-warning">
-          {daysLabel}
+      <div className="flex items-center gap-1 px-1.5 py-0.5 border border-punk-success/30 bg-punk-success/5">
+        <Calendar className="h-2.5 w-2.5 text-punk-success" />
+        <span className="font-punk-code text-[7px] text-punk-success">
+          {daysLabel} {condition.startTime}-{condition.endTime}
         </span>
       </div>
     )
