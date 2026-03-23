@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Search, Plus, X } from "lucide-react"
+import { Search, Plus, X, ChevronDown } from "lucide-react"
 import { cn } from "@/utils"
 import { useRuleStore } from "@/stores/ruleStore"
 import { useExtensionStore } from "@/stores/extensionStore"
@@ -10,6 +10,108 @@ import type { Rule } from "@/rules/types"
 
 type RuleFilterType = "all" | "enabled" | "disabled"
 
+const FILTERS: { value: RuleFilterType; label: string }[] = [
+  { value: "all", label: "ALL" },
+  { value: "enabled", label: "ON" },
+  { value: "disabled", label: "OFF" }
+]
+
+function RuleFilterDropdown({
+  value,
+  onChange
+}: {
+  value: RuleFilterType
+  onChange: (v: RuleFilterType) => void
+}) {
+  const [showDropdown, setShowDropdown] = React.useState(false)
+  const currentLabel = FILTERS.find(f => f.value === value)?.label || "ALL"
+
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setShowDropdown(!showDropdown)}
+        className={cn(
+          "flex items-center gap-2 px-3 h-11",
+          "border border-punk-border/50 bg-punk-bg-alt",
+          "font-punk-heading text-[9px] uppercase tracking-wide",
+          "text-punk-text-primary",
+          "hover:border-punk-primary hover:shadow-[0_0_10px_rgba(124,58,237,0.3)]",
+          "transition-all duration-200"
+        )}
+      >
+        <span>{currentLabel}</span>
+        <ChevronDown className={cn("h-3 w-3 transition-transform", showDropdown && "rotate-180")} />
+      </button>
+
+      {showDropdown && (
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => setShowDropdown(false)} />
+          <div className="absolute top-full left-0 mt-1 z-50 w-28 border border-punk-border bg-punk-bg-alt shadow-[0_0_20px_rgba(124,58,237,0.3)]">
+            {FILTERS.map((filter) => (
+              <button
+                key={filter.value}
+                onClick={() => {
+                  onChange(filter.value)
+                  setShowDropdown(false)
+                }}
+                className={cn(
+                  "w-full px-3 py-2 text-left font-punk-heading text-[9px] uppercase tracking-wide",
+                  "transition-all duration-150",
+                  value === filter.value
+                    ? "bg-punk-primary text-white"
+                    : "text-punk-text-secondary hover:bg-punk-bg hover:text-punk-text-primary"
+                )}
+              >
+                {filter.label}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
+
+function RuleSearchBar({
+  value,
+  onChange,
+  filter,
+  onFilterChange
+}: {
+  value: string
+  onChange: (v: string) => void
+  filter: RuleFilterType
+  onFilterChange: (v: RuleFilterType) => void
+}) {
+  return (
+    <div className="flex items-center gap-3 px-3 py-2 border-b border-punk-border/30">
+      <RuleFilterDropdown value={filter} onChange={onFilterChange} />
+
+      <div className="relative flex-1">
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 font-punk-body text-punk-accent text-lg">$</span>
+        <input
+          type="text"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder="Search rules..."
+          className={cn(
+            "punk-input h-11 w-full pl-9 pr-10 text-punk-text-primary",
+            "font-punk-body text-sm"
+          )}
+        />
+        {value && (
+          <button
+            onClick={() => onChange("")}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-punk-text-muted hover:text-punk-accent transition-colors"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        )}
+      </div>
+    </div>
+  )
+}
+
 export function RuleManager() {
   const { rules, fetchRules, createRule, updateRule, deleteRule, toggleRule } =
     useRuleStore()
@@ -19,12 +121,6 @@ export function RuleManager() {
   const [editingRule, setEditingRule] = React.useState<Rule | null>(null)
   const [searchQuery, setSearchQuery] = React.useState("")
   const [filter, setFilter] = React.useState<RuleFilterType>("all")
-
-  const FILTERS: { value: RuleFilterType; label: string }[] = [
-    { value: "all", label: "ALL" },
-    { value: "enabled", label: "ON" },
-    { value: "disabled", label: "OFF" }
-  ]
 
   React.useEffect(() => {
     fetchRules()
@@ -99,44 +195,21 @@ export function RuleManager() {
       </div>
 
       {/* Search */}
-      <div className="px-3 py-2 border-b border-punk-border/30">
-        <div className="flex items-center gap-1">
-          <div className="relative flex-1">
-            <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-punk-accent" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search rules..."
-              className="punk-input w-full h-8 pl-8 pr-3 text-xs"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery("")}
-                className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 text-punk-text-muted hover:text-punk-text-primary"
-              >
-                <X className="h-3 w-3" />
-              </button>
-            )}
-          </div>
-          <select
-            value={filter}
-            onChange={(e) => setFilter(e.target.value as RuleFilterType)}
-            className="punk-input h-8 px-2 text-xs"
-          >
-            {FILTERS.map((f) => (
-              <option key={f.value} value={f.value}>
-                {f.label}
-              </option>
-            ))}
-          </select>
-        </div>
-        {(searchQuery || filter !== "all") && (
-          <div className="mt-1 text-xs text-punk-text-muted">
+      <RuleSearchBar
+        value={searchQuery}
+        onChange={setSearchQuery}
+        filter={filter}
+        onFilterChange={setFilter}
+      />
+
+      {/* Results count */}
+      {(searchQuery || filter !== "all") && (
+        <div className="px-3 py-1 bg-punk-bg/50">
+          <span className="text-xs text-punk-text-muted">
             {filteredRules.length} / {rules.length} rules
-          </div>
-        )}
-      </div>
+          </span>
+        </div>
+      )}
 
       {/* Rule List */}
       <div className="flex-1 overflow-y-auto p-3">
