@@ -1,6 +1,7 @@
 import * as React from "react"
-import { Power, Folder, Search, X } from "lucide-react"
+import { Power, Folder, X } from "lucide-react"
 import { cn } from "@/utils"
+import { SearchBar } from "@/components/popup"
 import type { Action } from "@/rules/types"
 import { useExtensionStore } from "@/stores/extensionStore"
 import { useGroupStore } from "@/stores/groupStore"
@@ -10,13 +11,13 @@ interface ActionBuilderProps {
   onChange: (actions: Action[]) => void
 }
 
-type FilterType = "all" | "extensions" | "groups"
+type ActionFilterType = "all" | "extensions" | "groups"
 
 export function ActionBuilder({ actions, onChange }: ActionBuilderProps) {
   const { extensions } = useExtensionStore()
   const { groups } = useGroupStore()
   const [searchQuery, setSearchQuery] = React.useState("")
-  const [activeFilter, setActiveFilter] = React.useState<FilterType>("all")
+  const [activeFilter, setActiveFilter] = React.useState<ActionFilterType>("all")
 
   // Get currently selected IDs
   const enabledExtensions = actions
@@ -116,35 +117,13 @@ export function ActionBuilder({ actions, onChange }: ActionBuilderProps) {
   return (
     <div className="space-y-2">
       {/* Search and Filter */}
-      <div className="flex items-center gap-1">
-        <div className="relative flex-1">
-          <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-punk-accent" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search..."
-            className="punk-input w-full h-8 pl-8 pr-7 text-xs"
-          />
-          {searchQuery && (
-            <button
-              onClick={() => setSearchQuery("")}
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 text-punk-text-muted hover:text-punk-text-primary"
-            >
-              <X className="h-3 w-3" />
-            </button>
-          )}
-        </div>
-        <select
-          value={activeFilter}
-          onChange={(e) => setActiveFilter(e.target.value as FilterType)}
-          className="punk-input h-8 px-2 text-xs"
-        >
-          <option value="all">ALL</option>
-          <option value="extensions">EXT</option>
-          <option value="groups">SECTOR</option>
-        </select>
-      </div>
+      <SearchBar
+        value={searchQuery}
+        onChange={setSearchQuery}
+        placeholder="SEARCH_EXTENSIONS..."
+        activeFilter={activeFilter}
+        onFilterChange={setActiveFilter}
+      />
 
       {/* Compact Grid */}
       {(activeFilter === "all" || activeFilter === "extensions") && filteredExtensions.length > 0 && (

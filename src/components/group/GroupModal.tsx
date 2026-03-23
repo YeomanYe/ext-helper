@@ -1,6 +1,7 @@
 import * as React from "react"
-import { X, Plus, Search } from "lucide-react"
+import { X, Plus, Folder } from "lucide-react"
 import { cn } from "@/utils"
+import { SearchBar } from "@/components/popup"
 import type { Group, Extension } from "@/types"
 
 interface GroupChipProps {
@@ -337,16 +338,11 @@ export function GroupDetailModal({
 
         {/* Search */}
         <div className="px-4 py-3 border-b border-punk-border/30 bg-punk-bg shrink-0">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-punk-accent" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="SEARCH..."
-              className="punk-input w-full h-10 pl-10 pr-3 text-sm"
-            />
-          </div>
+          <SearchBar
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder="SEARCH_EXTENSIONS..."
+          />
         </div>
 
         {/* Extension List */}
