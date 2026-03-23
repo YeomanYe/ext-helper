@@ -76,6 +76,117 @@ export function CreateGroupChip({ onClick }: CreateGroupChipProps) {
   )
 }
 
+interface CreateGroupModalProps {
+  onClose: () => void
+  onCreate: (name: string, color: string) => void
+}
+
+const GROUP_COLORS = [
+  "#EF4444", "#F97316", "#F59E0B", "#22C55E",
+  "#14B8A6", "#3B82F6", "#8B5CF6", "#EC4899"
+]
+
+export function CreateGroupModal({ onClose, onCreate }: CreateGroupModalProps) {
+  const [name, setName] = React.useState("")
+  const [selectedColor, setSelectedColor] = React.useState(GROUP_COLORS[0])
+
+  // Close on escape
+  React.useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose()
+    }
+    document.addEventListener("keydown", handleEsc)
+    return () => document.removeEventListener("keydown", handleEsc)
+  }, [onClose])
+
+  const handleCreate = () => {
+    if (name.trim()) {
+      onCreate(name.trim(), selectedColor)
+      onClose()
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-punk-bg/80 backdrop-blur-sm" onClick={onClose}>
+      <div
+        className="w-80 border border-punk-border bg-punk-bg-alt shadow-[0_0_30px_rgba(124,58,237,0.4)] overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Modal Header */}
+        <div className="flex items-center gap-2 px-4 py-3 border-b border-punk-border/30">
+          <h3 className="flex-1 font-punk-heading text-[10px] text-punk-text-primary uppercase tracking-wide">
+            CREATE SECTOR
+          </h3>
+          <button
+            onClick={onClose}
+            className="p-1 text-punk-text-muted hover:text-punk-cta transition-colors"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        {/* Form */}
+        <div className="p-4 space-y-4">
+          <div>
+            <label className="block font-punk-heading text-[8px] text-punk-text-muted uppercase tracking-wide mb-2">
+              SECTOR NAME
+            </label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Enter sector name..."
+              className="punk-input w-full h-10 px-3 text-sm"
+              autoFocus
+            />
+          </div>
+
+          <div>
+            <label className="block font-punk-heading text-[8px] text-punk-text-muted uppercase tracking-wide mb-2">
+              COLOR
+            </label>
+            <div className="flex gap-2 flex-wrap">
+              {GROUP_COLORS.map((color) => (
+                <button
+                  key={color}
+                  onClick={() => setSelectedColor(color)}
+                  className={cn(
+                    "h-7 w-7 rounded-full transition-transform",
+                    selectedColor === color && "ring-2 ring-offset-2 ring-punk-accent scale-110"
+                  )}
+                  style={{ backgroundColor: color }}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="flex justify-end gap-2 px-4 py-3 border-t border-punk-border/30">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 font-punk-heading text-[9px] text-punk-text-muted uppercase tracking-wide hover:text-punk-text-primary"
+          >
+            CANCEL
+          </button>
+          <button
+            onClick={handleCreate}
+            disabled={!name.trim()}
+            className={cn(
+              "px-4 py-2 font-punk-heading text-[9px] uppercase tracking-wide transition-all",
+              name.trim()
+                ? "bg-punk-primary text-white hover:bg-punk-primary-hover"
+                : "bg-punk-border/50 text-punk-text-muted cursor-not-allowed"
+            )}
+          >
+            CREATE
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 interface GroupDetailModalProps {
   group: Group
   extensions: Extension[]
@@ -86,6 +197,7 @@ interface GroupDetailModalProps {
   onRemove?: (id: string) => void
   onAddExtension: (groupId: string, extId: string) => void
   onRemoveFromGroup: (groupId: string, extId: string) => void
+  onRename: (groupId: string, name: string) => void
 }
 
 export function GroupDetailModal({
@@ -97,9 +209,12 @@ export function GroupDetailModal({
   onOpenOptions,
   onRemove,
   onAddExtension,
-  onRemoveFromGroup
+  onRemoveFromGroup,
+  onRename
 }: GroupDetailModalProps) {
   const [searchQuery, setSearchQuery] = React.useState("")
+  const [isEditing, setIsEditing] = React.useState(false)
+  const [editName, setEditName] = React.useState(group.name)
 
   // Create a set of extension IDs in this group for fast lookup
   const groupExtIds = React.useMemo(() => {
@@ -131,11 +246,25 @@ export function GroupDetailModal({
   // Close on escape
   React.useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose()
+      if (e.key === "Escape") {
+        if (isEditing) {
+          setIsEditing(false)
+          setEditName(group.name)
+        } else {
+          onClose()
+        }
+      }
     }
     document.addEventListener("keydown", handleEsc)
     return () => document.removeEventListener("keydown", handleEsc)
-  }, [onClose])
+  }, [onClose, isEditing, group.name])
+
+  const handleSaveRename = () => {
+    if (editName.trim() && editName !== group.name) {
+      onRename(group.id, editName.trim())
+    }
+    setIsEditing(false)
+  }
 
   const handleToggleExtensionMembership = (ext: typeof filteredExtensions[0]) => {
     if (ext.isInGroup) {
@@ -162,12 +291,42 @@ export function GroupDetailModal({
             className="h-3 w-3"
             style={{ backgroundColor: group.color }}
           />
-          <h3 className="flex-1 font-punk-heading text-[10px] text-punk-text-primary uppercase tracking-wide">
-            {group.name}
-          </h3>
+          {isEditing ? (
+            <input
+              type="text"
+              value={editName}
+              onChange={(e) => setEditName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleSaveRename()
+                if (e.key === "Escape") {
+                  setIsEditing(false)
+                  setEditName(group.name)
+                }
+              }}
+              onBlur={handleSaveRename}
+              className="flex-1 h-6 px-2 font-punk-heading text-[10px] text-punk-text-primary uppercase bg-punk-bg border border-punk-border/50"
+              autoFocus
+            />
+          ) : (
+            <h3 className="flex-1 font-punk-heading text-[10px] text-punk-text-primary uppercase tracking-wide">
+              {group.name}
+            </h3>
+          )}
           <span className="font-punk-code text-[10px] text-punk-accent">
             [{extensions.length}]
           </span>
+          {!isEditing && (
+            <button
+              onClick={() => setIsEditing(true)}
+              className="p-1 text-punk-text-muted hover:text-punk-accent transition-colors"
+              title="Rename sector"
+            >
+              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+              </svg>
+            </button>
+          )}
           <button
             onClick={onClose}
             className="p-1 text-punk-text-muted hover:text-punk-cta transition-colors"

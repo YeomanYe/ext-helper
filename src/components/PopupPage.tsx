@@ -1,7 +1,7 @@
 import * as React from "react"
 import { Header, Footer, SearchBar } from "@/components/popup"
 import { ExtensionCard } from "@/components/extension"
-import { GroupChip, CreateGroupChip, GroupDetailModal } from "@/components/group"
+import { GroupChip, CreateGroupChip, GroupDetailModal, CreateGroupModal } from "@/components/group"
 import { RuleManager } from "@/components/rules"
 import {
   useExtensionStore,
@@ -33,7 +33,8 @@ export function PopupPage() {
     fetchGroups,
     createGroup,
     addToGroup,
-    removeFromGroup
+    removeFromGroup,
+    renameGroup
   } = useGroupStore()
 
   const {
@@ -53,6 +54,7 @@ export function PopupPage() {
 
   // Modal state
   const [selectedGroupId, setSelectedGroupId] = React.useState<string | null>(null)
+  const [showCreateModal, setShowCreateModal] = React.useState(false)
 
   // Get selected group
   const selectedGroup = React.useMemo(() => {
@@ -191,7 +193,7 @@ export function PopupPage() {
                 })}
 
                 {/* Create group chip */}
-                <CreateGroupChip onClick={() => createGroup("新分组", "#7C3AED")} />
+                <CreateGroupChip onClick={() => setShowCreateModal(true)} />
               </div>
             </div>
 
@@ -243,6 +245,15 @@ export function PopupPage() {
           onRemove={handleRemove}
           onAddExtension={addToGroup}
           onRemoveFromGroup={removeFromGroup}
+          onRename={renameGroup}
+        />
+      )}
+
+      {/* Create Group Modal */}
+      {showCreateModal && (
+        <CreateGroupModal
+          onClose={() => setShowCreateModal(false)}
+          onCreate={(name, color) => createGroup(name, color)}
         />
       )}
     </div>
