@@ -86,10 +86,37 @@ export function ActionBuilder({ actions, onChange }: ActionBuilderProps) {
     }
   }
 
+  // Combine all items for compact view
+  const allItems = React.useMemo(() => {
+    const extItems = filteredExtensions.map(ext => ({
+      id: ext.id,
+      type: "extension" as const,
+      name: ext.name,
+      iconUrl: ext.iconUrl,
+      isEnabled: enabledExtensions.includes(ext.id),
+      isDisabled: disabledExtensions.includes(ext.id),
+      onEnable: () => toggleExtensionEnable(ext.id),
+      onDisable: () => toggleExtensionDisable(ext.id)
+    }))
+
+    const groupItems = filteredGroups.map(grp => ({
+      id: grp.id,
+      type: "group" as const,
+      name: grp.name,
+      color: grp.color,
+      isEnabled: enabledGroups.includes(grp.id),
+      isDisabled: disabledGroups.includes(grp.id),
+      onEnable: () => toggleGroupEnable(grp.id),
+      onDisable: () => toggleGroupDisable(grp.id)
+    }))
+
+    return [...extItems, ...groupItems]
+  }, [filteredExtensions, filteredGroups, enabledExtensions, disabledExtensions, enabledGroups, disabledGroups])
+
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       {/* Search and Filter */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1">
         <div className="relative flex-1">
           <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-punk-accent" />
           <input
@@ -97,7 +124,7 @@ export function ActionBuilder({ actions, onChange }: ActionBuilderProps) {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search..."
-            className="punk-input w-full h-8 pl-7 pr-7 text-[9px]"
+            className="punk-input w-full h-8 pl-8 pr-7 text-xs"
           />
           {searchQuery && (
             <button
@@ -111,7 +138,7 @@ export function ActionBuilder({ actions, onChange }: ActionBuilderProps) {
         <select
           value={activeFilter}
           onChange={(e) => setActiveFilter(e.target.value as FilterType)}
-          className="punk-input h-8 px-2 text-[9px]"
+          className="punk-input h-8 px-2 text-xs"
         >
           <option value="all">ALL</option>
           <option value="extensions">EXT</option>
@@ -119,119 +146,129 @@ export function ActionBuilder({ actions, onChange }: ActionBuilderProps) {
         </select>
       </div>
 
-      {/* Extensions Section */}
+      {/* Compact Grid */}
       {(activeFilter === "all" || activeFilter === "extensions") && filteredExtensions.length > 0 && (
         <div>
-          <p className="font-punk-heading text-[8px] text-punk-text-muted uppercase tracking-wide mb-2">
-            EXTENSIONS [{filteredExtensions.length}]
+          <p className="font-punk-heading text-[8px] text-punk-text-muted uppercase tracking-wide mb-1">
+            EXTENSIONS
           </p>
-          <div className="space-y-1 max-h-48 overflow-y-auto">
+          <div className="grid grid-cols-2 gap-1 max-h-48 overflow-y-auto">
             {filteredExtensions.map((ext) => (
               <div
                 key={ext.id}
-                className="flex items-center gap-2 px-3 py-2 border border-punk-border/20 bg-punk-bg hover:border-punk-border/50 transition-colors"
+                className={cn(
+                  "flex items-center gap-1.5 px-2 py-1.5 border transition-all",
+                  enabledExtensions.includes(ext.id)
+                    ? "border-punk-success/50 bg-punk-success/5"
+                    : disabledExtensions.includes(ext.id)
+                      ? "border-punk-cta/50 bg-punk-cta/5"
+                      : "border-punk-border/20 bg-punk-bg hover:border-punk-border/50"
+                )}
               >
                 {/* Icon */}
                 {ext.iconUrl ? (
-                  <img src={ext.iconUrl} className="h-6 w-6 border border-punk-border/30 object-cover" alt="" />
+                  <img src={ext.iconUrl} className="h-5 w-5 border border-punk-border/30 object-cover flex-shrink-0" alt="" />
                 ) : (
-                  <div className="h-6 w-6 border border-punk-border/30 bg-punk-bg-alt flex items-center justify-center">
-                    <span className="font-punk-heading text-[8px] text-punk-text-muted">
+                  <div className="h-5 w-5 border border-punk-border/30 bg-punk-bg-alt flex items-center justify-center flex-shrink-0">
+                    <span className="font-punk-heading text-[6px] text-punk-text-muted">
                       {ext.name[0]}
                     </span>
                   </div>
                 )}
 
                 {/* Name */}
-                <span className="flex-1 font-punk-heading text-[9px] text-punk-text-primary uppercase truncate">
+                <span className="flex-1 font-punk-heading text-[7px] text-punk-text-primary uppercase truncate">
                   {ext.name}
                 </span>
 
-                {/* Enable Button */}
-                <button
-                  onClick={() => toggleExtensionEnable(ext.id)}
-                  className={cn(
-                    "flex items-center gap-1 px-2 py-1 text-[8px] font-punk-heading uppercase transition-all",
-                    enabledExtensions.includes(ext.id)
-                      ? "bg-punk-success/20 border border-punk-success/50 text-punk-success"
-                      : "border border-punk-border/30 text-punk-text-muted hover:border-punk-success/50 hover:text-punk-success/70"
-                  )}
-                >
-                  <Power className="h-3 w-3" />
-                  ON
-                </button>
-
-                {/* Disable Button */}
-                <button
-                  onClick={() => toggleExtensionDisable(ext.id)}
-                  className={cn(
-                    "flex items-center gap-1 px-2 py-1 text-[8px] font-punk-heading uppercase transition-all",
-                    disabledExtensions.includes(ext.id)
-                      ? "bg-punk-cta/20 border border-punk-cta/50 text-punk-cta"
-                      : "border border-punk-border/30 text-punk-text-muted hover:border-punk-cta/50 hover:text-punk-cta/70"
-                  )}
-                >
-                  <Power className="h-3 w-3" />
-                  OFF
-                </button>
+                {/* ON/OFF */}
+                <div className="flex gap-0.5">
+                  <button
+                    onClick={() => toggleExtensionEnable(ext.id)}
+                    className={cn(
+                      "px-1 py-0.5 text-[6px] font-punk-heading transition-all",
+                      enabledExtensions.includes(ext.id)
+                        ? "bg-punk-success text-white"
+                        : "text-punk-text-muted hover:text-punk-success"
+                    )}
+                  >
+                    ON
+                  </button>
+                  <button
+                    onClick={() => toggleExtensionDisable(ext.id)}
+                    className={cn(
+                      "px-1 py-0.5 text-[6px] font-punk-heading transition-all",
+                      disabledExtensions.includes(ext.id)
+                        ? "bg-punk-cta text-white"
+                        : "text-punk-text-muted hover:text-punk-cta"
+                    )}
+                  >
+                    OFF
+                  </button>
+                </div>
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {/* Groups Section */}
+      {/* Groups Grid */}
       {(activeFilter === "all" || activeFilter === "groups") && filteredGroups.length > 0 && (
         <div>
-          <p className="font-punk-heading text-[8px] text-punk-text-muted uppercase tracking-wide mb-2">
-            SECTORS [{filteredGroups.length}]
+          <p className="font-punk-heading text-[8px] text-punk-text-muted uppercase tracking-wide mb-1">
+            SECTORS
           </p>
-          <div className="space-y-1 max-h-48 overflow-y-auto">
+          <div className="grid grid-cols-2 gap-1 max-h-48 overflow-y-auto">
             {filteredGroups.map((group) => (
               <div
                 key={group.id}
-                className="flex items-center gap-2 px-3 py-2 border border-punk-border/20 bg-punk-bg hover:border-punk-border/50 transition-colors"
+                className={cn(
+                  "flex items-center gap-1.5 px-2 py-1.5 border transition-all",
+                  enabledGroups.includes(group.id)
+                    ? "border-punk-success/50 bg-punk-success/5"
+                    : disabledGroups.includes(group.id)
+                      ? "border-punk-cta/50 bg-punk-cta/5"
+                      : "border-punk-border/20 bg-punk-bg hover:border-punk-border/50"
+                )}
               >
                 {/* Color indicator */}
                 <div
-                  className="h-6 w-6 rounded border border-punk-border/30 flex items-center justify-center"
+                  className="h-5 w-5 rounded border border-punk-border/30 flex items-center justify-center flex-shrink-0"
                   style={{ backgroundColor: group.color + "20" }}
                 >
                   <Folder className="h-3 w-3" style={{ color: group.color }} />
                 </div>
 
                 {/* Name */}
-                <span className="flex-1 font-punk-heading text-[9px] text-punk-text-primary uppercase truncate">
+                <span className="flex-1 font-punk-heading text-[7px] text-punk-text-primary uppercase truncate">
                   {group.name}
                 </span>
 
-                {/* Enable Button */}
-                <button
-                  onClick={() => toggleGroupEnable(group.id)}
-                  className={cn(
-                    "flex items-center gap-1 px-2 py-1 text-[8px] font-punk-heading uppercase transition-all",
-                    enabledGroups.includes(group.id)
-                      ? "bg-punk-success/20 border border-punk-success/50 text-punk-success"
-                      : "border border-punk-border/30 text-punk-text-muted hover:border-punk-success/50 hover:text-punk-success/70"
-                  )}
-                >
-                  <Power className="h-3 w-3" />
-                  ON
-                </button>
-
-                {/* Disable Button */}
-                <button
-                  onClick={() => toggleGroupDisable(group.id)}
-                  className={cn(
-                    "flex items-center gap-1 px-2 py-1 text-[8px] font-punk-heading uppercase transition-all",
-                    disabledGroups.includes(group.id)
-                      ? "bg-punk-cta/20 border border-punk-cta/50 text-punk-cta"
-                      : "border border-punk-border/30 text-punk-text-muted hover:border-punk-cta/50 hover:text-punk-cta/70"
-                  )}
-                >
-                  <Power className="h-3 w-3" />
-                  OFF
-                </button>
+                {/* ON/OFF */}
+                <div className="flex gap-0.5">
+                  <button
+                    onClick={() => toggleGroupEnable(group.id)}
+                    className={cn(
+                      "px-1 py-0.5 text-[6px] font-punk-heading transition-all",
+                      enabledGroups.includes(group.id)
+                        ? "bg-punk-success text-white"
+                        : "text-punk-text-muted hover:text-punk-success"
+                    )}
+                  >
+                    ON
+                  </button>
+                  <button
+                    onClick={() => toggleGroupDisable(group.id)}
+                    className={cn(
+                      "px-1 py-0.5 text-[6px] font-punk-heading transition-all",
+                      disabledGroups.includes(group.id)
+                        ? "bg-punk-cta text-white"
+                        : "text-punk-text-muted hover:text-punk-cta"
+                    )}
+                  >
+                    OFF
+                  </button>
+                </div>
               </div>
             ))}
           </div>

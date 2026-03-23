@@ -1,5 +1,5 @@
 import * as React from "react"
-import { X } from "lucide-react"
+import { X, ChevronDown } from "lucide-react"
 import { cn } from "@/utils"
 import { ConditionBuilder } from "./ConditionBuilder"
 import { ActionBuilder } from "./ActionBuilder"
@@ -14,6 +14,70 @@ interface RuleEditorProps {
   rule: Rule | null
   onSave: (data: Omit<Rule, "id" | "createdAt" | "updatedAt" | "triggerCount">) => void
   onClose: () => void
+}
+
+const OPERATORS: { value: ConditionOperator; label: string }[] = [
+  { value: "AND", label: "MATCH ALL (AND)" },
+  { value: "OR", label: "MATCH ANY (OR)" }
+]
+
+function ConditionOperatorDropdown({
+  value,
+  onChange
+}: {
+  value: ConditionOperator
+  onChange: (op: ConditionOperator) => void
+}) {
+  const [showDropdown, setShowDropdown] = React.useState(false)
+  const dropdownRef = React.useRef<HTMLDivElement>(null)
+  const currentLabel = OPERATORS.find(o => o.value === value)?.label || ""
+
+  React.useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowDropdown(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        onClick={() => setShowDropdown(!showDropdown)}
+        className={cn(
+          "punk-input h-7 px-2 text-[9px] flex items-center gap-2",
+          "border border-punk-border/50 bg-punk-bg-alt"
+        )}
+      >
+        <span className="font-punk-heading uppercase">{currentLabel}</span>
+        <ChevronDown className={cn("h-3 w-3 text-punk-text-muted", showDropdown && "rotate-180")} />
+      </button>
+
+      {showDropdown && (
+        <div className="absolute top-full right-0 mt-1 z-50 w-40 border border-punk-border bg-punk-bg-alt shadow-[0_0_15px_rgba(124,58,237,0.3)]">
+          {OPERATORS.map((op) => (
+            <button
+              key={op.value}
+              onClick={() => {
+                onChange(op.value)
+                setShowDropdown(false)
+              }}
+              className={cn(
+                "w-full px-3 py-2 text-left font-punk-heading text-[9px] uppercase transition-all",
+                value === op.value
+                  ? "bg-punk-primary text-white"
+                  : "text-punk-text-secondary hover:bg-punk-bg hover:text-punk-text-primary"
+              )}
+            >
+              {op.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
 }
 
 export function RuleEditor({ rule, onSave, onClose }: RuleEditorProps) {
@@ -111,16 +175,10 @@ export function RuleEditor({ rule, onSave, onClose }: RuleEditorProps) {
               <label className="font-punk-heading text-[9px] text-punk-text-muted uppercase">
                 CONDITIONS
               </label>
-              <select
+              <ConditionOperatorDropdown
                 value={conditionOperator}
-                onChange={(e) =>
-                  setConditionOperator(e.target.value as ConditionOperator)
-                }
-                className="punk-input h-7 px-2 text-[9px]"
-              >
-                <option value="AND">MATCH ALL (AND)</option>
-                <option value="OR">MATCH ANY (OR)</option>
-              </select>
+                onChange={setConditionOperator}
+              />
             </div>
             <ConditionBuilder
               conditions={conditions}

@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Search, Plus } from "lucide-react"
+import { Search, Plus, X } from "lucide-react"
 import { cn } from "@/utils"
 import { useRuleStore } from "@/stores/ruleStore"
 import { useExtensionStore } from "@/stores/extensionStore"
@@ -7,6 +7,8 @@ import { useGroupStore } from "@/stores/groupStore"
 import { RuleList } from "./RuleList"
 import { RuleEditor } from "./RuleEditor"
 import type { Rule } from "@/rules/types"
+
+type RuleFilterType = "all" | "enabled" | "disabled"
 
 export function RuleManager() {
   const { rules, fetchRules, createRule, updateRule, deleteRule, toggleRule } =
@@ -16,20 +18,40 @@ export function RuleManager() {
   const [showEditor, setShowEditor] = React.useState(false)
   const [editingRule, setEditingRule] = React.useState<Rule | null>(null)
   const [searchQuery, setSearchQuery] = React.useState("")
+  const [filter, setFilter] = React.useState<RuleFilterType>("all")
+
+  const FILTERS: { value: RuleFilterType; label: string }[] = [
+    { value: "all", label: "ALL" },
+    { value: "enabled", label: "ON" },
+    { value: "disabled", label: "OFF" }
+  ]
 
   React.useEffect(() => {
     fetchRules()
   }, [])
 
   const filteredRules = React.useMemo(() => {
-    if (!searchQuery.trim()) return rules
-    const query = searchQuery.toLowerCase()
-    return rules.filter(
-      (r) =>
-        r.name.toLowerCase().includes(query) ||
-        r.description?.toLowerCase().includes(query)
-    )
-  }, [rules, searchQuery])
+    let result = rules
+
+    // Filter by status
+    if (filter === "enabled") {
+      result = result.filter(r => r.enabled)
+    } else if (filter === "disabled") {
+      result = result.filter(r => !r.enabled)
+    }
+
+    // Filter by search
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase()
+      result = result.filter(
+        (r) =>
+          r.name.toLowerCase().includes(query) ||
+          r.description?.toLowerCase().includes(query)
+      )
+    }
+
+    return result
+  }, [rules, searchQuery, filter])
 
   const handleCreateRule = () => {
     setEditingRule(null)
@@ -77,17 +99,43 @@ export function RuleManager() {
       </div>
 
       {/* Search */}
-      <div className="px-4 py-2 border-b border-punk-border/20">
-        <div className="relative">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-punk-accent" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="SEARCH RULES..."
-            className="punk-input w-full h-8 pl-8 pr-3 text-[10px]"
-          />
+      <div className="px-3 py-2 border-b border-punk-border/30">
+        <div className="flex items-center gap-1">
+          <div className="relative flex-1">
+            <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-punk-accent" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search rules..."
+              className="punk-input w-full h-8 pl-8 pr-3 text-xs"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 text-punk-text-muted hover:text-punk-text-primary"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            )}
+          </div>
+          <select
+            value={filter}
+            onChange={(e) => setFilter(e.target.value as RuleFilterType)}
+            className="punk-input h-8 px-2 text-xs"
+          >
+            {FILTERS.map((f) => (
+              <option key={f.value} value={f.value}>
+                {f.label}
+              </option>
+            ))}
+          </select>
         </div>
+        {(searchQuery || filter !== "all") && (
+          <div className="mt-1 text-xs text-punk-text-muted">
+            {filteredRules.length} / {rules.length} rules
+          </div>
+        )}
       </div>
 
       {/* Rule List */}
