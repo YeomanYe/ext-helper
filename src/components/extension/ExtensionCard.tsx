@@ -2,7 +2,7 @@ import * as React from "react"
 import { Settings, Trash2, Package, Power, PowerOff } from "lucide-react"
 import { cn } from "@/utils"
 import type { Extension, ViewMode } from "@/types"
-import { Switch } from "@/components/common"
+import { Switch, ConfirmDialog } from "@/components/common"
 
 interface ExtensionCardProps {
   extension: Extension
@@ -22,6 +22,7 @@ export function ExtensionCard({
   className
 }: ExtensionCardProps) {
   const [showMenu, setShowMenu] = React.useState(false)
+  const [showConfirmRemove, setShowConfirmRemove] = React.useState(false)
   const menuRef = React.useRef<HTMLDivElement>(null)
 
   // Close menu when clicking outside
@@ -38,6 +39,16 @@ export function ExtensionCard({
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault()
     setShowMenu(true)
+  }
+
+  const handleRemoveClick = () => {
+    setShowMenu(false)
+    setShowConfirmRemove(true)
+  }
+
+  const handleConfirmRemove = () => {
+    onRemove?.()
+    setShowConfirmRemove(false)
   }
 
   const isCard = viewMode === "card"
@@ -148,8 +159,7 @@ export function ExtensionCard({
             <button
               onClick={(e) => {
                 e.stopPropagation()
-                onRemove?.()
-                setShowMenu(false)
+                handleRemoveClick()
               }}
               className="flex w-full items-center gap-2 px-3 py-2 text-left font-punk-body text-sm text-punk-cta hover:bg-punk-cta/10 transition-colors"
             >
@@ -158,6 +168,17 @@ export function ExtensionCard({
             </button>
           </div>
         )}
+
+        {/* Confirm Remove Dialog */}
+        <ConfirmDialog
+          isOpen={showConfirmRemove}
+          title="REMOVE EXTENSION"
+          message={`Are you sure you want to remove "${extension.name}"? This action cannot be undone.`}
+          confirmText="REMOVE"
+          variant="danger"
+          onConfirm={handleConfirmRemove}
+          onCancel={() => setShowConfirmRemove(false)}
+        />
       </div>
     )
   }
@@ -246,10 +267,7 @@ export function ExtensionCard({
             </button>
           )}
           <button
-            onClick={() => {
-              onRemove?.()
-              setShowMenu(false)
-            }}
+            onClick={handleRemoveClick}
             className="flex w-full items-center gap-2 px-3 py-2 text-left font-punk-body text-sm text-punk-cta hover:bg-punk-cta/10 transition-colors"
           >
             <Trash2 className="h-4 w-4" />
@@ -257,6 +275,17 @@ export function ExtensionCard({
           </button>
         </div>
       )}
+
+      {/* Confirm Remove Dialog */}
+      <ConfirmDialog
+        isOpen={showConfirmRemove}
+        title="REMOVE EXTENSION"
+        message={`Are you sure you want to remove "${extension.name}"? This action cannot be undone.`}
+        confirmText="REMOVE"
+        variant="danger"
+        onConfirm={handleConfirmRemove}
+        onCancel={() => setShowConfirmRemove(false)}
+      />
     </div>
   )
 }

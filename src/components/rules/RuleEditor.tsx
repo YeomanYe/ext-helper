@@ -79,7 +79,7 @@ export function RuleEditor({ rule, onSave, onClose }: RuleEditorProps) {
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {/* Name */}
           <div>
-            <label className="block font-punk-heading text-[8px] text-punk-text-muted uppercase mb-1.5">
+            <label className="block font-punk-heading text-[9px] text-punk-text-muted uppercase mb-1.5">
               RULE_NAME
             </label>
             <input
@@ -87,13 +87,13 @@ export function RuleEditor({ rule, onSave, onClose }: RuleEditorProps) {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g., Work Time Extensions"
-              className="punk-input w-full h-9 px-3 text-[10px]"
+              className="punk-input w-full h-10 px-3 text-sm"
             />
           </div>
 
           {/* Description */}
           <div>
-            <label className="block font-punk-heading text-[8px] text-punk-text-muted uppercase mb-1.5">
+            <label className="block font-punk-heading text-[9px] text-punk-text-muted uppercase mb-1.5">
               DESCRIPTION (OPTIONAL)
             </label>
             <input
@@ -101,14 +101,14 @@ export function RuleEditor({ rule, onSave, onClose }: RuleEditorProps) {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Brief description..."
-              className="punk-input w-full h-9 px-3 text-[10px]"
+              className="punk-input w-full h-10 px-3 text-sm"
             />
           </div>
 
           {/* Conditions */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label className="font-punk-heading text-[8px] text-punk-text-muted uppercase">
+              <label className="font-punk-heading text-[9px] text-punk-text-muted uppercase">
                 CONDITIONS
               </label>
               <select
@@ -116,7 +116,7 @@ export function RuleEditor({ rule, onSave, onClose }: RuleEditorProps) {
                 onChange={(e) =>
                   setConditionOperator(e.target.value as ConditionOperator)
                 }
-                className="punk-input h-6 px-2 text-[8px]"
+                className="punk-input h-7 px-2 text-[9px]"
               >
                 <option value="AND">MATCH ALL (AND)</option>
                 <option value="OR">MATCH ANY (OR)</option>
@@ -130,7 +130,7 @@ export function RuleEditor({ rule, onSave, onClose }: RuleEditorProps) {
 
           {/* Actions */}
           <div>
-            <label className="block font-punk-heading text-[8px] text-punk-text-muted uppercase mb-1.5">
+            <label className="block font-punk-heading text-[9px] text-punk-text-muted uppercase mb-1.5">
               ACTIONS
             </label>
             <ActionBuilder actions={actions} onChange={setActions} />
@@ -138,14 +138,14 @@ export function RuleEditor({ rule, onSave, onClose }: RuleEditorProps) {
 
           {/* Priority */}
           <div>
-            <label className="block font-punk-heading text-[8px] text-punk-text-muted uppercase mb-1.5">
+            <label className="block font-punk-heading text-[9px] text-punk-text-muted uppercase mb-1.5">
               PRIORITY
             </label>
             <input
               type="number"
               value={priority}
               onChange={(e) => setPriority(parseInt(e.target.value) || 0)}
-              className="punk-input w-24 h-9 px-3 text-[10px]"
+              className="punk-input w-24 h-10 px-3 text-sm"
             />
           </div>
         </div>

@@ -3,26 +3,32 @@ import { Globe, Calendar, Edit2, Trash2 } from "lucide-react"
 import { cn } from "@/utils"
 import type { Rule, Condition, ScheduleCondition } from "@/rules/types"
 import { DAYS_OF_WEEK } from "@/rules/types"
+import type { Extension, Group } from "@/types"
 
 interface RuleCardProps {
   rule: Rule
+  extensions: Extension[]
+  groups: Group[]
   onToggle: (id: string) => void
   onEdit: (rule: Rule) => void
   onDelete: (id: string) => void
 }
 
-export function RuleCard({ rule, onToggle, onEdit, onDelete }: RuleCardProps) {
+export function RuleCard({ rule, extensions, groups, onToggle, onEdit, onDelete }: RuleCardProps) {
   const actionSummary = React.useMemo(() => {
-    return rule.actions
-      .map((a) => {
-        if (a.type === "enableExtension") return `ENABLE EXT`
-        if (a.type === "disableExtension") return `DISABLE EXT`
-        if (a.type === "enableGroup") return `ENABLE GRP`
-        if (a.type === "disableGroup") return `DISABLE GRP`
-        return a.type
-      })
-      .join(", ")
-  }, [rule.actions])
+    return rule.actions.map((a) => {
+      let name = a.type
+      if (a.type === "enableExtension" || a.type === "disableExtension") {
+        const ext = extensions.find(e => e.id === a.targetId)
+        name = ext ? ext.name.substring(0, 12) : a.targetId
+      } else if (a.type === "enableGroup" || a.type === "disableGroup") {
+        const grp = groups.find(g => g.id === a.targetId)
+        name = grp ? grp.name : a.targetId
+      }
+      const prefix = a.type.startsWith("enable") ? "+" : "-"
+      return `${prefix}${name}`
+    })
+  }, [rule.actions, extensions, groups])
 
   return (
     <div

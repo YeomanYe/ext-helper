@@ -175,7 +175,7 @@ function DomainConditionFields({
         value={condition.pattern}
         onChange={(e) => onChange({ pattern: e.target.value })}
         placeholder="*.example.com or github.com"
-        className="punk-input w-full h-8 px-2 text-[9px]"
+        className="punk-input w-full h-9 px-3 text-sm"
       />
 
       {/* Match Mode Dropdown - Styled */}
@@ -183,7 +183,7 @@ function DomainConditionFields({
         <button
           onClick={() => setShowDropdown(!showDropdown)}
           className={cn(
-            "w-full h-7 px-2 text-[8px] flex items-center justify-between",
+            "w-full h-8 px-2 text-[9px] flex items-center justify-between",
             "border border-punk-border/50 bg-punk-bg-alt",
             "hover:border-punk-primary hover:shadow-[0_0_10px_rgba(124,58,237,0.2)]",
             "transition-all duration-200"
@@ -256,14 +256,14 @@ function ScheduleConditionFields({
           type="time"
           value={condition.startTime}
           onChange={(e) => onChange({ startTime: e.target.value })}
-          className="punk-input h-7 px-2 text-[9px] border border-punk-border/50"
+          className="punk-input h-9 px-3 text-sm border border-punk-border/50"
         />
-        <span className="text-punk-text-muted text-[8px]">TO</span>
+        <span className="text-punk-text-muted text-[9px]">TO</span>
         <input
           type="time"
           value={condition.endTime}
           onChange={(e) => onChange({ endTime: e.target.value })}
-          className="punk-input h-7 px-2 text-[9px] border border-punk-border/50"
+          className="punk-input h-9 px-3 text-sm border border-punk-border/50"
         />
       </div>
     </div>

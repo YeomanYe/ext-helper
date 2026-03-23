@@ -2,6 +2,8 @@ import * as React from "react"
 import { Search, Plus } from "lucide-react"
 import { cn } from "@/utils"
 import { useRuleStore } from "@/stores/ruleStore"
+import { useExtensionStore } from "@/stores/extensionStore"
+import { useGroupStore } from "@/stores/groupStore"
 import { RuleList } from "./RuleList"
 import { RuleEditor } from "./RuleEditor"
 import type { Rule } from "@/rules/types"
@@ -9,6 +11,8 @@ import type { Rule } from "@/rules/types"
 export function RuleManager() {
   const { rules, fetchRules, createRule, updateRule, deleteRule, toggleRule } =
     useRuleStore()
+  const { extensions } = useExtensionStore()
+  const { groups } = useGroupStore()
   const [showEditor, setShowEditor] = React.useState(false)
   const [editingRule, setEditingRule] = React.useState<Rule | null>(null)
   const [searchQuery, setSearchQuery] = React.useState("")
@@ -90,6 +94,8 @@ export function RuleManager() {
       <div className="flex-1 overflow-y-auto p-3">
         <RuleList
           rules={filteredRules}
+          extensions={extensions}
+          groups={groups}
           onToggle={toggleRule}
           onEdit={handleEditRule}
           onDelete={deleteRule}

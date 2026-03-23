@@ -1,14 +1,17 @@
 import { RuleCard } from "./RuleCard"
 import type { Rule } from "@/rules/types"
+import type { Extension, Group } from "@/types"
 
 interface RuleListProps {
   rules: Rule[]
+  extensions: Extension[]
+  groups: Group[]
   onToggle: (id: string) => void
   onEdit: (rule: Rule) => void
   onDelete: (id: string) => void
 }
 
-export function RuleList({ rules, onToggle, onEdit, onDelete }: RuleListProps) {
+export function RuleList({ rules, extensions, groups, onToggle, onEdit, onDelete }: RuleListProps) {
   if (rules.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-8 text-center">
@@ -28,6 +31,8 @@ export function RuleList({ rules, onToggle, onEdit, onDelete }: RuleListProps) {
         <RuleCard
           key={rule.id}
           rule={rule}
+          extensions={extensions}
+          groups={groups}
           onToggle={onToggle}
           onEdit={onEdit}
           onDelete={onDelete}
