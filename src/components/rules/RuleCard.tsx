@@ -54,16 +54,20 @@ export function RuleCard({ rule, extensions, groups, onToggle, onEdit, onDelete 
       </div>
 
       {/* Conditions */}
-      <div className="flex items-center gap-1.5 mb-2 flex-wrap">
+      <div className="flex items-center gap-1 mb-2 flex-wrap">
         <span className="font-punk-heading text-[7px] text-punk-text-muted uppercase">
           IF
         </span>
         {rule.conditionGroups.map((group, idx) => (
-          <ConditionGroupBadge key={idx} group={group} />
+          <React.Fragment key={idx}>
+            {idx > 0 && (
+              <span className="px-1 py-0.5 font-punk-heading text-[6px] text-punk-accent bg-punk-accent/10 border border-punk-accent/30">
+                OR
+              </span>
+            )}
+            <ConditionGroupBadge group={group} />
+          </React.Fragment>
         ))}
-        <span className="font-punk-heading text-[7px] text-punk-text-muted uppercase">
-          ({rule.conditionOperator})
-        </span>
       </div>
 
       {/* Actions */}
