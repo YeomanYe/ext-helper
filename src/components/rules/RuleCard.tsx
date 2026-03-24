@@ -1,7 +1,7 @@
 import * as React from "react"
 import { Globe, Calendar, Edit2, Trash2, Folder } from "lucide-react"
 import { cn } from "@/utils"
-import type { Rule, Condition, ScheduleCondition, Action } from "@/rules/types"
+import type { Rule, ConditionGroup, Action } from "@/rules/types"
 import { DAYS_OF_WEEK } from "@/rules/types"
 import type { Extension, Group } from "@/types"
 
@@ -58,8 +58,8 @@ export function RuleCard({ rule, extensions, groups, onToggle, onEdit, onDelete 
         <span className="font-punk-heading text-[7px] text-punk-text-muted uppercase">
           IF
         </span>
-        {rule.conditions.map((condition, idx) => (
-          <ConditionBadge key={idx} condition={condition} />
+        {rule.conditionGroups.map((group, idx) => (
+          <ConditionGroupBadge key={idx} group={group} />
         ))}
         <span className="font-punk-heading text-[7px] text-punk-text-muted uppercase">
           ({rule.conditionOperator})
@@ -111,33 +111,27 @@ export function RuleCard({ rule, extensions, groups, onToggle, onEdit, onDelete 
   )
 }
 
-function ConditionBadge({ condition }: { condition: Condition }) {
-  if (condition.type === "domain") {
-    return (
-      <div className="flex items-center gap-1 px-1.5 py-0.5 border border-punk-accent/30 bg-punk-accent/5">
-        <Globe className="h-2.5 w-2.5 text-punk-accent" />
-        <span className="font-punk-code text-[7px] text-punk-accent">
-          {condition.pattern}
-        </span>
-      </div>
-    )
-  }
+function ConditionGroupBadge({ group }: { group: ConditionGroup }) {
+  const domainsLabel = group.domains.length > 1
+    ? `${group.domains.length} domains`
+    : group.domains[0] || "any"
 
-  if (condition.type === "schedule") {
-    const daysLabel = condition.days
-      .map((d) => DAYS_OF_WEEK.find(day => day.value === d)?.label || "")
-      .join("")
-    return (
-      <div className="flex items-center gap-1 px-1.5 py-0.5 border border-punk-success/30 bg-punk-success/5">
-        <Calendar className="h-2.5 w-2.5 text-punk-success" />
-        <span className="font-punk-code text-[7px] text-punk-success">
-          {daysLabel} {condition.startTime}-{condition.endTime}
-        </span>
-      </div>
-    )
-  }
+  const hasTime = group.schedule !== null
 
-  return null
+  return (
+    <div className="flex items-center gap-1 px-1.5 py-0.5 border border-punk-accent/30 bg-punk-accent/5">
+      <Globe className="h-2.5 w-2.5 text-punk-accent" />
+      <span className="font-punk-code text-[7px] text-punk-accent">
+        {domainsLabel}
+      </span>
+      {hasTime && (
+        <>
+          <span className="text-punk-text-muted">+</span>
+          <Calendar className="h-2.5 w-2.5 text-punk-success" />
+        </>
+      )}
+    </div>
+  )
 }
 
 function ActionBadge({ action, extensions, groups }: { action: Action; extensions: Extension[]; groups: Group[] }) {

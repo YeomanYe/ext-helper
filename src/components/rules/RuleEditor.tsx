@@ -5,7 +5,7 @@ import { ConditionBuilder } from "./ConditionBuilder"
 import { ActionBuilder } from "./ActionBuilder"
 import type {
   Rule,
-  Condition,
+  ConditionGroup,
   Action,
   ConditionOperator,
 } from "@/rules/types"
@@ -83,8 +83,8 @@ function ConditionOperatorDropdown({
 export function RuleEditor({ rule, onSave, onClose }: RuleEditorProps) {
   const [name, setName] = React.useState(rule?.name || "")
   const [description, setDescription] = React.useState(rule?.description || "")
-  const [conditions, setConditions] = React.useState<Condition[]>(
-    rule?.conditions || []
+  const [conditionGroups, setConditionGroups] = React.useState<ConditionGroup[]>(
+    rule?.conditionGroups || []
   )
   const [conditionOperator, setConditionOperator] = React.useState<ConditionOperator>(
     rule?.conditionOperator || "AND"
@@ -92,7 +92,7 @@ export function RuleEditor({ rule, onSave, onClose }: RuleEditorProps) {
   const [actions, setActions] = React.useState<Action[]>(rule?.actions || [])
   const [priority, setPriority] = React.useState(rule?.priority || 0)
 
-  const isValid = name.trim() && conditions.length > 0 && actions.length > 0
+  const isValid = name.trim() && conditionGroups.length > 0 && actions.length > 0
 
   // Close on escape
   React.useEffect(() => {
@@ -109,7 +109,7 @@ export function RuleEditor({ rule, onSave, onClose }: RuleEditorProps) {
     onSave({
       name: name.trim(),
       description: description.trim() || undefined,
-      conditions,
+      conditionGroups,
       conditionOperator,
       actions,
       priority,
@@ -181,8 +181,8 @@ export function RuleEditor({ rule, onSave, onClose }: RuleEditorProps) {
               />
             </div>
             <ConditionBuilder
-              conditions={conditions}
-              onChange={setConditions}
+              conditions={conditionGroups}
+              onChange={setConditionGroups}
             />
           </div>
 

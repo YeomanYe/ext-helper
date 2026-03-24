@@ -8,10 +8,10 @@ export type ConditionType = "domain" | "schedule"
 export type MatchMode = "exact" | "contains" | "wildcard" | "regex"
 export type ConditionOperator = "AND" | "OR"
 
-// 域名条件
+// 域名条件 - 支持多个域名 pattern
 export interface DomainCondition {
   type: "domain"
-  pattern: string
+  patterns: string[]  // 支持多个域名
   matchMode: MatchMode
 }
 
@@ -23,8 +23,20 @@ export interface ScheduleCondition {
   endTime: string // "HH:mm" 格式
 }
 
-// 联合条件类型
-export type Condition = DomainCondition | ScheduleCondition
+// 条件组：域名列表 + 时间条件（视觉和逻辑上分组）
+export interface ConditionGroup {
+  id: string  // 条件组唯一ID
+  domains: string[]  // 多个域名
+  matchMode: MatchMode  // 匹配模式（适用于所有域名）
+  schedule: {
+    days: number[]
+    startTime: string
+    endTime: string
+  } | null  // 可选，不设置表示不限时间
+}
+
+// 联合条件类型（兼容旧数据）
+export type Condition = DomainCondition | ScheduleCondition | ConditionGroup
 
 // ---------- 动作类型 ----------
 
@@ -46,7 +58,7 @@ export interface Rule {
   name: string
   description?: string
   enabled: boolean
-  conditions: Condition[]
+  conditionGroups: ConditionGroup[]
   conditionOperator: ConditionOperator
   actions: Action[]
   priority: number
