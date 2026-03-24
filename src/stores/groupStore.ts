@@ -100,6 +100,25 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
     }
   },
 
+  updateGroup: async (id: string, updates: Partial<Pick<Group, "name" | "color" | "icon">>) => {
+    const { groups } = get()
+    const newGroups = groups.map((g) =>
+      g.id === id ? { ...g, ...updates, updatedAt: Date.now() } : g
+    )
+    set({ groups: newGroups })
+
+    try {
+      if (isDevMode()) {
+        devStorage.setGroups(newGroups)
+      } else {
+        await browserAdapter.setStorage(STORAGE_KEY, newGroups)
+      }
+    } catch (error) {
+      console.error("Failed to update group:", error)
+      set({ groups })
+    }
+  },
+
   selectGroup: (id: string | null) => set({ activeGroupId: id }),
 
   toggleGroupExpanded: (id: string) => {

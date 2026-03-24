@@ -60,6 +60,7 @@ export interface GroupStore {
   createGroup: (name: string, color?: string) => Promise<void>
   deleteGroup: (id: string) => Promise<void>
   renameGroup: (id: string, name: string) => Promise<void>
+  updateGroup: (id: string, updates: { name?: string; color?: string; icon?: string }) => Promise<void>
   selectGroup: (id: string | null) => void
   toggleGroupExpanded: (id: string) => void
   addToGroup: (groupId: string, extId: string) => Promise<void>

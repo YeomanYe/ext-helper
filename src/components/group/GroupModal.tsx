@@ -1,8 +1,31 @@
 import * as React from "react"
-import { X, Plus, Folder, Package } from "lucide-react"
+import { X, Plus, Folder, Package, Star, Heart, Bookmark, Tag, Flag, Briefcase, Code, Globe, Lock, Settings, Wrench, Zap, Flame, Gem, Crown, Target } from "lucide-react"
 import { cn } from "@/utils"
 import { SearchBar } from "@/components/popup"
 import type { Group, Extension } from "@/types"
+
+const ICON_MAP: Record<string, React.ReactNode> = {
+  folder: <Folder className="w-3 h-3" />,
+  star: <Star className="w-3 h-3" />,
+  heart: <Heart className="w-3 h-3" />,
+  bookmark: <Bookmark className="w-3 h-3" />,
+  tag: <Tag className="w-3 h-3" />,
+  flag: <Flag className="w-3 h-3" />,
+  briefcase: <Briefcase className="w-3 h-3" />,
+  code: <Code className="w-3 h-3" />,
+  globe: <Globe className="w-3 h-3" />,
+  lock: <Lock className="w-3 h-3" />,
+  settings: <Settings className="w-3 h-3" />,
+  tool: <Wrench className="w-3 h-3" />,
+  zap: <Zap className="w-3 h-3" />,
+  bolt: <Zap className="w-3 h-3" />,
+  flame: <Flame className="w-3 h-3" />,
+  gem: <Gem className="w-3 h-3" />,
+  crown: <Crown className="w-3 h-3" />,
+  target: <Target className="w-3 h-3" />,
+}
+
+const ICON_OPTIONS = Object.keys(ICON_MAP)
 
 interface GroupChipProps {
   group: Group
@@ -198,7 +221,7 @@ interface GroupDetailModalProps {
   onRemove?: (id: string) => void
   onAddExtension: (groupId: string, extId: string) => void
   onRemoveFromGroup: (groupId: string, extId: string) => void
-  onRename: (groupId: string, name: string) => void
+  onUpdateGroup: (groupId: string, updates: { name?: string; color?: string; icon?: string }) => void
 }
 
 export function GroupDetailModal({
@@ -211,11 +234,24 @@ export function GroupDetailModal({
   onRemove,
   onAddExtension,
   onRemoveFromGroup,
-  onRename
+  onUpdateGroup
 }: GroupDetailModalProps) {
   const [searchQuery, setSearchQuery] = React.useState("")
   const [isEditing, setIsEditing] = React.useState(false)
   const [editName, setEditName] = React.useState(group.name)
+  const [showIconPicker, setShowIconPicker] = React.useState(false)
+  const iconPickerRef = React.useRef<HTMLDivElement>(null)
+
+  // Close icon picker on outside click
+  React.useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (iconPickerRef.current && !iconPickerRef.current.contains(event.target as Node)) {
+        setShowIconPicker(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
 
   // Create a set of extension IDs in this group for fast lookup
   const groupExtIds = React.useMemo(() => {
@@ -262,7 +298,7 @@ export function GroupDetailModal({
 
   const handleSaveRename = () => {
     if (editName.trim() && editName !== group.name) {
-      onRename(group.id, editName.trim())
+      onUpdateGroup(group.id, { name: editName.trim() })
     }
     setIsEditing(false)
   }
@@ -283,6 +319,41 @@ export function GroupDetailModal({
       >
         {/* Modal Header */}
         <div className="flex items-center gap-2 px-4 py-3 border-b border-punk-border/30 bg-punk-bg shrink-0">
+          {/* Icon selector */}
+          <div className="relative" ref={iconPickerRef}>
+            <button
+              onClick={() => setShowIconPicker(!showIconPicker)}
+              className="flex items-center justify-center w-6 h-6 border border-punk-border/50 bg-punk-bg-alt hover:border-punk-primary transition-colors"
+              style={{ color: group.color }}
+              title="Change icon"
+            >
+              {ICON_MAP[group.icon] || <Folder className="w-3 h-3" />}
+            </button>
+            {showIconPicker && (
+              <div className="absolute top-full left-0 mt-1 z-50 p-2 border border-punk-border bg-punk-bg-alt shadow-[0_0_15px_rgba(124,58,237,0.3)] grid grid-cols-5 gap-1">
+                {ICON_OPTIONS.map((iconName) => (
+                  <button
+                    key={iconName}
+                    onClick={() => {
+                      onUpdateGroup(group.id, { icon: iconName })
+                      setShowIconPicker(false)
+                    }}
+                    className={cn(
+                      "flex items-center justify-center w-7 h-7 transition-all",
+                      group.icon === iconName
+                        ? "bg-punk-primary text-white"
+                        : "text-punk-text-muted hover:text-punk-primary hover:bg-punk-bg"
+                    )}
+                    style={{ color: group.icon === iconName ? undefined : group.color }}
+                  >
+                    {ICON_MAP[iconName]}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Color dot */}
           <div
             className="h-3 w-3"
             style={{ backgroundColor: group.color }}
@@ -340,7 +411,7 @@ export function GroupDetailModal({
           />
         </div>
 
-        {/* Extension List - Compact Grid */}
+        {/* Extension List - Compact Grid with group icon overlay */}
         <div className="flex-1 overflow-y-auto p-3">
           {/* In Group Section - Compact Grid */}
           {inGroupExtensions.length > 0 && (
@@ -362,10 +433,19 @@ export function GroupDetailModal({
                     {/* Status dot */}
                     <div
                       className={cn(
-                        "absolute top-1 right-1 w-2 h-2 border border-punk-bg-alt",
+                        "absolute top-1 right-1 w-2 h-2 border border-punk-bg-alt z-10",
                         ext.enabled ? "bg-punk-success" : "bg-punk-text-muted"
                       )}
                     />
+                    {/* Group icon badge */}
+                    <div
+                      className="absolute bottom-1 right-1 w-4 h-4 rounded-sm flex items-center justify-center z-10"
+                      style={{ backgroundColor: group.color + "40" }}
+                    >
+                      <span style={{ color: group.color }}>
+                        {ICON_MAP[group.icon] || <Folder className="w-2 h-2" />}
+                      </span>
+                    </div>
                     {/* Icon */}
                     {ext.iconUrl ? (
                       <img src={ext.iconUrl} className="w-8 h-8 border border-punk-border/30 object-cover" alt="" />
