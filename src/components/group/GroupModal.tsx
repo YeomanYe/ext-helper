@@ -345,111 +345,76 @@ export function GroupDetailModal({
           />
         </div>
 
-        {/* Extension List */}
+        {/* Extension List - Compact */}
         <div className="flex-1 overflow-y-auto p-3 space-y-4">
-          {/* In Group Section */}
+          {/* In Group Section - Compact */}
           {inGroupExtensions.length > 0 && (
             <div>
               <p className="font-punk-heading text-[8px] text-punk-success uppercase tracking-wide mb-2">
                 IN SECTOR [{inGroupExtensions.length}]
               </p>
-              <div className="space-y-1">
+              <div className="flex flex-wrap gap-1">
                 {inGroupExtensions.map((ext) => (
                   <div
                     key={ext.id}
                     onClick={() => handleToggleExtensionMembership(ext)}
                     className={cn(
-                      "flex items-center gap-3 p-2.5 cursor-pointer transition-all",
-                      "border bg-punk-bg",
-                      "border-punk-success/50 hover:border-punk-success hover:bg-punk-success/5",
+                      "flex items-center gap-1.5 px-2 py-1 border cursor-pointer transition-all",
+                      "border-punk-success/50 bg-punk-success/5 hover:border-punk-success",
                       !ext.enabled && "opacity-50"
                     )}
                   >
                     {ext.iconUrl ? (
-                      <img src={ext.iconUrl} className="h-8 w-8 object-cover border border-punk-border/30" alt="" />
+                      <img src={ext.iconUrl} className="h-4 w-4 object-cover border border-punk-border/30" alt="" />
                     ) : (
-                      <div className="h-8 w-8 border border-punk-border/30 bg-punk-bg-alt flex items-center justify-center">
-                        <span className="font-punk-heading text-[8px] text-punk-text-muted">{ext.name[0]}</span>
+                      <div className="h-4 w-4 border border-punk-border/30 bg-punk-bg-alt flex items-center justify-center">
+                        <span className="font-punk-heading text-[6px] text-punk-text-muted">{ext.name[0]}</span>
                       </div>
                     )}
-                    <div className="flex-1 min-w-0">
-                      <p className="font-punk-heading text-[8px] text-punk-text-primary truncate uppercase">
-                        {ext.name}
-                      </p>
-                      <p className="font-punk-code text-[9px] text-punk-text-muted">
-                        v{ext.version}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <button
-                        onClick={(e) => handleToggleEnabled(e, ext.id)}
-                        className={cn(
-                          "px-2 py-1 text-[8px] font-punk-heading transition-all",
-                          ext.enabled
-                            ? "text-punk-success border border-punk-success/50 bg-punk-success/10"
-                            : "text-punk-text-muted border border-punk-border/30"
-                        )}
-                      >
-                        {ext.enabled ? "1" : "0"}
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          onRemoveFromGroup(group.id, ext.id)
-                        }}
-                        className={cn(
-                          "p-1.5 text-punk-text-muted transition-all",
-                          "hover:text-punk-cta hover:bg-punk-cta/10"
-                        )}
-                      >
-                        <X className="h-3.5 w-3.5" />
-                      </button>
-                    </div>
+                    <span className="font-punk-heading text-[7px] text-punk-text-primary uppercase truncate max-w-[80px]">
+                      {ext.name}
+                    </span>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        onRemoveFromGroup(group.id, ext.id)
+                      }}
+                      className="text-punk-text-muted hover:text-punk-cta transition-colors"
+                    >
+                      <X className="h-2.5 w-2.5" />
+                    </button>
                   </div>
                 ))}
               </div>
             </div>
           )}
 
-          {/* Not In Group Section */}
+          {/* Not In Group Section - Compact */}
           {notInGroupExtensions.length > 0 && (
             <div>
               <p className="font-punk-heading text-[8px] text-punk-text-muted uppercase tracking-wide mb-2">
                 NOT IN SECTOR [{notInGroupExtensions.length}]
               </p>
-              <div className="space-y-1">
+              <div className="flex flex-wrap gap-1">
                 {notInGroupExtensions.map((ext) => (
                   <div
                     key={ext.id}
                     onClick={() => handleToggleExtensionMembership(ext)}
                     className={cn(
-                      "flex items-center gap-3 p-2.5 cursor-pointer transition-all opacity-40",
-                      "border border-punk-border/20 bg-punk-bg-alt",
-                      "hover:border-punk-primary/50 hover:opacity-70"
+                      "flex items-center gap-1.5 px-2 py-1 border cursor-pointer transition-all opacity-40",
+                      "border-punk-border/20 bg-punk-bg-alt hover:border-punk-primary/50 hover:opacity-70"
                     )}
                   >
                     {ext.iconUrl ? (
-                      <img src={ext.iconUrl} className="h-8 w-8 object-cover border border-punk-border/30 grayscale" alt="" />
+                      <img src={ext.iconUrl} className="h-4 w-4 object-cover border border-punk-border/30 grayscale" alt="" />
                     ) : (
-                      <div className="h-8 w-8 border border-punk-border/30 bg-punk-bg-alt flex items-center justify-center grayscale">
-                        <span className="font-punk-heading text-[8px] text-punk-text-muted">{ext.name[0]}</span>
+                      <div className="h-4 w-4 border border-punk-border/30 bg-punk-bg-alt flex items-center justify-center grayscale">
+                        <span className="font-punk-heading text-[6px] text-punk-text-muted">{ext.name[0]}</span>
                       </div>
                     )}
-                    <div className="flex-1 min-w-0">
-                      <p className="font-punk-heading text-[8px] text-punk-text-muted truncate uppercase">
-                        {ext.name}
-                      </p>
-                      <p className="font-punk-code text-[9px] text-punk-text-muted">
-                        v{ext.version}
-                      </p>
-                    </div>
-                    <button
-                      className={cn(
-                        "p-1.5 text-punk-text-muted transition-all"
-                      )}
-                    >
-                      <Plus className="h-3.5 w-3.5" />
-                    </button>
+                    <span className="font-punk-heading text-[7px] text-punk-text-muted uppercase truncate max-w-[80px]">
+                      {ext.name}
+                    </span>
                   </div>
                 ))}
               </div>

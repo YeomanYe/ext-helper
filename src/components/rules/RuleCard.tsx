@@ -125,10 +125,7 @@ function ConditionGroupBadge({ group }: { group: ConditionGroup }) {
         {domainsLabel}
       </span>
       {hasTime && (
-        <>
-          <span className="text-punk-text-muted">+</span>
-          <Calendar className="h-2.5 w-2.5 text-punk-success" />
-        </>
+        <Calendar className="h-2.5 w-2.5 text-punk-success" />
       )}
     </div>
   )

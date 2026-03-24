@@ -191,65 +191,59 @@ export function ActionBuilder({ actions, onChange }: ActionBuilderProps) {
         </div>
       )}
 
-      {/* Groups Grid */}
+      {/* Groups Grid - Simple highlight mode */}
       {(activeFilter === "all" || activeFilter === "groups") && filteredGroups.length > 0 && (
         <div>
           <p className="font-punk-heading text-[8px] text-punk-text-muted uppercase tracking-wide mb-1">
             SECTORS
           </p>
-          <div className="grid grid-cols-2 gap-1 max-h-48 overflow-y-auto">
-            {filteredGroups.map((group) => (
-              <div
-                key={group.id}
-                className={cn(
-                  "flex items-center gap-1.5 px-2 py-1.5 border transition-all",
-                  enabledGroups.includes(group.id)
-                    ? "border-punk-success/50 bg-punk-success/5"
-                    : disabledGroups.includes(group.id)
-                      ? "border-punk-cta/50 bg-punk-cta/5"
-                      : "border-punk-border/20 bg-punk-bg hover:border-punk-border/50"
-                )}
-              >
-                {/* Color indicator */}
+          <div className="flex flex-wrap gap-1">
+            {filteredGroups.map((group) => {
+              const isSelected = enabledGroups.includes(group.id) || disabledGroups.includes(group.id)
+              const actionType = enabledGroups.includes(group.id) ? "enable" : disabledGroups.includes(group.id) ? "disable" : null
+              return (
                 <div
-                  className="h-5 w-5 rounded border border-punk-border/30 flex items-center justify-center flex-shrink-0"
-                  style={{ backgroundColor: group.color + "20" }}
+                  key={group.id}
+                  onClick={() => {
+                    if (enabledGroups.includes(group.id)) {
+                      toggleGroupEnable(group.id)
+                    } else if (disabledGroups.includes(group.id)) {
+                      toggleGroupDisable(group.id)
+                    } else {
+                      // Default to enable
+                      toggleGroupEnable(group.id)
+                    }
+                  }}
+                  className={cn(
+                    "flex items-center gap-1.5 px-2 py-1 border transition-all cursor-pointer",
+                    isSelected
+                      ? actionType === "enable"
+                        ? "border-punk-success/50 bg-punk-success/5"
+                        : "border-punk-cta/50 bg-punk-cta/5"
+                      : "border-punk-border/20 bg-punk-bg hover:border-punk-border/50"
+                  )}
                 >
-                  <Folder className="h-3 w-3" style={{ color: group.color }} />
+                  <div
+                    className="h-3 w-3 rounded-sm flex-shrink-0"
+                    style={{ backgroundColor: group.color }}
+                  />
+                  <span className={cn(
+                    "font-punk-heading text-[7px] uppercase truncate",
+                    isSelected ? "text-punk-text-primary" : "text-punk-text-muted"
+                  )}>
+                    {group.name}
+                  </span>
+                  {isSelected && (
+                    <span className={cn(
+                      "text-[6px] font-punk-code",
+                      actionType === "enable" ? "text-punk-success" : "text-punk-cta"
+                    )}>
+                      {actionType === "enable" ? "ON" : "OFF"}
+                    </span>
+                  )}
                 </div>
-
-                {/* Name */}
-                <span className="flex-1 font-punk-heading text-[7px] text-punk-text-primary uppercase truncate">
-                  {group.name}
-                </span>
-
-                {/* ON/OFF */}
-                <div className="flex gap-0.5">
-                  <button
-                    onClick={() => toggleGroupEnable(group.id)}
-                    className={cn(
-                      "px-1 py-0.5 text-[6px] font-punk-heading transition-all",
-                      enabledGroups.includes(group.id)
-                        ? "bg-punk-success text-white"
-                        : "text-punk-text-muted hover:text-punk-success"
-                    )}
-                  >
-                    ON
-                  </button>
-                  <button
-                    onClick={() => toggleGroupDisable(group.id)}
-                    className={cn(
-                      "px-1 py-0.5 text-[6px] font-punk-heading transition-all",
-                      disabledGroups.includes(group.id)
-                        ? "bg-punk-cta text-white"
-                        : "text-punk-text-muted hover:text-punk-cta"
-                    )}
-                  >
-                    OFF
-                  </button>
-                </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       )}
