@@ -35,6 +35,8 @@ export function ConditionBuilder({ conditions, onChange }: ConditionBuilderProps
   }
 
   const removeGroup = (index: number) => {
+    // Ensure at least one group remains
+    if (conditions.length <= 1) return
     onChange(conditions.filter((_, i) => i !== index))
   }
 

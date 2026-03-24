@@ -1,5 +1,5 @@
 import * as React from "react"
-import { X, ChevronDown } from "lucide-react"
+import { X } from "lucide-react"
 import { cn } from "@/utils"
 import { ConditionBuilder } from "./ConditionBuilder"
 import { ActionBuilder } from "./ActionBuilder"
@@ -7,7 +7,6 @@ import type {
   Rule,
   ConditionGroup,
   Action,
-  ConditionOperator,
 } from "@/rules/types"
 
 interface RuleEditorProps {
@@ -16,78 +15,26 @@ interface RuleEditorProps {
   onClose: () => void
 }
 
-const OPERATORS: { value: ConditionOperator; label: string }[] = [
-  { value: "AND", label: "MATCH ALL (AND)" },
-  { value: "OR", label: "MATCH ANY (OR)" }
-]
-
-function ConditionOperatorDropdown({
-  value,
-  onChange
-}: {
-  value: ConditionOperator
-  onChange: (op: ConditionOperator) => void
-}) {
-  const [showDropdown, setShowDropdown] = React.useState(false)
-  const dropdownRef = React.useRef<HTMLDivElement>(null)
-  const currentLabel = OPERATORS.find(o => o.value === value)?.label || ""
-
-  React.useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setShowDropdown(false)
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside)
-    return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [])
-
-  return (
-    <div className="relative" ref={dropdownRef}>
-      <button
-        onClick={() => setShowDropdown(!showDropdown)}
-        className={cn(
-          "punk-input h-7 px-2 text-[9px] flex items-center gap-2",
-          "border border-punk-border/50 bg-punk-bg-alt"
-        )}
-      >
-        <span className="font-punk-heading uppercase">{currentLabel}</span>
-        <ChevronDown className={cn("h-3 w-3 text-punk-text-muted", showDropdown && "rotate-180")} />
-      </button>
-
-      {showDropdown && (
-        <div className="absolute top-full right-0 mt-1 z-50 w-40 border border-punk-border bg-punk-bg-alt shadow-[0_0_15px_rgba(124,58,237,0.3)]">
-          {OPERATORS.map((op) => (
-            <button
-              key={op.value}
-              onClick={() => {
-                onChange(op.value)
-                setShowDropdown(false)
-              }}
-              className={cn(
-                "w-full px-3 py-2 text-left font-punk-heading text-[9px] uppercase transition-all",
-                value === op.value
-                  ? "bg-punk-primary text-white"
-                  : "text-punk-text-secondary hover:bg-punk-bg hover:text-punk-text-primary"
-              )}
-            >
-              {op.label}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  )
+// Helper to create a default condition group
+function createDefaultConditionGroup(): ConditionGroup {
+  return {
+    id: Math.random().toString(36).substring(2, 9),
+    domains: [""],
+    matchMode: "wildcard",
+    schedule: {
+      days: [1, 2, 3, 4, 5],
+      startTime: "09:00",
+      endTime: "18:00",
+    },
+  }
 }
 
 export function RuleEditor({ rule, onSave, onClose }: RuleEditorProps) {
   const [name, setName] = React.useState(rule?.name || "")
   const [description, setDescription] = React.useState(rule?.description || "")
+  // Always have at least one condition group
   const [conditionGroups, setConditionGroups] = React.useState<ConditionGroup[]>(
-    rule?.conditionGroups || []
-  )
-  const [conditionOperator, setConditionOperator] = React.useState<ConditionOperator>(
-    rule?.conditionOperator || "AND"
+    rule?.conditionGroups?.length ? rule.conditionGroups : [createDefaultConditionGroup()]
   )
   const [actions, setActions] = React.useState<Action[]>(rule?.actions || [])
   const [priority, setPriority] = React.useState(rule?.priority || 0)
@@ -106,11 +53,12 @@ export function RuleEditor({ rule, onSave, onClose }: RuleEditorProps) {
   const handleSave = () => {
     if (!isValid) return
 
+    // Always use "OR" - match any condition
     onSave({
       name: name.trim(),
       description: description.trim() || undefined,
       conditionGroups,
-      conditionOperator,
+      conditionOperator: "OR",
       actions,
       priority,
       enabled: rule?.enabled ?? true,
@@ -171,15 +119,9 @@ export function RuleEditor({ rule, onSave, onClose }: RuleEditorProps) {
 
           {/* Conditions */}
           <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <label className="font-punk-heading text-[9px] text-punk-text-muted uppercase">
-                CONDITIONS
-              </label>
-              <ConditionOperatorDropdown
-                value={conditionOperator}
-                onChange={setConditionOperator}
-              />
-            </div>
+            <label className="font-punk-heading text-[9px] text-punk-text-muted uppercase mb-1.5">
+              CONDITIONS (MATCH ANY)
+            </label>
             <ConditionBuilder
               conditions={conditionGroups}
               onChange={setConditionGroups}
