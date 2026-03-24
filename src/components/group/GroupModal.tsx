@@ -1,5 +1,5 @@
 import * as React from "react"
-import { X, Plus, Folder } from "lucide-react"
+import { X, Plus, Folder, Package } from "lucide-react"
 import { cn } from "@/utils"
 import { SearchBar } from "@/components/popup"
 import type { Group, Extension } from "@/types"
@@ -88,7 +88,7 @@ const GROUP_COLORS = [
 ]
 
 export function CreateGroupModal({ onClose, onCreate }: CreateGroupModalProps) {
-  const [name, setName] = React.useState("")
+  const [name, setName] = React.useState("New Sector")
   const [selectedColor, setSelectedColor] = React.useState(GROUP_COLORS[0])
 
   // Close on escape
@@ -275,11 +275,6 @@ export function GroupDetailModal({
     }
   }
 
-  const handleToggleEnabled = (e: React.MouseEvent, extId: string) => {
-    e.stopPropagation()
-    onToggleExtension(extId)
-  }
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-punk-bg/80 backdrop-blur-sm" onClick={onClose}>
       <div
@@ -345,75 +340,77 @@ export function GroupDetailModal({
           />
         </div>
 
-        {/* Extension List - Compact */}
-        <div className="flex-1 overflow-y-auto p-3 space-y-4">
-          {/* In Group Section - Compact */}
+        {/* Extension List - Compact Grid */}
+        <div className="flex-1 overflow-y-auto p-3">
+          {/* In Group Section - Compact Grid */}
           {inGroupExtensions.length > 0 && (
-            <div>
+            <div className="mb-4">
               <p className="font-punk-heading text-[8px] text-punk-success uppercase tracking-wide mb-2">
                 IN SECTOR [{inGroupExtensions.length}]
               </p>
-              <div className="flex flex-wrap gap-1">
+              <div className="grid grid-cols-4 gap-2">
                 {inGroupExtensions.map((ext) => (
                   <div
                     key={ext.id}
                     onClick={() => handleToggleExtensionMembership(ext)}
                     className={cn(
-                      "flex items-center gap-1.5 px-2 py-1 border cursor-pointer transition-all",
+                      "relative flex flex-col items-center justify-center p-2 cursor-pointer transition-all border",
                       "border-punk-success/50 bg-punk-success/5 hover:border-punk-success",
                       !ext.enabled && "opacity-50"
                     )}
                   >
+                    {/* Status dot */}
+                    <div
+                      className={cn(
+                        "absolute top-1 right-1 w-2 h-2 border border-punk-bg-alt",
+                        ext.enabled ? "bg-punk-success" : "bg-punk-text-muted"
+                      )}
+                    />
+                    {/* Icon */}
                     {ext.iconUrl ? (
-                      <img src={ext.iconUrl} className="h-4 w-4 object-cover border border-punk-border/30" alt="" />
+                      <img src={ext.iconUrl} className="w-8 h-8 border border-punk-border/30 object-cover" alt="" />
                     ) : (
-                      <div className="h-4 w-4 border border-punk-border/30 bg-punk-bg-alt flex items-center justify-center">
-                        <span className="font-punk-heading text-[6px] text-punk-text-muted">{ext.name[0]}</span>
+                      <div className="w-8 h-8 border border-punk-border/30 bg-punk-bg flex items-center justify-center">
+                        <Package className="w-4 h-4 text-punk-text-muted" />
                       </div>
                     )}
-                    <span className="font-punk-heading text-[7px] text-punk-text-primary uppercase truncate max-w-[80px]">
-                      {ext.name}
+                    {/* Name */}
+                    <span className="font-punk-heading text-[6px] text-punk-text-primary uppercase text-center truncate w-full mt-1">
+                      {ext.name.substring(0, 12)}
                     </span>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        onRemoveFromGroup(group.id, ext.id)
-                      }}
-                      className="text-punk-text-muted hover:text-punk-cta transition-colors"
-                    >
-                      <X className="h-2.5 w-2.5" />
-                    </button>
                   </div>
                 ))}
               </div>
             </div>
           )}
 
-          {/* Not In Group Section - Compact */}
+          {/* Not In Group Section - Compact Grid */}
           {notInGroupExtensions.length > 0 && (
             <div>
               <p className="font-punk-heading text-[8px] text-punk-text-muted uppercase tracking-wide mb-2">
                 NOT IN SECTOR [{notInGroupExtensions.length}]
               </p>
-              <div className="flex flex-wrap gap-1">
+              <div className="grid grid-cols-4 gap-2">
                 {notInGroupExtensions.map((ext) => (
                   <div
                     key={ext.id}
                     onClick={() => handleToggleExtensionMembership(ext)}
                     className={cn(
-                      "flex items-center gap-1.5 px-2 py-1 border cursor-pointer transition-all opacity-40",
+                      "relative flex flex-col items-center justify-center p-2 cursor-pointer transition-all border opacity-40",
                       "border-punk-border/20 bg-punk-bg-alt hover:border-punk-primary/50 hover:opacity-70"
                     )}
                   >
+                    {/* Icon */}
                     {ext.iconUrl ? (
-                      <img src={ext.iconUrl} className="h-4 w-4 object-cover border border-punk-border/30 grayscale" alt="" />
+                      <img src={ext.iconUrl} className="w-8 h-8 border border-punk-border/30 object-cover grayscale" alt="" />
                     ) : (
-                      <div className="h-4 w-4 border border-punk-border/30 bg-punk-bg-alt flex items-center justify-center grayscale">
-                        <span className="font-punk-heading text-[6px] text-punk-text-muted">{ext.name[0]}</span>
+                      <div className="w-8 h-8 border border-punk-border/30 bg-punk-bg flex items-center justify-center grayscale">
+                        <Package className="w-4 h-4 text-punk-text-muted" />
                       </div>
                     )}
-                    <span className="font-punk-heading text-[7px] text-punk-text-muted uppercase truncate max-w-[80px]">
-                      {ext.name}
+                    {/* Name */}
+                    <span className="font-punk-heading text-[6px] text-punk-text-muted uppercase text-center truncate w-full mt-1">
+                      {ext.name.substring(0, 12)}
                     </span>
                   </div>
                 ))}
