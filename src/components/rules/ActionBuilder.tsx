@@ -193,65 +193,60 @@ export function ActionBuilder({ actions, onChange }: ActionBuilderProps) {
 
       {/* Groups Grid - With ON/OFF buttons */}
       {(activeFilter === "all" || activeFilter === "groups") && filteredGroups.length > 0 && (
-        <div>
-          <p className="font-punk-heading text-[8px] text-punk-text-muted uppercase tracking-wide mb-1">
-            SECTORS
-          </p>
-          <div className="flex flex-wrap gap-1">
-            {filteredGroups.map((group) => {
-              const isSelected = enabledGroups.includes(group.id) || disabledGroups.includes(group.id)
-              return (
+        <div className="flex flex-wrap gap-1">
+          {filteredGroups.map((group) => {
+            const isSelected = enabledGroups.includes(group.id) || disabledGroups.includes(group.id)
+            return (
+              <div
+                key={group.id}
+                className={cn(
+                  "flex items-center gap-1.5 px-2 py-1.5 border transition-all",
+                  enabledGroups.includes(group.id)
+                    ? "border-punk-success/50 bg-punk-success/5"
+                    : disabledGroups.includes(group.id)
+                      ? "border-punk-cta/50 bg-punk-cta/5"
+                      : "border-punk-border/20 bg-punk-bg hover:border-punk-border/50"
+                )}
+              >
                 <div
-                  key={group.id}
-                  className={cn(
-                    "flex items-center gap-1.5 px-2 py-1.5 border transition-all",
-                    enabledGroups.includes(group.id)
-                      ? "border-punk-success/50 bg-punk-success/5"
-                      : disabledGroups.includes(group.id)
-                        ? "border-punk-cta/50 bg-punk-cta/5"
-                        : "border-punk-border/20 bg-punk-bg hover:border-punk-border/50"
-                  )}
-                >
-                  <div
-                    className="h-3 w-3 rounded-sm flex-shrink-0"
-                    style={{ backgroundColor: group.color }}
-                  />
-                  <span className={cn(
-                    "font-punk-heading text-[7px] uppercase truncate",
-                    isSelected ? "text-punk-text-primary" : "text-punk-text-muted"
-                  )}>
-                    {group.name}
-                  </span>
+                  className="h-3 w-3 rounded-sm flex-shrink-0"
+                  style={{ backgroundColor: group.color }}
+                />
+                <span className={cn(
+                  "font-punk-heading text-[7px] uppercase truncate",
+                  isSelected ? "text-punk-text-primary" : "text-punk-text-muted"
+                )}>
+                  {group.name}
+                </span>
 
-                  {/* ON/OFF buttons */}
-                  <div className="flex gap-0.5 ml-auto">
-                    <button
-                      onClick={() => toggleGroupEnable(group.id)}
-                      className={cn(
-                        "px-1 py-0.5 text-[6px] font-punk-heading transition-all",
-                        enabledGroups.includes(group.id)
-                          ? "bg-punk-success text-white"
-                          : "text-punk-text-muted hover:text-punk-success"
-                      )}
-                    >
-                      ON
-                    </button>
-                    <button
-                      onClick={() => toggleGroupDisable(group.id)}
-                      className={cn(
-                        "px-1 py-0.5 text-[6px] font-punk-heading transition-all",
-                        disabledGroups.includes(group.id)
-                          ? "bg-punk-cta text-white"
-                          : "text-punk-text-muted hover:text-punk-cta"
-                      )}
-                    >
-                      OFF
-                    </button>
-                  </div>
+                {/* ON/OFF buttons */}
+                <div className="flex gap-0.5 ml-auto">
+                  <button
+                    onClick={() => toggleGroupEnable(group.id)}
+                    className={cn(
+                      "px-1 py-0.5 text-[6px] font-punk-heading transition-all",
+                      enabledGroups.includes(group.id)
+                        ? "bg-punk-success text-white"
+                        : "text-punk-text-muted hover:text-punk-success"
+                    )}
+                  >
+                    ON
+                  </button>
+                  <button
+                    onClick={() => toggleGroupDisable(group.id)}
+                    className={cn(
+                      "px-1 py-0.5 text-[6px] font-punk-heading transition-all",
+                      disabledGroups.includes(group.id)
+                        ? "bg-punk-cta text-white"
+                        : "text-punk-text-muted hover:text-punk-cta"
+                    )}
+                  >
+                    OFF
+                  </button>
                 </div>
-              )
-            })}
-          </div>
+              </div>
+            )
+          })}
         </div>
       )}
 

@@ -221,7 +221,7 @@ interface GroupDetailModalProps {
   onRemove?: (id: string) => void
   onAddExtension: (groupId: string, extId: string) => void
   onRemoveFromGroup: (groupId: string, extId: string) => void
-  onUpdateGroup: (groupId: string, updates: { name?: string; color?: string; icon?: string }) => void
+  onUpdateGroup: (groupId: string, updates: { name?: string; color?: string; icon?: string; iconUrl?: string }) => void
 }
 
 export function GroupDetailModal({
@@ -237,16 +237,30 @@ export function GroupDetailModal({
   onUpdateGroup
 }: GroupDetailModalProps) {
   const [searchQuery, setSearchQuery] = React.useState("")
-  const [isEditing, setIsEditing] = React.useState(false)
   const [editName, setEditName] = React.useState(group.name)
-  const [showIconPicker, setShowIconPicker] = React.useState(false)
-  const iconPickerRef = React.useRef<HTMLDivElement>(null)
+  const [showImageUpload, setShowImageUpload] = React.useState(false)
+  const fileInputRef = React.useRef<HTMLInputElement>(null)
+  const imageUploadRef = React.useRef<HTMLDivElement>(null)
 
-  // Close icon picker on outside click
+  // Handle image upload
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onload = (event) => {
+        const dataUrl = event.target?.result as string
+        onUpdateGroup(group.id, { icon: "custom", iconUrl: dataUrl })
+        setShowImageUpload(false)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  // Close image upload on outside click
   React.useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (iconPickerRef.current && !iconPickerRef.current.contains(event.target as Node)) {
-        setShowIconPicker(false)
+      if (imageUploadRef.current && !imageUploadRef.current.contains(event.target as Node)) {
+        setShowImageUpload(false)
       }
     }
     document.addEventListener("mousedown", handleClickOutside)
@@ -276,31 +290,24 @@ export function GroupDetailModal({
     )
   }, [extensionsWithStatus, searchQuery])
 
-  // Separate into in-group and not-in-group
-  const inGroupExtensions = filteredExtensions.filter(e => e.isInGroup)
-  const notInGroupExtensions = filteredExtensions.filter(e => !e.isInGroup)
-
   // Close on escape
   React.useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        if (isEditing) {
-          setIsEditing(false)
-          setEditName(group.name)
-        } else {
-          onClose()
-        }
+        onClose()
       }
     }
     document.addEventListener("keydown", handleEsc)
     return () => document.removeEventListener("keydown", handleEsc)
-  }, [onClose, isEditing, group.name])
+  }, [onClose])
 
-  const handleSaveRename = () => {
+  // Update name on blur or enter
+  const handleNameChange = () => {
     if (editName.trim() && editName !== group.name) {
       onUpdateGroup(group.id, { name: editName.trim() })
+    } else if (!editName.trim()) {
+      setEditName(group.name)
     }
-    setIsEditing(false)
   }
 
   const handleToggleExtensionMembership = (ext: typeof filteredExtensions[0]) => {
@@ -311,84 +318,79 @@ export function GroupDetailModal({
     }
   }
 
+  // Get icon to display (custom image or icon map)
+  const groupIconUrl = (group as any).iconUrl
+  const displayIcon = groupIconUrl ? (
+    <img src={groupIconUrl} className="w-full h-full object-cover" alt="" />
+  ) : (
+    ICON_MAP[group.icon] || <Folder className="w-4 h-4" />
+  )
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-punk-bg/80 backdrop-blur-sm" onClick={onClose}>
       <div
-        className="w-[400px] max-h-[560px] border border-punk-border bg-punk-bg-alt shadow-[0_0_30px_rgba(124,58,237,0.4)] overflow-hidden flex flex-col"
+        className="w-[480px] max-h-[560px] border border-punk-border bg-punk-bg-alt shadow-[0_0_30px_rgba(124,58,237,0.4)] overflow-hidden flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Modal Header */}
-        <div className="flex items-center gap-2 px-4 py-3 border-b border-punk-border/30 bg-punk-bg shrink-0">
-          {/* Icon selector */}
-          <div className="relative" ref={iconPickerRef}>
+        {/* Redesigned Header: Icon + Name + Search in one row */}
+        <div className="flex items-center gap-3 px-4 py-3 border-b border-punk-border/30 bg-punk-bg shrink-0">
+          {/* Icon with image upload */}
+          <div className="relative" ref={imageUploadRef}>
             <button
-              onClick={() => setShowIconPicker(!showIconPicker)}
-              className="flex items-center justify-center w-6 h-6 border border-punk-border/50 bg-punk-bg-alt hover:border-punk-primary transition-colors"
+              onClick={() => setShowImageUpload(!showImageUpload)}
+              className="flex items-center justify-center w-10 h-10 border border-punk-border/50 bg-punk-bg-alt hover:border-punk-primary transition-colors overflow-hidden"
               style={{ color: group.color }}
-              title="Change icon"
+              title="Upload icon image"
             >
-              {ICON_MAP[group.icon] || <Folder className="w-3 h-3" />}
+              {displayIcon}
             </button>
-            {showIconPicker && (
-              <div className="absolute top-full left-0 mt-1 z-50 p-2 border border-punk-border bg-punk-bg-alt shadow-[0_0_15px_rgba(124,58,237,0.3)] grid grid-cols-5 gap-1">
-                {ICON_OPTIONS.map((iconName) => (
-                  <button
-                    key={iconName}
-                    onClick={() => {
-                      onUpdateGroup(group.id, { icon: iconName })
-                      setShowIconPicker(false)
-                    }}
-                    className={cn(
-                      "flex items-center justify-center w-7 h-7 transition-all",
-                      group.icon === iconName
-                        ? "bg-punk-primary text-white"
-                        : "text-punk-text-muted hover:text-punk-primary hover:bg-punk-bg"
-                    )}
-                    style={{ color: group.icon === iconName ? undefined : group.color }}
-                  >
-                    {ICON_MAP[iconName]}
-                  </button>
-                ))}
+            {showImageUpload && (
+              <div className="absolute top-full left-0 mt-1 z-50 p-2 border border-punk-border bg-punk-bg-alt shadow-[0_0_15px_rgba(124,58,237,0.3)]">
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
+                <button
+                  onClick={() => {
+                    fileInputRef.current?.click()
+                  }}
+                  className="flex items-center gap-2 w-full px-3 py-2 text-[9px] font-punk-heading uppercase text-punk-text-secondary hover:text-punk-primary hover:bg-punk-bg transition-colors whitespace-nowrap"
+                >
+                  <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="17 8 12 3 7 8" />
+                    <line x1="12" y1="3" x2="12" y2="15" />
+                  </svg>
+                  UPLOAD IMAGE
+                </button>
               </div>
             )}
           </div>
 
-          {isEditing ? (
-            <input
-              type="text"
-              value={editName}
-              onChange={(e) => setEditName(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleSaveRename()
-                if (e.key === "Escape") {
-                  setIsEditing(false)
-                  setEditName(group.name)
-                }
-              }}
-              onBlur={handleSaveRename}
-              className="flex-1 h-6 px-2 font-punk-heading text-[10px] text-punk-text-primary uppercase bg-punk-bg border border-punk-border/50"
-              autoFocus
-            />
-          ) : (
-            <h3 className="flex-1 font-punk-heading text-[10px] text-punk-text-primary uppercase tracking-wide">
-              {group.name}
-            </h3>
-          )}
+          {/* Editable Name */}
+          <input
+            type="text"
+            value={editName}
+            onChange={(e) => setEditName(e.target.value)}
+            onBlur={handleNameChange}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleNameChange()
+                e.currentTarget.blur()
+              }
+            }}
+            className="flex-1 h-10 px-3 font-punk-heading text-[11px] text-punk-text-primary uppercase bg-punk-bg border border-punk-border/50"
+          />
+
+          {/* Count badge */}
           <span className="font-punk-code text-[10px] text-punk-accent">
             [{extensions.length}]
           </span>
-          {!isEditing && (
-            <button
-              onClick={() => setIsEditing(true)}
-              className="p-1 text-punk-text-muted hover:text-punk-accent transition-colors"
-              title="Rename sector"
-            >
-              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-              </svg>
-            </button>
-          )}
+
+          {/* Close button */}
           <button
             onClick={onClose}
             className="p-1 text-punk-text-muted hover:text-punk-cta transition-colors"
@@ -397,13 +399,26 @@ export function GroupDetailModal({
           </button>
         </div>
 
-        {/* Search */}
+        {/* Search bar below header */}
         <div className="px-4 py-3 border-b border-punk-border/30 bg-punk-bg shrink-0">
-          <SearchBar
-            value={searchQuery}
-            onChange={setSearchQuery}
-            placeholder="SEARCH_EXTENSIONS..."
-          />
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 font-punk-body text-punk-accent text-lg">$</span>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="SEARCH_EXTENSIONS..."
+              className="w-full h-9 pl-9 pr-4 font-punk-body text-sm bg-punk-bg-alt border border-punk-border/50 text-punk-text-primary placeholder:text-punk-text-muted/50"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-punk-text-muted hover:text-punk-accent transition-colors"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Extension List - Single grid with highlight for in-group, dimmed for not-in-group */}
@@ -432,12 +447,16 @@ export function GroupDetailModal({
                   {/* Group icon badge - only show for in-group */}
                   {ext.isInGroup && (
                     <div
-                      className="absolute bottom-1 right-1 w-4 h-4 rounded-sm flex items-center justify-center z-10"
+                      className="absolute bottom-1 right-1 w-4 h-4 rounded-sm flex items-center justify-center z-10 overflow-hidden"
                       style={{ backgroundColor: group.color + "40" }}
                     >
-                      <span style={{ color: group.color }}>
-                        {ICON_MAP[group.icon] || <Folder className="w-2 h-2" />}
-                      </span>
+                      {groupIconUrl ? (
+                        <img src={groupIconUrl} className="w-full h-full object-cover" alt="" />
+                      ) : (
+                        <span style={{ color: group.color }}>
+                          {ICON_MAP[group.icon] || <Folder className="w-2 h-2" />}
+                        </span>
+                      )}
                     </div>
                   )}
                   {/* Icon */}

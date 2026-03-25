@@ -100,7 +100,7 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
     }
   },
 
-  updateGroup: async (id: string, updates: Partial<Pick<Group, "name" | "color" | "icon">>) => {
+  updateGroup: async (id: string, updates: Partial<Pick<Group, "name" | "color" | "icon" | "iconUrl">>) => {
     const { groups } = get()
     const newGroups = groups.map((g) =>
       g.id === id ? { ...g, ...updates, updatedAt: Date.now() } : g
