@@ -2,7 +2,7 @@ import * as React from "react"
 import { X, Plus, Folder, Package, Star, Heart, Bookmark, Tag, Flag, Briefcase, Code, Globe, Lock, Settings, Wrench, Zap, Flame, Gem, Crown, Target } from "lucide-react"
 import { cn } from "@/utils"
 import { SearchBar } from "@/components/popup"
-import type { Group, Extension } from "@/types"
+import type { Group, Extension, FilterType } from "@/types"
 
 const ICON_MAP: Record<string, React.ReactNode> = {
   folder: <Folder className="w-3 h-3" />,
@@ -237,6 +237,7 @@ export function GroupDetailModal({
   onUpdateGroup
 }: GroupDetailModalProps) {
   const [searchQuery, setSearchQuery] = React.useState("")
+  const [filter, setFilter] = React.useState<FilterType>("all")
   const [editName, setEditName] = React.useState(group.name)
   const [showImageUpload, setShowImageUpload] = React.useState(false)
   const fileInputRef = React.useRef<HTMLInputElement>(null)
@@ -280,15 +281,28 @@ export function GroupDetailModal({
     }))
   }, [allExtensions, groupExtIds])
 
-  // Filter by search query
+  // Filter by search query and enabled/disabled status
   const filteredExtensions = React.useMemo(() => {
-    if (!searchQuery.trim()) return extensionsWithStatus
-    const query = searchQuery.toLowerCase()
-    return extensionsWithStatus.filter(ext =>
-      ext.name.toLowerCase().includes(query) ||
-      ext.description.toLowerCase().includes(query)
-    )
-  }, [extensionsWithStatus, searchQuery])
+    let result = extensionsWithStatus
+
+    // Apply enabled/disabled filter
+    if (filter === "enabled") {
+      result = result.filter(ext => ext.enabled)
+    } else if (filter === "disabled") {
+      result = result.filter(ext => !ext.enabled)
+    }
+
+    // Apply search query filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase()
+      result = result.filter(ext =>
+        ext.name.toLowerCase().includes(query) ||
+        ext.description.toLowerCase().includes(query)
+      )
+    }
+
+    return result
+  }, [extensionsWithStatus, searchQuery, filter])
 
   // Close on escape
   React.useEffect(() => {
@@ -438,24 +452,13 @@ export function GroupDetailModal({
 
         {/* Search bar below header */}
         <div className="px-4 py-3 border-b border-punk-border/30 bg-punk-bg shrink-0">
-          <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 font-punk-body text-punk-accent text-lg">$</span>
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="SEARCH_EXTENSIONS..."
-              className="w-full h-9 pl-9 pr-4 font-punk-body text-sm bg-punk-bg-alt border border-punk-border/50 text-punk-text-primary placeholder:text-punk-text-muted/50"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-punk-text-muted hover:text-punk-accent transition-colors"
-              >
-                <X className="h-3 w-3" />
-              </button>
-            )}
-          </div>
+          <SearchBar
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder="SEARCH_EXTENSIONS..."
+            activeFilter={filter}
+            onFilterChange={setFilter}
+          />
         </div>
 
         {/* Extension List - Single grid with highlight for in-group, dimmed for not-in-group */}
