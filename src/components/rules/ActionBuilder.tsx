@@ -193,7 +193,11 @@ export function ActionBuilder({ actions, onChange }: ActionBuilderProps) {
 
       {/* Groups Grid - Same card style as extensions */}
       {(activeFilter === "all" || activeFilter === "groups") && filteredGroups.length > 0 && (
-        <div className="grid grid-cols-2 gap-1 max-h-48 overflow-y-auto">
+        <div>
+          <p className="font-punk-heading text-[8px] text-punk-text-muted uppercase tracking-wide mb-1">
+            SECTORS
+          </p>
+          <div className="grid grid-cols-2 gap-1 max-h-48 overflow-y-auto">
           {filteredGroups.map((group) => {
             const isSelected = enabledGroups.includes(group.id) || disabledGroups.includes(group.id)
             return (
@@ -256,6 +260,7 @@ export function ActionBuilder({ actions, onChange }: ActionBuilderProps) {
               </div>
             )
           })}
+        </div>
         </div>
       )}
 
