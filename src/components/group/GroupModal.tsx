@@ -440,14 +440,6 @@ export function GroupDetailModal({
               {allEnabled ? "ON" : allDisabled ? "OFF" : "TOGGLE"}
             </button>
           </div>
-
-          {/* Close button */}
-          <button
-            onClick={onClose}
-            className="p-1 text-punk-text-muted hover:text-punk-cta transition-colors"
-          >
-            <X className="h-4 w-4" />
-          </button>
         </div>
 
         {/* Search bar below header */}
@@ -524,6 +516,22 @@ export function GroupDetailModal({
               </p>
             </div>
           )}
+        </div>
+
+        {/* Bottom Actions */}
+        <div className="flex justify-end gap-2 px-4 py-3 border-t border-punk-border/30 shrink-0">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 font-punk-heading text-[9px] text-punk-text-muted uppercase tracking-wide hover:text-punk-text-primary transition-colors"
+          >
+            CANCEL
+          </button>
+          <button
+            onClick={onClose}
+            className="px-4 py-2 font-punk-heading text-[9px] bg-punk-primary text-white uppercase tracking-wide hover:bg-punk-primary/80 transition-colors"
+          >
+            CONFIRM
+          </button>
         </div>
       </div>
     </div>
