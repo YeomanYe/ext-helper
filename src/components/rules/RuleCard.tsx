@@ -12,9 +12,10 @@ interface RuleCardProps {
   onToggle: (id: string) => void
   onEdit: (rule: Rule) => void
   onDelete: (id: string) => void
+  showDelete?: boolean
 }
 
-export function RuleCard({ rule, extensions, groups, onToggle, onEdit, onDelete }: RuleCardProps) {
+export function RuleCard({ rule, extensions, groups, onToggle, onEdit, onDelete, showDelete = true }: RuleCardProps) {
   const isEnabled = rule.enabled
 
   return (
@@ -103,12 +104,14 @@ export function RuleCard({ rule, extensions, groups, onToggle, onEdit, onDelete 
           >
             <Edit2 className="h-3 w-3" />
           </button>
-          <button
-            onClick={() => onDelete(rule.id)}
-            className="p-1 text-punk-text-muted hover:text-punk-cta transition-colors"
-          >
-            <Trash2 className="h-3 w-3" />
-          </button>
+          {showDelete && (
+            <button
+              onClick={() => onDelete(rule.id)}
+              className="p-1 text-punk-text-muted hover:text-punk-cta transition-colors"
+            >
+              <Trash2 className="h-3 w-3" />
+            </button>
+          )}
         </div>
       </div>
     </div>

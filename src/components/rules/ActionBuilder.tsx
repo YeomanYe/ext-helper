@@ -191,36 +191,45 @@ export function ActionBuilder({ actions, onChange }: ActionBuilderProps) {
         </div>
       )}
 
-      {/* Groups Grid - With ON/OFF buttons */}
+      {/* Groups Grid - Card style with ON/OFF */}
       {(activeFilter === "all" || activeFilter === "groups") && filteredGroups.length > 0 && (
-        <div className="flex flex-wrap gap-1">
+        <div className="grid grid-cols-2 gap-1 max-h-48 overflow-y-auto">
           {filteredGroups.map((group) => {
             const isSelected = enabledGroups.includes(group.id) || disabledGroups.includes(group.id)
             return (
               <div
                 key={group.id}
                 className={cn(
-                  "flex items-center gap-1.5 px-2 py-1.5 border transition-all",
+                  "flex flex-col items-center justify-center p-2 border transition-all",
                   enabledGroups.includes(group.id)
                     ? "border-punk-success/50 bg-punk-success/5"
                     : disabledGroups.includes(group.id)
                       ? "border-punk-cta/50 bg-punk-cta/5"
-                      : "border-punk-border/20 bg-punk-bg hover:border-punk-border/50"
+                      : "border-punk-border/20 bg-punk-bg-alt hover:border-punk-border/50"
                 )}
               >
-                <div
-                  className="h-3 w-3 rounded-sm flex-shrink-0"
-                  style={{ backgroundColor: group.color }}
-                />
+                {/* Icon */}
+                {group.iconUrl ? (
+                  <img src={group.iconUrl} className="w-6 h-6 border border-punk-border/30 object-cover" alt="" />
+                ) : (
+                  <div
+                    className="w-6 h-6 rounded-sm border border-punk-border/30 flex items-center justify-center"
+                    style={{ backgroundColor: group.color + "20" }}
+                  >
+                    <Folder className="w-3 h-3" style={{ color: group.color }} />
+                  </div>
+                )}
+
+                {/* Name */}
                 <span className={cn(
-                  "font-punk-heading text-[7px] uppercase truncate",
+                  "font-punk-heading text-[6px] uppercase text-center truncate w-full mt-1",
                   isSelected ? "text-punk-text-primary" : "text-punk-text-muted"
                 )}>
                   {group.name}
                 </span>
 
                 {/* ON/OFF buttons */}
-                <div className="flex gap-0.5 ml-auto">
+                <div className="flex gap-0.5 mt-1">
                   <button
                     onClick={() => toggleGroupEnable(group.id)}
                     className={cn(
