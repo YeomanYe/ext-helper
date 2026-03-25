@@ -378,22 +378,8 @@ export function GroupModal({
             [{isCreateMode ? selectedExtensions.size : extensions.length}]
           </span>
 
-          {/* Color selector for create mode, ON/OFF toggle for edit mode */}
-          {isCreateMode ? (
-            <div className="flex gap-1">
-              {GROUP_COLORS.slice(0, 4).map((color) => (
-                <button
-                  key={color}
-                  onClick={() => setSelectedColor(color)}
-                  className={cn(
-                    "h-5 w-5 rounded-full transition-transform",
-                    selectedColor === color && "ring-2 ring-offset-1 ring-punk-accent scale-110"
-                  )}
-                  style={{ backgroundColor: color }}
-                />
-              ))}
-            </div>
-          ) : (
+          {/* ON/OFF toggle for edit mode */}
+          {isCreateMode ? null : (
             <div className="flex gap-1">
               <button
                 onClick={() => {
@@ -456,7 +442,7 @@ export function GroupModal({
                     "relative flex flex-col items-center justify-center p-2 cursor-pointer transition-all border",
                     ext.isInGroup
                       ? "border-punk-success/50 bg-punk-success/5 hover:border-punk-success"
-                      : "border-punk-border/20 bg-punk-bg-alt hover:border-punk-primary/50 opacity-40 hover:opacity-70"
+                      : "border-punk-border/20 bg-punk-bg-alt hover:border-punk-primary/50"
                   )}
                 >
                   {/* Status dot */}
@@ -483,9 +469,9 @@ export function GroupModal({
                   )}
                   {/* Icon */}
                   {ext.iconUrl ? (
-                    <img src={ext.iconUrl} className={cn("w-8 h-8 border border-punk-border/30 object-cover", !ext.isInGroup && "grayscale")} alt="" />
+                    <img src={ext.iconUrl} className="w-8 h-8 border border-punk-border/30 object-cover" alt="" />
                   ) : (
-                    <div className={cn("w-8 h-8 border border-punk-border/30 bg-punk-bg flex items-center justify-center", !ext.isInGroup && "grayscale")}>
+                    <div className="w-8 h-8 border border-punk-border/30 bg-punk-bg flex items-center justify-center">
                       <Package className="w-4 h-4 text-punk-text-muted" />
                     </div>
                   )}
