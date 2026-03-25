@@ -191,7 +191,7 @@ export function ActionBuilder({ actions, onChange }: ActionBuilderProps) {
         </div>
       )}
 
-      {/* Groups Grid - Simple highlight mode */}
+      {/* Groups Grid - With ON/OFF buttons */}
       {(activeFilter === "all" || activeFilter === "groups") && filteredGroups.length > 0 && (
         <div>
           <p className="font-punk-heading text-[8px] text-punk-text-muted uppercase tracking-wide mb-1">
@@ -200,27 +200,16 @@ export function ActionBuilder({ actions, onChange }: ActionBuilderProps) {
           <div className="flex flex-wrap gap-1">
             {filteredGroups.map((group) => {
               const isSelected = enabledGroups.includes(group.id) || disabledGroups.includes(group.id)
-              const actionType = enabledGroups.includes(group.id) ? "enable" : disabledGroups.includes(group.id) ? "disable" : null
               return (
                 <div
                   key={group.id}
-                  onClick={() => {
-                    if (enabledGroups.includes(group.id)) {
-                      toggleGroupEnable(group.id)
-                    } else if (disabledGroups.includes(group.id)) {
-                      toggleGroupDisable(group.id)
-                    } else {
-                      // Default to enable
-                      toggleGroupEnable(group.id)
-                    }
-                  }}
                   className={cn(
-                    "flex items-center gap-1.5 px-2 py-1 border transition-all cursor-pointer",
-                    isSelected
-                      ? actionType === "enable"
-                        ? "border-punk-success/50 bg-punk-success/5"
-                        : "border-punk-cta/50 bg-punk-cta/5"
-                      : "border-punk-border/20 bg-punk-bg hover:border-punk-border/50"
+                    "flex items-center gap-1.5 px-2 py-1.5 border transition-all",
+                    enabledGroups.includes(group.id)
+                      ? "border-punk-success/50 bg-punk-success/5"
+                      : disabledGroups.includes(group.id)
+                        ? "border-punk-cta/50 bg-punk-cta/5"
+                        : "border-punk-border/20 bg-punk-bg hover:border-punk-border/50"
                   )}
                 >
                   <div
@@ -233,14 +222,32 @@ export function ActionBuilder({ actions, onChange }: ActionBuilderProps) {
                   )}>
                     {group.name}
                   </span>
-                  {isSelected && (
-                    <span className={cn(
-                      "text-[6px] font-punk-code",
-                      actionType === "enable" ? "text-punk-success" : "text-punk-cta"
-                    )}>
-                      {actionType === "enable" ? "ON" : "OFF"}
-                    </span>
-                  )}
+
+                  {/* ON/OFF buttons */}
+                  <div className="flex gap-0.5 ml-auto">
+                    <button
+                      onClick={() => toggleGroupEnable(group.id)}
+                      className={cn(
+                        "px-1 py-0.5 text-[6px] font-punk-heading transition-all",
+                        enabledGroups.includes(group.id)
+                          ? "bg-punk-success text-white"
+                          : "text-punk-text-muted hover:text-punk-success"
+                      )}
+                    >
+                      ON
+                    </button>
+                    <button
+                      onClick={() => toggleGroupDisable(group.id)}
+                      className={cn(
+                        "px-1 py-0.5 text-[6px] font-punk-heading transition-all",
+                        disabledGroups.includes(group.id)
+                          ? "bg-punk-cta text-white"
+                          : "text-punk-text-muted hover:text-punk-cta"
+                      )}
+                    >
+                      OFF
+                    </button>
+                  </div>
                 </div>
               )
             })}

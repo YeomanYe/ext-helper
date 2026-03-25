@@ -103,18 +103,31 @@ export function RuleEditor({ rule, onSave, onClose }: RuleEditorProps) {
             />
           </div>
 
-          {/* Description */}
-          <div>
-            <label className="block font-punk-heading text-[9px] text-punk-text-muted uppercase mb-1.5">
-              DESCRIPTION (OPTIONAL)
-            </label>
-            <input
-              type="text"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Brief description..."
-              className="punk-input w-full h-10 px-3 text-sm"
-            />
+          {/* Description & Priority */}
+          <div className="flex gap-4">
+            <div className="flex-1">
+              <label className="block font-punk-heading text-[9px] text-punk-text-muted uppercase mb-1.5">
+                DESCRIPTION (OPTIONAL)
+              </label>
+              <input
+                type="text"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Brief description..."
+                className="punk-input w-full h-10 px-3 text-sm"
+              />
+            </div>
+            <div className="w-24">
+              <label className="block font-punk-heading text-[9px] text-punk-text-muted uppercase mb-1.5">
+                PRIORITY
+              </label>
+              <input
+                type="number"
+                value={priority}
+                onChange={(e) => setPriority(parseInt(e.target.value) || 0)}
+                className="punk-input w-full h-10 px-3 text-sm"
+              />
+            </div>
           </div>
 
           {/* Conditions */}
@@ -134,19 +147,6 @@ export function RuleEditor({ rule, onSave, onClose }: RuleEditorProps) {
               ACTIONS
             </label>
             <ActionBuilder actions={actions} onChange={setActions} />
-          </div>
-
-          {/* Priority */}
-          <div>
-            <label className="block font-punk-heading text-[9px] text-punk-text-muted uppercase mb-1.5">
-              PRIORITY
-            </label>
-            <input
-              type="number"
-              value={priority}
-              onChange={(e) => setPriority(parseInt(e.target.value) || 0)}
-              className="punk-input w-24 h-10 px-3 text-sm"
-            />
           </div>
         </div>
 
