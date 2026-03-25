@@ -156,7 +156,7 @@ export function PopupPage() {
                 : "text-punk-text-muted hover:text-punk-text-primary"
             )}
           >
-            AUTO_RULES
+            RULES
           </button>
         </div>
       </div>
@@ -243,7 +243,22 @@ export function PopupPage() {
             setSelectedGroupId(null)
             setShowCreateModal(false)
           }}
-          onCreate={showCreateModal ? (name, color) => createGroup(name, color) : undefined}
+          onCreate={showCreateModal ? async (name, color, extensionIds) => {
+            await createGroup(name, color)
+            // Add selected extensions to the new group
+            // We need to find the newly created group and add extensions to it
+            // Since createGroup doesn't return the ID directly, we'll use the latest group
+            const latestGroup = groups[groups.length]
+            if (latestGroup && extensionIds.length > 0) {
+              extensionIds.forEach(extId => {
+                addToGroup(latestGroup.id, extId)
+              })
+            }
+            // Keep the new group highlighted after creation
+            if (latestGroup) {
+              setSelectedGroupId(latestGroup.id)
+            }
+          } : undefined}
           onToggleExtension={selectedGroup ? handleToggleExtension : undefined}
           onOpenOptions={selectedGroup ? handleOpenOptions : undefined}
           onRemove={selectedGroup ? handleRemove : undefined}

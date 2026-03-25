@@ -127,7 +127,7 @@ interface GroupModalProps {
   extensions?: Extension[]
   allExtensions?: Extension[]
   onClose: () => void
-  onCreate?: (name: string, color: string) => void
+  onCreate?: (name: string, color: string, extensionIds: string[]) => void
   onToggleExtension?: (id: string) => void
   onOpenOptions?: (id: string) => void
   onRemove?: (id: string) => void
@@ -156,6 +156,7 @@ export function GroupModal({
   const [editName, setEditName] = React.useState(group?.name || "New Sector")
   const [selectedColor, setSelectedColor] = React.useState(group?.color || GROUP_COLORS[0])
   const [showImageUpload, setShowImageUpload] = React.useState(false)
+  const [selectedExtensions, setSelectedExtensions] = React.useState<Set<string>>(new Set())
   const fileInputRef = React.useRef<HTMLInputElement>(null)
   const imageUploadRef = React.useRef<HTMLDivElement>(null)
 
@@ -194,9 +195,9 @@ export function GroupModal({
   const extensionsWithStatus = React.useMemo(() => {
     return allExtensions.map(ext => ({
       ...ext,
-      isInGroup: groupExtIds.has(ext.id)
+      isInGroup: isCreateMode ? selectedExtensions.has(ext.id) : groupExtIds.has(ext.id)
     }))
-  }, [allExtensions, groupExtIds])
+  }, [allExtensions, groupExtIds, selectedExtensions, isCreateMode])
 
   // Filter by search query and enabled/disabled status
   const filteredExtensions = React.useMemo(() => {
@@ -244,11 +245,24 @@ export function GroupModal({
   }
 
   const handleToggleExtensionMembership = (ext: typeof filteredExtensions[0]) => {
-    if (!group || !onAddExtension || !onRemoveFromGroup) return
-    if (ext.isInGroup) {
-      onRemoveFromGroup(group.id, ext.id)
-    } else {
-      onAddExtension(group.id, ext.id)
+    if (isCreateMode) {
+      // In create mode, toggle selectedExtensions state
+      setSelectedExtensions(prev => {
+        const next = new Set(prev)
+        if (next.has(ext.id)) {
+          next.delete(ext.id)
+        } else {
+          next.add(ext.id)
+        }
+        return next
+      })
+    } else if (group && onAddExtension && onRemoveFromGroup) {
+      // In edit mode, call actual handlers
+      if (ext.isInGroup) {
+        onRemoveFromGroup(group.id, ext.id)
+      } else {
+        onAddExtension(group.id, ext.id)
+      }
     }
   }
 
@@ -275,7 +289,7 @@ export function GroupModal({
   // Handle create
   const handleCreate = () => {
     if (onCreate && editName.trim()) {
-      onCreate(editName.trim(), selectedColor)
+      onCreate(editName.trim(), selectedColor, Array.from(selectedExtensions))
       onClose()
     }
   }
@@ -293,10 +307,7 @@ export function GroupModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-punk-bg/80 backdrop-blur-sm" onClick={onClose}>
       <div
-        className={cn(
-          "border border-punk-border bg-punk-bg-alt shadow-[0_0_30px_rgba(124,58,237,0.4)] overflow-hidden flex flex-col",
-          isCreateMode ? "w-80" : "w-[480px] max-h-[560px]"
-        )}
+        className="w-[480px] max-h-[560px] border border-punk-border bg-punk-bg-alt shadow-[0_0_30px_rgba(124,58,237,0.4)] overflow-hidden flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -362,135 +373,120 @@ export function GroupModal({
             className="flex-1 h-10 px-3 font-punk-heading text-[11px] text-punk-text-primary uppercase bg-punk-bg border border-punk-border/50"
           />
 
-          {/* Edit mode extras */}
-          {!isCreateMode && (
-            <>
-              {/* Count badge */}
-              <span className="font-punk-code text-[10px] text-punk-accent">
-                [{extensions.length}]
-              </span>
+          {/* Count badge */}
+          <span className="font-punk-code text-[10px] text-punk-accent">
+            [{isCreateMode ? selectedExtensions.size : extensions.length}]
+          </span>
 
-              {/* ON/OFF toggle */}
-              <div className="flex gap-0.5">
-                <button
-                  onClick={handleToggleAll}
-                  disabled={extensions.length === 0}
-                  className={cn(
-                    "px-2 py-1 text-[8px] font-punk-heading transition-all",
-                    allEnabled
-                      ? "bg-punk-success text-white"
-                      : allDisabled
-                        ? "bg-punk-cta text-white"
-                        : "border border-punk-border/30 text-punk-text-muted hover:border-punk-primary"
-                  )}
-                >
-                  {allEnabled ? "ON" : allDisabled ? "OFF" : "TOGGLE"}
-                </button>
-              </div>
-            </>
-          )}
-        </div>
-
-        {/* Color selector for create mode */}
-        {isCreateMode && (
-          <div className="px-4 py-3 border-b border-punk-border/30 bg-punk-bg shrink-0">
-            <label className="block font-punk-heading text-[8px] text-punk-text-muted uppercase tracking-wide mb-2">
-              COLOR
-            </label>
-            <div className="flex gap-2 flex-wrap">
-              {GROUP_COLORS.map((color) => (
+          {/* Color selector for create mode, ON/OFF toggle for edit mode */}
+          {isCreateMode ? (
+            <div className="flex gap-1">
+              {GROUP_COLORS.slice(0, 4).map((color) => (
                 <button
                   key={color}
                   onClick={() => setSelectedColor(color)}
                   className={cn(
-                    "h-7 w-7 rounded-full transition-transform",
-                    selectedColor === color && "ring-2 ring-offset-2 ring-punk-accent scale-110"
+                    "h-5 w-5 rounded-full transition-transform",
+                    selectedColor === color && "ring-2 ring-offset-1 ring-punk-accent scale-110"
                   )}
                   style={{ backgroundColor: color }}
                 />
               ))}
             </div>
-          </div>
-        )}
+          ) : (
+            <div className="flex gap-0.5">
+              <button
+                onClick={handleToggleAll}
+                disabled={extensions.length === 0}
+                className={cn(
+                  "px-2 py-1 text-[8px] font-punk-heading transition-all",
+                  allEnabled
+                    ? "bg-punk-success text-white"
+                    : allDisabled
+                      ? "bg-punk-cta text-white"
+                      : "border border-punk-border/30 text-punk-text-muted hover:border-punk-primary"
+                )}
+              >
+                {allEnabled ? "ON" : allDisabled ? "OFF" : "TOGGLE"}
+              </button>
+            </div>
+          )}
+        </div>
 
-        {/* Search bar for edit mode */}
-        {!isCreateMode && (
-          <div className="px-4 py-3 border-b border-punk-border/30 bg-punk-bg shrink-0">
-            <SearchBar
-              value={searchQuery}
-              onChange={setSearchQuery}
-              placeholder="SEARCH_EXTENSIONS..."
-              activeFilter={filter}
-              onFilterChange={setFilter}
-            />
-          </div>
-        )}
+        {/* Search bar */}
+        <div className="px-4 py-3 border-b border-punk-border/30 bg-punk-bg shrink-0">
+          <SearchBar
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder="SEARCH_EXTENSIONS..."
+            activeFilter={filter}
+            onFilterChange={setFilter}
+          />
+        </div>
 
-        {/* Extension List (edit mode only) */}
-        {!isCreateMode && (
-          <div className="flex-1 overflow-y-auto p-3">
-            {filteredExtensions.length > 0 ? (
-              <div className="grid grid-cols-4 gap-2">
-                {filteredExtensions.map((ext) => (
+        {/* Extension List */}
+        <div className="flex-1 overflow-y-auto p-3">
+          {filteredExtensions.length > 0 ? (
+            <div className="grid grid-cols-4 gap-2">
+              {filteredExtensions.map((ext) => (
+                <div
+                  key={ext.id}
+                  onClick={() => handleToggleExtensionMembership(ext)}
+                  className={cn(
+                    "relative flex flex-col items-center justify-center p-2 cursor-pointer transition-all border",
+                    ext.isInGroup
+                      ? "border-punk-success/50 bg-punk-success/5 hover:border-punk-success"
+                      : "border-punk-border/20 bg-punk-bg-alt hover:border-punk-primary/50 opacity-40 hover:opacity-70"
+                  )}
+                >
+                  {/* Status dot */}
                   <div
-                    key={ext.id}
-                    onClick={() => handleToggleExtensionMembership(ext)}
                     className={cn(
-                      "relative flex flex-col items-center justify-center p-2 cursor-pointer transition-all border",
-                      ext.isInGroup
-                        ? "border-punk-success/50 bg-punk-success/5 hover:border-punk-success"
-                        : "border-punk-border/20 bg-punk-bg-alt hover:border-punk-primary/50 opacity-40 hover:opacity-70"
+                      "absolute top-1 right-1 w-2 h-2 border border-punk-bg-alt z-10",
+                      ext.enabled ? "bg-punk-success" : "bg-punk-text-muted"
                     )}
-                  >
-                    {/* Status dot */}
+                  />
+                  {/* Group icon badge - only show for in-group */}
+                  {ext.isInGroup && (
                     <div
-                      className={cn(
-                        "absolute top-1 right-1 w-2 h-2 border border-punk-bg-alt z-10",
-                        ext.enabled ? "bg-punk-success" : "bg-punk-text-muted"
+                      className="absolute bottom-1 right-1 w-4 h-4 rounded-sm flex items-center justify-center z-10 overflow-hidden"
+                      style={{ backgroundColor: (group?.color || selectedColor) + "40" }}
+                    >
+                      {groupIconUrl ? (
+                        <img src={groupIconUrl} className="w-full h-full object-cover" alt="" />
+                      ) : (
+                        <span style={{ color: group?.color || selectedColor }}>
+                          {ICON_MAP[group?.icon || "folder"] || <Folder className="w-2 h-2" />}
+                        </span>
                       )}
-                    />
-                    {/* Group icon badge - only show for in-group */}
-                    {ext.isInGroup && group && (
-                      <div
-                        className="absolute bottom-1 right-1 w-4 h-4 rounded-sm flex items-center justify-center z-10 overflow-hidden"
-                        style={{ backgroundColor: group.color + "40" }}
-                      >
-                        {groupIconUrl ? (
-                          <img src={groupIconUrl} className="w-full h-full object-cover" alt="" />
-                        ) : (
-                          <span style={{ color: group.color }}>
-                            {ICON_MAP[group.icon] || <Folder className="w-2 h-2" />}
-                          </span>
-                        )}
-                      </div>
-                    )}
-                    {/* Icon */}
-                    {ext.iconUrl ? (
-                      <img src={ext.iconUrl} className={cn("w-8 h-8 border border-punk-border/30 object-cover", !ext.isInGroup && "grayscale")} alt="" />
-                    ) : (
-                      <div className={cn("w-8 h-8 border border-punk-border/30 bg-punk-bg flex items-center justify-center", !ext.isInGroup && "grayscale")}>
-                        <Package className="w-4 h-4 text-punk-text-muted" />
-                      </div>
-                    )}
-                    {/* Name */}
-                    <span className={cn(
-                      "font-punk-heading text-[6px] uppercase text-center truncate w-full mt-1",
-                      ext.isInGroup ? "text-punk-text-primary" : "text-punk-text-muted"
-                    )}>
-                      {ext.name.substring(0, 12)}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center py-8 text-center">
-                <p className="font-punk-body text-base text-punk-text-muted">
-                  NO_MATCH_FOUND
-                </p>
-              </div>
-            )}
-          </div>
-        )}
+                    </div>
+                  )}
+                  {/* Icon */}
+                  {ext.iconUrl ? (
+                    <img src={ext.iconUrl} className={cn("w-8 h-8 border border-punk-border/30 object-cover", !ext.isInGroup && "grayscale")} alt="" />
+                  ) : (
+                    <div className={cn("w-8 h-8 border border-punk-border/30 bg-punk-bg flex items-center justify-center", !ext.isInGroup && "grayscale")}>
+                      <Package className="w-4 h-4 text-punk-text-muted" />
+                    </div>
+                  )}
+                  {/* Name */}
+                  <span className={cn(
+                    "font-punk-heading text-[6px] uppercase text-center truncate w-full mt-1",
+                    ext.isInGroup ? "text-punk-text-primary" : "text-punk-text-muted"
+                  )}>
+                    {ext.name.substring(0, 12)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-8 text-center">
+              <p className="font-punk-body text-base text-punk-text-muted">
+                NO_MATCH_FOUND
+              </p>
+            </div>
+          )}
+        </div>
 
         {/* Bottom Actions */}
         <div className="flex justify-end gap-2 px-4 py-3 border-t border-punk-border/30 shrink-0">
@@ -510,7 +506,7 @@ export function GroupModal({
                 : "bg-punk-border/50 text-punk-text-muted cursor-not-allowed"
             )}
           >
-            {isCreateMode ? "CONFIRM" : "CONFIRM"}
+            CONFIRM
           </button>
         </div>
       </div>
