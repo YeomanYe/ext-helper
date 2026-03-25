@@ -318,6 +318,25 @@ export function GroupDetailModal({
     }
   }
 
+  // Check if all extensions in group are enabled
+  const allEnabled = extensions.length > 0 && extensions.every(ext => ext.enabled)
+  const allDisabled = extensions.length > 0 && extensions.every(ext => !ext.enabled)
+
+  // Toggle all extensions in group
+  const handleToggleAll = () => {
+    if (allEnabled) {
+      // Disable all
+      extensions.forEach(ext => {
+        if (ext.enabled) onToggleExtension(ext.id)
+      })
+    } else {
+      // Enable all
+      extensions.forEach(ext => {
+        if (!ext.enabled) onToggleExtension(ext.id)
+      })
+    }
+  }
+
   // Get icon to display (custom image or icon map)
   const groupIconUrl = (group as any).iconUrl
   const displayIcon = groupIconUrl ? (
@@ -389,6 +408,24 @@ export function GroupDetailModal({
           <span className="font-punk-code text-[10px] text-punk-accent">
             [{extensions.length}]
           </span>
+
+          {/* ON/OFF toggle */}
+          <div className="flex gap-0.5">
+            <button
+              onClick={handleToggleAll}
+              disabled={extensions.length === 0}
+              className={cn(
+                "px-2 py-1 text-[8px] font-punk-heading transition-all",
+                allEnabled
+                  ? "bg-punk-success text-white"
+                  : allDisabled
+                    ? "bg-punk-cta text-white"
+                    : "border border-punk-border/30 text-punk-text-muted hover:border-punk-primary"
+              )}
+            >
+              {allEnabled ? "ON" : allDisabled ? "OFF" : "TOGGLE"}
+            </button>
+          </div>
 
           {/* Close button */}
           <button
