@@ -231,7 +231,7 @@ export function CreateGroupButton({ onClick, className }: CreateGroupButtonProps
       )}
     >
       <Plus className="h-4 w-4" />
-      + NEW SECTOR
+      NEW SECTOR
     </button>
   )
 }

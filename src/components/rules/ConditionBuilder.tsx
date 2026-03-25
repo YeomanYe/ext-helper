@@ -46,6 +46,7 @@ export function ConditionBuilder({ conditions, onChange }: ConditionBuilderProps
         <ConditionGroupRow
           key={group.id}
           group={group}
+          totalGroups={conditions.length}
           onChange={(updates) => updateGroup(index, updates)}
           onRemove={() => removeGroup(index)}
         />
@@ -71,10 +72,12 @@ export function ConditionBuilder({ conditions, onChange }: ConditionBuilderProps
 
 function ConditionGroupRow({
   group,
+  totalGroups,
   onChange,
   onRemove,
 }: {
   group: ConditionGroup
+  totalGroups: number
   onChange: (updates: Partial<ConditionGroup>) => void
   onRemove: () => void
 }) {
@@ -135,12 +138,14 @@ function ConditionGroupRow({
             onChange={(matchMode) => onChange({ matchMode })}
           />
         </div>
-        <button
-          onClick={onRemove}
-          className="p-1 text-punk-text-muted hover:text-punk-cta transition-colors"
-        >
-          <Trash2 className="h-3 w-3" />
-        </button>
+        {totalGroups > 1 && (
+          <button
+            onClick={onRemove}
+            className="p-1 text-punk-text-muted hover:text-punk-cta transition-colors"
+          >
+            <Trash2 className="h-3 w-3" />
+          </button>
+        )}
       </div>
 
       {/* Domain inputs */}
