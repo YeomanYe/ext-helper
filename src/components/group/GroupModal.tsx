@@ -95,14 +95,9 @@ export function CreateGroupChip({ onClick }: CreateGroupChipProps) {
       )}
     >
       <Plus className="h-3.5 w-3.5" />
-      <span className="font-punk-heading text-[8px] uppercase tracking-wide">+ SECTOR</span>
+      <span className="font-punk-heading text-[8px] uppercase tracking-wide">NEW SECTOR</span>
     </button>
   )
-}
-
-interface CreateGroupModalProps {
-  onClose: () => void
-  onCreate: (name: string, color: string) => void
 }
 
 const GROUP_COLORS = [
@@ -110,129 +105,41 @@ const GROUP_COLORS = [
   "#14B8A6", "#3B82F6", "#8B5CF6", "#EC4899"
 ]
 
-export function CreateGroupModal({ onClose, onCreate }: CreateGroupModalProps) {
-  const [name, setName] = React.useState("New Sector")
-  const [selectedColor, setSelectedColor] = React.useState(GROUP_COLORS[0])
-
-  // Close on escape
-  React.useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose()
-    }
-    document.addEventListener("keydown", handleEsc)
-    return () => document.removeEventListener("keydown", handleEsc)
-  }, [onClose])
-
-  const handleCreate = () => {
-    if (name.trim()) {
-      onCreate(name.trim(), selectedColor)
-      onClose()
-    }
-  }
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-punk-bg/80 backdrop-blur-sm" onClick={onClose}>
-      <div
-        className="w-80 border border-punk-border bg-punk-bg-alt shadow-[0_0_30px_rgba(124,58,237,0.4)] overflow-hidden"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Modal Header */}
-        <div className="flex items-center gap-2 px-4 py-3 border-b border-punk-border/30">
-          <h3 className="flex-1 font-punk-heading text-[10px] text-punk-text-primary uppercase tracking-wide">
-            CREATE SECTOR
-          </h3>
-        </div>
-
-        {/* Form */}
-        <div className="p-4 space-y-4">
-          <div>
-            <label className="block font-punk-heading text-[8px] text-punk-text-muted uppercase tracking-wide mb-2">
-              SECTOR NAME
-            </label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Enter sector name..."
-              className="punk-input w-full h-10 px-3 text-sm"
-              autoFocus
-            />
-          </div>
-
-          <div>
-            <label className="block font-punk-heading text-[8px] text-punk-text-muted uppercase tracking-wide mb-2">
-              COLOR
-            </label>
-            <div className="flex gap-2 flex-wrap">
-              {GROUP_COLORS.map((color) => (
-                <button
-                  key={color}
-                  onClick={() => setSelectedColor(color)}
-                  className={cn(
-                    "h-7 w-7 rounded-full transition-transform",
-                    selectedColor === color && "ring-2 ring-offset-2 ring-punk-accent scale-110"
-                  )}
-                  style={{ backgroundColor: color }}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Actions */}
-        <div className="flex justify-end gap-2 px-4 py-3 border-t border-punk-border/30">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 font-punk-heading text-[9px] text-punk-text-muted uppercase tracking-wide hover:text-punk-text-primary transition-colors"
-          >
-            CANCEL
-          </button>
-          <button
-            onClick={handleCreate}
-            disabled={!name.trim()}
-            className={cn(
-              "px-4 py-2 font-punk-heading text-[9px] uppercase tracking-wide transition-colors",
-              name.trim()
-                ? "bg-punk-primary text-white hover:bg-punk-primary/80"
-                : "bg-punk-border/50 text-punk-text-muted cursor-not-allowed"
-            )}
-          >
-            CONFIRM
-          </button>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-interface GroupDetailModalProps {
-  group: Group
-  extensions: Extension[]
-  allExtensions: Extension[]
+interface GroupModalProps {
+  // For create mode: group is null/undefined
+  // For edit mode: group is provided
+  group?: Group
+  extensions?: Extension[]
+  allExtensions?: Extension[]
   onClose: () => void
-  onToggleExtension: (id: string) => void
+  onCreate?: (name: string, color: string) => void
+  onToggleExtension?: (id: string) => void
   onOpenOptions?: (id: string) => void
   onRemove?: (id: string) => void
-  onAddExtension: (groupId: string, extId: string) => void
-  onRemoveFromGroup: (groupId: string, extId: string) => void
-  onUpdateGroup: (groupId: string, updates: { name?: string; color?: string; icon?: string; iconUrl?: string }) => void
+  onAddExtension?: (groupId: string, extId: string) => void
+  onRemoveFromGroup?: (groupId: string, extId: string) => void
+  onUpdateGroup?: (groupId: string, updates: { name?: string; color?: string; icon?: string; iconUrl?: string }) => void
 }
 
-export function GroupDetailModal({
+export function GroupModal({
   group,
-  extensions,
-  allExtensions,
+  extensions = [],
+  allExtensions = [],
   onClose,
+  onCreate,
   onToggleExtension,
   onOpenOptions,
   onRemove,
   onAddExtension,
   onRemoveFromGroup,
   onUpdateGroup
-}: GroupDetailModalProps) {
+}: GroupModalProps) {
+  const isCreateMode = !group
+
   const [searchQuery, setSearchQuery] = React.useState("")
   const [filter, setFilter] = React.useState<FilterType>("all")
-  const [editName, setEditName] = React.useState(group.name)
+  const [editName, setEditName] = React.useState(group?.name || "New Sector")
+  const [selectedColor, setSelectedColor] = React.useState(group?.color || GROUP_COLORS[0])
   const [showImageUpload, setShowImageUpload] = React.useState(false)
   const fileInputRef = React.useRef<HTMLInputElement>(null)
   const imageUploadRef = React.useRef<HTMLDivElement>(null)
@@ -240,7 +147,7 @@ export function GroupDetailModal({
   // Handle image upload
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    if (file) {
+    if (file && group && onUpdateGroup) {
       const reader = new FileReader()
       reader.onload = (event) => {
         const dataUrl = event.target?.result as string
@@ -253,6 +160,7 @@ export function GroupDetailModal({
 
   // Close image upload on outside click
   React.useEffect(() => {
+    if (!showImageUpload) return
     function handleClickOutside(event: MouseEvent) {
       if (imageUploadRef.current && !imageUploadRef.current.contains(event.target as Node)) {
         setShowImageUpload(false)
@@ -260,7 +168,7 @@ export function GroupDetailModal({
     }
     document.addEventListener("mousedown", handleClickOutside)
     return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [])
+  }, [showImageUpload])
 
   // Create a set of extension IDs in this group for fast lookup
   const groupExtIds = React.useMemo(() => {
@@ -309,16 +217,19 @@ export function GroupDetailModal({
     return () => document.removeEventListener("keydown", handleEsc)
   }, [onClose])
 
-  // Update name on blur or enter
+  // Update name on blur or enter (edit mode only)
   const handleNameChange = () => {
-    if (editName.trim() && editName !== group.name) {
-      onUpdateGroup(group.id, { name: editName.trim() })
-    } else if (!editName.trim()) {
-      setEditName(group.name)
+    if (group && onUpdateGroup) {
+      if (editName.trim() && editName !== group.name) {
+        onUpdateGroup(group.id, { name: editName.trim() })
+      } else if (!editName.trim()) {
+        setEditName(group.name)
+      }
     }
   }
 
   const handleToggleExtensionMembership = (ext: typeof filteredExtensions[0]) => {
+    if (!group || !onAddExtension || !onRemoveFromGroup) return
     if (ext.isInGroup) {
       onRemoveFromGroup(group.id, ext.id)
     } else {
@@ -332,6 +243,7 @@ export function GroupDetailModal({
 
   // Toggle all extensions in group
   const handleToggleAll = () => {
+    if (!onToggleExtension) return
     if (allEnabled) {
       // Disable all
       extensions.forEach(ext => {
@@ -345,171 +257,225 @@ export function GroupDetailModal({
     }
   }
 
+  // Handle create
+  const handleCreate = () => {
+    if (onCreate && editName.trim()) {
+      onCreate(editName.trim(), selectedColor)
+      onClose()
+    }
+  }
+
   // Get icon to display (custom image or icon map)
-  const groupIconUrl = (group as any).iconUrl
+  const groupIconUrl = (group as any)?.iconUrl
   const displayIcon = groupIconUrl ? (
     <img src={groupIconUrl} className="w-full h-full object-cover" alt="" />
   ) : (
-    ICON_MAP[group.icon] || <Folder className="w-4 h-4" />
+    ICON_MAP[group?.icon || "folder"] || <Folder className="w-4 h-4" />
   )
+
+  const canCreate = editName.trim()
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-punk-bg/80 backdrop-blur-sm" onClick={onClose}>
       <div
-        className="w-[480px] max-h-[560px] border border-punk-border bg-punk-bg-alt shadow-[0_0_30px_rgba(124,58,237,0.4)] overflow-hidden flex flex-col"
+        className={cn(
+          "border border-punk-border bg-punk-bg-alt shadow-[0_0_30px_rgba(124,58,237,0.4)] overflow-hidden flex flex-col",
+          isCreateMode ? "w-80" : "w-[480px] max-h-[560px]"
+        )}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Redesigned Header: Icon + Name + Search in one row */}
+        {/* Header */}
         <div className="flex items-center gap-3 px-4 py-3 border-b border-punk-border/30 bg-punk-bg shrink-0">
-          {/* Icon with image upload */}
-          <div className="relative" ref={imageUploadRef}>
-            <button
-              onClick={() => setShowImageUpload(!showImageUpload)}
-              className="flex items-center justify-center w-10 h-10 border border-punk-border/50 bg-punk-bg-alt hover:border-punk-primary transition-colors overflow-hidden"
-              style={{ color: group.color }}
-              title="Upload icon image"
+          {/* Icon */}
+          {isCreateMode ? (
+            <div
+              className="flex items-center justify-center w-10 h-10 border border-punk-border/50 bg-punk-bg-alt"
+              style={{ color: selectedColor }}
             >
-              {displayIcon}
-            </button>
-            {showImageUpload && (
-              <div className="absolute top-full left-0 mt-1 z-50 p-2 border border-punk-border bg-punk-bg-alt shadow-[0_0_15px_rgba(124,58,237,0.3)]">
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="hidden"
-                />
-                <button
-                  onClick={() => {
-                    fileInputRef.current?.click()
-                  }}
-                  className="flex items-center gap-2 w-full px-3 py-2 text-[9px] font-punk-heading uppercase text-punk-text-secondary hover:text-punk-primary hover:bg-punk-bg transition-colors whitespace-nowrap"
-                >
-                  <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                    <polyline points="17 8 12 3 7 8" />
-                    <line x1="12" y1="3" x2="12" y2="15" />
-                  </svg>
-                  UPLOAD IMAGE
-                </button>
-              </div>
-            )}
-          </div>
+              {ICON_MAP.folder}
+            </div>
+          ) : (
+            <div className="relative" ref={imageUploadRef}>
+              <button
+                onClick={() => setShowImageUpload(!showImageUpload)}
+                className="flex items-center justify-center w-10 h-10 border border-punk-border/50 bg-punk-bg-alt hover:border-punk-primary transition-colors overflow-hidden"
+                style={{ color: group.color }}
+                title="Upload icon image"
+              >
+                {displayIcon}
+              </button>
+              {showImageUpload && (
+                <div className="absolute top-full left-0 mt-1 z-50 p-2 border border-punk-border bg-punk-bg-alt shadow-[0_0_15px_rgba(124,58,237,0.3)]">
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                  />
+                  <button
+                    onClick={() => {
+                      fileInputRef.current?.click()
+                    }}
+                    className="flex items-center gap-2 w-full px-3 py-2 text-[9px] font-punk-heading uppercase text-punk-text-secondary hover:text-punk-primary hover:bg-punk-bg transition-colors whitespace-nowrap"
+                  >
+                    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="17 8 12 3 7 8" />
+                      <line x1="12" y1="3" x2="12" y2="15" />
+                    </svg>
+                    UPLOAD IMAGE
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
 
-          {/* Editable Name */}
+          {/* Name input */}
           <input
             type="text"
             value={editName}
             onChange={(e) => setEditName(e.target.value)}
-            onBlur={handleNameChange}
+            onBlur={isCreateMode ? undefined : handleNameChange}
             onKeyDown={(e) => {
-              if (e.key === "Enter") {
+              if (!isCreateMode && e.key === "Enter") {
                 handleNameChange()
                 e.currentTarget.blur()
               }
             }}
+            placeholder="SECTOR NAME..."
             className="flex-1 h-10 px-3 font-punk-heading text-[11px] text-punk-text-primary uppercase bg-punk-bg border border-punk-border/50"
           />
 
-          {/* Count badge */}
-          <span className="font-punk-code text-[10px] text-punk-accent">
-            [{extensions.length}]
-          </span>
+          {/* Edit mode extras */}
+          {!isCreateMode && (
+            <>
+              {/* Count badge */}
+              <span className="font-punk-code text-[10px] text-punk-accent">
+                [{extensions.length}]
+              </span>
 
-          {/* ON/OFF toggle */}
-          <div className="flex gap-0.5">
-            <button
-              onClick={handleToggleAll}
-              disabled={extensions.length === 0}
-              className={cn(
-                "px-2 py-1 text-[8px] font-punk-heading transition-all",
-                allEnabled
-                  ? "bg-punk-success text-white"
-                  : allDisabled
-                    ? "bg-punk-cta text-white"
-                    : "border border-punk-border/30 text-punk-text-muted hover:border-punk-primary"
-              )}
-            >
-              {allEnabled ? "ON" : allDisabled ? "OFF" : "TOGGLE"}
-            </button>
-          </div>
-        </div>
-
-        {/* Search bar below header */}
-        <div className="px-4 py-3 border-b border-punk-border/30 bg-punk-bg shrink-0">
-          <SearchBar
-            value={searchQuery}
-            onChange={setSearchQuery}
-            placeholder="SEARCH_EXTENSIONS..."
-            activeFilter={filter}
-            onFilterChange={setFilter}
-          />
-        </div>
-
-        {/* Extension List - Single grid with highlight for in-group, dimmed for not-in-group */}
-        <div className="flex-1 overflow-y-auto p-3">
-          {filteredExtensions.length > 0 ? (
-            <div className="grid grid-cols-4 gap-2">
-              {filteredExtensions.map((ext) => (
-                <div
-                  key={ext.id}
-                  onClick={() => handleToggleExtensionMembership(ext)}
+              {/* ON/OFF toggle */}
+              <div className="flex gap-0.5">
+                <button
+                  onClick={handleToggleAll}
+                  disabled={extensions.length === 0}
                   className={cn(
-                    "relative flex flex-col items-center justify-center p-2 cursor-pointer transition-all border",
-                    ext.isInGroup
-                      ? "border-punk-success/50 bg-punk-success/5 hover:border-punk-success"
-                      : "border-punk-border/20 bg-punk-bg-alt hover:border-punk-primary/50 opacity-40 hover:opacity-70"
+                    "px-2 py-1 text-[8px] font-punk-heading transition-all",
+                    allEnabled
+                      ? "bg-punk-success text-white"
+                      : allDisabled
+                        ? "bg-punk-cta text-white"
+                        : "border border-punk-border/30 text-punk-text-muted hover:border-punk-primary"
                   )}
                 >
-                  {/* Status dot */}
-                  <div
-                    className={cn(
-                      "absolute top-1 right-1 w-2 h-2 border border-punk-bg-alt z-10",
-                      ext.enabled ? "bg-punk-success" : "bg-punk-text-muted"
-                    )}
-                  />
-                  {/* Group icon badge - only show for in-group */}
-                  {ext.isInGroup && (
-                    <div
-                      className="absolute bottom-1 right-1 w-4 h-4 rounded-sm flex items-center justify-center z-10 overflow-hidden"
-                      style={{ backgroundColor: group.color + "40" }}
-                    >
-                      {groupIconUrl ? (
-                        <img src={groupIconUrl} className="w-full h-full object-cover" alt="" />
-                      ) : (
-                        <span style={{ color: group.color }}>
-                          {ICON_MAP[group.icon] || <Folder className="w-2 h-2" />}
-                        </span>
-                      )}
-                    </div>
-                  )}
-                  {/* Icon */}
-                  {ext.iconUrl ? (
-                    <img src={ext.iconUrl} className={cn("w-8 h-8 border border-punk-border/30 object-cover", !ext.isInGroup && "grayscale")} alt="" />
-                  ) : (
-                    <div className={cn("w-8 h-8 border border-punk-border/30 bg-punk-bg flex items-center justify-center", !ext.isInGroup && "grayscale")}>
-                      <Package className="w-4 h-4 text-punk-text-muted" />
-                    </div>
-                  )}
-                  {/* Name */}
-                  <span className={cn(
-                    "font-punk-heading text-[6px] uppercase text-center truncate w-full mt-1",
-                    ext.isInGroup ? "text-punk-text-primary" : "text-punk-text-muted"
-                  )}>
-                    {ext.name.substring(0, 12)}
-                  </span>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center py-8 text-center">
-              <p className="font-punk-body text-base text-punk-text-muted">
-                NO_MATCH_FOUND
-              </p>
-            </div>
+                  {allEnabled ? "ON" : allDisabled ? "OFF" : "TOGGLE"}
+                </button>
+              </div>
+            </>
           )}
         </div>
+
+        {/* Color selector for create mode */}
+        {isCreateMode && (
+          <div className="px-4 py-3 border-b border-punk-border/30 bg-punk-bg shrink-0">
+            <label className="block font-punk-heading text-[8px] text-punk-text-muted uppercase tracking-wide mb-2">
+              COLOR
+            </label>
+            <div className="flex gap-2 flex-wrap">
+              {GROUP_COLORS.map((color) => (
+                <button
+                  key={color}
+                  onClick={() => setSelectedColor(color)}
+                  className={cn(
+                    "h-7 w-7 rounded-full transition-transform",
+                    selectedColor === color && "ring-2 ring-offset-2 ring-punk-accent scale-110"
+                  )}
+                  style={{ backgroundColor: color }}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Search bar for edit mode */}
+        {!isCreateMode && (
+          <div className="px-4 py-3 border-b border-punk-border/30 bg-punk-bg shrink-0">
+            <SearchBar
+              value={searchQuery}
+              onChange={setSearchQuery}
+              placeholder="SEARCH_EXTENSIONS..."
+              activeFilter={filter}
+              onFilterChange={setFilter}
+            />
+          </div>
+        )}
+
+        {/* Extension List (edit mode only) */}
+        {!isCreateMode && (
+          <div className="flex-1 overflow-y-auto p-3">
+            {filteredExtensions.length > 0 ? (
+              <div className="grid grid-cols-4 gap-2">
+                {filteredExtensions.map((ext) => (
+                  <div
+                    key={ext.id}
+                    onClick={() => handleToggleExtensionMembership(ext)}
+                    className={cn(
+                      "relative flex flex-col items-center justify-center p-2 cursor-pointer transition-all border",
+                      ext.isInGroup
+                        ? "border-punk-success/50 bg-punk-success/5 hover:border-punk-success"
+                        : "border-punk-border/20 bg-punk-bg-alt hover:border-punk-primary/50 opacity-40 hover:opacity-70"
+                    )}
+                  >
+                    {/* Status dot */}
+                    <div
+                      className={cn(
+                        "absolute top-1 right-1 w-2 h-2 border border-punk-bg-alt z-10",
+                        ext.enabled ? "bg-punk-success" : "bg-punk-text-muted"
+                      )}
+                    />
+                    {/* Group icon badge - only show for in-group */}
+                    {ext.isInGroup && group && (
+                      <div
+                        className="absolute bottom-1 right-1 w-4 h-4 rounded-sm flex items-center justify-center z-10 overflow-hidden"
+                        style={{ backgroundColor: group.color + "40" }}
+                      >
+                        {groupIconUrl ? (
+                          <img src={groupIconUrl} className="w-full h-full object-cover" alt="" />
+                        ) : (
+                          <span style={{ color: group.color }}>
+                            {ICON_MAP[group.icon] || <Folder className="w-2 h-2" />}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                    {/* Icon */}
+                    {ext.iconUrl ? (
+                      <img src={ext.iconUrl} className={cn("w-8 h-8 border border-punk-border/30 object-cover", !ext.isInGroup && "grayscale")} alt="" />
+                    ) : (
+                      <div className={cn("w-8 h-8 border border-punk-border/30 bg-punk-bg flex items-center justify-center", !ext.isInGroup && "grayscale")}>
+                        <Package className="w-4 h-4 text-punk-text-muted" />
+                      </div>
+                    )}
+                    {/* Name */}
+                    <span className={cn(
+                      "font-punk-heading text-[6px] uppercase text-center truncate w-full mt-1",
+                      ext.isInGroup ? "text-punk-text-primary" : "text-punk-text-muted"
+                    )}>
+                      {ext.name.substring(0, 12)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-8 text-center">
+                <p className="font-punk-body text-base text-punk-text-muted">
+                  NO_MATCH_FOUND
+                </p>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Bottom Actions */}
         <div className="flex justify-end gap-2 px-4 py-3 border-t border-punk-border/30 shrink-0">
@@ -520,10 +486,16 @@ export function GroupDetailModal({
             CANCEL
           </button>
           <button
-            onClick={onClose}
-            className="px-4 py-2 font-punk-heading text-[9px] bg-punk-primary text-white uppercase tracking-wide hover:bg-punk-primary/80 transition-colors"
+            onClick={isCreateMode ? handleCreate : onClose}
+            disabled={isCreateMode && !canCreate}
+            className={cn(
+              "px-4 py-2 font-punk-heading text-[9px] uppercase tracking-wide transition-colors",
+              (isCreateMode && canCreate) || !isCreateMode
+                ? "bg-punk-primary text-white hover:bg-punk-primary/80"
+                : "bg-punk-border/50 text-punk-text-muted cursor-not-allowed"
+            )}
           >
-            CONFIRM
+            {isCreateMode ? "CONFIRM" : "CONFIRM"}
           </button>
         </div>
       </div>

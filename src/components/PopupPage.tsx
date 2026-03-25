@@ -1,7 +1,7 @@
 import * as React from "react"
 import { Header, Footer, SearchBar } from "@/components/popup"
 import { ExtensionCard } from "@/components/extension"
-import { GroupChip, CreateGroupChip, GroupDetailModal, CreateGroupModal } from "@/components/group"
+import { GroupChip, CreateGroupChip, GroupModal } from "@/components/group"
 import { RuleManager } from "@/components/rules"
 import {
   useExtensionStore,
@@ -233,27 +233,23 @@ export function PopupPage() {
 
       <Footer totalCount={totalCount} enabledCount={enabledCount} />
 
-      {/* Group Detail Modal */}
-      {selectedGroup && (
-        <GroupDetailModal
+      {/* Unified Group Modal */}
+      {(selectedGroup || showCreateModal) && (
+        <GroupModal
           group={selectedGroup}
-          extensions={selectedGroupExtensions}
+          extensions={selectedGroup ? selectedGroupExtensions : undefined}
           allExtensions={displayExtensions}
-          onClose={() => setSelectedGroupId(null)}
-          onToggleExtension={handleToggleExtension}
-          onOpenOptions={handleOpenOptions}
-          onRemove={handleRemove}
-          onAddExtension={addToGroup}
-          onRemoveFromGroup={removeFromGroup}
-          onUpdateGroup={updateGroup}
-        />
-      )}
-
-      {/* Create Group Modal */}
-      {showCreateModal && (
-        <CreateGroupModal
-          onClose={() => setShowCreateModal(false)}
-          onCreate={(name, color) => createGroup(name, color)}
+          onClose={() => {
+            setSelectedGroupId(null)
+            setShowCreateModal(false)
+          }}
+          onCreate={showCreateModal ? (name, color) => createGroup(name, color) : undefined}
+          onToggleExtension={selectedGroup ? handleToggleExtension : undefined}
+          onOpenOptions={selectedGroup ? handleOpenOptions : undefined}
+          onRemove={selectedGroup ? handleRemove : undefined}
+          onAddExtension={selectedGroup ? addToGroup : undefined}
+          onRemoveFromGroup={selectedGroup ? removeFromGroup : undefined}
+          onUpdateGroup={selectedGroup ? updateGroup : undefined}
         />
       )}
     </div>
