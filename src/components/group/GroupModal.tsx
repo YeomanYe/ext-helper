@@ -465,8 +465,7 @@ export function GroupDetailModal({
                     "relative flex flex-col items-center justify-center p-2 cursor-pointer transition-all border",
                     ext.isInGroup
                       ? "border-punk-success/50 bg-punk-success/5 hover:border-punk-success"
-                      : "border-punk-border/20 bg-punk-bg-alt hover:border-punk-primary/50 opacity-40 hover:opacity-70",
-                    !ext.enabled && "opacity-30"
+                      : "border-punk-border/20 bg-punk-bg-alt hover:border-punk-primary/50 opacity-40 hover:opacity-70"
                   )}
                 >
                   {/* Status dot */}
