@@ -394,20 +394,40 @@ export function GroupModal({
               ))}
             </div>
           ) : (
-            <div className="flex gap-0.5">
+            <div className="flex gap-1">
               <button
-                onClick={handleToggleAll}
-                disabled={extensions.length === 0}
+                onClick={() => {
+                  if (!onToggleExtension) return
+                  extensions.forEach(ext => {
+                    if (!ext.enabled) onToggleExtension(ext.id)
+                  })
+                }}
+                disabled={extensions.length === 0 || allEnabled}
                 className={cn(
                   "px-2 py-1 text-[8px] font-punk-heading transition-all",
                   allEnabled
                     ? "bg-punk-success text-white"
-                    : allDisabled
-                      ? "bg-punk-cta text-white"
-                      : "border border-punk-border/30 text-punk-text-muted hover:border-punk-primary"
+                    : "border border-punk-border/30 text-punk-text-muted hover:border-punk-success"
                 )}
               >
-                {allEnabled ? "ON" : allDisabled ? "OFF" : "TOGGLE"}
+                ON
+              </button>
+              <button
+                onClick={() => {
+                  if (!onToggleExtension) return
+                  extensions.forEach(ext => {
+                    if (ext.enabled) onToggleExtension(ext.id)
+                  })
+                }}
+                disabled={extensions.length === 0 || allDisabled}
+                className={cn(
+                  "px-2 py-1 text-[8px] font-punk-heading transition-all",
+                  allDisabled
+                    ? "bg-punk-cta text-white"
+                    : "border border-punk-border/30 text-punk-text-muted hover:border-punk-cta"
+                )}
+              >
+                OFF
               </button>
             </div>
           )}
