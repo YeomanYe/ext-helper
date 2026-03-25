@@ -141,12 +141,6 @@ export function CreateGroupModal({ onClose, onCreate }: CreateGroupModalProps) {
           <h3 className="flex-1 font-punk-heading text-[10px] text-punk-text-primary uppercase tracking-wide">
             CREATE SECTOR
           </h3>
-          <button
-            onClick={onClose}
-            className="p-1 text-punk-text-muted hover:text-punk-cta transition-colors"
-          >
-            <X className="h-4 w-4" />
-          </button>
         </div>
 
         {/* Form */}
@@ -189,7 +183,7 @@ export function CreateGroupModal({ onClose, onCreate }: CreateGroupModalProps) {
         <div className="flex justify-end gap-2 px-4 py-3 border-t border-punk-border/30">
           <button
             onClick={onClose}
-            className="px-4 py-2 font-punk-heading text-[9px] text-punk-text-muted uppercase tracking-wide hover:text-punk-text-primary"
+            className="px-4 py-2 font-punk-heading text-[9px] text-punk-text-muted uppercase tracking-wide hover:text-punk-text-primary transition-colors"
           >
             CANCEL
           </button>
@@ -197,13 +191,13 @@ export function CreateGroupModal({ onClose, onCreate }: CreateGroupModalProps) {
             onClick={handleCreate}
             disabled={!name.trim()}
             className={cn(
-              "px-4 py-2 font-punk-heading text-[9px] uppercase tracking-wide transition-all",
+              "px-4 py-2 font-punk-heading text-[9px] uppercase tracking-wide transition-colors",
               name.trim()
-                ? "bg-punk-primary text-white hover:bg-punk-primary-hover"
+                ? "bg-punk-primary text-white hover:bg-punk-primary/80"
                 : "bg-punk-border/50 text-punk-text-muted cursor-not-allowed"
             )}
           >
-            CREATE
+            CONFIRM
           </button>
         </div>
       </div>
