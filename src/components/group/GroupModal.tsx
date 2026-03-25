@@ -353,11 +353,6 @@ export function GroupDetailModal({
             )}
           </div>
 
-          {/* Color dot */}
-          <div
-            className="h-3 w-3"
-            style={{ backgroundColor: group.color }}
-          />
           {isEditing ? (
             <input
               type="text"
@@ -411,33 +406,31 @@ export function GroupDetailModal({
           />
         </div>
 
-        {/* Extension List - Compact Grid with group icon overlay */}
+        {/* Extension List - Single grid with highlight for in-group, dimmed for not-in-group */}
         <div className="flex-1 overflow-y-auto p-3">
-          {/* In Group Section - Compact Grid */}
-          {inGroupExtensions.length > 0 && (
-            <div className="mb-4">
-              <p className="font-punk-heading text-[8px] text-punk-success uppercase tracking-wide mb-2">
-                IN SECTOR [{inGroupExtensions.length}]
-              </p>
-              <div className="grid grid-cols-4 gap-2">
-                {inGroupExtensions.map((ext) => (
+          {filteredExtensions.length > 0 ? (
+            <div className="grid grid-cols-4 gap-2">
+              {filteredExtensions.map((ext) => (
+                <div
+                  key={ext.id}
+                  onClick={() => handleToggleExtensionMembership(ext)}
+                  className={cn(
+                    "relative flex flex-col items-center justify-center p-2 cursor-pointer transition-all border",
+                    ext.isInGroup
+                      ? "border-punk-success/50 bg-punk-success/5 hover:border-punk-success"
+                      : "border-punk-border/20 bg-punk-bg-alt hover:border-punk-primary/50 opacity-40 hover:opacity-70",
+                    !ext.enabled && "opacity-30"
+                  )}
+                >
+                  {/* Status dot */}
                   <div
-                    key={ext.id}
-                    onClick={() => handleToggleExtensionMembership(ext)}
                     className={cn(
-                      "relative flex flex-col items-center justify-center p-2 cursor-pointer transition-all border",
-                      "border-punk-success/50 bg-punk-success/5 hover:border-punk-success",
-                      !ext.enabled && "opacity-50"
+                      "absolute top-1 right-1 w-2 h-2 border border-punk-bg-alt z-10",
+                      ext.enabled ? "bg-punk-success" : "bg-punk-text-muted"
                     )}
-                  >
-                    {/* Status dot */}
-                    <div
-                      className={cn(
-                        "absolute top-1 right-1 w-2 h-2 border border-punk-bg-alt z-10",
-                        ext.enabled ? "bg-punk-success" : "bg-punk-text-muted"
-                      )}
-                    />
-                    {/* Group icon badge */}
+                  />
+                  {/* Group icon badge - only show for in-group */}
+                  {ext.isInGroup && (
                     <div
                       className="absolute bottom-1 right-1 w-4 h-4 rounded-sm flex items-center justify-center z-10"
                       style={{ backgroundColor: group.color + "40" }}
@@ -446,60 +439,26 @@ export function GroupDetailModal({
                         {ICON_MAP[group.icon] || <Folder className="w-2 h-2" />}
                       </span>
                     </div>
-                    {/* Icon */}
-                    {ext.iconUrl ? (
-                      <img src={ext.iconUrl} className="w-8 h-8 border border-punk-border/30 object-cover" alt="" />
-                    ) : (
-                      <div className="w-8 h-8 border border-punk-border/30 bg-punk-bg flex items-center justify-center">
-                        <Package className="w-4 h-4 text-punk-text-muted" />
-                      </div>
-                    )}
-                    {/* Name */}
-                    <span className="font-punk-heading text-[6px] text-punk-text-primary uppercase text-center truncate w-full mt-1">
-                      {ext.name.substring(0, 12)}
-                    </span>
-                  </div>
-                ))}
-              </div>
+                  )}
+                  {/* Icon */}
+                  {ext.iconUrl ? (
+                    <img src={ext.iconUrl} className={cn("w-8 h-8 border border-punk-border/30 object-cover", !ext.isInGroup && "grayscale")} alt="" />
+                  ) : (
+                    <div className={cn("w-8 h-8 border border-punk-border/30 bg-punk-bg flex items-center justify-center", !ext.isInGroup && "grayscale")}>
+                      <Package className="w-4 h-4 text-punk-text-muted" />
+                    </div>
+                  )}
+                  {/* Name */}
+                  <span className={cn(
+                    "font-punk-heading text-[6px] uppercase text-center truncate w-full mt-1",
+                    ext.isInGroup ? "text-punk-text-primary" : "text-punk-text-muted"
+                  )}>
+                    {ext.name.substring(0, 12)}
+                  </span>
+                </div>
+              ))}
             </div>
-          )}
-
-          {/* Not In Group Section - Compact Grid */}
-          {notInGroupExtensions.length > 0 && (
-            <div>
-              <p className="font-punk-heading text-[8px] text-punk-text-muted uppercase tracking-wide mb-2">
-                NOT IN SECTOR [{notInGroupExtensions.length}]
-              </p>
-              <div className="grid grid-cols-4 gap-2">
-                {notInGroupExtensions.map((ext) => (
-                  <div
-                    key={ext.id}
-                    onClick={() => handleToggleExtensionMembership(ext)}
-                    className={cn(
-                      "relative flex flex-col items-center justify-center p-2 cursor-pointer transition-all border opacity-40",
-                      "border-punk-border/20 bg-punk-bg-alt hover:border-punk-primary/50 hover:opacity-70"
-                    )}
-                  >
-                    {/* Icon */}
-                    {ext.iconUrl ? (
-                      <img src={ext.iconUrl} className="w-8 h-8 border border-punk-border/30 object-cover grayscale" alt="" />
-                    ) : (
-                      <div className="w-8 h-8 border border-punk-border/30 bg-punk-bg flex items-center justify-center grayscale">
-                        <Package className="w-4 h-4 text-punk-text-muted" />
-                      </div>
-                    )}
-                    {/* Name */}
-                    <span className="font-punk-heading text-[6px] text-punk-text-muted uppercase text-center truncate w-full mt-1">
-                      {ext.name.substring(0, 12)}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Empty state */}
-          {filteredExtensions.length === 0 && (
+          ) : (
             <div className="flex flex-col items-center justify-center py-8 text-center">
               <p className="font-punk-body text-base text-punk-text-muted">
                 NO_MATCH_FOUND
