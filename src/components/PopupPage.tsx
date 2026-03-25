@@ -198,7 +198,7 @@ export function PopupPage() {
             </div>
 
             {/* Extension List */}
-            <div className="h-full overflow-y-auto p-3">
+            <div className="h-full overflow-y-auto p-3 pb-8">
               {error ? (
                 <div className="flex flex-col items-center justify-center py-12 text-center">
                   <p className="font-punk-body text-base text-punk-cta">ERROR: {error}</p>

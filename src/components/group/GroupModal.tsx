@@ -40,6 +40,14 @@ export function GroupChip({
   onClick,
   onToggle
 }: GroupChipProps) {
+  // Get icon to display (custom image or icon map)
+  const groupIconUrl = (group as any)?.iconUrl
+  const displayIcon = groupIconUrl ? (
+    <img src={groupIconUrl} className="w-full h-full object-cover" alt="" />
+  ) : (
+    ICON_MAP[group.icon] || <Folder className="w-3 h-3" />
+  )
+
   return (
     <div
       className={cn(
@@ -50,10 +58,17 @@ export function GroupChip({
       )}
       onClick={onClick}
     >
-      <div
-        className="h-2 w-2"
-        style={{ backgroundColor: group.color }}
-      />
+      {/* Icon */}
+      {groupIconUrl ? (
+        <img src={groupIconUrl} className="h-5 w-5 border border-punk-border/30 object-cover flex-shrink-0" alt="" />
+      ) : (
+        <div
+          className="h-5 w-5 rounded-sm border border-punk-border/30 flex items-center justify-center flex-shrink-0"
+          style={{ backgroundColor: group.color + "20" }}
+        >
+          <span style={{ color: group.color }}>{displayIcon}</span>
+        </div>
+      )}
       <span className="font-punk-heading text-[9px] text-punk-text-primary uppercase tracking-wide">
         {group.name}
       </span>
@@ -94,7 +109,7 @@ export function CreateGroupChip({ onClick }: CreateGroupChipProps) {
         "hover:border-punk-accent hover:text-punk-accent hover:bg-punk-accent/5"
       )}
     >
-      <Plus className="h-3.5 w-3.5" />
+      <Folder className="h-3.5 w-3.5" />
       <span className="font-punk-heading text-[8px] uppercase tracking-wide">NEW SECTOR</span>
     </button>
   )
