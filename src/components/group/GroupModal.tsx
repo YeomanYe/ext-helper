@@ -310,21 +310,21 @@ export function GroupModal({
         className="w-[630px] max-h-[95%] border border-punk-border bg-punk-bg-alt shadow-[0_0_30px_rgba(124,58,237,0.4)] overflow-hidden flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className="flex items-center gap-3 px-4 py-3 border-b border-punk-border/30 bg-punk-bg shrink-0">
-          {/* Icon */}
+        {/* Header - Icon with name input and search */}
+        <div className="flex gap-4 px-4 py-3 border-b border-punk-border/30 bg-punk-bg shrink-0">
+          {/* Large Icon - spans 2 rows */}
           {isCreateMode ? (
             <div
-              className="flex items-center justify-center w-10 h-10 border border-punk-border/50 bg-punk-bg-alt"
+              className="flex items-center justify-center w-16 h-16 border border-punk-border/50 bg-punk-bg-alt self-start"
               style={{ color: selectedColor }}
             >
               {ICON_MAP.folder}
             </div>
           ) : (
-            <div className="relative" ref={imageUploadRef}>
+            <div className="relative self-start" ref={imageUploadRef}>
               <button
                 onClick={() => setShowImageUpload(!showImageUpload)}
-                className="flex items-center justify-center w-10 h-10 border border-punk-border/50 bg-punk-bg-alt hover:border-punk-primary transition-colors overflow-hidden"
+                className="flex items-center justify-center w-16 h-16 border border-punk-border/50 bg-punk-bg-alt hover:border-punk-primary transition-colors overflow-hidden"
                 style={{ color: group.color }}
                 title="Upload icon image"
               >
@@ -357,77 +357,80 @@ export function GroupModal({
             </div>
           )}
 
-          {/* Name input */}
-          <input
-            type="text"
-            value={editName}
-            onChange={(e) => setEditName(e.target.value)}
-            onBlur={isCreateMode ? undefined : handleNameChange}
-            onKeyDown={(e) => {
-              if (!isCreateMode && e.key === "Enter") {
-                handleNameChange()
-                e.currentTarget.blur()
-              }
-            }}
-            placeholder="SECTOR NAME..."
-            className="flex-1 h-10 px-3 font-punk-heading text-[11px] text-punk-text-primary uppercase bg-transparent border-b border-punk-border/50 focus:outline-none focus:border-punk-accent"
-          />
-
-          {/* Count badge */}
-          <span className="font-punk-code text-[10px] text-punk-accent">
-            [{isCreateMode ? selectedExtensions.size : extensions.length}]
-          </span>
-
-          {/* ON/OFF toggle for edit mode */}
-          {isCreateMode ? null : (
-            <div className="flex gap-1">
-              <button
-                onClick={() => {
-                  if (!onToggleExtension) return
-                  extensions.forEach(ext => {
-                    if (!ext.enabled) onToggleExtension(ext.id)
-                  })
+          {/* Right side: Name input + Count/Buttons, then Search bar below */}
+          <div className="flex-1 flex flex-col gap-2">
+            {/* Name input row */}
+            <div className="flex items-center gap-3">
+              <input
+                type="text"
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+                onBlur={isCreateMode ? undefined : handleNameChange}
+                onKeyDown={(e) => {
+                  if (!isCreateMode && e.key === "Enter") {
+                    handleNameChange()
+                    e.currentTarget.blur()
+                  }
                 }}
-                disabled={extensions.length === 0 || allEnabled}
-                className={cn(
-                  "px-2 py-1 text-[8px] font-punk-heading transition-all",
-                  allEnabled
-                    ? "bg-punk-success text-white"
-                    : "border border-punk-border/30 text-punk-text-muted hover:border-punk-success"
-                )}
-              >
-                ON
-              </button>
-              <button
-                onClick={() => {
-                  if (!onToggleExtension) return
-                  extensions.forEach(ext => {
-                    if (ext.enabled) onToggleExtension(ext.id)
-                  })
-                }}
-                disabled={extensions.length === 0 || allDisabled}
-                className={cn(
-                  "px-2 py-1 text-[8px] font-punk-heading transition-all",
-                  allDisabled
-                    ? "bg-punk-cta text-white"
-                    : "border border-punk-border/30 text-punk-text-muted hover:border-punk-cta"
-                )}
-              >
-                OFF
-              </button>
+                placeholder="SECTOR NAME..."
+                className="flex-1 h-10 px-3 font-punk-heading text-[11px] text-punk-text-primary uppercase bg-transparent border-b border-punk-border/50 focus:outline-none focus:border-punk-accent"
+              />
+
+              {/* Count badge */}
+              <span className="font-punk-code text-[10px] text-punk-accent">
+                [{isCreateMode ? selectedExtensions.size : extensions.length}]
+              </span>
+
+              {/* ON/OFF toggle for edit mode */}
+              {isCreateMode ? null : (
+                <div className="flex gap-1">
+                  <button
+                    onClick={() => {
+                      if (!onToggleExtension) return
+                      extensions.forEach(ext => {
+                        if (!ext.enabled) onToggleExtension(ext.id)
+                      })
+                    }}
+                    disabled={extensions.length === 0 || allEnabled}
+                    className={cn(
+                      "px-2 py-1 text-[8px] font-punk-heading transition-all",
+                      allEnabled
+                        ? "bg-punk-success text-white"
+                        : "border border-punk-border/30 text-punk-text-muted hover:border-punk-success"
+                    )}
+                  >
+                    ON
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (!onToggleExtension) return
+                      extensions.forEach(ext => {
+                        if (ext.enabled) onToggleExtension(ext.id)
+                      })
+                    }}
+                    disabled={extensions.length === 0 || allDisabled}
+                    className={cn(
+                      "px-2 py-1 text-[8px] font-punk-heading transition-all",
+                      allDisabled
+                        ? "bg-punk-cta text-white"
+                        : "border border-punk-border/30 text-punk-text-muted hover:border-punk-cta"
+                    )}
+                  >
+                    OFF
+                  </button>
+                </div>
+              )}
             </div>
-          )}
-        </div>
 
-        {/* Search bar */}
-        <div className="px-4 py-3 border-b border-punk-border/30 bg-punk-bg shrink-0">
-          <SearchBar
-            value={searchQuery}
-            onChange={setSearchQuery}
-            placeholder="SEARCH_EXTENSIONS..."
-            activeFilter={filter}
-            onFilterChange={setFilter}
-          />
+            {/* Search bar */}
+            <SearchBar
+              value={searchQuery}
+              onChange={setSearchQuery}
+              placeholder="SEARCH_EXTENSIONS..."
+              activeFilter={filter}
+              onFilterChange={setFilter}
+            />
+          </div>
         </div>
 
         {/* Extension List */}
