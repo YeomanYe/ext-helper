@@ -370,7 +370,7 @@ export function GroupModal({
               }
             }}
             placeholder="SECTOR NAME..."
-            className="flex-1 h-10 px-3 font-punk-heading text-[11px] text-punk-text-primary uppercase bg-punk-bg border border-punk-border/50"
+            className="flex-1 h-10 px-3 font-punk-heading text-[11px] text-punk-text-primary uppercase bg-transparent border-b border-punk-border/50 focus:outline-none focus:border-punk-accent"
           />
 
           {/* Count badge */}
