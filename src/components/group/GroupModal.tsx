@@ -315,13 +315,13 @@ export function GroupModal({
           {/* Large Icon - spans 2 rows */}
           {isCreateMode ? (
             <div
-              className="flex items-center justify-center w-16 h-16 border border-punk-border/50 bg-punk-bg-alt self-start"
+              className="flex items-center justify-center w-16 h-16 border border-punk-border/50 bg-punk-bg-alt self-center"
               style={{ color: selectedColor }}
             >
               {ICON_MAP.folder}
             </div>
           ) : (
-            <div className="relative self-start" ref={imageUploadRef}>
+            <div className="relative self-center" ref={imageUploadRef}>
               <button
                 onClick={() => setShowImageUpload(!showImageUpload)}
                 className="flex items-center justify-center w-16 h-16 border border-punk-border/50 bg-punk-bg-alt hover:border-punk-primary transition-colors overflow-hidden"
@@ -373,7 +373,7 @@ export function GroupModal({
                   }
                 }}
                 placeholder="SECTOR NAME..."
-                className="flex-1 h-10 px-3 font-punk-heading text-[11px] text-punk-text-primary uppercase bg-transparent border-b border-punk-border/50 focus:outline-none focus:border-punk-accent"
+                className="w-1/3 h-10 px-3 font-punk-heading text-[11px] text-punk-text-primary uppercase bg-transparent border-b border-punk-border/50 focus:outline-none focus:border-punk-accent"
               />
 
               {/* Count badge */}
