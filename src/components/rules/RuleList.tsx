@@ -1,6 +1,6 @@
 import { RuleCard } from "./RuleCard"
 import type { Rule } from "@/rules/types"
-import type { Extension, Group } from "@/types"
+import type { Extension, Group, ViewMode } from "@/types"
 
 interface RuleListProps {
   rules: Rule[]
@@ -9,9 +9,10 @@ interface RuleListProps {
   onToggle: (id: string) => void
   onEdit: (rule: Rule) => void
   onDelete: (id: string) => void
+  viewMode?: ViewMode
 }
 
-export function RuleList({ rules, extensions, groups, onToggle, onEdit, onDelete }: RuleListProps) {
+export function RuleList({ rules, extensions, groups, onToggle, onEdit, onDelete, viewMode = "card" }: RuleListProps) {
   if (rules.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-8 text-center">
@@ -36,6 +37,7 @@ export function RuleList({ rules, extensions, groups, onToggle, onEdit, onDelete
           onToggle={onToggle}
           onEdit={onEdit}
           onDelete={onDelete}
+          viewMode={viewMode}
           showDelete={rules.length > 1}
         />
       ))}

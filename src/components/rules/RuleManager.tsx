@@ -4,6 +4,7 @@ import { cn } from "@/utils"
 import { useRuleStore } from "@/stores/ruleStore"
 import { useExtensionStore } from "@/stores/extensionStore"
 import { useGroupStore } from "@/stores/groupStore"
+import { useUIStore } from "@/stores/uiStore"
 import { RuleList } from "./RuleList"
 import { RuleEditor } from "./RuleEditor"
 import type { Rule } from "@/rules/types"
@@ -117,6 +118,7 @@ export function RuleManager() {
     useRuleStore()
   const { extensions } = useExtensionStore()
   const { groups } = useGroupStore()
+  const { viewMode } = useUIStore()
   const [showEditor, setShowEditor] = React.useState(false)
   const [editingRule, setEditingRule] = React.useState<Rule | null>(null)
   const [searchQuery, setSearchQuery] = React.useState("")
@@ -220,6 +222,7 @@ export function RuleManager() {
           onToggle={toggleRule}
           onEdit={handleEditRule}
           onDelete={deleteRule}
+          viewMode={viewMode}
         />
       </div>
 
