@@ -95,6 +95,18 @@ export function RuleCard({
                 </p>
               )}
             </div>
+            {/* Toggle */}
+            <button
+              onClick={() => onToggle(rule.id)}
+              className={cn(
+                "px-2 py-0.5 text-[7px] font-punk-heading transition-all shrink-0",
+                isEnabled
+                  ? "text-punk-success border border-punk-success/50 bg-punk-success/10"
+                  : "text-punk-text-muted border border-punk-border/30"
+              )}
+            >
+              {isEnabled ? "ON" : "OFF"}
+            </button>
           </div>
 
           {/* Conditions */}
@@ -196,11 +208,24 @@ export function RuleCard({
                   </p>
                 )}
               </div>
-              {rule.triggerCount > 0 && (
-                <span className="font-punk-code text-[7px] text-punk-success shrink-0">
-                  {rule.triggerCount}x TRIGGERS
-                </span>
-              )}
+              <div className="flex items-center gap-2">
+                {rule.triggerCount > 0 && (
+                  <span className="font-punk-code text-[7px] text-punk-success shrink-0">
+                    {rule.triggerCount}x TRIGGERS
+                  </span>
+                )}
+                <button
+                  onClick={() => onToggle(rule.id)}
+                  className={cn(
+                    "px-2 py-0.5 text-[7px] font-punk-heading transition-all shrink-0",
+                    isEnabled
+                      ? "text-punk-success border border-punk-success/50 bg-punk-success/10"
+                      : "text-punk-text-muted border border-punk-border/30"
+                  )}
+                >
+                  {isEnabled ? "ON" : "OFF"}
+                </button>
+              </div>
             </div>
 
             {/* Status line */}
