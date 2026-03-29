@@ -1,11 +1,9 @@
 import * as React from "react"
-import { Globe, Calendar, Edit2, Trash2, Folder, Zap, ChevronDown, ChevronUp, List, LayoutGrid } from "lucide-react"
+import { Globe, Calendar, Edit2, Trash2, Folder, Zap, ChevronDown, ChevronUp } from "lucide-react"
 import { cn } from "@/utils"
 import type { Rule, ConditionGroup, Action } from "@/rules/types"
 import { DAYS_OF_WEEK } from "@/rules/types"
-import type { Extension, Group } from "@/types"
-
-type RuleViewMode = "compact" | "card" | "detail"
+import type { Extension, Group, ViewMode } from "@/types"
 
 interface RuleCardProps {
   rule: Rule
@@ -14,7 +12,7 @@ interface RuleCardProps {
   onToggle: (id: string) => void
   onEdit: (rule: Rule) => void
   onDelete: (id: string) => void
-  viewMode?: RuleViewMode
+  viewMode?: ViewMode
   showDelete?: boolean
   className?: string
 }
@@ -31,16 +29,10 @@ export function RuleCard({
   className
 }: RuleCardProps) {
   const isEnabled = rule.enabled
-  const [localViewMode, setLocalViewMode] = React.useState(viewMode)
   const [isExpanded, setIsExpanded] = React.useState(false)
 
-  // Sync with external viewMode
-  React.useEffect(() => {
-    setLocalViewMode(viewMode)
-  }, [viewMode])
-
   // Compact mode - vertical layout with fixed size
-  if (localViewMode === "compact") {
+  if (viewMode === "compact") {
     return (
       <div
         className={cn(
@@ -71,34 +63,12 @@ export function RuleCard({
         <h4 className="font-punk-heading text-[6px] text-punk-text-primary text-center uppercase tracking-wide px-1 truncate w-full">
           {rule.name.substring(0, 12)}
         </h4>
-
-        {/* View mode tabs - mini */}
-        <div className="absolute bottom-1 left-1 right-1 flex gap-0.5">
-          <button
-            onClick={(e) => { e.stopPropagation(); setLocalViewMode("card"); }}
-            className={cn(
-              "flex-1 h-4 rounded-sm transition-all",
-              localViewMode === "card" ? "bg-punk-primary/30 text-punk-accent" : "bg-punk-bg/50 text-punk-text-muted hover:text-punk-text-secondary"
-            )}
-          >
-            <LayoutGrid className="w-2.5 h-2.5 mx-auto" />
-          </button>
-          <button
-            onClick={(e) => { e.stopPropagation(); setLocalViewMode("detail"); }}
-            className={cn(
-              "flex-1 h-4 rounded-sm transition-all",
-              localViewMode === "detail" ? "bg-punk-primary/30 text-punk-accent" : "bg-punk-bg/50 text-punk-text-muted hover:text-punk-text-secondary"
-            )}
-          >
-            <List className="w-2.5 h-2.5 mx-auto" />
-          </button>
-        </div>
       </div>
     )
   }
 
   // Card mode - horizontal layout with more details
-  if (localViewMode === "card") {
+  if (viewMode === "card") {
     return (
       <div
         className={cn(
@@ -111,62 +81,6 @@ export function RuleCard({
           className
         )}
       >
-        {/* Top Tab Bar */}
-        <div className="flex items-center justify-between px-3 py-1.5 border-b border-punk-border/30 bg-punk-bg/50">
-          {/* View mode tabs */}
-          <div className="flex gap-1">
-            <button
-              onClick={() => setLocalViewMode("compact")}
-              className={cn(
-                "flex items-center gap-1 px-2 py-0.5 rounded text-[6px] font-punk-heading uppercase transition-all",
-                localViewMode === "compact"
-                  ? "bg-punk-primary/30 text-punk-accent border border-punk-primary/50"
-                  : "text-punk-text-muted hover:text-punk-text-secondary"
-              )}
-            >
-              <LayoutGrid className="w-3 h-3" />
-              GRID
-            </button>
-            <button
-              onClick={() => setLocalViewMode("card")}
-              className={cn(
-                "flex items-center gap-1 px-2 py-0.5 rounded text-[6px] font-punk-heading uppercase transition-all",
-                localViewMode === "card"
-                  ? "bg-punk-primary/30 text-punk-accent border border-punk-primary/50"
-                  : "text-punk-text-muted hover:text-punk-text-secondary"
-              )}
-            >
-              <List className="w-3 h-3" />
-              CARD
-            </button>
-            <button
-              onClick={() => setLocalViewMode("detail")}
-              className={cn(
-                "flex items-center gap-1 px-2 py-0.5 rounded text-[6px] font-punk-heading uppercase transition-all",
-                localViewMode === "detail"
-                  ? "bg-punk-primary/30 text-punk-accent border border-punk-primary/50"
-                  : "text-punk-text-muted hover:text-punk-text-secondary"
-              )}
-            >
-              <ChevronDown className="w-3 h-3" />
-              DETAIL
-            </button>
-          </div>
-
-          {/* Toggle */}
-          <button
-            onClick={() => onToggle(rule.id)}
-            className={cn(
-              "px-2 py-0.5 text-[7px] font-punk-heading transition-all shrink-0",
-              isEnabled
-                ? "text-punk-success border border-punk-success/50 bg-punk-success/10"
-                : "text-punk-text-muted border border-punk-border/30"
-            )}
-          >
-            {isEnabled ? "ON" : "OFF"}
-          </button>
-        </div>
-
         {/* Content */}
         <div className="p-3">
           {/* Header */}
@@ -261,62 +175,6 @@ export function RuleCard({
         className
       )}
     >
-      {/* Top Tab Bar */}
-      <div className="flex items-center justify-between px-3 py-1.5 border-b border-punk-border/30 bg-punk-bg/50">
-        {/* View mode tabs */}
-        <div className="flex gap-1">
-          <button
-            onClick={() => setLocalViewMode("compact")}
-            className={cn(
-              "flex items-center gap-1 px-2 py-0.5 rounded text-[6px] font-punk-heading uppercase transition-all",
-              localViewMode === "compact"
-                ? "bg-punk-primary/30 text-punk-accent border border-punk-primary/50"
-                : "text-punk-text-muted hover:text-punk-text-secondary"
-            )}
-          >
-            <LayoutGrid className="w-3 h-3" />
-            GRID
-          </button>
-          <button
-            onClick={() => setLocalViewMode("card")}
-            className={cn(
-              "flex items-center gap-1 px-2 py-0.5 rounded text-[6px] font-punk-heading uppercase transition-all",
-              localViewMode === "card"
-                ? "bg-punk-primary/30 text-punk-accent border border-punk-primary/50"
-                : "text-punk-text-muted hover:text-punk-text-secondary"
-            )}
-          >
-            <List className="w-3 h-3" />
-            CARD
-          </button>
-          <button
-            onClick={() => setLocalViewMode("detail")}
-            className={cn(
-              "flex items-center gap-1 px-2 py-0.5 rounded text-[6px] font-punk-heading uppercase transition-all",
-              localViewMode === "detail"
-                ? "bg-punk-primary/30 text-punk-accent border border-punk-primary/50"
-                : "text-punk-text-muted hover:text-punk-text-secondary"
-            )}
-          >
-            <ChevronDown className="w-3 h-3" />
-            DETAIL
-          </button>
-        </div>
-
-        {/* Toggle */}
-        <button
-          onClick={() => onToggle(rule.id)}
-          className={cn(
-            "px-2 py-0.5 text-[7px] font-punk-heading transition-all shrink-0",
-            isEnabled
-              ? "text-punk-success border border-punk-success/50 bg-punk-success/10"
-              : "text-punk-text-muted border border-punk-border/30"
-          )}
-        >
-          {isEnabled ? "ON" : "OFF"}
-        </button>
-      </div>
-
       {/* Content */}
       <div className="p-3">
         {/* Header */}

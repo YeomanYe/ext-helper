@@ -28,7 +28,7 @@ export interface Group {
 
 export type FilterType = 'all' | 'enabled' | 'disabled' | 'favorites'
 export type SortType = 'name' | 'enabled' | 'recentlyUsed'
-export type ViewMode = 'card' | 'compact'
+export type ViewMode = 'compact' | 'card' | 'detail'
 
 export interface Preferences {
   theme: 'light' | 'dark' | 'system'

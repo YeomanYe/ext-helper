@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Settings, X, LayoutGrid, List, ChevronDown } from "lucide-react"
+import { Settings, X, LayoutGrid, List, ChevronDown, FileText } from "lucide-react"
 import { cn } from "@/utils"
 import type { FilterType, ViewMode } from "@/types"
 
@@ -159,30 +159,45 @@ export function Header({ onSettingsClick, viewMode = "compact", onViewModeChange
 
       <div className="flex items-center gap-1 relative z-10">
         {/* View Mode Toggle */}
-        <div className="flex border border-punk-border/30">
+        <div className="flex border border-punk-border/30 bg-punk-bg/50">
           <button
             onClick={() => onViewModeChange?.("compact")}
             className={cn(
-              "flex items-center justify-center p-1.5 transition-all duration-200",
+              "flex items-center gap-1 px-2 py-1 transition-all duration-200",
               viewMode === "compact"
-                ? "bg-punk-primary text-white shadow-neon-purple"
-                : "text-punk-text-muted hover:text-punk-accent hover:bg-punk-bg-alt"
+                ? "bg-punk-primary/30 text-punk-accent border border-punk-primary/50"
+                : "text-punk-text-muted hover:text-punk-text-secondary border border-transparent"
             )}
             title="Grid view"
           >
-            <LayoutGrid className="h-4 w-4" />
+            <LayoutGrid className="h-3 w-3" />
+            <span className="text-[6px] font-punk-heading uppercase">GRID</span>
           </button>
           <button
             onClick={() => onViewModeChange?.("card")}
             className={cn(
-              "flex items-center justify-center p-1.5 transition-all duration-200",
+              "flex items-center gap-1 px-2 py-1 transition-all duration-200",
               viewMode === "card"
-                ? "bg-punk-primary text-white shadow-neon-purple"
-                : "text-punk-text-muted hover:text-punk-accent hover:bg-punk-bg-alt"
+                ? "bg-punk-primary/30 text-punk-accent border border-punk-primary/50"
+                : "text-punk-text-muted hover:text-punk-text-secondary border border-transparent"
             )}
-            title="List view"
+            title="Card view"
           >
-            <List className="h-4 w-4" />
+            <List className="h-3 w-3" />
+            <span className="text-[6px] font-punk-heading uppercase">CARD</span>
+          </button>
+          <button
+            onClick={() => onViewModeChange?.("detail")}
+            className={cn(
+              "flex items-center gap-1 px-2 py-1 transition-all duration-200",
+              viewMode === "detail"
+                ? "bg-punk-primary/30 text-punk-accent border border-punk-primary/50"
+                : "text-punk-text-muted hover:text-punk-text-secondary border border-transparent"
+            )}
+            title="Detail view"
+          >
+            <FileText className="h-3 w-3" />
+            <span className="text-[6px] font-punk-heading uppercase">DETAIL</span>
           </button>
         </div>
 
