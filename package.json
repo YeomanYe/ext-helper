@@ -9,7 +9,7 @@
     "dev:hmr": "vite dev --config vite.config.ts",
     "build": "plasmo build",
     "build:web": "vite build --config vite.config.ts",
-    "preview": "vite build --config vite.config.ts && vite preview",
+    "preview": "vite dev --config vite.config.ts && vite preview",
     "test": "vitest"
   },
   "dependencies": {
