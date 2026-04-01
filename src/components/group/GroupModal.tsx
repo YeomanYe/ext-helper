@@ -1,28 +1,28 @@
 import * as React from "react"
-import { X, Plus, Folder, Package, Star, Heart, Bookmark, Tag, Flag, Briefcase, Code, Globe, Lock, Settings, Wrench, Zap, Flame, Gem, Crown, Target } from "lucide-react"
+import { X, Plus, Folder, Package, Star, Heart, Bookmark, Tag, Flag, Briefcase, Code, Globe, Lock, Settings, Wrench, Zap, Flame, Gem, Crown, Target, Image, Upload } from "lucide-react"
 import { cn } from "@/utils"
 import { SearchBar } from "@/components/popup"
 import type { Group, Extension, FilterType } from "@/types"
 
 const ICON_MAP: Record<string, React.ReactNode> = {
-  folder: <Folder className="w-3 h-3" />,
-  star: <Star className="w-3 h-3" />,
-  heart: <Heart className="w-3 h-3" />,
-  bookmark: <Bookmark className="w-3 h-3" />,
-  tag: <Tag className="w-3 h-3" />,
-  flag: <Flag className="w-3 h-3" />,
-  briefcase: <Briefcase className="w-3 h-3" />,
-  code: <Code className="w-3 h-3" />,
-  globe: <Globe className="w-3 h-3" />,
-  lock: <Lock className="w-3 h-3" />,
-  settings: <Settings className="w-3 h-3" />,
-  tool: <Wrench className="w-3 h-3" />,
-  zap: <Zap className="w-3 h-3" />,
-  bolt: <Zap className="w-3 h-3" />,
-  flame: <Flame className="w-3 h-3" />,
-  gem: <Gem className="w-3 h-3" />,
-  crown: <Crown className="w-3 h-3" />,
-  target: <Target className="w-3 h-3" />,
+  folder: <Folder className="w-4 h-4" />,
+  star: <Star className="w-4 h-4" />,
+  heart: <Heart className="w-4 h-4" />,
+  bookmark: <Bookmark className="w-4 h-4" />,
+  tag: <Tag className="w-4 h-4" />,
+  flag: <Flag className="w-4 h-4" />,
+  briefcase: <Briefcase className="w-4 h-4" />,
+  code: <Code className="w-4 h-4" />,
+  globe: <Globe className="w-4 h-4" />,
+  lock: <Lock className="w-4 h-4" />,
+  settings: <Settings className="w-4 h-4" />,
+  tool: <Wrench className="w-4 h-4" />,
+  zap: <Zap className="w-4 h-4" />,
+  bolt: <Zap className="w-4 h-4" />,
+  flame: <Flame className="w-4 h-4" />,
+  gem: <Gem className="w-4 h-4" />,
+  crown: <Crown className="w-4 h-4" />,
+  target: <Target className="w-4 h-4" />,
 }
 
 const ICON_OPTIONS = Object.keys(ICON_MAP)
@@ -127,7 +127,7 @@ interface GroupModalProps {
   extensions?: Extension[]
   allExtensions?: Extension[]
   onClose: () => void
-  onCreate?: (name: string, color: string, extensionIds: string[]) => void
+  onCreate?: (name: string, color: string, extensionIds: string[], iconUrl?: string) => void
   onToggleExtension?: (id: string) => void
   onOpenOptions?: (id: string) => void
   onRemove?: (id: string) => void
@@ -155,20 +155,22 @@ export function GroupModal({
   const [filter, setFilter] = React.useState<FilterType>("all")
   const [editName, setEditName] = React.useState(group?.name || "New Sector")
   const [selectedColor, setSelectedColor] = React.useState(group?.color || GROUP_COLORS[0])
-  const [showImageUpload, setShowImageUpload] = React.useState(false)
+  const [editIconUrl, setEditIconUrl] = React.useState((group as any)?.iconUrl || "")
   const [selectedExtensions, setSelectedExtensions] = React.useState<Set<string>>(new Set())
   const fileInputRef = React.useRef<HTMLInputElement>(null)
-  const imageUploadRef = React.useRef<HTMLDivElement>(null)
 
   // Handle image upload
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    if (file && group && onUpdateGroup) {
+    if (file) {
       const reader = new FileReader()
       reader.onload = (event) => {
         const dataUrl = event.target?.result as string
-        onUpdateGroup(group.id, { icon: "custom", iconUrl: dataUrl })
-        setShowImageUpload(false)
+        if (isCreateMode) {
+          setEditIconUrl(dataUrl)
+        } else if (group && onUpdateGroup) {
+          onUpdateGroup(group.id, { icon: "custom", iconUrl: dataUrl })
+        }
       }
       reader.readAsDataURL(file)
     }
@@ -289,7 +291,7 @@ export function GroupModal({
   // Handle create
   const handleCreate = () => {
     if (onCreate && editName.trim()) {
-      onCreate(editName.trim(), selectedColor, Array.from(selectedExtensions))
+      onCreate(editName.trim(), selectedColor, Array.from(selectedExtensions), editIconUrl)
       onClose()
     }
   }
@@ -312,78 +314,93 @@ export function GroupModal({
       >
         {/* Header - Icon with name input and search */}
         <div className="flex gap-4 px-4 py-3 border-b border-punk-border/30 bg-punk-bg shrink-0">
-          {/* Large Icon - spans 2 rows */}
-          {isCreateMode ? (
-            <div
-              className="flex items-center justify-center w-16 h-16 border border-punk-border/50 bg-punk-bg-alt self-center"
-              style={{ color: selectedColor }}
-            >
-              {ICON_MAP.folder}
-            </div>
-          ) : (
-            <div className="relative self-center" ref={imageUploadRef}>
-              <button
-                onClick={() => setShowImageUpload(!showImageUpload)}
-                className="flex items-center justify-center w-16 h-16 border border-punk-border/50 bg-punk-bg-alt hover:border-punk-primary transition-colors overflow-hidden"
-                style={{ color: group.color }}
-                title="Upload icon image"
+          {/* Icon Upload */}
+          <div className="flex-shrink-0 flex items-center">
+            {isCreateMode ? (
+              <div
+                className="relative w-[96px] h-[96px] border border-punk-border/50 bg-punk-bg rounded overflow-hidden group cursor-pointer"
+                onClick={() => fileInputRef.current?.click()}
               >
-                {displayIcon}
-              </button>
-              {showImageUpload && (
-                <div className="absolute top-full left-0 mt-1 z-50 p-2 border border-punk-border bg-punk-bg-alt shadow-[0_0_15px_rgba(124,58,237,0.3)]">
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="hidden"
-                  />
-                  <button
-                    onClick={() => {
-                      fileInputRef.current?.click()
-                    }}
-                    className="flex items-center gap-2 w-full px-3 py-2 text-[9px] font-punk-heading uppercase text-punk-text-secondary hover:text-punk-primary hover:bg-punk-bg transition-colors whitespace-nowrap"
-                  >
-                    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                      <polyline points="17 8 12 3 7 8" />
-                      <line x1="12" y1="3" x2="12" y2="15" />
-                    </svg>
-                    UPLOAD IMAGE
-                  </button>
+                <div className="flex flex-col items-center justify-center w-full h-full">
+                  <Image className="h-6 w-6 text-punk-text-muted mb-1" />
+                  <span className="text-[6px] text-punk-text-muted uppercase">UPLOAD</span>
                 </div>
-              )}
-            </div>
-          )}
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
+              </div>
+            ) : (
+              <div className="relative w-[96px] h-[96px] border border-punk-border/50 bg-punk-bg rounded overflow-hidden group">
+                {(group as any)?.iconUrl ? (
+                  <>
+                    <img
+                      src={(group as any).iconUrl}
+                      alt=""
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-punk-bg/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <label className="cursor-pointer p-2 text-punk-text-muted hover:text-punk-accent transition-colors">
+                        <Upload className="h-5 w-5" />
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageUpload}
+                          className="hidden"
+                        />
+                      </label>
+                    </div>
+                  </>
+                ) : (
+                  <div
+                    className="flex flex-col items-center justify-center w-full h-full cursor-pointer hover:bg-punk-bg-alt transition-colors"
+                    style={{ color: group.color }}
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    {ICON_MAP[group?.icon || "folder"]}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
 
           {/* Right side: Name input + Count/Buttons, then Search bar below */}
-          <div className="flex-1 flex flex-col gap-2">
-            {/* Name input row */}
+          <div className="flex-1 flex flex-col gap-3">
+            {/* Name input row with label */}
             <div className="flex items-center gap-3">
-              <input
-                type="text"
-                value={editName}
-                onChange={(e) => setEditName(e.target.value)}
-                onBlur={isCreateMode ? undefined : handleNameChange}
-                onKeyDown={(e) => {
-                  if (!isCreateMode && e.key === "Enter") {
-                    handleNameChange()
-                    e.currentTarget.blur()
-                  }
-                }}
-                placeholder="SECTOR NAME..."
-                className="w-1/3 h-10 px-3 font-punk-heading text-[11px] text-punk-text-primary uppercase bg-transparent border-b border-punk-border/50 focus:outline-none focus:border-punk-accent"
-              />
+              <div className="flex-1">
+                <label className="block font-punk-heading text-[9px] text-punk-text-muted uppercase mb-1.5">
+                  SECTOR_NAME
+                </label>
+                <input
+                  type="text"
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  onBlur={isCreateMode ? undefined : handleNameChange}
+                  onKeyDown={(e) => {
+                    if (!isCreateMode && e.key === "Enter") {
+                      handleNameChange()
+                      e.currentTarget.blur()
+                    }
+                  }}
+                  placeholder="e.g., Work Extensions"
+                  className="punk-input w-full h-10 px-3 text-sm"
+                />
+              </div>
 
               {/* Count badge */}
-              <span className="font-punk-code text-[10px] text-punk-accent">
-                [{isCreateMode ? selectedExtensions.size : extensions.length}]
-              </span>
+              <div className="pt-5">
+                <span className="font-punk-code text-[10px] text-punk-accent">
+                  [{isCreateMode ? selectedExtensions.size : extensions.length}]
+                </span>
+              </div>
 
               {/* ON/OFF toggle for edit mode */}
               {isCreateMode ? null : (
-                <div className="flex gap-1">
+                <div className="flex gap-1 pt-5">
                   <button
                     onClick={() => {
                       if (!onToggleExtension) return
