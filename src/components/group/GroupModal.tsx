@@ -297,7 +297,7 @@ export function GroupModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-punk-bg/80 backdrop-blur-sm" onClick={onClose}>
       <div
-        className="w-[630px] max-h-[95%] border border-punk-border bg-punk-bg-alt shadow-[0_0_30px_rgba(124,58,237,0.4)] overflow-hidden flex flex-col"
+        className="w-[480px] max-h-[95%] border border-punk-border bg-punk-bg-alt shadow-[0_0_30px_rgba(124,58,237,0.4)] overflow-hidden flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header - Icon with name input and search */}
@@ -428,6 +428,9 @@ export function GroupModal({
             </div>
 
             {/* Search bar */}
+            <label className="block font-punk-heading text-[9px] text-punk-text-muted uppercase mb-1">
+              SEARCH & FILTER
+            </label>
             <SearchBar
               value={searchQuery}
               onChange={setSearchQuery}
