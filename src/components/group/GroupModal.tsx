@@ -444,7 +444,7 @@ export function GroupModal({
 
         {/* Group member icons - just icons, no names */}
         <div className="flex gap-2 px-4 py-2 border-b border-punk-border/30 bg-punk-bg shrink-0 overflow-x-auto">
-          {extensions.filter(ext => ext.isInGroup).map((ext) => (
+          {extensionsWithStatus.filter(ext => ext.isInGroup).map((ext) => (
             <div
               key={ext.id}
               className="w-8 h-8 flex-shrink-0 border border-punk-border/30 bg-punk-bg-alt flex items-center justify-center overflow-hidden"
@@ -458,7 +458,7 @@ export function GroupModal({
               )}
             </div>
           ))}
-          {extensions.filter(ext => ext.isInGroup).length === 0 && (
+          {extensionsWithStatus.filter(ext => ext.isInGroup).length === 0 && (
             <span className="font-punk-heading text-[8px] text-punk-text-muted uppercase">
               NO SECTOR MEMBERS
             </span>
