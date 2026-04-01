@@ -404,18 +404,38 @@ export function GroupModal({
               <div className="flex items-center gap-2 pt-2">
                 <span className="font-punk-heading text-[8px] text-punk-text-muted uppercase">ACTIONS</span>
                 <button
-                  onClick={handleToggleAll}
-                  disabled={extensions.length === 0}
+                  onClick={() => {
+                    if (!onToggleExtension) return
+                    extensions.forEach(ext => {
+                      if (!ext.enabled) onToggleExtension(ext.id)
+                    })
+                  }}
+                  disabled={extensions.length === 0 || allEnabled}
                   className={cn(
                     "px-2 py-1 text-[8px] font-punk-heading uppercase transition-all",
-                    extensions.length === 0
-                      ? "text-punk-text-muted/50 cursor-not-allowed"
-                      : allEnabled
-                        ? "bg-punk-cta text-white"
-                        : "border border-punk-border/30 text-punk-text-muted hover:border-punk-cta hover:text-punk-cta"
+                    extensions.length === 0 || allEnabled
+                      ? "bg-punk-success/20 text-punk-success/50 cursor-not-allowed"
+                      : "bg-punk-success/20 text-punk-success border border-punk-success/50 hover:bg-punk-success hover:text-white"
                   )}
                 >
-                  {allEnabled ? "DISABLE ALL" : "ENABLE ALL"}
+                  ENABLE ALL
+                </button>
+                <button
+                  onClick={() => {
+                    if (!onToggleExtension) return
+                    extensions.forEach(ext => {
+                      if (ext.enabled) onToggleExtension(ext.id)
+                    })
+                  }}
+                  disabled={extensions.length === 0 || allDisabled}
+                  className={cn(
+                    "px-2 py-1 text-[8px] font-punk-heading uppercase transition-all",
+                    extensions.length === 0 || allDisabled
+                      ? "bg-punk-cta/20 text-punk-cta/50 cursor-not-allowed"
+                      : "bg-punk-cta/20 text-punk-cta border border-punk-cta/50 hover:bg-punk-cta hover:text-white"
+                  )}
+                >
+                  DISABLE ALL
                 </button>
               </div>
             )}
