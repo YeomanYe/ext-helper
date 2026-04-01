@@ -104,11 +104,8 @@ export function RuleEditor({ rule, onSave, onClose }: RuleEditorProps) {
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {/* Name & Icon */}
           <div className="flex gap-4">
-            {/* Icon Upload */}
-            <div className="flex-shrink-0">
-              <label className="block font-punk-heading text-[9px] text-punk-text-muted uppercase mb-1.5">
-                ICON
-              </label>
+            {/* Icon Upload - centered with right side content */}
+            <div className="flex-shrink-0 flex items-start">
               <div className="relative w-[96px] h-[96px] border border-punk-border/50 bg-punk-bg rounded overflow-hidden group">
                 {iconUrl ? (
                   <>
@@ -146,17 +143,31 @@ export function RuleEditor({ rule, onSave, onClose }: RuleEditorProps) {
 
             {/* Name & Description Stack */}
             <div className="flex-1 space-y-4">
-              <div>
-                <label className="block font-punk-heading text-[9px] text-punk-text-muted uppercase mb-1.5">
-                  RULE_NAME
-                </label>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g., Work Time Extensions"
-                  className="punk-input w-full h-10 px-3 text-sm"
-                />
+              {/* Rule Name & Priority on same row */}
+              <div className="flex gap-4">
+                <div className="flex-1">
+                  <label className="block font-punk-heading text-[9px] text-punk-text-muted uppercase mb-1.5">
+                    RULE_NAME
+                  </label>
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="e.g., Work Time Extensions"
+                    className="punk-input w-full h-10 px-3 text-sm"
+                  />
+                </div>
+                <div className="w-24">
+                  <label className="block font-punk-heading text-[9px] text-punk-text-muted uppercase mb-1.5">
+                    PRIORITY
+                  </label>
+                  <input
+                    type="number"
+                    value={priority}
+                    onChange={(e) => setPriority(parseInt(e.target.value) || 0)}
+                    className="punk-input w-full h-10 px-3 text-sm"
+                  />
+                </div>
               </div>
               <div>
                 <label className="block font-punk-heading text-[9px] text-punk-text-muted uppercase mb-1.5">
@@ -171,19 +182,6 @@ export function RuleEditor({ rule, onSave, onClose }: RuleEditorProps) {
                 />
               </div>
             </div>
-          </div>
-
-          {/* Priority */}
-          <div className="w-24">
-            <label className="block font-punk-heading text-[9px] text-punk-text-muted uppercase mb-1.5">
-              PRIORITY
-            </label>
-            <input
-              type="number"
-              value={priority}
-              onChange={(e) => setPriority(parseInt(e.target.value) || 0)}
-              className="punk-input w-full h-10 px-3 text-sm"
-            />
           </div>
 
           {/* Conditions */}
