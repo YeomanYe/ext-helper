@@ -1,5 +1,5 @@
 import * as React from "react"
-import { X } from "lucide-react"
+import { X, Image, Upload } from "lucide-react"
 import { cn } from "@/utils"
 import { ConditionBuilder } from "./ConditionBuilder"
 import { ActionBuilder } from "./ActionBuilder"
@@ -32,6 +32,7 @@ function createDefaultConditionGroup(): ConditionGroup {
 export function RuleEditor({ rule, onSave, onClose }: RuleEditorProps) {
   const [name, setName] = React.useState(rule?.name || "")
   const [description, setDescription] = React.useState(rule?.description || "")
+  const [iconUrl, setIconUrl] = React.useState(rule?.iconUrl || "")
   // Always have at least one condition group
   const [conditionGroups, setConditionGroups] = React.useState<ConditionGroup[]>(
     rule?.conditionGroups?.length ? rule.conditionGroups : [createDefaultConditionGroup()]
@@ -57,12 +58,24 @@ export function RuleEditor({ rule, onSave, onClose }: RuleEditorProps) {
     onSave({
       name: name.trim(),
       description: description.trim() || undefined,
+      iconUrl: iconUrl.trim() || undefined,
       conditionGroups,
       conditionOperator: "OR",
       actions,
       priority,
       enabled: rule?.enabled ?? true,
     })
+  }
+
+  const handleIconUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onload = (event) => {
+        setIconUrl(event.target?.result as string || "")
+      }
+      reader.readAsDataURL(file)
+    }
   }
 
   return (
@@ -89,45 +102,88 @@ export function RuleEditor({ rule, onSave, onClose }: RuleEditorProps) {
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
-          {/* Name */}
-          <div>
-            <label className="block font-punk-heading text-[9px] text-punk-text-muted uppercase mb-1.5">
-              RULE_NAME
-            </label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="e.g., Work Time Extensions"
-              className="punk-input w-full h-10 px-3 text-sm"
-            />
+          {/* Name & Icon */}
+          <div className="flex gap-4">
+            {/* Icon Upload */}
+            <div className="flex-shrink-0">
+              <label className="block font-punk-heading text-[9px] text-punk-text-muted uppercase mb-1.5">
+                ICON
+              </label>
+              <div className="relative w-[88px] h-[88px] border border-punk-border/50 bg-punk-bg rounded overflow-hidden group">
+                {iconUrl ? (
+                  <>
+                    <img
+                      src={iconUrl}
+                      alt="Rule icon"
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-punk-bg/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <label className="cursor-pointer p-2 text-punk-text-muted hover:text-punk-accent transition-colors">
+                        <Upload className="h-5 w-5" />
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleIconUpload}
+                          className="hidden"
+                        />
+                      </label>
+                    </div>
+                  </>
+                ) : (
+                  <label className="flex flex-col items-center justify-center w-full h-full cursor-pointer hover:bg-punk-bg-alt transition-colors">
+                    <Image className="h-6 w-6 text-punk-text-muted mb-1" />
+                    <span className="text-[6px] text-punk-text-muted uppercase">UPLOAD</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleIconUpload}
+                      className="hidden"
+                    />
+                  </label>
+                )}
+              </div>
+            </div>
+
+            {/* Name & Description Stack */}
+            <div className="flex-1 space-y-4">
+              <div>
+                <label className="block font-punk-heading text-[9px] text-punk-text-muted uppercase mb-1.5">
+                  RULE_NAME
+                </label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="e.g., Work Time Extensions"
+                  className="punk-input w-full h-10 px-3 text-sm"
+                />
+              </div>
+              <div>
+                <label className="block font-punk-heading text-[9px] text-punk-text-muted uppercase mb-1.5">
+                  DESCRIPTION (OPTIONAL)
+                </label>
+                <input
+                  type="text"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Brief description..."
+                  className="punk-input w-full h-10 px-3 text-sm"
+                />
+              </div>
+            </div>
           </div>
 
-          {/* Description & Priority */}
-          <div className="flex gap-4">
-            <div className="flex-1">
-              <label className="block font-punk-heading text-[9px] text-punk-text-muted uppercase mb-1.5">
-                DESCRIPTION (OPTIONAL)
-              </label>
-              <input
-                type="text"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Brief description..."
-                className="punk-input w-full h-10 px-3 text-sm"
-              />
-            </div>
-            <div className="w-24">
-              <label className="block font-punk-heading text-[9px] text-punk-text-muted uppercase mb-1.5">
-                PRIORITY
-              </label>
-              <input
-                type="number"
-                value={priority}
-                onChange={(e) => setPriority(parseInt(e.target.value) || 0)}
-                className="punk-input w-full h-10 px-3 text-sm"
-              />
-            </div>
+          {/* Priority */}
+          <div className="w-24">
+            <label className="block font-punk-heading text-[9px] text-punk-text-muted uppercase mb-1.5">
+              PRIORITY
+            </label>
+            <input
+              type="number"
+              value={priority}
+              onChange={(e) => setPriority(parseInt(e.target.value) || 0)}
+              className="punk-input w-full h-10 px-3 text-sm"
+            />
           </div>
 
           {/* Conditions */}

@@ -57,6 +57,7 @@ export interface Rule {
   id: string
   name: string
   description?: string
+  iconUrl?: string
   enabled: boolean
   conditionGroups: ConditionGroup[]
   conditionOperator: ConditionOperator

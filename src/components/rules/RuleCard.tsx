@@ -55,8 +55,12 @@ export function RuleCard({
         />
 
         {/* Rule Icon */}
-        <div className="w-8 h-8 flex items-center justify-center border border-punk-border/50 bg-punk-bg rounded mb-1.5">
-          <Zap className="w-4 h-4 text-punk-accent" />
+        <div className="w-8 h-8 flex items-center justify-center border border-punk-border/50 bg-punk-bg rounded mb-1.5 overflow-hidden">
+          {rule.iconUrl ? (
+            <img src={rule.iconUrl} alt="" className="w-full h-full object-cover" />
+          ) : (
+            <Zap className="w-4 h-4 text-punk-accent" />
+          )}
         </div>
 
         {/* Rule Name */}
@@ -84,7 +88,15 @@ export function RuleCard({
         {/* Content */}
         <div className="p-3">
           {/* Header */}
-          <div className="flex items-start gap-2 mb-2">
+          <div className="flex items-start gap-3 mb-2">
+            {/* Rule Icon */}
+            <div className="w-10 h-10 flex items-center justify-center border border-punk-border/50 bg-punk-bg rounded flex-shrink-0 overflow-hidden">
+              {rule.iconUrl ? (
+                <img src={rule.iconUrl} alt="" className="w-full h-full object-cover" />
+              ) : (
+                <Zap className="w-5 h-5 text-punk-accent" />
+              )}
+            </div>
             <div className="flex-1 min-w-0">
               <h4 className="font-punk-heading text-[9px] text-punk-text-primary uppercase tracking-wide truncate">
                 {rule.name}
@@ -192,8 +204,12 @@ export function RuleCard({
         {/* Header */}
         <div className="flex items-start gap-3 mb-3">
           {/* Rule Icon */}
-          <div className="w-12 h-12 flex items-center justify-center border border-punk-border/50 bg-punk-bg rounded flex-shrink-0">
-            <Zap className="w-6 h-6 text-punk-accent" />
+          <div className="w-12 h-12 flex items-center justify-center border border-punk-border/50 bg-punk-bg rounded flex-shrink-0 overflow-hidden">
+            {rule.iconUrl ? (
+              <img src={rule.iconUrl} alt="" className="w-full h-full object-cover" />
+            ) : (
+              <Zap className="w-6 h-6 text-punk-accent" />
+            )}
           </div>
 
           <div className="flex-1 min-w-0">
