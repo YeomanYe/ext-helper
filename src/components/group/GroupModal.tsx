@@ -256,6 +256,26 @@ export function GroupModal({
     }
   }
 
+  // Check if all extensions in group are enabled
+  const allEnabled = extensions.length > 0 && extensions.every(ext => ext.enabled)
+  const allDisabled = extensions.length > 0 && extensions.every(ext => !ext.enabled)
+
+  // Toggle all extensions in group
+  const handleToggleAll = () => {
+    if (!onToggleExtension) return
+    if (allEnabled) {
+      // Disable all
+      extensions.forEach(ext => {
+        if (ext.enabled) onToggleExtension(ext.id)
+      })
+    } else {
+      // Enable all
+      extensions.forEach(ext => {
+        if (!ext.enabled) onToggleExtension(ext.id)
+      })
+    }
+  }
+
   // Handle create
   const handleCreate = () => {
     if (onCreate && editName.trim()) {
@@ -365,11 +385,31 @@ export function GroupModal({
                   [{isCreateMode ? selectedExtensions.size : extensions.length}]
                 </span>
               </div>
+            </div>
 
-                          </div>
+            {/* Enable/Disable All row */}
+            {isCreateMode ? null : (
+              <div className="flex items-center gap-2 pt-2">
+                <span className="font-punk-heading text-[8px] text-punk-text-muted uppercase">SECTOR</span>
+                <button
+                  onClick={handleToggleAll}
+                  disabled={extensions.length === 0}
+                  className={cn(
+                    "px-2 py-1 text-[8px] font-punk-heading uppercase transition-all",
+                    extensions.length === 0
+                      ? "text-punk-text-muted/50 cursor-not-allowed"
+                      : allEnabled
+                        ? "bg-punk-cta text-white"
+                        : "border border-punk-border/30 text-punk-text-muted hover:border-punk-cta hover:text-punk-cta"
+                  )}
+                >
+                  {allEnabled ? "DISABLE ALL" : "ENABLE ALL"}
+                </button>
+              </div>
+            )}
 
             {/* Search bar */}
-            <label className="block font-punk-heading text-[9px] text-punk-text-muted uppercase mb-1">
+            <label className="block font-punk-heading text-[9px] text-punk-text-muted uppercase mb-1 pt-2">
               SEARCH & FILTER
             </label>
             <SearchBar
@@ -385,66 +425,55 @@ export function GroupModal({
         {/* Extension List */}
         <div className="flex-1 overflow-y-auto p-3">
           {filteredExtensions.length > 0 ? (
-            <div className="space-y-1.5">
+            <div className="grid grid-cols-5 gap-2">
               {filteredExtensions.map((ext) => (
                 <div
                   key={ext.id}
+                  onClick={() => handleToggleExtensionMembership(ext)}
                   className={cn(
-                    "flex items-center gap-2 px-2 py-1.5 cursor-pointer transition-all border rounded",
+                    "relative flex flex-col items-center justify-center p-2 cursor-pointer transition-all border rounded",
                     ext.isInGroup
                       ? "border-punk-success/50 bg-punk-success/5 hover:border-punk-success"
                       : "border-punk-border/20 bg-punk-bg-alt hover:border-punk-primary/50"
                   )}
                 >
-                  {/* Checkbox to add/remove from group */}
+                  {/* Status dot */}
                   <div
-                    onClick={() => handleToggleExtensionMembership(ext)}
                     className={cn(
-                      "w-4 h-4 rounded border flex items-center justify-center flex-shrink-0",
-                      ext.isInGroup
-                        ? "border-punk-success bg-punk-success/20"
-                        : "border-punk-border/30"
+                      "absolute top-1 right-1 w-2 h-2 border border-punk-bg-alt z-10",
+                      ext.enabled ? "bg-punk-success" : "bg-punk-text-muted"
                     )}
-                  >
-                    {ext.isInGroup && (
-                      <span className="text-punk-success text-[8px]">✓</span>
-                    )}
-                  </div>
+                  />
+                  {/* Group icon badge */}
+                  {ext.isInGroup && (
+                    <div
+                      className="absolute bottom-1 right-1 w-4 h-4 rounded-sm flex items-center justify-center z-10 overflow-hidden"
+                      style={{ backgroundColor: (group?.color || selectedColor) + "40" }}
+                    >
+                      {groupIconUrl ? (
+                        <img src={groupIconUrl} className="w-full h-full object-cover" alt="" />
+                      ) : (
+                        <span style={{ color: group?.color || selectedColor }}>
+                          {ICON_MAP[group?.icon || "folder"] || <Folder className="w-2 h-2" />}
+                        </span>
+                      )}
+                    </div>
+                  )}
                   {/* Icon */}
-                  <div className="w-6 h-6 flex-shrink-0">
-                    {ext.iconUrl ? (
-                      <img src={ext.iconUrl} className="w-6 h-6 border border-punk-border/30 object-cover rounded-sm" alt="" />
-                    ) : (
-                      <div className="w-6 h-6 border border-punk-border/30 bg-punk-bg flex items-center justify-center rounded-sm">
-                        <Package className="w-3 h-3 text-punk-text-muted" />
-                      </div>
-                    )}
-                  </div>
+                  {ext.iconUrl ? (
+                    <img src={ext.iconUrl} className="w-8 h-8 border border-punk-border/30 object-cover" alt="" />
+                  ) : (
+                    <div className="w-8 h-8 border border-punk-border/30 bg-punk-bg flex items-center justify-center">
+                      <Package className="w-4 h-4 text-punk-text-muted" />
+                    </div>
+                  )}
                   {/* Name */}
-                  <span
-                    onClick={() => handleToggleExtensionMembership(ext)}
-                    className={cn(
-                      "flex-1 font-punk-heading text-[8px] uppercase truncate",
-                      ext.isInGroup ? "text-punk-text-primary" : "text-punk-text-muted"
-                    )}
-                  >
-                    {ext.name}
+                  <span className={cn(
+                    "font-punk-heading text-[6px] uppercase text-center truncate w-full mt-1",
+                    ext.isInGroup ? "text-punk-text-primary" : "text-punk-text-muted"
+                  )}>
+                    {ext.name.substring(0, 10)}
                   </span>
-                  {/* Enable/Disable toggle */}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      if (onToggleExtension) onToggleExtension(ext.id)
-                    }}
-                    className={cn(
-                      "w-8 h-4 rounded text-[6px] font-punk-heading uppercase transition-all flex-shrink-0",
-                      ext.enabled
-                        ? "bg-punk-success/20 text-punk-success border border-punk-success/50"
-                        : "bg-punk-text-muted/20 text-punk-text-muted border border-punk-text-muted/50"
-                    )}
-                  >
-                    {ext.enabled ? "ON" : "OFF"}
-                  </button>
                 </div>
               ))}
             </div>
