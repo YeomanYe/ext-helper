@@ -225,13 +225,14 @@ export function CreateGroupButton({ onClick, className }: CreateGroupButtonProps
     <button
       onClick={onClick}
       className={cn(
-        "flex w-full items-center gap-2 px-3 py-2 font-punk-body text-sm text-punk-text-muted",
-        "hover:text-punk-accent hover:bg-punk-bg-alt transition-colors border border-dashed border-punk-border/30 hover:border-punk-accent",
+        "flex w-full items-center gap-2 px-3 py-2 font-punk-body text-sm",
+        "border border-punk-accent/50 text-punk-accent",
+        "hover:bg-punk-accent/10 hover:border-punk-accent transition-all",
         className
       )}
     >
       <Plus className="h-4 w-4" />
-      NEW SECTOR
+      NEW GROUP
     </button>
   )
 }

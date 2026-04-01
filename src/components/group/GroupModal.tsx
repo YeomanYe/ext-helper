@@ -84,7 +84,7 @@ export function GroupChip({
           "p-0.5 transition-colors",
           "text-punk-text-muted hover:text-punk-success hover:bg-punk-success/10"
         )}
-        title="Toggle all in sector"
+        title="Toggle all in group"
       >
         <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M18.36 6.64a9 9 0 1 1-12.73 0" />
@@ -110,7 +110,7 @@ export function CreateGroupChip({ onClick }: CreateGroupChipProps) {
       )}
     >
       <Folder className="h-3.5 w-3.5" />
-      <span className="font-punk-heading text-[8px] uppercase tracking-wide">NEW SECTOR</span>
+      <span className="font-punk-heading text-[8px] uppercase tracking-wide">NEW GROUP</span>
     </button>
   )
 }
@@ -379,13 +379,13 @@ export function GroupModal({
             )}
           </div>
 
-          {/* Right side: Name input + Count + Search */}
+          {/* Right side: Name input + Search */}
           <div className="flex-1 flex flex-col gap-3">
             {/* Name input row with label */}
             <div className="flex items-center gap-3">
               <div className="flex-1">
                 <label className="block font-punk-heading text-[9px] text-punk-text-muted uppercase mb-1.5">
-                  SECTOR_NAME
+                  GROUP_NAME
                 </label>
                 <input
                   type="text"
@@ -401,13 +401,6 @@ export function GroupModal({
                   placeholder="e.g., Work Extensions"
                   className="punk-input w-full h-10 px-3 text-sm"
                 />
-              </div>
-
-              {/* Count badge */}
-              <div className="pt-5">
-                <span className="font-punk-code text-[10px] text-punk-accent">
-                  [{isCreateMode ? selectedExtensions.size : extensions.length}]
-                </span>
               </div>
             </div>
 
@@ -484,7 +477,7 @@ export function GroupModal({
           ))}
           {extensionsWithStatus.filter(ext => ext.isInGroup).length === 0 && (
             <span className="font-punk-heading text-[8px] text-punk-text-muted uppercase">
-              NO SECTOR MEMBERS
+              NO GROUP MEMBERS
             </span>
           )}
         </div>
