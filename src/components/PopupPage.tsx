@@ -243,7 +243,7 @@ export function PopupPage() {
             setSelectedGroupId(null)
             setShowCreateModal(false)
           }}
-          onCreate={showCreateModal ? async (name, color, extensionIds) => {
+          onCreate={showCreateModal ? async (name, color, extensionIds, iconUrl) => {
             await createGroup(name, color)
             // Add selected extensions to the new group
             // We need to find the newly created group and add extensions to it
