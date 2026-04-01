@@ -245,17 +245,21 @@ export function PopupPage() {
           }}
           onCreate={showCreateModal ? async (name, color, extensionIds, iconUrl) => {
             await createGroup(name, color)
-            // Add selected extensions to the new group
-            // We need to find the newly created group and add extensions to it
-            // Since createGroup doesn't return the ID directly, we'll use the latest group
-            const latestGroup = groups[groups.length]
-            if (latestGroup && extensionIds.length > 0) {
-              extensionIds.forEach(extId => {
-                addToGroup(latestGroup.id, extId)
-              })
-            }
-            // Keep the new group highlighted after creation
+            // Get fresh groups from store after state update
+            const latestGroups = useGroupStore.getState().groups
+            const latestGroup = latestGroups[latestGroups.length - 1]
             if (latestGroup) {
+              // Add selected extensions to the new group
+              if (extensionIds.length > 0) {
+                extensionIds.forEach(extId => {
+                  addToGroup(latestGroup.id, extId)
+                })
+              }
+              // Update icon if provided
+              if (iconUrl) {
+                updateGroup(latestGroup.id, { icon: "custom", iconUrl })
+              }
+              // Keep the new group highlighted after creation
               setSelectedGroupId(latestGroup.id)
             }
           } : undefined}
