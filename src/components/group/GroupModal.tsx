@@ -483,9 +483,9 @@ export function GroupModal({
         </div>
 
         {/* Extension List - filtered extensions for adding/removing */}
-        <div className="flex-1 overflow-y-auto p-3">
+        <div className="flex-1 overflow-y-auto p-3 min-h-0">
           {filteredExtensions.length > 0 ? (
-            <div className="grid grid-cols-5 gap-2">
+            <div className="grid grid-cols-5 gap-2 auto-rows-fr">
               {filteredExtensions.map((ext) => (
                 <div
                   key={ext.id}
