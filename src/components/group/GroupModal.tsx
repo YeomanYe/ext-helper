@@ -178,8 +178,8 @@ export function GroupModal({
 
   // Create a set of extension IDs in this group for fast lookup
   const groupExtIds = React.useMemo(() => {
-    return new Set(extensions.map(e => e.id))
-  }, [extensions])
+    return new Set(group?.extensionIds || [])
+  }, [group?.extensionIds])
 
   // Get all extensions with their group membership status
   const extensionsWithStatus = React.useMemo(() => {
