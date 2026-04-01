@@ -176,18 +176,6 @@ export function GroupModal({
     }
   }
 
-  // Close image upload on outside click
-  React.useEffect(() => {
-    if (!showImageUpload) return
-    function handleClickOutside(event: MouseEvent) {
-      if (imageUploadRef.current && !imageUploadRef.current.contains(event.target as Node)) {
-        setShowImageUpload(false)
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside)
-    return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [showImageUpload])
-
   // Create a set of extension IDs in this group for fast lookup
   const groupExtIds = React.useMemo(() => {
     return new Set(extensions.map(e => e.id))
