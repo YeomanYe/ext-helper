@@ -297,7 +297,7 @@ export function GroupModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-punk-bg/80 backdrop-blur-sm" onClick={onClose}>
       <div
-        className="w-[480px] max-h-[95%] border border-punk-border bg-punk-bg-alt shadow-[0_0_30px_rgba(124,58,237,0.4)] overflow-hidden flex flex-col"
+        className="w-[480px] max-h-[600px] border border-punk-border bg-punk-bg-alt shadow-[0_0_30px_rgba(124,58,237,0.4)] overflow-hidden flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header - Icon with name input and search */}
@@ -387,10 +387,22 @@ export function GroupModal({
               </div>
             </div>
 
-            {/* Enable/Disable All row */}
+            {/* Search bar */}
+            <label className="block font-punk-heading text-[9px] text-punk-text-muted uppercase mb-1 pt-2">
+              SEARCH & FILTER
+            </label>
+            <SearchBar
+              value={searchQuery}
+              onChange={setSearchQuery}
+              placeholder="SEARCH_EXTENSIONS..."
+              activeFilter={filter}
+              onFilterChange={setFilter}
+            />
+
+            {/* Actions row */}
             {isCreateMode ? null : (
               <div className="flex items-center gap-2 pt-2">
-                <span className="font-punk-heading text-[8px] text-punk-text-muted uppercase">SECTOR</span>
+                <span className="font-punk-heading text-[8px] text-punk-text-muted uppercase">ACTIONS</span>
                 <button
                   onClick={handleToggleAll}
                   disabled={extensions.length === 0}
@@ -407,18 +419,6 @@ export function GroupModal({
                 </button>
               </div>
             )}
-
-            {/* Search bar */}
-            <label className="block font-punk-heading text-[9px] text-punk-text-muted uppercase mb-1 pt-2">
-              SEARCH & FILTER
-            </label>
-            <SearchBar
-              value={searchQuery}
-              onChange={setSearchQuery}
-              placeholder="SEARCH_EXTENSIONS..."
-              activeFilter={filter}
-              onFilterChange={setFilter}
-            />
           </div>
         </div>
 
@@ -475,39 +475,6 @@ export function GroupModal({
                   )}>
                     {ext.name.substring(0, 8)}
                   </span>
-                  {/* ON/OFF buttons row */}
-                  <div className="flex gap-0.5 mt-0.5">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        if (ext.enabled) return
-                        if (onToggleExtension) onToggleExtension(ext.id)
-                      }}
-                      className={cn(
-                        "px-1 py-0.5 text-[5px] font-punk-heading uppercase transition-all",
-                        ext.enabled
-                          ? "bg-punk-success text-white"
-                          : "border border-punk-border/30 text-punk-text-muted hover:border-punk-success"
-                      )}
-                    >
-                      ON
-                    </button>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        if (!ext.enabled) return
-                        if (onToggleExtension) onToggleExtension(ext.id)
-                      }}
-                      className={cn(
-                        "px-1 py-0.5 text-[5px] font-punk-heading uppercase transition-all",
-                        !ext.enabled
-                          ? "bg-punk-cta text-white"
-                          : "border border-punk-border/30 text-punk-text-muted hover:border-punk-cta"
-                      )}
-                    >
-                      OFF
-                    </button>
-                  </div>
                 </div>
               ))}
             </div>
