@@ -105,7 +105,7 @@ export function RuleEditor({ rule, onSave, onClose }: RuleEditorProps) {
           {/* Name & Icon */}
           <div className="flex gap-4">
             {/* Icon Upload - centered with right side content */}
-            <div className="flex-shrink-0 flex items-start">
+            <div className="flex-shrink-0 flex items-center">
               <div className="relative w-[96px] h-[96px] border border-punk-border/50 bg-punk-bg rounded overflow-hidden group">
                 {iconUrl ? (
                   <>
