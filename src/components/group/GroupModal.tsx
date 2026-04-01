@@ -309,17 +309,41 @@ export function GroupModal({
                 className="relative w-[96px] h-[96px] border border-punk-border/50 bg-punk-bg rounded overflow-hidden group cursor-pointer"
                 onClick={() => fileInputRef.current?.click()}
               >
-                <div className="flex flex-col items-center justify-center w-full h-full">
-                  <Image className="h-6 w-6 text-punk-text-muted mb-1" />
-                  <span className="text-[6px] text-punk-text-muted uppercase">UPLOAD</span>
-                </div>
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="hidden"
-                />
+                {editIconUrl ? (
+                  <>
+                    <img
+                      src={editIconUrl}
+                      alt=""
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-punk-bg/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <label className="cursor-pointer p-2 text-punk-text-muted hover:text-punk-accent transition-colors">
+                        <Upload className="h-5 w-5" />
+                        <input
+                          type="file"
+                          ref={fileInputRef}
+                          accept="image/*"
+                          onChange={handleImageUpload}
+                          className="hidden"
+                        />
+                      </label>
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex flex-col items-center justify-center w-full h-full">
+                    <Image className="h-6 w-6 text-punk-text-muted mb-1" />
+                    <span className="text-[6px] text-punk-text-muted uppercase">UPLOAD</span>
+                  </div>
+                )}
+                {!editIconUrl && (
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                  />
+                )}
               </div>
             ) : (
               <div className="relative w-[96px] h-[96px] border border-punk-border/50 bg-punk-bg rounded overflow-hidden group">
