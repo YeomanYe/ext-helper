@@ -1,5 +1,5 @@
 import * as React from "react"
-import { ChevronDown, ChevronRight, Folder, MoreVertical, Plus, Pencil, Trash2 } from "lucide-react"
+import { ChevronDown, ChevronRight, Folder, MoreVertical, Plus, Pencil, Trash2, Edit2 } from "lucide-react"
 import { ExtensionCard } from "@/components/extension"
 import { cn } from "@/utils"
 import type { Group, Extension } from "@/types"
@@ -43,21 +43,21 @@ export function GroupCard({
   }, [])
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800 overflow-hidden">
+    <div className="border transition-all punk-border bg-punk-bg-alt hover:border-punk-primary hover:shadow-[0_0_15px_rgba(124,58,237,0.3)]">
       {/* Group Header */}
       <div
         className={cn(
-          "flex items-center gap-2 px-4 py-3 cursor-pointer",
-          "hover:bg-gray-50 dark:hover:bg-gray-700/50",
+          "flex items-center gap-2 px-3 py-2 cursor-pointer",
+          "hover:bg-punk-bg/50",
           "transition-colors duration-150"
         )}
         onClick={onToggleExpand}
       >
-        <button className="flex-shrink-0 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+        <button className="flex-shrink-0 text-punk-text-muted hover:text-punk-accent">
           {isExpanded ? (
-            <ChevronDown className="h-4 w-4" />
+            <ChevronDown className="h-3 w-3" />
           ) : (
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-3 w-3" />
           )}
         </button>
 
@@ -66,13 +66,13 @@ export function GroupCard({
           style={{ backgroundColor: group.color }}
         />
 
-        <Folder className="h-4 w-4 text-gray-500" />
+        <Folder className="h-3 w-3 text-punk-accent" />
 
-        <span className="flex-1 truncate text-sm font-medium text-gray-900 dark:text-gray-100">
+        <span className="flex-1 truncate font-punk-heading text-[9px] text-punk-text-primary uppercase tracking-wide">
           {group.name}
         </span>
 
-        <span className="text-xs text-gray-500 dark:text-gray-400">
+        <span className="font-punk-code text-[7px] text-punk-text-muted">
           ({extensions.length})
         </span>
 
@@ -82,23 +82,23 @@ export function GroupCard({
               e.stopPropagation()
               setShowMenu(!showMenu)
             }}
-            className="flex h-7 w-7 items-center justify-center rounded text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-gray-600 dark:hover:text-gray-300"
+            className="flex h-6 w-6 items-center justify-center text-punk-text-muted hover:text-punk-accent transition-colors"
           >
-            <MoreVertical className="h-4 w-4" />
+            <MoreVertical className="h-3 w-3" />
           </button>
 
           {showMenu && (
-            <div className="absolute right-0 top-full z-50 mt-1 w-36 rounded-md border border-gray-200 bg-white py-1 shadow-lg dark:border-gray-700 dark:bg-gray-800">
+            <div className="absolute right-0 top-full z-50 mt-1 w-32 border border-punk-border bg-punk-bg-alt py-1 shadow-[0_0_20px_rgba(124,58,237,0.3)]">
               <button
                 onClick={(e) => {
                   e.stopPropagation()
                   onRename()
                   setShowMenu(false)
                 }}
-                className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                className="flex w-full items-center gap-2 px-3 py-1.5 text-left font-punk-body text-[9px] text-punk-text-secondary hover:text-punk-accent hover:bg-punk-bg transition-colors"
               >
-                <Pencil className="h-4 w-4" />
-                重命名
+                <Edit2 className="h-3 w-3" />
+                RENAME
               </button>
               <button
                 onClick={(e) => {
@@ -106,10 +106,10 @@ export function GroupCard({
                   onDelete()
                   setShowMenu(false)
                 }}
-                className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-error hover:bg-red-50 dark:hover:bg-red-900/20"
+                className="flex w-full items-center gap-2 px-3 py-1.5 text-left font-punk-body text-[9px] text-punk-cta hover:bg-punk-cta/10 transition-colors"
               >
-                <Trash2 className="h-4 w-4" />
-                删除
+                <Trash2 className="h-3 w-3" />
+                DELETE
               </button>
             </div>
           )}
@@ -118,9 +118,9 @@ export function GroupCard({
 
       {/* Group Content - Extension Grid */}
       {isExpanded && (
-        <div className="border-t border-gray-200 px-4 py-3 dark:border-gray-700">
+        <div className="border-t border-punk-border/30 px-3 py-3">
           {extensions.length > 0 ? (
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-2">
               {extensions.map((ext) => (
                 <ExtensionCard
                   key={ext.id}
@@ -132,20 +132,20 @@ export function GroupCard({
               ))}
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center py-8 text-center">
-              <Folder className="h-8 w-8 text-gray-300 dark:text-gray-600" />
-              <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                暂无扩展
+            <div className="flex flex-col items-center justify-center py-6 text-center">
+              <Folder className="h-6 w-6 text-punk-text-muted" />
+              <p className="mt-2 font-punk-body text-[9px] text-punk-text-muted uppercase">
+                NO_EXTENSIONS
               </p>
               <button
                 onClick={(e) => {
                   e.stopPropagation()
                   onAddExtension?.()
                 }}
-                className="mt-2 flex items-center gap-1 text-sm text-primary hover:underline"
+                className="mt-2 flex items-center gap-1 font-punk-heading text-[8px] text-punk-accent uppercase hover:text-punk-primary transition-colors"
               >
-                <Plus className="h-4 w-4" />
-                添加扩展
+                <Plus className="h-3 w-3" />
+                ADD_EXTENSION
               </button>
             </div>
           )}
@@ -164,15 +164,14 @@ export function CreateGroupCard({ onClick }: CreateGroupCardProps) {
     <button
       onClick={onClick}
       className={cn(
-        "flex items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-300",
-        "px-4 py-3 text-sm text-gray-500",
-        "hover:border-primary hover:text-primary",
-        "dark:border-gray-600 dark:hover:border-primary",
-        "transition-colors duration-150"
+        "flex items-center justify-center gap-2 border border-dashed border-punk-border/50",
+        "px-3 py-2 font-punk-heading text-[9px] uppercase text-punk-text-muted",
+        "hover:border-punk-primary hover:text-punk-accent hover:shadow-[0_0_10px_rgba(124,58,237,0.3)]",
+        "transition-all duration-200"
       )}
     >
-      <Plus className="h-4 w-4" />
-      新建分组
+      <Plus className="h-3 w-3" />
+      NEW_GROUP
     </button>
   )
 }
