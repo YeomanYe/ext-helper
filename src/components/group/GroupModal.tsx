@@ -355,7 +355,7 @@ export function GroupModal({
             )}
           </div>
 
-          {/* Right side: Name input + Count/Buttons, then Search bar below */}
+          {/* Right side: Name input + Count */}
           <div className="flex-1 flex flex-col gap-3">
             {/* Name input row with label */}
             <div className="flex items-center gap-3">
@@ -386,63 +386,88 @@ export function GroupModal({
                 </span>
               </div>
             </div>
-
-            {/* Search bar */}
-            <label className="block font-punk-heading text-[9px] text-punk-text-muted uppercase mb-1 pt-2">
-              SEARCH & FILTER
-            </label>
-            <SearchBar
-              value={searchQuery}
-              onChange={setSearchQuery}
-              placeholder="SEARCH_EXTENSIONS..."
-              activeFilter={filter}
-              onFilterChange={setFilter}
-            />
-
-            {/* Actions row */}
-            {isCreateMode ? null : (
-              <div className="flex items-center gap-2 pt-2">
-                <span className="font-punk-heading text-[8px] text-punk-text-muted uppercase">ACTIONS</span>
-                <button
-                  onClick={() => {
-                    if (!onToggleExtension) return
-                    extensions.forEach(ext => {
-                      if (!ext.enabled) onToggleExtension(ext.id)
-                    })
-                  }}
-                  disabled={extensions.length === 0 || allEnabled}
-                  className={cn(
-                    "px-2 py-1 text-[8px] font-punk-heading uppercase transition-all",
-                    extensions.length === 0 || allEnabled
-                      ? "bg-punk-success/20 text-punk-success/50 cursor-not-allowed"
-                      : "bg-punk-success/20 text-punk-success border border-punk-success/50 hover:bg-punk-success hover:text-white"
-                  )}
-                >
-                  ENABLE ALL
-                </button>
-                <button
-                  onClick={() => {
-                    if (!onToggleExtension) return
-                    extensions.forEach(ext => {
-                      if (ext.enabled) onToggleExtension(ext.id)
-                    })
-                  }}
-                  disabled={extensions.length === 0 || allDisabled}
-                  className={cn(
-                    "px-2 py-1 text-[8px] font-punk-heading uppercase transition-all",
-                    extensions.length === 0 || allDisabled
-                      ? "bg-punk-cta/20 text-punk-cta/50 cursor-not-allowed"
-                      : "bg-punk-cta/20 text-punk-cta border border-punk-cta/50 hover:bg-punk-cta hover:text-white"
-                  )}
-                >
-                  DISABLE ALL
-                </button>
-              </div>
-            )}
           </div>
         </div>
 
-        {/* Extension List */}
+        {/* Full width: SEARCH & FILTER */}
+        <div className="px-4 py-2 border-b border-punk-border/30 bg-punk-bg shrink-0">
+          <label className="block font-punk-heading text-[9px] text-punk-text-muted uppercase mb-1">
+            SEARCH & FILTER
+          </label>
+          <SearchBar
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder="SEARCH_EXTENSIONS..."
+            activeFilter={filter}
+            onFilterChange={setFilter}
+          />
+        </div>
+
+        {/* Full width: ACTIONS */}
+        {isCreateMode ? null : (
+          <div className="flex items-center gap-2 px-4 py-2 border-b border-punk-border/30 bg-punk-bg shrink-0">
+            <span className="font-punk-heading text-[8px] text-punk-text-muted uppercase">ACTIONS</span>
+            <button
+              onClick={() => {
+                if (!onToggleExtension) return
+                extensions.forEach(ext => {
+                  if (!ext.enabled) onToggleExtension(ext.id)
+                })
+              }}
+              disabled={extensions.length === 0 || allEnabled}
+              className={cn(
+                "px-2 py-1 text-[8px] font-punk-heading uppercase transition-all",
+                extensions.length === 0 || allEnabled
+                  ? "bg-punk-success/20 text-punk-success/50 cursor-not-allowed"
+                  : "bg-punk-success/20 text-punk-success border border-punk-success/50 hover:bg-punk-success hover:text-white"
+              )}
+            >
+              ENABLE ALL
+            </button>
+            <button
+              onClick={() => {
+                if (!onToggleExtension) return
+                extensions.forEach(ext => {
+                  if (ext.enabled) onToggleExtension(ext.id)
+                })
+              }}
+              disabled={extensions.length === 0 || allDisabled}
+              className={cn(
+                "px-2 py-1 text-[8px] font-punk-heading uppercase transition-all",
+                extensions.length === 0 || allDisabled
+                  ? "bg-punk-cta/20 text-punk-cta/50 cursor-not-allowed"
+                  : "bg-punk-cta/20 text-punk-cta border border-punk-cta/50 hover:bg-punk-cta hover:text-white"
+              )}
+            >
+              DISABLE ALL
+            </button>
+          </div>
+        )}
+
+        {/* Group member icons - just icons, no names */}
+        <div className="flex gap-2 px-4 py-2 border-b border-punk-border/30 bg-punk-bg shrink-0 overflow-x-auto">
+          {extensions.filter(ext => ext.isInGroup).map((ext) => (
+            <div
+              key={ext.id}
+              className="w-8 h-8 flex-shrink-0 border border-punk-border/30 bg-punk-bg-alt flex items-center justify-center"
+              style={{ borderColor: ext.enabled ? group?.color || selectedColor : undefined }}
+              onClick={() => handleToggleExtensionMembership(ext)}
+            >
+              {ext.iconUrl ? (
+                <img src={ext.iconUrl} className="w-full h-full object-cover" alt="" />
+              ) : (
+                <Package className="w-4 h-4 text-punk-text-muted" />
+              )}
+            </div>
+          ))}
+          {extensions.filter(ext => ext.isInGroup).length === 0 && (
+            <span className="font-punk-heading text-[8px] text-punk-text-muted uppercase">
+              NO SECTOR MEMBERS
+            </span>
+          )}
+        </div>
+
+        {/* Extension List - filtered extensions for adding/removing */}
         <div className="flex-1 overflow-y-auto p-3">
           {filteredExtensions.length > 0 ? (
             <div className="grid grid-cols-5 gap-2">
@@ -465,21 +490,6 @@ export function GroupModal({
                       ext.enabled ? "bg-punk-success" : "bg-punk-text-muted"
                     )}
                   />
-                  {/* Group icon badge */}
-                  {ext.isInGroup && (
-                    <div
-                      className="absolute bottom-1 right-1 w-4 h-4 flex items-center justify-center z-10 overflow-hidden"
-                      style={{ backgroundColor: (group?.color || selectedColor) + "40" }}
-                    >
-                      {groupIconUrl ? (
-                        <img src={groupIconUrl} className="w-full h-full object-cover" alt="" />
-                      ) : (
-                        <span style={{ color: group?.color || selectedColor }}>
-                          {ICON_MAP[group?.icon || "folder"] || <Folder className="w-2 h-2" />}
-                        </span>
-                      )}
-                    </div>
-                  )}
                   {/* Icon */}
                   {ext.iconUrl ? (
                     <img src={ext.iconUrl} className="w-8 h-8 border border-punk-border/30 object-cover" alt="" />
