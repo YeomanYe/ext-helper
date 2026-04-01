@@ -109,7 +109,7 @@ export function RuleEditor({ rule, onSave, onClose }: RuleEditorProps) {
               <label className="block font-punk-heading text-[9px] text-punk-text-muted uppercase mb-1.5">
                 ICON
               </label>
-              <div className="relative w-[88px] h-[88px] border border-punk-border/50 bg-punk-bg rounded overflow-hidden group">
+              <div className="relative w-[96px] h-[96px] border border-punk-border/50 bg-punk-bg rounded overflow-hidden group">
                 {iconUrl ? (
                   <>
                     <img
