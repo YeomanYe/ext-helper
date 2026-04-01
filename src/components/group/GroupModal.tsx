@@ -431,10 +431,11 @@ export function GroupModal({
                   key={ext.id}
                   onClick={() => handleToggleExtensionMembership(ext)}
                   className={cn(
-                    "relative flex flex-col items-center justify-center p-2 cursor-pointer transition-all border rounded",
+                    "relative flex flex-col items-center justify-center p-2 cursor-pointer transition-all border",
                     ext.isInGroup
                       ? "border-punk-success/50 bg-punk-success/5 hover:border-punk-success"
-                      : "border-punk-border/20 bg-punk-bg-alt hover:border-punk-primary/50"
+                      : "border-punk-border/20 bg-punk-bg-alt hover:border-punk-primary/50",
+                    "w-[72px] h-[72px]"
                   )}
                 >
                   {/* Status dot */}
@@ -447,7 +448,7 @@ export function GroupModal({
                   {/* Group icon badge */}
                   {ext.isInGroup && (
                     <div
-                      className="absolute bottom-1 right-1 w-4 h-4 rounded-sm flex items-center justify-center z-10 overflow-hidden"
+                      className="absolute bottom-1 right-1 w-4 h-4 flex items-center justify-center z-10 overflow-hidden"
                       style={{ backgroundColor: (group?.color || selectedColor) + "40" }}
                     >
                       {groupIconUrl ? (
@@ -472,8 +473,41 @@ export function GroupModal({
                     "font-punk-heading text-[6px] uppercase text-center truncate w-full mt-1",
                     ext.isInGroup ? "text-punk-text-primary" : "text-punk-text-muted"
                   )}>
-                    {ext.name.substring(0, 10)}
+                    {ext.name.substring(0, 8)}
                   </span>
+                  {/* ON/OFF buttons row */}
+                  <div className="flex gap-0.5 mt-0.5">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        if (ext.enabled) return
+                        if (onToggleExtension) onToggleExtension(ext.id)
+                      }}
+                      className={cn(
+                        "px-1 py-0.5 text-[5px] font-punk-heading uppercase transition-all",
+                        ext.enabled
+                          ? "bg-punk-success text-white"
+                          : "border border-punk-border/30 text-punk-text-muted hover:border-punk-success"
+                      )}
+                    >
+                      ON
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        if (!ext.enabled) return
+                        if (onToggleExtension) onToggleExtension(ext.id)
+                      }}
+                      className={cn(
+                        "px-1 py-0.5 text-[5px] font-punk-heading uppercase transition-all",
+                        !ext.enabled
+                          ? "bg-punk-cta text-white"
+                          : "border border-punk-border/30 text-punk-text-muted hover:border-punk-cta"
+                      )}
+                    >
+                      OFF
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
