@@ -355,7 +355,7 @@ export function GroupModal({
             )}
           </div>
 
-          {/* Right side: Name input + Count */}
+          {/* Right side: Name input + Count + Search */}
           <div className="flex-1 flex flex-col gap-3">
             {/* Name input row with label */}
             <div className="flex items-center gap-3">
@@ -386,21 +386,19 @@ export function GroupModal({
                 </span>
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* Full width: SEARCH & FILTER */}
-        <div className="px-4 py-2 border-b border-punk-border/30 bg-punk-bg shrink-0">
-          <label className="block font-punk-heading text-[9px] text-punk-text-muted uppercase mb-1">
-            SEARCH & FILTER
-          </label>
-          <SearchBar
-            value={searchQuery}
-            onChange={setSearchQuery}
-            placeholder="SEARCH_EXTENSIONS..."
-            activeFilter={filter}
-            onFilterChange={setFilter}
-          />
+            {/* Search bar */}
+            <label className="block font-punk-heading text-[9px] text-punk-text-muted uppercase mb-1">
+              SEARCH & FILTER
+            </label>
+            <SearchBar
+              value={searchQuery}
+              onChange={setSearchQuery}
+              placeholder="SEARCH_EXTENSIONS..."
+              activeFilter={filter}
+              onFilterChange={setFilter}
+            />
+          </div>
         </div>
 
         {/* Full width: ACTIONS */}
@@ -449,7 +447,7 @@ export function GroupModal({
           {extensions.filter(ext => ext.isInGroup).map((ext) => (
             <div
               key={ext.id}
-              className="w-8 h-8 flex-shrink-0 border border-punk-border/30 bg-punk-bg-alt flex items-center justify-center"
+              className="w-8 h-8 flex-shrink-0 border border-punk-border/30 bg-punk-bg-alt flex items-center justify-center overflow-hidden"
               style={{ borderColor: ext.enabled ? group?.color || selectedColor : undefined }}
               onClick={() => handleToggleExtensionMembership(ext)}
             >
