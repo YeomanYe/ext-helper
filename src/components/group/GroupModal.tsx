@@ -1,5 +1,5 @@
 import * as React from "react"
-import { X, Plus, Folder, Package, Star, Heart, Bookmark, Tag, Flag, Briefcase, Code, Globe, Lock, Settings, Wrench, Zap, Flame, Gem, Crown, Target, Image, Upload } from "lucide-react"
+import { X, Plus, Folder, Package, Star, Heart, Bookmark, Tag, Flag, Briefcase, Code, Globe, Lock, Settings, Wrench, Zap, Flame, Gem, Crown, Target, Image, Upload, AlertTriangle } from "lucide-react"
 import { cn } from "@/utils"
 import { SearchBar } from "@/components/popup"
 import type { Group, Extension, FilterType } from "@/types"
@@ -537,62 +537,75 @@ export function GroupModal({
 
         {/* Bottom Actions */}
         <div className="flex justify-end gap-2 px-4 py-3 border-t border-punk-border/30 shrink-0">
-          {showDeleteConfirm ? (
-            /* Delete Confirmation */
-            <div className="flex items-center gap-4 w-full">
-              <span className="flex-1 font-punk-body text-[10px] text-punk-text-secondary">
-                Delete "{group?.name}"? This cannot be undone.
-              </span>
-              <button
-                onClick={() => setShowDeleteConfirm(false)}
-                className="px-3 py-1.5 font-punk-heading text-[8px] text-punk-text-muted uppercase tracking-wide hover:text-punk-text-primary transition-colors"
-              >
-                CANCEL
-              </button>
-              <button
-                onClick={() => {
-                  if (group && onDeleteGroup) {
-                    onDeleteGroup(group.id)
-                    onClose()
-                  }
-                }}
-                className="px-3 py-1.5 font-punk-heading text-[8px] text-white uppercase tracking-wide bg-punk-cta hover:bg-punk-cta/80 transition-colors"
-              >
-                DELETE
-              </button>
-            </div>
-          ) : (
-            /* Normal Actions */
-            <>
-              {isCreateMode ? null : (
+          {isCreateMode ? null : (
+            <button
+              onClick={() => setShowDeleteConfirm(true)}
+              className="mr-auto px-3 py-1.5 font-punk-heading text-[8px] text-punk-cta uppercase tracking-wide hover:bg-punk-cta/10 transition-colors"
+            >
+              DELETE
+            </button>
+          )}
+          <button
+            onClick={onClose}
+            className="px-4 py-2 font-punk-heading text-[9px] text-punk-text-muted uppercase tracking-wide hover:text-punk-text-primary transition-colors"
+          >
+            CANCEL
+          </button>
+          <button
+            onClick={isCreateMode ? handleCreate : onClose}
+            disabled={isCreateMode && !canCreate}
+            className={cn(
+              "px-4 py-2 font-punk-heading text-[9px] uppercase tracking-wide transition-colors",
+              (isCreateMode && canCreate) || !isCreateMode
+                ? "bg-punk-primary text-white hover:bg-punk-primary/80"
+                : "bg-punk-border/50 text-punk-text-muted cursor-not-allowed"
+            )}
+          >
+            CONFIRM
+          </button>
+        </div>
+
+        {/* Delete Confirmation Modal */}
+        {showDeleteConfirm && (
+          <div
+            className="fixed inset-0 z-[60] flex items-center justify-center bg-punk-bg/80 backdrop-blur-sm"
+            onClick={() => setShowDeleteConfirm(false)}
+          >
+            <div
+              className="w-[320px] border border-punk-border bg-punk-bg-alt shadow-[0_0_30px_rgba(124,58,237,0.4)] p-4"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center gap-2 mb-3">
+                <AlertTriangle className="w-5 h-5 text-punk-cta" />
+                <span className="font-punk-heading text-sm text-punk-text-primary uppercase">
+                  Delete "{group?.name}"?
+                </span>
+              </div>
+              <p className="font-punk-body text-[10px] text-punk-text-muted mb-4">
+                This action cannot be undone.
+              </p>
+              <div className="flex justify-end gap-2">
                 <button
-                  onClick={() => setShowDeleteConfirm(true)}
-                  className="mr-auto px-3 py-1.5 font-punk-heading text-[8px] text-punk-cta uppercase tracking-wide hover:bg-punk-cta/10 transition-colors"
+                  onClick={() => setShowDeleteConfirm(false)}
+                  className="px-4 py-2 font-punk-heading text-[9px] text-punk-text-muted uppercase tracking-wide hover:text-punk-text-primary transition-colors"
+                >
+                  CANCEL
+                </button>
+                <button
+                  onClick={() => {
+                    if (group && onDeleteGroup) {
+                      onDeleteGroup(group.id)
+                      onClose()
+                    }
+                  }}
+                  className="px-4 py-2 font-punk-heading text-[9px] text-white uppercase tracking-wide bg-punk-cta hover:bg-punk-cta/80 transition-colors"
                 >
                   DELETE
                 </button>
-              )}
-              <button
-                onClick={onClose}
-                className="px-4 py-2 font-punk-heading text-[9px] text-punk-text-muted uppercase tracking-wide hover:text-punk-text-primary transition-colors"
-              >
-                CANCEL
-              </button>
-              <button
-                onClick={isCreateMode ? handleCreate : onClose}
-                disabled={isCreateMode && !canCreate}
-                className={cn(
-                  "px-4 py-2 font-punk-heading text-[9px] uppercase tracking-wide transition-colors",
-                  (isCreateMode && canCreate) || !isCreateMode
-                    ? "bg-punk-primary text-white hover:bg-punk-primary/80"
-                    : "bg-punk-border/50 text-punk-text-muted cursor-not-allowed"
-                )}
-              >
-                CONFIRM
-              </button>
-            </>
-          )}
-        </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
