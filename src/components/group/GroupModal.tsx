@@ -485,7 +485,7 @@ export function GroupModal({
         {/* Extension List - filtered extensions for adding/removing */}
         <div className="flex-1 overflow-y-auto p-3 min-h-0">
           {filteredExtensions.length > 0 ? (
-            <div className="grid grid-cols-5 gap-2 auto-rows-fr">
+            <div className="grid grid-cols-5 gap-2" style={{ gridAutoRows: "72px" }}>
               {filteredExtensions.map((ext) => (
                 <div
                   key={ext.id}
@@ -494,9 +494,9 @@ export function GroupModal({
                     "relative flex flex-col items-center justify-center p-2 cursor-pointer transition-all border",
                     ext.isInGroup
                       ? "border-punk-success/50 bg-punk-success/5 hover:border-punk-success"
-                      : "border-punk-border/20 bg-punk-bg-alt hover:border-punk-primary/50",
-                    "w-[72px] h-[72px]"
+                      : "border-punk-border/20 bg-punk-bg-alt hover:border-punk-primary/50"
                   )}
+                  style={{ height: "72px" }}
                 >
                   {/* Status dot */}
                   <div
