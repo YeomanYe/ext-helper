@@ -576,12 +576,12 @@ export function GroupModal({
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center gap-2 mb-3">
-                <AlertTriangle className="w-5 h-5 text-punk-cta" />
-                <span className="font-punk-heading text-sm text-punk-text-primary uppercase">
+                <AlertTriangle className="w-4 h-4 text-punk-cta" />
+                <span className="font-punk-heading text-[10px] text-punk-text-muted uppercase tracking-wide">
                   Delete "{group?.name}"?
                 </span>
               </div>
-              <p className="font-punk-body text-[10px] text-punk-text-muted mb-4">
+              <p className="font-punk-body text-sm text-punk-text-primary mb-4">
                 This action cannot be undone.
               </p>
               <div className="flex justify-end gap-2">
