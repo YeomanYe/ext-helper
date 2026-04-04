@@ -34,7 +34,8 @@ export function PopupPage() {
     createGroup,
     addToGroup,
     removeFromGroup,
-    updateGroup
+    updateGroup,
+    deleteGroup
   } = useGroupStore()
 
   const {
@@ -266,6 +267,7 @@ export function PopupPage() {
           onToggleExtension={selectedGroup ? handleToggleExtension : undefined}
           onOpenOptions={selectedGroup ? handleOpenOptions : undefined}
           onRemove={selectedGroup ? handleRemove : undefined}
+          onDeleteGroup={selectedGroup ? deleteGroup : undefined}
           onAddExtension={selectedGroup ? addToGroup : undefined}
           onRemoveFromGroup={selectedGroup ? removeFromGroup : undefined}
           onUpdateGroup={selectedGroup ? updateGroup : undefined}

@@ -131,6 +131,7 @@ interface GroupModalProps {
   onToggleExtension?: (id: string) => void
   onOpenOptions?: (id: string) => void
   onRemove?: (id: string) => void
+  onDeleteGroup?: (id: string) => void
   onAddExtension?: (groupId: string, extId: string) => void
   onRemoveFromGroup?: (groupId: string, extId: string) => void
   onUpdateGroup?: (groupId: string, updates: { name?: string; color?: string; icon?: string; iconUrl?: string }) => void
@@ -145,6 +146,7 @@ export function GroupModal({
   onToggleExtension,
   onOpenOptions,
   onRemove,
+  onDeleteGroup,
   onAddExtension,
   onRemoveFromGroup,
   onUpdateGroup
@@ -153,7 +155,8 @@ export function GroupModal({
 
   const [searchQuery, setSearchQuery] = React.useState("")
   const [filter, setFilter] = React.useState<FilterType>("all")
-  const [editName, setEditName] = React.useState(group?.name || "New Sector")
+  const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false)
+  const [editName, setEditName] = React.useState(group?.name || "New Group")
   const [selectedColor, setSelectedColor] = React.useState(group?.color || GROUP_COLORS[0])
   const [editIconUrl, setEditIconUrl] = React.useState((group as any)?.iconUrl || "")
   const [selectedExtensions, setSelectedExtensions] = React.useState<Set<string>>(new Set())
@@ -534,24 +537,61 @@ export function GroupModal({
 
         {/* Bottom Actions */}
         <div className="flex justify-end gap-2 px-4 py-3 border-t border-punk-border/30 shrink-0">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 font-punk-heading text-[9px] text-punk-text-muted uppercase tracking-wide hover:text-punk-text-primary transition-colors"
-          >
-            CANCEL
-          </button>
-          <button
-            onClick={isCreateMode ? handleCreate : onClose}
-            disabled={isCreateMode && !canCreate}
-            className={cn(
-              "px-4 py-2 font-punk-heading text-[9px] uppercase tracking-wide transition-colors",
-              (isCreateMode && canCreate) || !isCreateMode
-                ? "bg-punk-primary text-white hover:bg-punk-primary/80"
-                : "bg-punk-border/50 text-punk-text-muted cursor-not-allowed"
-            )}
-          >
-            CONFIRM
-          </button>
+          {showDeleteConfirm ? (
+            /* Delete Confirmation */
+            <div className="flex items-center gap-4 w-full">
+              <span className="flex-1 font-punk-body text-[10px] text-punk-text-secondary">
+                Delete "{group?.name}"? This cannot be undone.
+              </span>
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                className="px-3 py-1.5 font-punk-heading text-[8px] text-punk-text-muted uppercase tracking-wide hover:text-punk-text-primary transition-colors"
+              >
+                CANCEL
+              </button>
+              <button
+                onClick={() => {
+                  if (group && onDeleteGroup) {
+                    onDeleteGroup(group.id)
+                    onClose()
+                  }
+                }}
+                className="px-3 py-1.5 font-punk-heading text-[8px] text-white uppercase tracking-wide bg-punk-cta hover:bg-punk-cta/80 transition-colors"
+              >
+                DELETE
+              </button>
+            </div>
+          ) : (
+            /* Normal Actions */
+            <>
+              {isCreateMode ? null : (
+                <button
+                  onClick={() => setShowDeleteConfirm(true)}
+                  className="mr-auto px-3 py-1.5 font-punk-heading text-[8px] text-punk-cta uppercase tracking-wide hover:bg-punk-cta/10 transition-colors"
+                >
+                  DELETE
+                </button>
+              )}
+              <button
+                onClick={onClose}
+                className="px-4 py-2 font-punk-heading text-[9px] text-punk-text-muted uppercase tracking-wide hover:text-punk-text-primary transition-colors"
+              >
+                CANCEL
+              </button>
+              <button
+                onClick={isCreateMode ? handleCreate : onClose}
+                disabled={isCreateMode && !canCreate}
+                className={cn(
+                  "px-4 py-2 font-punk-heading text-[9px] uppercase tracking-wide transition-colors",
+                  (isCreateMode && canCreate) || !isCreateMode
+                    ? "bg-punk-primary text-white hover:bg-punk-primary/80"
+                    : "bg-punk-border/50 text-punk-text-muted cursor-not-allowed"
+                )}
+              >
+                CONFIRM
+              </button>
+            </>
+          )}
         </div>
       </div>
     </div>
