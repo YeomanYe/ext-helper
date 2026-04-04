@@ -1,5 +1,7 @@
 // Development mode storage - simulates browser storage in memory
-import type { Extension, Group, Rule } from "@/types"
+import type { Extension, Group } from "@/types"
+import type { Rule } from "@/rules/types"
+import { MOCK_EXTENSIONS, MOCK_GROUPS, MOCK_RULES } from "./mockData"
 
 class DevStorage {
   private extensions: Extension[] = []
@@ -19,11 +21,16 @@ class DevStorage {
       const rls = localStorage.getItem("dev-rules")
       const prefs = localStorage.getItem("dev-preferences")
       if (ext) this.extensions = JSON.parse(ext)
+      else this.extensions = MOCK_EXTENSIONS
       if (grp) this.groups = JSON.parse(grp)
+      else this.groups = MOCK_GROUPS
       if (rls) this.rules = JSON.parse(rls)
+      else this.rules = MOCK_RULES
       if (prefs) this.preferences = JSON.parse(prefs)
     } catch {
-      // Ignore parse errors
+      this.extensions = MOCK_EXTENSIONS
+      this.groups = MOCK_GROUPS
+      this.rules = MOCK_RULES
     }
   }
 

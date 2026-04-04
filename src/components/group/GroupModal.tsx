@@ -69,7 +69,7 @@ export function GroupChip({
           <span style={{ color: group.color }}>{displayIcon}</span>
         </div>
       )}
-      <span className="font-punk-heading text-[9px] text-punk-text-primary uppercase tracking-wide">
+      <span className="font-punk-heading text-[9px] text-punk-text-primary tracking-wide">
         {group.name}
       </span>
       <span className="font-punk-code text-[10px] text-punk-accent px-1.5 py-0.5 border border-punk-accent/30 bg-punk-accent/5">
@@ -105,8 +105,7 @@ export function CreateGroupChip({ onClick }: CreateGroupChipProps) {
       onClick={onClick}
       className={cn(
         "flex items-center gap-2 px-3 py-2 transition-all duration-200",
-        "border border-dashed border-punk-border/30 text-punk-text-muted",
-        "hover:border-punk-accent hover:text-punk-accent hover:bg-punk-accent/5"
+        "border border-dashed border-punk-accent text-punk-accent bg-punk-accent/5"
       )}
     >
       <Folder className="h-3.5 w-3.5" />
@@ -300,7 +299,7 @@ export function GroupModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-punk-bg/80 backdrop-blur-sm" onClick={onClose}>
       <div
-        className="w-[480px] max-h-[600px] border border-punk-border bg-punk-bg-alt shadow-[0_0_30px_rgba(124,58,237,0.4)] overflow-hidden flex flex-col"
+        className="w-[480px] h-[575px] border border-punk-border bg-punk-bg-alt shadow-[0_0_30px_rgba(124,58,237,0.4)] overflow-hidden flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header - Icon with name input and search */}
@@ -370,13 +369,22 @@ export function GroupModal({
                     </div>
                   </>
                 ) : (
-                  <div
-                    className="flex flex-col items-center justify-center w-full h-full cursor-pointer hover:bg-punk-bg-alt transition-colors"
-                    style={{ color: group.color }}
-                    onClick={() => fileInputRef.current?.click()}
-                  >
-                    {ICON_MAP[group?.icon || "folder"]}
-                  </div>
+                  <>
+                    <div
+                      className="flex flex-col items-center justify-center w-full h-full cursor-pointer hover:bg-punk-bg-alt transition-colors"
+                      style={{ color: group.color }}
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      {ICON_MAP[group?.icon || "folder"]}
+                    </div>
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                    />
+                  </>
                 )}
               </div>
             )}
@@ -467,8 +475,10 @@ export function GroupModal({
           {extensionsWithStatus.filter(ext => ext.isInGroup).map((ext) => (
             <div
               key={ext.id}
-              className="w-8 h-8 flex-shrink-0 border border-punk-border/30 bg-punk-bg-alt flex items-center justify-center overflow-hidden"
-              style={{ borderColor: ext.enabled ? group?.color || selectedColor : undefined }}
+              className={cn(
+                "w-8 h-8 flex-shrink-0 border bg-punk-bg-alt flex items-center justify-center overflow-hidden",
+                ext.enabled ? "border-punk-success" : "border-punk-border/30"
+              )}
               onClick={() => handleToggleExtensionMembership(ext)}
             >
               {ext.iconUrl ? (
@@ -479,14 +489,16 @@ export function GroupModal({
             </div>
           ))}
           {extensionsWithStatus.filter(ext => ext.isInGroup).length === 0 && (
-            <span className="font-punk-heading text-[8px] text-punk-text-muted uppercase">
-              NO GROUP MEMBERS
-            </span>
+            <div className="h-8 flex items-center">
+              <span className="font-punk-heading text-[8px] text-punk-text-muted uppercase">
+                NO GROUP MEMBERS
+              </span>
+            </div>
           )}
         </div>
 
         {/* Extension List - filtered extensions for adding/removing */}
-        <div className="overflow-y-auto" style={{ maxHeight: "calc(600px - 340px)" }}>
+        <div className="flex-1 overflow-y-auto min-h-0">
           {filteredExtensions.length > 0 ? (
             <div className="grid grid-cols-5 gap-2 p-3" style={{ gridAutoRows: "72px" }}>
               {filteredExtensions.map((ext) => (
@@ -536,7 +548,7 @@ export function GroupModal({
         </div>
 
         {/* Bottom Actions */}
-        <div className="flex justify-end gap-2 px-4 py-3 border-t border-punk-border/30 shrink-0">
+        <div className="flex justify-end gap-2 px-4 py-2 border-t border-punk-border/30 shrink-0 mt-auto">
           {isCreateMode ? null : (
             <button
               onClick={() => setShowDeleteConfirm(true)}
@@ -549,20 +561,22 @@ export function GroupModal({
             onClick={onClose}
             className="px-4 py-2 font-punk-heading text-[9px] text-punk-text-muted uppercase tracking-wide hover:text-punk-text-primary transition-colors"
           >
-            CANCEL
+            {isCreateMode ? "CANCEL" : "CLOSE"}
           </button>
-          <button
-            onClick={isCreateMode ? handleCreate : onClose}
-            disabled={isCreateMode && !canCreate}
-            className={cn(
-              "px-4 py-2 font-punk-heading text-[9px] uppercase tracking-wide transition-colors",
-              (isCreateMode && canCreate) || !isCreateMode
-                ? "bg-punk-primary text-white hover:bg-punk-primary/80"
-                : "bg-punk-border/50 text-punk-text-muted cursor-not-allowed"
-            )}
-          >
-            CONFIRM
-          </button>
+          {isCreateMode && (
+            <button
+              onClick={handleCreate}
+              disabled={!canCreate}
+              className={cn(
+                "px-4 py-2 font-punk-heading text-[9px] uppercase tracking-wide transition-colors",
+                canCreate
+                  ? "bg-punk-primary text-white hover:bg-punk-primary/80"
+                  : "bg-punk-border/50 text-punk-text-muted cursor-not-allowed"
+              )}
+            >
+              CONFIRM
+            </button>
+          )}
         </div>
 
         {/* Delete Confirmation Modal */}

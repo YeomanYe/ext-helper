@@ -27,7 +27,7 @@ export function RuleList({ rules, extensions, groups, onToggle, onEdit, onDelete
   }
 
   return (
-    <div className="space-y-2">
+    <div className="flex flex-wrap gap-2">
       {rules.map((rule) => (
         <RuleCard
           key={rule.id}

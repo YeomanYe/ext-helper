@@ -30,7 +30,7 @@ function createDefaultConditionGroup(): ConditionGroup {
 }
 
 export function RuleEditor({ rule, onSave, onClose }: RuleEditorProps) {
-  const [name, setName] = React.useState(rule?.name || "")
+  const [name, setName] = React.useState(rule?.name || "New Rule")
   const [description, setDescription] = React.useState(rule?.description || "")
   const [iconUrl, setIconUrl] = React.useState(rule?.iconUrl || "")
   // Always have at least one condition group

@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Settings, X, LayoutGrid, List, ChevronDown, FileText } from "lucide-react"
+import { X, LayoutGrid, List, ChevronDown, FileText } from "lucide-react"
 import { cn } from "@/utils"
 import type { FilterType, ViewMode } from "@/types"
 
@@ -123,12 +123,11 @@ export function QuickFilters({ activeFilter, onFilterChange }: QuickFiltersProps
 }
 
 interface HeaderProps {
-  onSettingsClick?: () => void
   viewMode?: ViewMode
   onViewModeChange?: (mode: ViewMode) => void
 }
 
-export function Header({ onSettingsClick, viewMode = "compact", onViewModeChange }: HeaderProps) {
+export function Header({ viewMode = "compact", onViewModeChange }: HeaderProps) {
   return (
     <header className="relative flex items-center justify-between border-b-2 border-punk-primary bg-punk-bg px-4 py-3 hud-corner">
       {/* Decorative scanline */}
@@ -148,7 +147,7 @@ export function Header({ onSettingsClick, viewMode = "compact", onViewModeChange
         </div>
 
         <div className="flex flex-col">
-          <h1 className="font-punk-heading text-xs text-punk-neon-cyan glitch" data-text="EXTHELPER">
+          <h1 className="font-punk-heading text-xs text-punk-neon-cyan">
             EXTHELPER
           </h1>
           <span className="font-punk-body text-punk-text-muted text-sm tracking-wider">
@@ -200,18 +199,6 @@ export function Header({ onSettingsClick, viewMode = "compact", onViewModeChange
             <span className="text-[6px] font-punk-heading uppercase">DETAIL</span>
           </button>
         </div>
-
-        <button
-          onClick={onSettingsClick}
-          className="relative group"
-        >
-          <div className="flex h-9 w-9 items-center justify-center border-2 border-punk-primary/50 bg-punk-bg-alt hover:border-punk-cta transition-all duration-200 hover:shadow-neon-cta">
-            <Settings className="h-4 w-4 text-punk-secondary group-hover:text-punk-cta" />
-          </div>
-          {/* Corner accents */}
-          <div className="absolute top-0 left-0 w-2 h-2 border-l-2 border-t-2 border-punk-cta opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute bottom-0 right-0 w-2 h-2 border-r-2 border-b-2 border-punk-cta opacity-0 group-hover:opacity-100 transition-opacity" />
-        </button>
       </div>
     </header>
   )

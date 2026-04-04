@@ -163,7 +163,7 @@ export function PopupPage() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 overflow-hidden">
+      <div className="flex flex-1 flex-col overflow-hidden">
         {activeTab === "extensions" ? (
           <>
             {/* Search */}
@@ -199,7 +199,7 @@ export function PopupPage() {
             </div>
 
             {/* Extension List */}
-            <div className="h-full overflow-y-auto p-3 pb-8">
+            <div className="flex-1 min-h-0 overflow-y-auto p-3">
               {error ? (
                 <div className="flex flex-col items-center justify-center py-12 text-center">
                   <p className="font-punk-body text-base text-punk-cta">ERROR: {error}</p>
@@ -237,7 +237,7 @@ export function PopupPage() {
       {/* Unified Group Modal */}
       {(selectedGroup || showCreateModal) && (
         <GroupModal
-          group={selectedGroup}
+          group={selectedGroup ?? undefined}
           extensions={selectedGroup ? selectedGroupExtensions : undefined}
           allExtensions={displayExtensions}
           onClose={() => {
