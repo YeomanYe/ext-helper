@@ -483,9 +483,9 @@ export function GroupModal({
         </div>
 
         {/* Extension List - filtered extensions for adding/removing */}
-        <div className="flex-1 overflow-y-auto p-3 min-h-0">
+        <div className="overflow-y-auto" style={{ maxHeight: "calc(600px - 340px)" }}>
           {filteredExtensions.length > 0 ? (
-            <div className="grid grid-cols-5 gap-2" style={{ gridAutoRows: "72px" }}>
+            <div className="grid grid-cols-5 gap-2 p-3" style={{ gridAutoRows: "72px" }}>
               {filteredExtensions.map((ext) => (
                 <div
                   key={ext.id}
