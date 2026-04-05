@@ -1,8 +1,7 @@
 import * as React from "react"
-import { ChevronDown } from "lucide-react"
-import { Header, Footer, SearchBar } from "@/components/popup"
+import { Header, Footer, SearchBar, ExtensionsActionsMenu, BisectBanner } from "@/components/popup"
 import { ExtensionCard } from "@/components/extension"
-import { GroupChip, CreateGroupChip, GroupModal } from "@/components/group"
+import { GroupModal, GroupsBar } from "@/components/group"
 import { RuleManager } from "@/components/rules"
 import {
   useExtensionStore,
@@ -71,8 +70,6 @@ export function PopupPage() {
   // Modal state
   const [selectedGroupId, setSelectedGroupId] = React.useState<string | null>(null)
   const [showCreateModal, setShowCreateModal] = React.useState(false)
-  const [showTabActions, setShowTabActions] = React.useState(false)
-  const tabActionsRef = React.useRef<HTMLDivElement>(null)
 
   // Get selected group
   const selectedGroup = React.useMemo(() => {
@@ -100,16 +97,6 @@ export function PopupPage() {
     fetchExtensions()
     fetchGroups()
   }, [fetchExtensions, fetchGroups])
-
-  React.useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (tabActionsRef.current && !tabActionsRef.current.contains(event.target as Node)) {
-        setShowTabActions(false)
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside)
-    return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [])
 
   const handleOpenOptions = React.useCallback(async (id: string) => {
     if (devMode) return
@@ -196,102 +183,23 @@ export function PopupPage() {
             </button>
           </div>
           {activeTab === "extensions" && (
-            <div className="relative ml-auto" ref={tabActionsRef}>
-              <button
-                onClick={() => setShowTabActions((value) => !value)}
-                className="flex h-8 items-center gap-1 border border-punk-border/30 bg-punk-bg-alt px-2 text-[11px] font-punk-heading uppercase tracking-wider text-punk-text-muted transition-all hover:border-punk-accent/50 hover:text-punk-accent"
-              >
-                ACTIONS
-                <ChevronDown className={cn("h-3 w-3 transition-transform", showTabActions && "rotate-180")} />
-              </button>
-              {showTabActions && (
-                <div className="absolute right-0 top-full z-50 mt-1 w-40 border border-punk-border bg-punk-bg-alt shadow-[0_0_20px_rgba(124,58,237,0.3)]">
-                  {!isBisectActive && (
-                    <button
-                      onClick={() => {
-                        void startBisect()
-                        setShowTabActions(false)
-                      }}
-                      disabled={extensions.filter((ext) => ext.enabled).length < 2}
-                      className="w-full px-3 py-2 text-left font-punk-heading text-[11px] uppercase tracking-wider text-punk-text-secondary transition-colors hover:bg-punk-bg hover:text-punk-text-primary disabled:cursor-not-allowed disabled:opacity-40"
-                    >
-                      Start Bisect
-                    </button>
-                  )}
-                  {isBisectActive && !isBisectResolved && (
-                    <>
-                      <button
-                        onClick={() => {
-                          void markBisectGood()
-                          setShowTabActions(false)
-                        }}
-                        className="w-full px-3 py-2 text-left font-punk-heading text-[11px] uppercase tracking-wider text-punk-success transition-colors hover:bg-punk-bg"
-                      >
-                        Bisect Good
-                      </button>
-                      <button
-                        onClick={() => {
-                          void markBisectBad()
-                          setShowTabActions(false)
-                        }}
-                        className="w-full px-3 py-2 text-left font-punk-heading text-[11px] uppercase tracking-wider text-punk-cta transition-colors hover:bg-punk-bg"
-                      >
-                        Bisect Bad
-                      </button>
-                      <button
-                        onClick={() => {
-                          void cancelBisect()
-                          setShowTabActions(false)
-                        }}
-                        className="w-full px-3 py-2 text-left font-punk-heading text-[11px] uppercase tracking-wider text-punk-text-secondary transition-colors hover:bg-punk-bg hover:text-punk-text-primary"
-                      >
-                        Cancel Bisect
-                      </button>
-                    </>
-                  )}
-                  <button
-                    onClick={() => {
-                      void setExtensionsEnabled(displayedExtensions.map((ext) => ext.id), true)
-                      setShowTabActions(false)
-                    }}
-                    disabled={isBisectActive}
-                    className="w-full px-3 py-2 text-left font-punk-heading text-[11px] uppercase tracking-wider text-punk-text-secondary transition-colors hover:bg-punk-bg hover:text-punk-text-primary"
-                  >
-                    Enable All
-                  </button>
-                  <button
-                    onClick={() => {
-                      void setExtensionsEnabled(displayedExtensions.map((ext) => ext.id), false)
-                      setShowTabActions(false)
-                    }}
-                    disabled={isBisectActive}
-                    className="w-full px-3 py-2 text-left font-punk-heading text-[11px] uppercase tracking-wider text-punk-text-secondary transition-colors hover:bg-punk-bg hover:text-punk-text-primary"
-                  >
-                    Disable All
-                  </button>
-                  <button
-                    onClick={() => {
-                      void undoExtensions()
-                      setShowTabActions(false)
-                    }}
-                    disabled={!canUndo || isBisectActive}
-                    className="w-full px-3 py-2 text-left font-punk-heading text-[11px] uppercase tracking-wider text-punk-text-secondary transition-colors hover:bg-punk-bg hover:text-punk-text-primary disabled:cursor-not-allowed disabled:opacity-40"
-                  >
-                    Undo [{undoCount}]
-                  </button>
-                  <button
-                    onClick={() => {
-                      void redoExtensions()
-                      setShowTabActions(false)
-                    }}
-                    disabled={!canRedo || isBisectActive}
-                    className="w-full px-3 py-2 text-left font-punk-heading text-[11px] uppercase tracking-wider text-punk-text-secondary transition-colors hover:bg-punk-bg hover:text-punk-text-primary disabled:cursor-not-allowed disabled:opacity-40"
-                  >
-                    Redo [{redoCount}]
-                  </button>
-                </div>
-              )}
-            </div>
+            <ExtensionsActionsMenu
+              enabledExtensionCount={extensions.filter((ext) => ext.enabled).length}
+              isBisectActive={isBisectActive}
+              isBisectResolved={isBisectResolved}
+              canUndo={canUndo}
+              canRedo={canRedo}
+              undoCount={undoCount}
+              redoCount={redoCount}
+              onStartBisect={() => void startBisect()}
+              onBisectGood={() => void markBisectGood()}
+              onBisectBad={() => void markBisectBad()}
+              onCancelBisect={() => void cancelBisect()}
+              onEnableAll={() => void setExtensionsEnabled(displayedExtensions.map((ext) => ext.id), true)}
+              onDisableAll={() => void setExtensionsEnabled(displayedExtensions.map((ext) => ext.id), false)}
+              onUndo={() => void undoExtensions()}
+              onRedo={() => void redoExtensions()}
+            />
           )}
         </div>
       </div>
@@ -310,85 +218,23 @@ export function PopupPage() {
               />
             </div>
 
-            {isBisectActive && (
-              <div className="flex-shrink-0 border-b border-punk-border/30 bg-punk-bg px-3 py-3">
-                <div className="border border-punk-warning/40 bg-punk-bg-alt px-3 py-2.5">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="space-y-1">
-                      <p className="font-punk-heading text-[12px] uppercase tracking-wider text-punk-warning">
-                        {isBisectResolved ? "Bisect Resolved" : `Bisect Step ${bisectSession.step}`}
-                      </p>
-                      <p className="font-punk-body text-sm text-punk-text-secondary">
-                        {isBisectResolved
-                          ? `Suspect: ${bisectResultExtension?.name ?? bisectSession.resultId ?? "Unknown extension"}. Current state is preserved until you restore it.`
-                          : "Good means the issue disappeared. Bad means the issue is still present."}
-                      </p>
-                      <p className="font-punk-code text-[10px] uppercase tracking-wider text-punk-text-muted">
-                        Candidates {bisectSession.candidateIds.length} · Testing {bisectSession.currentTestIds.length}
-                      </p>
-                    </div>
-                    {!isBisectResolved && (
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => void markBisectGood()}
-                          className="border border-punk-success/50 bg-punk-success/10 px-3 py-1.5 font-punk-heading text-[11px] uppercase tracking-wider text-punk-success transition-colors hover:bg-punk-success/20"
-                        >
-                          Good
-                        </button>
-                        <button
-                          onClick={() => void markBisectBad()}
-                          className="border border-punk-cta/50 bg-punk-cta/10 px-3 py-1.5 font-punk-heading text-[11px] uppercase tracking-wider text-punk-cta transition-colors hover:bg-punk-cta/20"
-                        >
-                          Bad
-                        </button>
-                        <button
-                          onClick={() => void cancelBisect()}
-                          className="border border-punk-border/30 px-3 py-1.5 font-punk-heading text-[11px] uppercase tracking-wider text-punk-text-muted transition-colors hover:border-punk-accent/50 hover:text-punk-text-primary"
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                    )}
-                    {isBisectResolved && (
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => void finishBisectRestore()}
-                          className="border border-punk-border/30 px-3 py-1.5 font-punk-heading text-[11px] uppercase tracking-wider text-punk-text-muted transition-colors hover:border-punk-accent/50 hover:text-punk-text-primary"
-                        >
-                          Restore Original
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
+            <BisectBanner
+              bisectSession={bisectSession}
+              resultExtension={bisectResultExtension}
+              onGood={() => void markBisectGood()}
+              onBad={() => void markBisectBad()}
+              onCancel={() => void cancelBisect()}
+              onRestore={() => void finishBisectRestore()}
+            />
 
-            {/* Group Chips */}
-            <div className="flex-shrink-0 px-3 py-2 border-b border-punk-border/30">
-              <div className="flex flex-wrap gap-2">
-                {/* Group chips */}
-                {displayGroups.map((group) => {
-                  const groupExtensions = displayExtensions.filter(ext => group.extensionIds.includes(ext.id))
-                  const count = groupExtensions.length
-                  const allEnabled = count > 0 && groupExtensions.every((ext) => ext.enabled)
-                  return (
-                    <GroupChip
-                      key={group.id}
-                      group={group}
-                      extensionCount={count}
-                      allEnabled={allEnabled}
-                      disabled={isBisectActive}
-                      onClick={() => setSelectedGroupId(group.id)}
-                      onToggle={() => handleToggleGroup(group)}
-                    />
-                  )
-                })}
-
-                {/* Create group chip */}
-                <CreateGroupChip onClick={() => setShowCreateModal(true)} />
-              </div>
-            </div>
+            <GroupsBar
+              groups={displayGroups}
+              extensions={displayExtensions}
+              disabled={isBisectActive}
+              onSelectGroup={setSelectedGroupId}
+              onToggleGroup={handleToggleGroup}
+              onCreateGroup={() => setShowCreateModal(true)}
+            />
 
             {/* Extension List */}
             <div

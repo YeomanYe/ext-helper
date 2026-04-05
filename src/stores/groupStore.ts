@@ -1,11 +1,6 @@
 import { create } from "zustand"
 import type { Group, GroupStore } from "@/types"
-import { browserAdapter } from "@/services/browser/adapter"
-import { devStorage } from "@/services/devStorage"
-import { isDevMode } from "@/services/mockData"
-import { MOCK_GROUPS } from "@/services/mockData"
-
-const STORAGE_KEY = "ext-helper-groups"
+import { groupsRepo } from "@/services/groupsRepo"
 
 export const useGroupStore = create<GroupStore>((set, get) => ({
   groups: [],
@@ -15,17 +10,7 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
 
   fetchGroups: async () => {
     try {
-      let groups
-      if (isDevMode()) {
-        const stored = devStorage.getGroups()
-        if (stored.length === 0) {
-          devStorage.setGroups(MOCK_GROUPS)
-        }
-        groups = devStorage.getGroups()
-      } else {
-        groups = (await browserAdapter.getStorage(STORAGE_KEY)) || []
-      }
-      set({ groups })
+      set({ groups: await groupsRepo.fetchAll() })
     } catch (error) {
       console.error("Failed to fetch groups:", error)
       set({ groups: [] })
@@ -35,7 +20,7 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
   createGroup: async (name: string, color: string = "#6366F1") => {
     const { groups } = get()
     const newGroup: Group = {
-      id: devStorage.generateId(),
+      id: groupsRepo.generateId(),
       name,
       color,
       icon: "folder",
@@ -50,11 +35,7 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
     set({ groups: newGroups })
 
     try {
-      if (isDevMode()) {
-        devStorage.setGroups(newGroups)
-      } else {
-        await browserAdapter.setStorage(STORAGE_KEY, newGroups)
-      }
+      await groupsRepo.saveAll(newGroups)
     } catch (error) {
       console.error("Failed to save group:", error)
       set({ groups })
@@ -70,11 +51,7 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
     })
 
     try {
-      if (isDevMode()) {
-        devStorage.setGroups(newGroups)
-      } else {
-        await browserAdapter.setStorage(STORAGE_KEY, newGroups)
-      }
+      await groupsRepo.saveAll(newGroups)
     } catch (error) {
       console.error("Failed to delete group:", error)
       set({ groups })
@@ -89,11 +66,7 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
     set({ groups: newGroups })
 
     try {
-      if (isDevMode()) {
-        devStorage.setGroups(newGroups)
-      } else {
-        await browserAdapter.setStorage(STORAGE_KEY, newGroups)
-      }
+      await groupsRepo.saveAll(newGroups)
     } catch (error) {
       console.error("Failed to rename group:", error)
       set({ groups })
@@ -108,11 +81,7 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
     set({ groups: newGroups })
 
     try {
-      if (isDevMode()) {
-        devStorage.setGroups(newGroups)
-      } else {
-        await browserAdapter.setStorage(STORAGE_KEY, newGroups)
-      }
+      await groupsRepo.saveAll(newGroups)
     } catch (error) {
       console.error("Failed to update group:", error)
       set({ groups })
@@ -152,11 +121,7 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
     set({ groups: newGroups })
 
     try {
-      if (isDevMode()) {
-        devStorage.setGroups(newGroups)
-      } else {
-        await browserAdapter.setStorage(STORAGE_KEY, newGroups)
-      }
+      await groupsRepo.saveAll(newGroups)
     } catch (error) {
       console.error("Failed to add extension to group:", error)
       set({ groups })
@@ -177,11 +142,7 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
     set({ groups: newGroups })
 
     try {
-      if (isDevMode()) {
-        devStorage.setGroups(newGroups)
-      } else {
-        await browserAdapter.setStorage(STORAGE_KEY, newGroups)
-      }
+      await groupsRepo.saveAll(newGroups)
     } catch (error) {
       console.error("Failed to remove extension from group:", error)
       set({ groups })
