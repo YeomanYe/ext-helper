@@ -27,6 +27,8 @@ export function ExtensionCard({
   const [menuPosition, setMenuPosition] = React.useState<{ top: number; left: number }>({ top: 0, left: 0 })
   const menuRef = React.useRef<HTMLDivElement>(null)
   const cardRef = React.useRef<HTMLDivElement>(null)
+  const isCard = viewMode === "card"
+  const isDetail = viewMode === "detail"
   const menuWidth = viewMode === "compact" ? 160 : 176
   const menuHeight = extension.optionsUrl ? 120 : 84
 
@@ -110,8 +112,6 @@ export function ExtensionCard({
     setShowConfirmRemove(false)
   }
 
-  const isCard = viewMode === "card"
-  const isDetail = viewMode === "detail"
   const isDimmed = !extension.enabled && !showMenu && !showConfirmRemove
 
   const renderContextMenu = () => {
