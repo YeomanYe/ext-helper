@@ -28,6 +28,9 @@ class DevStorage {
       else this.groups = MOCK_GROUPS
       if (rls) this.rules = JSON.parse(rls)
       else this.rules = MOCK_RULES
+      if (this.rules.length < 50) {
+        this.rules = MOCK_RULES
+      }
       if (prefs) this.preferences = JSON.parse(prefs)
       if (bisect) this.bisectSession = JSON.parse(bisect)
     } catch {
