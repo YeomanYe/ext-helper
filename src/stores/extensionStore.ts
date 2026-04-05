@@ -5,6 +5,8 @@ import { devStorage } from "@/services/devStorage"
 import { isDevMode } from "@/services/mockData"
 import { MOCK_EXTENSIONS } from "@/services/mockData"
 
+const BISECT_STORAGE_KEY = "ext-helper-bisect-session"
+
 const cloneExtensions = (extensions: typeof MOCK_EXTENSIONS) =>
   extensions.map((extension) => ({
     ...extension,
@@ -68,6 +70,54 @@ const applyExtensionsState = async (
   )
 }
 
+const persistBisectSession = async (session: BisectSession | null) => {
+  if (isDevMode()) {
+    devStorage.setBisectSession(session)
+    return
+  }
+  await browserAdapter.setStorage(BISECT_STORAGE_KEY, session)
+}
+
+const loadPersistedBisectSession = async (): Promise<BisectSession | null> => {
+  if (isDevMode()) {
+    return devStorage.getBisectSession()
+  }
+  return (await browserAdapter.getStorage(BISECT_STORAGE_KEY)) ?? null
+}
+
+const clearPersistedBisectSession = async () => {
+  await persistBisectSession(null)
+}
+
+const isBisectSessionConsistent = (
+  session: BisectSession,
+  currentExtensions: typeof MOCK_EXTENSIONS
+) => {
+  if (!session.active) return false
+
+  const currentById = new Map(currentExtensions.map((extension) => [extension.id, extension]))
+  const baselineById = new Map(session.baselineExtensions.map((extension) => [extension.id, extension]))
+
+  const trackedIds = Array.from(new Set([
+    ...session.allCandidateIds,
+    ...session.baselineExtensions.map((extension) => extension.id)
+  ]))
+
+  const allTrackedExist = trackedIds.every((id) => currentById.has(id) && baselineById.has(id))
+  if (!allTrackedExist) return false
+
+  const expectedExtensions = buildBisectExtensions(
+    session.baselineExtensions as typeof MOCK_EXTENSIONS,
+    session.allCandidateIds,
+    session.currentTestIds
+  )
+  const expectedById = new Map(expectedExtensions.map((extension) => [extension.id, extension.enabled]))
+
+  return session.allCandidateIds.every(
+    (id) => currentById.get(id)?.enabled === expectedById.get(id)
+  )
+}
+
 const withHistoryCleared = (extensions: typeof MOCK_EXTENSIONS) => ({
   extensions,
   canUndo: false,
@@ -106,7 +156,23 @@ export const useExtensionStore = create<ExtensionStore>((set, get) => ({
       } else {
         extensions = await browserAdapter.getExtensions()
       }
-      set({ ...withHistoryCleared(extensions), loading: false })
+      const persistedBisectSession = await loadPersistedBisectSession()
+      const nextBisectSession = persistedBisectSession && isBisectSessionConsistent(
+        persistedBisectSession,
+        extensions
+      )
+        ? persistedBisectSession
+        : createIdleBisectSession()
+
+      if (persistedBisectSession && !nextBisectSession.active) {
+        await clearPersistedBisectSession()
+      }
+
+      set({
+        ...withHistoryCleared(extensions),
+        bisectSession: nextBisectSession,
+        loading: false
+      })
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : "Failed to load extensions",
@@ -384,12 +450,14 @@ export const useExtensionStore = create<ExtensionStore>((set, get) => ({
 
     try {
       await applyExtensionsState(baselineExtensions, nextExtensions)
+      await persistBisectSession(get().bisectSession)
     } catch (error) {
       set({
         extensions: baselineExtensions,
         bisectSession: createIdleBisectSession(),
         error: error instanceof Error ? error.message : "Failed to start bisect"
       })
+      await clearPersistedBisectSession()
     }
   },
 
@@ -429,6 +497,7 @@ export const useExtensionStore = create<ExtensionStore>((set, get) => ({
 
     try {
       await applyExtensionsState(state.extensions, nextExtensions)
+      await persistBisectSession(get().bisectSession)
     } catch (error) {
       set({
         extensions: state.extensions,
@@ -474,6 +543,7 @@ export const useExtensionStore = create<ExtensionStore>((set, get) => ({
 
     try {
       await applyExtensionsState(state.extensions, nextExtensions)
+      await persistBisectSession(get().bisectSession)
     } catch (error) {
       set({
         extensions: state.extensions,
@@ -497,6 +567,7 @@ export const useExtensionStore = create<ExtensionStore>((set, get) => ({
 
     try {
       await applyExtensionsState(state.extensions, baselineExtensions)
+      await clearPersistedBisectSession()
     } catch (error) {
       set({
         extensions: state.extensions,
@@ -520,6 +591,7 @@ export const useExtensionStore = create<ExtensionStore>((set, get) => ({
 
     try {
       await applyExtensionsState(state.extensions, baselineExtensions)
+      await clearPersistedBisectSession()
     } catch (error) {
       set({
         extensions: state.extensions,
