@@ -31,9 +31,10 @@ export function PopupPage() {
     setExtensionsEnabled,
     undoExtensions,
     redoExtensions,
-    bisectExtensions,
     canUndo,
-    canRedo
+    canRedo,
+    undoCount,
+    redoCount
   } = useExtensionStore()
 
   const {
@@ -197,7 +198,7 @@ export function PopupPage() {
                     }}
                     className="w-full px-3 py-2 text-left font-punk-heading text-[11px] uppercase tracking-wider text-punk-text-secondary transition-colors hover:bg-punk-bg hover:text-punk-text-primary"
                   >
-                    全部启用
+                    Enable All
                   </button>
                   <button
                     onClick={() => {
@@ -206,7 +207,7 @@ export function PopupPage() {
                     }}
                     className="w-full px-3 py-2 text-left font-punk-heading text-[11px] uppercase tracking-wider text-punk-text-secondary transition-colors hover:bg-punk-bg hover:text-punk-text-primary"
                   >
-                    全部禁用
+                    Disable All
                   </button>
                   <button
                     onClick={() => {
@@ -216,7 +217,7 @@ export function PopupPage() {
                     disabled={!canUndo}
                     className="w-full px-3 py-2 text-left font-punk-heading text-[11px] uppercase tracking-wider text-punk-text-secondary transition-colors hover:bg-punk-bg hover:text-punk-text-primary disabled:cursor-not-allowed disabled:opacity-40"
                   >
-                    撤销
+                    Undo [{undoCount}]
                   </button>
                   <button
                     onClick={() => {
@@ -226,17 +227,7 @@ export function PopupPage() {
                     disabled={!canRedo}
                     className="w-full px-3 py-2 text-left font-punk-heading text-[11px] uppercase tracking-wider text-punk-text-secondary transition-colors hover:bg-punk-bg hover:text-punk-text-primary disabled:cursor-not-allowed disabled:opacity-40"
                   >
-                    反撤销
-                  </button>
-                  <button
-                    onClick={() => {
-                      void bisectExtensions(displayedExtensions.map((ext) => ext.id))
-                      setShowTabActions(false)
-                    }}
-                    disabled={displayedExtensions.length < 2}
-                    className="w-full px-3 py-2 text-left font-punk-heading text-[11px] uppercase tracking-wider text-punk-text-secondary transition-colors hover:bg-punk-bg hover:text-punk-text-primary disabled:cursor-not-allowed disabled:opacity-40"
-                  >
-                    二分查找
+                    Redo [{redoCount}]
                   </button>
                 </div>
               )}

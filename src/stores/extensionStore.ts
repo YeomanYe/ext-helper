@@ -15,6 +15,8 @@ const withHistoryCleared = (extensions: typeof MOCK_EXTENSIONS) => ({
   extensions,
   canUndo: false,
   canRedo: false,
+  undoCount: 0,
+  redoCount: 0,
   history: [],
   future: []
 })
@@ -28,6 +30,8 @@ export const useExtensionStore = create<ExtensionStore>((set, get) => ({
   sortBy: "name",
   canUndo: false,
   canRedo: false,
+  undoCount: 0,
+  redoCount: 0,
 
   fetchExtensions: async () => {
     set({ loading: true, error: null })
@@ -65,7 +69,9 @@ export const useExtensionStore = create<ExtensionStore>((set, get) => ({
     set({
       extensions: newExtensions,
       canUndo: true,
-      canRedo: false
+      canRedo: false,
+      undoCount: ((get() as any).history || []).length + 1,
+      redoCount: 0
     })
 
     try {
@@ -83,7 +89,9 @@ export const useExtensionStore = create<ExtensionStore>((set, get) => ({
       set({
         error: error instanceof Error ? error.message : "Failed to toggle extension",
         canUndo: ((get() as any).history || []).length > 0,
-        canRedo: ((get() as any).future || []).length > 0
+        canRedo: ((get() as any).future || []).length > 0,
+        undoCount: ((get() as any).history || []).length,
+        redoCount: ((get() as any).future || []).length
       })
     }
   },
@@ -99,7 +107,9 @@ export const useExtensionStore = create<ExtensionStore>((set, get) => ({
     set({
       extensions: nextExtensions,
       canUndo: true,
-      canRedo: false
+      canRedo: false,
+      undoCount: ((get() as any).history || []).length + 1,
+      redoCount: 0
     })
 
     try {
@@ -117,7 +127,9 @@ export const useExtensionStore = create<ExtensionStore>((set, get) => ({
       set({
         error: error instanceof Error ? error.message : "Failed to remove extension",
         canUndo: ((get() as any).history || []).length > 0,
-        canRedo: ((get() as any).future || []).length > 0
+        canRedo: ((get() as any).future || []).length > 0,
+        undoCount: ((get() as any).history || []).length,
+        redoCount: ((get() as any).future || []).length
       })
     }
   },
@@ -141,7 +153,9 @@ export const useExtensionStore = create<ExtensionStore>((set, get) => ({
     set({
       extensions: nextExtensions,
       canUndo: true,
-      canRedo: false
+      canRedo: false,
+      undoCount: ((get() as any).history || []).length + 1,
+      redoCount: 0
     })
 
     try {
@@ -166,7 +180,9 @@ export const useExtensionStore = create<ExtensionStore>((set, get) => ({
       set({
         error: error instanceof Error ? error.message : "Failed to update extensions",
         canUndo: ((get() as any).history || []).length > 0,
-        canRedo: ((get() as any).future || []).length > 0
+        canRedo: ((get() as any).future || []).length > 0,
+        undoCount: ((get() as any).history || []).length,
+        redoCount: ((get() as any).future || []).length
       })
     }
   },
@@ -182,7 +198,9 @@ export const useExtensionStore = create<ExtensionStore>((set, get) => ({
     set({
       extensions: previousExtensions,
       canUndo: history.length > 1,
-      canRedo: true
+      canRedo: true,
+      undoCount: history.length - 1,
+      redoCount: (state.future || []).length + 1
     })
 
     try {
@@ -202,7 +220,9 @@ export const useExtensionStore = create<ExtensionStore>((set, get) => ({
         history: history.slice(0, -1),
         future: [...(state.future || []), currentExtensions],
         canUndo: history.length > 1,
-        canRedo: true
+        canRedo: true,
+        undoCount: history.length - 1,
+        redoCount: (state.future || []).length + 1
       } as any)
     } catch (error) {
       set({ extensions: state.extensions })
@@ -223,7 +243,9 @@ export const useExtensionStore = create<ExtensionStore>((set, get) => ({
     set({
       extensions: nextExtensions,
       canUndo: true,
-      canRedo: future.length > 1
+      canRedo: future.length > 1,
+      undoCount: (state.history || []).length + 1,
+      redoCount: future.length - 1
     })
 
     try {
@@ -243,66 +265,14 @@ export const useExtensionStore = create<ExtensionStore>((set, get) => ({
         history: [...(state.history || []), currentExtensions],
         future: future.slice(0, -1),
         canUndo: true,
-        canRedo: future.length > 1
+        canRedo: future.length > 1,
+        undoCount: (state.history || []).length + 1,
+        redoCount: future.length - 1
       } as any)
     } catch (error) {
       set({ extensions: state.extensions })
       set({
         error: error instanceof Error ? error.message : "Failed to redo extension changes"
-      })
-    }
-  },
-
-  bisectExtensions: async (ids: string[]) => {
-    const orderedIds = ids.filter(Boolean)
-    if (orderedIds.length < 2) return
-
-    const midpoint = Math.ceil(orderedIds.length / 2)
-    const leftIds = new Set(orderedIds.slice(0, midpoint))
-    const rightIds = new Set(orderedIds.slice(midpoint))
-    const { extensions } = get()
-
-    const nextExtensions = extensions.map((extension) => {
-      if (leftIds.has(extension.id)) return { ...extension, enabled: true }
-      if (rightIds.has(extension.id)) return { ...extension, enabled: false }
-      return extension
-    })
-
-    if (nextExtensions.every((extension, index) => extension.enabled === extensions[index].enabled)) {
-      return
-    }
-
-    const previousExtensions = cloneExtensions(extensions)
-
-    set({
-      extensions: nextExtensions,
-      canUndo: true,
-      canRedo: false
-    })
-
-    try {
-      if (isDevMode()) {
-        devStorage.setExtensions(nextExtensions)
-      } else {
-        await Promise.all(
-          nextExtensions
-            .filter((extension, index) => extension.enabled !== extensions[index].enabled)
-            .map((extension) =>
-              browserAdapter.setExtensionEnabled(extension.id, extension.enabled)
-            )
-        )
-      }
-
-      set((state: any) => ({
-        history: [...(state.history || []), previousExtensions],
-        future: []
-      }))
-    } catch (error) {
-      set({ extensions })
-      set({
-        error: error instanceof Error ? error.message : "Failed to bisect extensions",
-        canUndo: ((get() as any).history || []).length > 0,
-        canRedo: ((get() as any).future || []).length > 0
       })
     }
   },
