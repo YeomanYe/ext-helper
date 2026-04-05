@@ -9,7 +9,14 @@ const cloneRules = (rules: Rule[]): Rule[] =>
     ...rule,
     conditionGroups: rule.conditionGroups.map((group) => ({
       ...group,
-      conditions: group.conditions.map((condition) => ({ ...condition }))
+      domains: [...group.domains],
+      schedule: group.schedule
+        ? {
+            days: [...group.schedule.days],
+            startTime: group.schedule.startTime,
+            endTime: group.schedule.endTime
+          }
+        : null
     })),
     actions: rule.actions.map((action) => ({ ...action }))
   }))
