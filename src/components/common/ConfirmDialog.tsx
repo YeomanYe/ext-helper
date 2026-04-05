@@ -1,4 +1,5 @@
 import * as React from "react"
+import { createPortal } from "react-dom"
 import { AlertTriangle } from "lucide-react"
 import { cn } from "@/utils"
 
@@ -48,7 +49,9 @@ export function ConfirmDialog({
       ? "bg-punk-warning hover:bg-punk-warning/90 text-punk-bg"
       : "bg-punk-primary hover:bg-punk-primary/90"
 
-  return (
+  if (typeof document === "undefined") return null
+
+  return createPortal(
     <div
       className="fixed inset-0 z-[100] flex items-center justify-center bg-punk-bg/80 backdrop-blur-sm"
       onClick={onCancel}
@@ -94,6 +97,7 @@ export function ConfirmDialog({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }

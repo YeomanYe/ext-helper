@@ -1,5 +1,6 @@
 import * as React from "react"
-import { Settings, Trash2, Package, Power, PowerOff, Shield, Globe, ChevronDown, ChevronUp } from "lucide-react"
+import { createPortal } from "react-dom"
+import { Settings, Trash2, Package, Power, PowerOff, Shield } from "lucide-react"
 import { cn } from "@/utils"
 import type { Extension, ViewMode } from "@/types"
 import { Switch, ConfirmDialog } from "@/components/common"
@@ -23,34 +24,54 @@ export function ExtensionCard({
 }: ExtensionCardProps) {
   const [showMenu, setShowMenu] = React.useState(false)
   const [showConfirmRemove, setShowConfirmRemove] = React.useState(false)
-  const [menuPosition, setMenuPosition] = React.useState<{ horizontal: "left" | "right"; vertical: "top" | "bottom" }>({ horizontal: "right", vertical: "bottom" })
+  const [menuPosition, setMenuPosition] = React.useState<{ top: number; left: number }>({ top: 0, left: 0 })
   const menuRef = React.useRef<HTMLDivElement>(null)
   const cardRef = React.useRef<HTMLDivElement>(null)
+  const menuWidth = viewMode === "compact" ? 160 : 176
+  const menuHeight = extension.optionsUrl ? 120 : 84
+
+  const updateMenuPosition = React.useCallback(() => {
+    if (!cardRef.current) return
+
+    const rect = cardRef.current.getBoundingClientRect()
+    const viewportWidth = window.innerWidth
+    const viewportHeight = window.innerHeight
+    const padding = 10
+    const gap = 6
+
+    const openToLeft = rect.left > viewportWidth / 2
+    const openUpward = rect.top > viewportHeight / 2
+
+    const desiredLeft = openToLeft ? rect.right - menuWidth : rect.left
+    const desiredTop = openUpward ? rect.top - menuHeight - gap : rect.bottom + gap
+
+    const left = Math.min(
+      Math.max(desiredLeft, padding),
+      viewportWidth - menuWidth - padding
+    )
+    const top = Math.min(
+      Math.max(desiredTop, padding),
+      viewportHeight - menuHeight - padding
+    )
+
+    setMenuPosition({ top, left })
+  }, [menuHeight, menuWidth])
 
   // Calculate menu position based on card location
   React.useEffect(() => {
-    if (showMenu && cardRef.current) {
-      const rect = cardRef.current.getBoundingClientRect()
-      const menuWidth = 176
-      const menuHeight = 120
-      const viewportWidth = window.innerWidth
-      const viewportHeight = window.innerHeight
-      const padding = 10
+    if (!showMenu) return
 
-      let horizontal: "left" | "right" = "right"
-      let vertical: "top" | "bottom" = "bottom"
+    updateMenuPosition()
 
-      if (rect.right + menuWidth > viewportWidth - padding) {
-        horizontal = "left"
-      }
+    const handleViewportChange = () => updateMenuPosition()
+    window.addEventListener("resize", handleViewportChange)
+    window.addEventListener("scroll", handleViewportChange, true)
 
-      if (rect.bottom + menuHeight > viewportHeight - padding) {
-        vertical = "top"
-      }
-
-      setMenuPosition({ horizontal, vertical })
+    return () => {
+      window.removeEventListener("resize", handleViewportChange)
+      window.removeEventListener("scroll", handleViewportChange, true)
     }
-  }, [showMenu])
+  }, [showMenu, updateMenuPosition])
 
   // Close menu when clicking outside
   React.useEffect(() => {
@@ -80,6 +101,65 @@ export function ExtensionCard({
 
   const isCard = viewMode === "card"
   const isDetail = viewMode === "detail"
+  const isDimmed = !extension.enabled && !showMenu && !showConfirmRemove
+
+  const renderContextMenu = () => {
+    if (!showMenu || typeof document === "undefined") return null
+
+    return createPortal(
+      <div
+        ref={menuRef}
+        className="fixed z-[90] border border-punk-border bg-punk-bg-alt py-1 shadow-[0_0_20px_rgba(124,58,237,0.3)]"
+        style={{ top: menuPosition.top, left: menuPosition.left, width: menuWidth }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            onToggle()
+            setShowMenu(false)
+          }}
+          className="flex w-full items-center gap-2 px-3 py-2 text-left font-punk-body text-sm text-punk-text-secondary hover:text-punk-accent hover:bg-punk-bg transition-colors"
+        >
+          {extension.enabled ? (
+            <>
+              <PowerOff className="h-4 w-4" />
+              DISABLE
+            </>
+          ) : (
+            <>
+              <Power className="h-4 w-4" />
+              ENABLE
+            </>
+          )}
+        </button>
+        {extension.optionsUrl && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              onOpenOptions?.()
+              setShowMenu(false)
+            }}
+            className="flex w-full items-center gap-2 px-3 py-2 text-left font-punk-body text-sm text-punk-text-secondary hover:text-punk-accent hover:bg-punk-bg transition-colors"
+          >
+            <Settings className="h-4 w-4" />
+            OPTIONS
+          </button>
+        )}
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            handleRemoveClick()
+          }}
+          className="flex w-full items-center gap-2 px-3 py-2 text-left font-punk-body text-sm text-punk-cta hover:bg-punk-cta/10 transition-colors"
+        >
+          <Trash2 className="h-4 w-4" />
+          REMOVE
+        </button>
+      </div>,
+      document.body
+    )
+  }
 
   // Card mode: horizontal layout with icon, info, and toggle switch
   // Compact mode: vertical layout with fixed size
@@ -94,7 +174,7 @@ export function ExtensionCard({
           "group relative flex flex-col border transition-all",
           "bg-punk-bg-alt",
           "hover:border-punk-primary hover:shadow-[0_0_15px_rgba(124,58,237,0.3)]",
-          !extension.enabled && "opacity-60",
+          isDimmed && "opacity-60",
           "w-full",
           "punk-border",
           className
@@ -222,70 +302,18 @@ export function ExtensionCard({
         </div>
 
         {/* Context Menu */}
-        {showMenu && (
-          <div
-            ref={menuRef}
-            className={cn("absolute z-50 w-44 border border-punk-border bg-punk-bg-alt py-1 shadow-[0_0_20px_rgba(124,58,237,0.3)]", menuPosition.horizontal === "right" ? "right-0" : "left-0", menuPosition.vertical === "bottom" ? "top-full mt-1" : "bottom-full mb-1", !extension.enabled && "!opacity-100")}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              onClick={(e) => {
-                e.stopPropagation()
-                onToggle()
-                setShowMenu(false)
-              }}
-              className="flex w-full items-center gap-2 px-3 py-2 text-left font-punk-body text-sm text-punk-text-secondary hover:text-punk-accent hover:bg-punk-bg transition-colors"
-            >
-              {extension.enabled ? (
-                <>
-                  <PowerOff className="h-4 w-4" />
-                  DISABLE
-                </>
-              ) : (
-                <>
-                  <Power className="h-4 w-4" />
-                  ENABLE
-                </>
-              )}
-            </button>
-            {extension.optionsUrl && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onOpenOptions?.()
-                  setShowMenu(false)
-                }}
-                className="flex w-full items-center gap-2 px-3 py-2 text-left font-punk-body text-sm text-punk-text-secondary hover:text-punk-accent hover:bg-punk-bg transition-colors"
-              >
-                <Settings className="h-4 w-4" />
-                OPTIONS
-              </button>
-            )}
-            <button
-              onClick={(e) => {
-                e.stopPropagation()
-                handleRemoveClick()
-              }}
-              className="flex w-full items-center gap-2 px-3 py-2 text-left font-punk-body text-sm text-punk-cta hover:bg-punk-cta/10 transition-colors"
-            >
-              <Trash2 className="h-4 w-4" />
-              REMOVE
-            </button>
-          </div>
-        )}
+        {renderContextMenu()}
 
         {/* Confirm Remove Dialog */}
-        <div className={cn(!extension.enabled && "!opacity-100")}>
-          <ConfirmDialog
-            isOpen={showConfirmRemove}
-            title="REMOVE EXTENSION"
-            message={`Are you sure you want to remove "${extension.name}"? This action cannot be undone.`}
-            confirmText="REMOVE"
-            variant="danger"
-            onConfirm={handleConfirmRemove}
-            onCancel={() => setShowConfirmRemove(false)}
-          />
-        </div>
+        <ConfirmDialog
+          isOpen={showConfirmRemove}
+          title="REMOVE EXTENSION"
+          message={`Are you sure you want to remove "${extension.name}"? This action cannot be undone.`}
+          confirmText="REMOVE"
+          variant="danger"
+          onConfirm={handleConfirmRemove}
+          onCancel={() => setShowConfirmRemove(false)}
+        />
       </div>
     )
   }
@@ -299,7 +327,7 @@ export function ExtensionCard({
           "group relative flex items-center gap-3 p-2.5 border",
           "bg-punk-bg-alt",
           "hover:border-punk-primary hover:shadow-[0_0_15px_rgba(124,58,237,0.3)]",
-          !extension.enabled && "opacity-50",
+          isDimmed && "opacity-50",
           "w-full min-h-[60px]",
           "punk-border",
           className
@@ -353,70 +381,18 @@ export function ExtensionCard({
         </div>
 
         {/* Context Menu */}
-        {showMenu && (
-          <div
-            ref={menuRef}
-            className={cn("absolute z-50 w-44 border border-punk-border bg-punk-bg-alt py-1 shadow-[0_0_20px_rgba(124,58,237,0.3)]", menuPosition.horizontal === "right" ? "right-0" : "left-0", menuPosition.vertical === "bottom" ? "top-full mt-1" : "bottom-full mb-1", !extension.enabled && "!opacity-100")}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              onClick={(e) => {
-                e.stopPropagation()
-                onToggle()
-                setShowMenu(false)
-              }}
-              className="flex w-full items-center gap-2 px-3 py-2 text-left font-punk-body text-sm text-punk-text-secondary hover:text-punk-accent hover:bg-punk-bg transition-colors"
-            >
-              {extension.enabled ? (
-                <>
-                  <PowerOff className="h-4 w-4" />
-                  DISABLE
-                </>
-              ) : (
-                <>
-                  <Power className="h-4 w-4" />
-                  ENABLE
-                </>
-              )}
-            </button>
-            {extension.optionsUrl && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onOpenOptions?.()
-                  setShowMenu(false)
-                }}
-                className="flex w-full items-center gap-2 px-3 py-2 text-left font-punk-body text-sm text-punk-text-secondary hover:text-punk-accent hover:bg-punk-bg transition-colors"
-              >
-                <Settings className="h-4 w-4" />
-                OPTIONS
-              </button>
-            )}
-            <button
-              onClick={(e) => {
-                e.stopPropagation()
-                handleRemoveClick()
-              }}
-              className="flex w-full items-center gap-2 px-3 py-2 text-left font-punk-body text-sm text-punk-cta hover:bg-punk-cta/10 transition-colors"
-            >
-              <Trash2 className="h-4 w-4" />
-              REMOVE
-            </button>
-          </div>
-        )}
+        {renderContextMenu()}
 
         {/* Confirm Remove Dialog */}
-        <div className={cn(!extension.enabled && "!opacity-100")}>
-          <ConfirmDialog
-            isOpen={showConfirmRemove}
-            title="REMOVE EXTENSION"
-            message={`Are you sure you want to remove "${extension.name}"? This action cannot be undone.`}
-            confirmText="REMOVE"
-            variant="danger"
-            onConfirm={handleConfirmRemove}
-            onCancel={() => setShowConfirmRemove(false)}
-          />
-        </div>
+        <ConfirmDialog
+          isOpen={showConfirmRemove}
+          title="REMOVE EXTENSION"
+          message={`Are you sure you want to remove "${extension.name}"? This action cannot be undone.`}
+          confirmText="REMOVE"
+          variant="danger"
+          onConfirm={handleConfirmRemove}
+          onCancel={() => setShowConfirmRemove(false)}
+        />
       </div>
     )
   }
@@ -429,7 +405,7 @@ export function ExtensionCard({
         "group relative flex flex-col items-center justify-center p-3 border",
         "bg-punk-bg-alt",
         "hover:border-punk-primary hover:shadow-[0_0_15px_rgba(124,58,237,0.3)]",
-        !extension.enabled && "opacity-50",
+        isDimmed && "opacity-50",
         "aspect-square",
         "punk-border",
         className
@@ -468,65 +444,18 @@ export function ExtensionCard({
       </div>
 
       {/* Context Menu */}
-      {showMenu && (
-        <div
-          ref={menuRef}
-          className={cn("absolute z-50 w-40 border border-punk-border bg-punk-bg-alt py-1 shadow-[0_0_20px_rgba(124,58,237,0.3)]", menuPosition.horizontal === "right" ? "right-0" : "left-0", menuPosition.vertical === "bottom" ? "top-full mt-1" : "bottom-full mb-1", !extension.enabled && "!opacity-100")}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <button
-            onClick={() => {
-              onToggle()
-              setShowMenu(false)
-            }}
-            className="flex w-full items-center gap-2 px-3 py-2 text-left font-punk-body text-sm text-punk-text-secondary hover:text-punk-accent hover:bg-punk-bg transition-colors"
-          >
-            {extension.enabled ? (
-              <>
-                <PowerOff className="h-4 w-4" />
-                DISABLE
-              </>
-            ) : (
-              <>
-                <Power className="h-4 w-4" />
-                ENABLE
-              </>
-            )}
-          </button>
-          {extension.optionsUrl && (
-            <button
-              onClick={() => {
-                onOpenOptions?.()
-                setShowMenu(false)
-              }}
-              className="flex w-full items-center gap-2 px-3 py-2 text-left font-punk-body text-sm text-punk-text-secondary hover:text-punk-accent hover:bg-punk-bg transition-colors"
-            >
-              <Settings className="h-4 w-4" />
-              OPTIONS
-            </button>
-          )}
-          <button
-            onClick={handleRemoveClick}
-            className="flex w-full items-center gap-2 px-3 py-2 text-left font-punk-body text-sm text-punk-cta hover:bg-punk-cta/10 transition-colors"
-          >
-            <Trash2 className="h-4 w-4" />
-            REMOVE
-          </button>
-        </div>
-      )}
+      {renderContextMenu()}
 
       {/* Confirm Remove Dialog */}
-      <div className={cn(!extension.enabled && "!opacity-100")}>
-        <ConfirmDialog
-          isOpen={showConfirmRemove}
-          title="REMOVE EXTENSION"
-          message={`Are you sure you want to remove "${extension.name}"? This action cannot be undone.`}
-          confirmText="REMOVE"
-          variant="danger"
-          onConfirm={handleConfirmRemove}
-          onCancel={() => setShowConfirmRemove(false)}
-        />
-      </div>
+      <ConfirmDialog
+        isOpen={showConfirmRemove}
+        title="REMOVE EXTENSION"
+        message={`Are you sure you want to remove "${extension.name}"? This action cannot be undone.`}
+        confirmText="REMOVE"
+        variant="danger"
+        onConfirm={handleConfirmRemove}
+        onCancel={() => setShowConfirmRemove(false)}
+      />
     </div>
   )
 }

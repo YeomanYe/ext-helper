@@ -32,6 +32,7 @@ export function RuleCard({
   const isEnabled = rule.enabled
   const [isExpanded, setIsExpanded] = React.useState(false)
   const [showConfirmDelete, setShowConfirmDelete] = React.useState(false)
+  const isDimmed = !isEnabled && !showConfirmDelete
 
   const handleConfirmDelete = () => {
     onDelete(rule.id)
@@ -46,7 +47,7 @@ export function RuleCard({
           "group relative flex flex-col items-center justify-center p-3 border",
           "bg-punk-bg-alt",
           "hover:border-punk-primary hover:shadow-[0_0_15px_rgba(124,58,237,0.3)]",
-          !isEnabled && "opacity-50",
+          isDimmed && "opacity-50",
           "aspect-square",
           "punk-border",
           className
@@ -123,7 +124,7 @@ export function RuleCard({
           "group relative flex flex-col border transition-all",
           "bg-punk-bg-alt",
           "hover:border-punk-primary hover:shadow-[0_0_15px_rgba(124,58,237,0.3)]",
-          !isEnabled && "opacity-60",
+          isDimmed && "opacity-60",
           "min-w-[280px] flex-1",
           "punk-border",
           className
@@ -228,17 +229,15 @@ export function RuleCard({
         </div>
 
         {/* Confirm Delete Dialog */}
-        <div className={cn(!isEnabled && "!opacity-100")}>
-          <ConfirmDialog
-            isOpen={showConfirmDelete}
-            title="DELETE RULE"
-            message={`Are you sure you want to delete "${rule.name}"? This action cannot be undone.`}
-            confirmText="DELETE"
-            variant="danger"
-            onConfirm={handleConfirmDelete}
-            onCancel={() => setShowConfirmDelete(false)}
-          />
-        </div>
+        <ConfirmDialog
+          isOpen={showConfirmDelete}
+          title="DELETE RULE"
+          message={`Are you sure you want to delete "${rule.name}"? This action cannot be undone.`}
+          confirmText="DELETE"
+          variant="danger"
+          onConfirm={handleConfirmDelete}
+          onCancel={() => setShowConfirmDelete(false)}
+        />
       </div>
     )
   }
@@ -250,7 +249,7 @@ export function RuleCard({
         "group relative flex flex-col border transition-all",
         "bg-punk-bg-alt",
         "hover:border-punk-primary hover:shadow-[0_0_15px_rgba(124,58,237,0.3)]",
-        !isEnabled && "opacity-60",
+        isDimmed && "opacity-60",
         "w-full",
         "punk-border",
         className
