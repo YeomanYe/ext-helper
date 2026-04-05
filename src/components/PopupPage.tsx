@@ -155,19 +155,32 @@ export function PopupPage() {
       {/* Tab Bar */}
       <div className="flex-shrink-0 px-3 pt-2 border-b border-punk-border/30">
         <div className="flex items-center gap-1">
-          <button
-            onClick={() => setActiveTab("extensions")}
-            className={cn(
-              "px-3 py-2 text-[13px] font-punk-heading uppercase tracking-wider transition-all",
-              activeTab === "extensions"
-                ? "text-punk-accent border-b-2 border-punk-accent"
-                : "text-punk-text-muted hover:text-punk-text-primary"
-            )}
-          >
-            EXTENSIONS
-          </button>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setActiveTab("extensions")}
+              className={cn(
+                "px-3 py-2 text-[13px] font-punk-heading uppercase tracking-wider transition-all",
+                activeTab === "extensions"
+                  ? "text-punk-accent border-b-2 border-punk-accent"
+                  : "text-punk-text-muted hover:text-punk-text-primary"
+              )}
+            >
+              EXTENSIONS
+            </button>
+            <button
+              onClick={() => setActiveTab("rules")}
+              className={cn(
+                "px-3 py-2 text-[13px] font-punk-heading uppercase tracking-wider transition-all",
+                activeTab === "rules"
+                  ? "text-punk-accent border-b-2 border-punk-accent"
+                  : "text-punk-text-muted hover:text-punk-text-primary"
+              )}
+            >
+              RULES
+            </button>
+          </div>
           {activeTab === "extensions" && (
-            <div className="relative" ref={tabActionsRef}>
+            <div className="relative ml-auto" ref={tabActionsRef}>
               <button
                 onClick={() => setShowTabActions((value) => !value)}
                 className="flex h-8 items-center gap-1 border border-punk-border/30 bg-punk-bg-alt px-2 text-[11px] font-punk-heading uppercase tracking-wider text-punk-text-muted transition-all hover:border-punk-accent/50 hover:text-punk-accent"
@@ -176,7 +189,7 @@ export function PopupPage() {
                 <ChevronDown className={cn("h-3 w-3 transition-transform", showTabActions && "rotate-180")} />
               </button>
               {showTabActions && (
-                <div className="absolute left-0 top-full z-50 mt-1 w-40 border border-punk-border bg-punk-bg-alt shadow-[0_0_20px_rgba(124,58,237,0.3)]">
+                <div className="absolute right-0 top-full z-50 mt-1 w-40 border border-punk-border bg-punk-bg-alt shadow-[0_0_20px_rgba(124,58,237,0.3)]">
                   <button
                     onClick={() => {
                       void setExtensionsEnabled(displayedExtensions.map((ext) => ext.id), true)
@@ -229,17 +242,6 @@ export function PopupPage() {
               )}
             </div>
           )}
-          <button
-            onClick={() => setActiveTab("rules")}
-            className={cn(
-              "px-3 py-2 text-[13px] font-punk-heading uppercase tracking-wider transition-all",
-              activeTab === "rules"
-                ? "text-punk-accent border-b-2 border-punk-accent"
-                : "text-punk-text-muted hover:text-punk-text-primary"
-            )}
-          >
-            RULES
-          </button>
         </div>
       </div>
 
