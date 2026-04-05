@@ -529,16 +529,6 @@ export const useExtensionStore = create<ExtensionStore>((set, get) => ({
     }
   },
 
-  finishBisectKeepCurrent: () => {
-    const state = get()
-    if (!state.bisectSession.active) return
-
-    set({
-      error: null,
-      bisectSession: createIdleBisectSession()
-    })
-  },
-
   setFilter: (filter: FilterType) => set({ filter }),
   setSearchQuery: (searchQuery: string) => set({ searchQuery }),
   setSortBy: (sortBy: SortType) => set({ sortBy })

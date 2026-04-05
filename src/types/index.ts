@@ -75,7 +75,6 @@ export interface ExtensionStore {
   markBisectBad: () => Promise<void>
   cancelBisect: () => Promise<void>
   finishBisectRestore: () => Promise<void>
-  finishBisectKeepCurrent: () => void
   setFilter: (filter: FilterType) => void
   setSearchQuery: (query: string) => void
   setSortBy: (sort: SortType) => void

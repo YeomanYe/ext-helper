@@ -36,7 +36,6 @@ export function PopupPage() {
     markBisectBad,
     cancelBisect,
     finishBisectRestore,
-    finishBisectKeepCurrent,
     canUndo,
     canRedo,
     undoCount,
@@ -321,7 +320,7 @@ export function PopupPage() {
                       </p>
                       <p className="font-punk-body text-sm text-punk-text-secondary">
                         {isBisectResolved
-                          ? `Suspect: ${bisectResultExtension?.name ?? bisectSession.resultId ?? "Unknown extension"}`
+                          ? `Suspect: ${bisectResultExtension?.name ?? bisectSession.resultId ?? "Unknown extension"}. Current state is preserved until you restore it.`
                           : "Good means the issue disappeared. Bad means the issue is still present."}
                       </p>
                       <p className="font-punk-code text-[10px] uppercase tracking-wider text-punk-text-muted">
@@ -357,12 +356,6 @@ export function PopupPage() {
                           className="border border-punk-border/30 px-3 py-1.5 font-punk-heading text-[11px] uppercase tracking-wider text-punk-text-muted transition-colors hover:border-punk-accent/50 hover:text-punk-text-primary"
                         >
                           Restore Original
-                        </button>
-                        <button
-                          onClick={() => finishBisectKeepCurrent()}
-                          className="border border-punk-warning/50 bg-punk-warning/10 px-3 py-1.5 font-punk-heading text-[11px] uppercase tracking-wider text-punk-warning transition-colors hover:bg-punk-warning/20"
-                        >
-                          Keep Current
                         </button>
                       </div>
                     )}
