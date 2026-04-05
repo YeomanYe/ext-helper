@@ -175,10 +175,10 @@ export function RuleManager() {
       {/* Header */}
       <div className="flex items-center gap-2 px-4 py-3 border-b border-punk-border/30">
         <div className="flex items-center gap-2">
-          <span className="font-punk-heading text-[10px] text-punk-text-primary uppercase tracking-wider">
+          <span className="font-punk-heading text-[13px] text-punk-text-primary uppercase tracking-wider">
             AUTO_RULES
           </span>
-          <span className="font-punk-code text-[10px] text-punk-accent">
+          <span className="font-punk-code text-[13px] text-punk-accent">
             [{rules.length}]
           </span>
         </div>
