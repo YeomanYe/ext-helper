@@ -5,6 +5,7 @@
 import { create } from "zustand"
 import type { Rule, RuleStore } from "@/rules/types"
 import { rulesRepo } from "@/services/rulesRepo"
+import { runOptimisticMutation } from "@/stores/optimistic"
 
 export const useRuleStore = create<RuleStore>((set, get) => ({
   rules: [],
@@ -34,14 +35,16 @@ export const useRuleStore = create<RuleStore>((set, get) => ({
     }
 
     const newRules = [...rules, newRule]
-    set({ rules: newRules })
-
-    try {
-      await rulesRepo.saveAll(newRules)
-    } catch (error) {
-      console.error("Failed to save rule:", error)
-      set({ rules, error: "Failed to save rule" })
-    }
+    await runOptimisticMutation(set, get, {
+      snapshot: (state) => state.rules,
+      apply: () => ({ rules: newRules, error: null }),
+      persist: () => rulesRepo.saveAll(newRules),
+      rollback: (snapshot) => ({ rules: snapshot }),
+      onError: (error) => {
+        console.error("Failed to save rule:", error)
+        return { error: "Failed to save rule" }
+      }
+    })
   },
 
   updateRule: async (id, updates) => {
@@ -49,27 +52,31 @@ export const useRuleStore = create<RuleStore>((set, get) => ({
     const newRules = rules.map((r) =>
       r.id === id ? { ...r, ...updates, updatedAt: Date.now() } : r
     )
-    set({ rules: newRules })
-
-    try {
-      await rulesRepo.saveAll(newRules)
-    } catch (error) {
-      console.error("Failed to update rule:", error)
-      set({ rules, error: "Failed to update rule" })
-    }
+    await runOptimisticMutation(set, get, {
+      snapshot: (state) => state.rules,
+      apply: () => ({ rules: newRules, error: null }),
+      persist: () => rulesRepo.saveAll(newRules),
+      rollback: (snapshot) => ({ rules: snapshot }),
+      onError: (error) => {
+        console.error("Failed to update rule:", error)
+        return { error: "Failed to update rule" }
+      }
+    })
   },
 
   deleteRule: async (id) => {
     const { rules } = get()
     const newRules = rules.filter((r) => r.id !== id)
-    set({ rules: newRules })
-
-    try {
-      await rulesRepo.saveAll(newRules)
-    } catch (error) {
-      console.error("Failed to delete rule:", error)
-      set({ rules, error: "Failed to delete rule" })
-    }
+    await runOptimisticMutation(set, get, {
+      snapshot: (state) => state.rules,
+      apply: () => ({ rules: newRules, error: null }),
+      persist: () => rulesRepo.saveAll(newRules),
+      rollback: (snapshot) => ({ rules: snapshot }),
+      onError: (error) => {
+        console.error("Failed to delete rule:", error)
+        return { error: "Failed to delete rule" }
+      }
+    })
   },
 
   toggleRule: async (id) => {
@@ -80,14 +87,16 @@ export const useRuleStore = create<RuleStore>((set, get) => ({
     const newRules = rules.map((r) =>
       r.id === id ? { ...r, enabled: !r.enabled, updatedAt: Date.now() } : r
     )
-    set({ rules: newRules })
-
-    try {
-      await rulesRepo.saveAll(newRules)
-    } catch (error) {
-      console.error("Failed to toggle rule:", error)
-      set({ rules, error: "Failed to toggle rule" })
-    }
+    await runOptimisticMutation(set, get, {
+      snapshot: (state) => state.rules,
+      apply: () => ({ rules: newRules, error: null }),
+      persist: () => rulesRepo.saveAll(newRules),
+      rollback: (snapshot) => ({ rules: snapshot }),
+      onError: (error) => {
+        console.error("Failed to toggle rule:", error)
+        return { error: "Failed to toggle rule" }
+      }
+    })
   },
 
   duplicateRule: async (id) => {
@@ -106,13 +115,15 @@ export const useRuleStore = create<RuleStore>((set, get) => ({
     }
 
     const newRules = [...rules, newRule]
-    set({ rules: newRules })
-
-    try {
-      await rulesRepo.saveAll(newRules)
-    } catch (error) {
-      console.error("Failed to duplicate rule:", error)
-      set({ rules, error: "Failed to duplicate rule" })
-    }
+    await runOptimisticMutation(set, get, {
+      snapshot: (state) => state.rules,
+      apply: () => ({ rules: newRules, error: null }),
+      persist: () => rulesRepo.saveAll(newRules),
+      rollback: (snapshot) => ({ rules: snapshot }),
+      onError: (error) => {
+        console.error("Failed to duplicate rule:", error)
+        return { error: "Failed to duplicate rule" }
+      }
+    })
   },
 }))

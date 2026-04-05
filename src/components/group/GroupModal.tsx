@@ -1,132 +1,11 @@
 import * as React from "react"
-import { X, Plus, Folder, Package, Star, Heart, Bookmark, Tag, Flag, Briefcase, Code, Globe, Lock, Settings, Wrench, Zap, Flame, Gem, Crown, Target, Image, Upload, AlertTriangle, Power, PowerOff } from "lucide-react"
-import { cn } from "@/utils"
-import { SearchBar } from "@/components/popup"
+import { ConfirmDialog } from "@/components/common"
+import { GroupEditorPanel } from "@/components/group/GroupEditorPanel"
+import { GroupExtensionPicker } from "@/components/group/GroupExtensionPicker"
 import type { Group, Extension, FilterType } from "@/types"
-
-const ICON_MAP: Record<string, React.ReactNode> = {
-  folder: <Folder className="w-4 h-4" />,
-  star: <Star className="w-4 h-4" />,
-  heart: <Heart className="w-4 h-4" />,
-  bookmark: <Bookmark className="w-4 h-4" />,
-  tag: <Tag className="w-4 h-4" />,
-  flag: <Flag className="w-4 h-4" />,
-  briefcase: <Briefcase className="w-4 h-4" />,
-  code: <Code className="w-4 h-4" />,
-  globe: <Globe className="w-4 h-4" />,
-  lock: <Lock className="w-4 h-4" />,
-  settings: <Settings className="w-4 h-4" />,
-  tool: <Wrench className="w-4 h-4" />,
-  zap: <Zap className="w-4 h-4" />,
-  bolt: <Zap className="w-4 h-4" />,
-  flame: <Flame className="w-4 h-4" />,
-  gem: <Gem className="w-4 h-4" />,
-  crown: <Crown className="w-4 h-4" />,
-  target: <Target className="w-4 h-4" />,
-}
-
-const ICON_OPTIONS = Object.keys(ICON_MAP)
-
-interface GroupChipProps {
-  group: Group
-  extensionCount: number
-  allEnabled: boolean
-  disabled?: boolean
-  onClick: () => void
-  onToggle: () => void
-}
-
-export function GroupChip({
-  group,
-  extensionCount,
-  allEnabled,
-  disabled = false,
-  onClick,
-  onToggle
-}: GroupChipProps) {
-  // Get icon to display (custom image or icon map)
-  const groupIconUrl = (group as any)?.iconUrl
-  const displayIcon = groupIconUrl ? (
-    <img src={groupIconUrl} className="w-full h-full object-cover" alt="" />
-  ) : (
-    ICON_MAP[group.icon] || <Folder className="w-3 h-3" />
-  )
-
-  return (
-    <div
-      className={cn(
-        "flex items-center gap-2 px-3 py-2 transition-all duration-200 cursor-pointer",
-        "border border-punk-border/50 bg-punk-bg-alt",
-        "hover:border-punk-primary hover:shadow-[0_0_10px_rgba(124,58,237,0.3)]",
-        "active:shadow-[0_0_15px_rgba(124,58,237,0.5)]"
-      )}
-      onClick={onClick}
-    >
-      {/* Icon */}
-      {groupIconUrl ? (
-        <img src={groupIconUrl} className="h-5 w-5 border border-punk-border/30 object-cover flex-shrink-0" alt="" />
-      ) : (
-        <div
-          className="h-5 w-5 rounded-sm border border-punk-border/30 flex items-center justify-center flex-shrink-0"
-          style={{ backgroundColor: group.color + "20" }}
-        >
-          <span style={{ color: group.color }}>{displayIcon}</span>
-        </div>
-      )}
-      <span className="font-punk-heading text-[13px] text-punk-text-primary tracking-wider">
-        {group.name}
-      </span>
-      <span className="font-punk-code text-[10px] text-punk-accent px-1.5 py-0.5 border border-punk-accent/30 bg-punk-accent/5">
-        {extensionCount}
-      </span>
-      <button
-        onClick={(e) => {
-          e.stopPropagation()
-          if (disabled) return
-          onToggle()
-        }}
-        disabled={disabled}
-        className={cn(
-          "p-0.5 transition-colors",
-          disabled
-            ? "cursor-not-allowed text-punk-text-muted/40"
-            : "text-punk-text-muted hover:text-punk-success hover:bg-punk-success/10"
-        )}
-        title={allEnabled ? "Disable all in group" : "Enable all in group"}
-      >
-        {allEnabled ? <PowerOff className="h-3.5 w-3.5" /> : <Power className="h-3.5 w-3.5" />}
-      </button>
-    </div>
-  )
-}
-
-interface CreateGroupChipProps {
-  onClick: () => void
-}
-
-export function CreateGroupChip({ onClick }: CreateGroupChipProps) {
-  return (
-    <button
-      onClick={onClick}
-      className={cn(
-        "flex items-center gap-2 px-3 py-2 transition-all duration-200",
-        "border border-dashed border-punk-accent text-punk-accent bg-punk-accent/5"
-      )}
-    >
-      <Folder className="h-3.5 w-3.5" />
-      <span className="font-punk-heading text-[12px] uppercase tracking-wider">NEW GROUP</span>
-    </button>
-  )
-}
-
-const GROUP_COLORS = [
-  "#EF4444", "#F97316", "#F59E0B", "#22C55E",
-  "#14B8A6", "#3B82F6", "#8B5CF6", "#EC4899"
-]
+import { cn } from "@/utils"
 
 interface GroupModalProps {
-  // For create mode: group is null/undefined
-  // For edit mode: group is provided
   group?: Group
   extensions?: Extension[]
   allExtensions?: Extension[]
@@ -142,6 +21,10 @@ interface GroupModalProps {
   onUpdateGroup?: (groupId: string, updates: { name?: string; color?: string; icon?: string; iconUrl?: string }) => void
 }
 
+interface ExtensionWithStatus extends Extension {
+  isInGroup: boolean
+}
+
 export function GroupModal({
   group,
   extensions = [],
@@ -150,414 +33,178 @@ export function GroupModal({
   onClose,
   onCreate,
   onToggleExtension,
-  onOpenOptions,
-  onRemove,
   onDeleteGroup,
   onAddExtension,
   onRemoveFromGroup,
   onUpdateGroup
 }: GroupModalProps) {
   const isCreateMode = !group
-
   const [searchQuery, setSearchQuery] = React.useState("")
   const [filter, setFilter] = React.useState<FilterType>("all")
   const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false)
   const [editName, setEditName] = React.useState(group?.name || "New Group")
-  const [selectedColor, setSelectedColor] = React.useState(group?.color || GROUP_COLORS[0])
-  const [editIconUrl, setEditIconUrl] = React.useState((group as any)?.iconUrl || "")
+  const [editIconUrl, setEditIconUrl] = React.useState(group?.iconUrl || "")
   const [selectedExtensions, setSelectedExtensions] = React.useState<Set<string>>(new Set())
-  const fileInputRef = React.useRef<HTMLInputElement>(null)
 
-  // Handle image upload
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      const reader = new FileReader()
-      reader.onload = (event) => {
-        const dataUrl = event.target?.result as string
-        if (isCreateMode) {
-          setEditIconUrl(dataUrl)
-        } else if (group && onUpdateGroup) {
-          onUpdateGroup(group.id, { icon: "custom", iconUrl: dataUrl })
-        }
-      }
-      reader.readAsDataURL(file)
-    }
-  }
+  const groupExtensionIds = React.useMemo(
+    () => new Set(group?.extensionIds || []),
+    [group?.extensionIds]
+  )
 
-  // Create a set of extension IDs in this group for fast lookup
-  const groupExtIds = React.useMemo(() => {
-    return new Set(group?.extensionIds || [])
-  }, [group?.extensionIds])
+  const extensionsWithStatus = React.useMemo<ExtensionWithStatus[]>(
+    () =>
+      allExtensions.map((extension) => ({
+        ...extension,
+        isInGroup: isCreateMode
+          ? selectedExtensions.has(extension.id)
+          : groupExtensionIds.has(extension.id)
+      })),
+    [allExtensions, groupExtensionIds, isCreateMode, selectedExtensions]
+  )
 
-  // Get all extensions with their group membership status
-  const extensionsWithStatus = React.useMemo(() => {
-    return allExtensions.map(ext => ({
-      ...ext,
-      isInGroup: isCreateMode ? selectedExtensions.has(ext.id) : groupExtIds.has(ext.id)
-    }))
-  }, [allExtensions, groupExtIds, selectedExtensions, isCreateMode])
+  const filteredExtensions = React.useMemo(
+    () => extensionsWithStatus.filter((extension) => {
+      if (filter === "enabled" && !extension.enabled) return false
+      if (filter === "disabled" && extension.enabled) return false
+      if (!searchQuery.trim()) return true
 
-  // Filter by search query and enabled/disabled status
-  const filteredExtensions = React.useMemo(() => {
-    let result = extensionsWithStatus
-
-    // Apply enabled/disabled filter
-    if (filter === "enabled") {
-      result = result.filter(ext => ext.enabled)
-    } else if (filter === "disabled") {
-      result = result.filter(ext => !ext.enabled)
-    }
-
-    // Apply search query filter
-    if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase()
-      result = result.filter(ext =>
-        ext.name.toLowerCase().includes(query) ||
-        ext.description.toLowerCase().includes(query)
+      return (
+        extension.name.toLowerCase().includes(query) ||
+        extension.description.toLowerCase().includes(query)
       )
-    }
+    }),
+    [extensionsWithStatus, filter, searchQuery]
+  )
 
-    return result
-  }, [extensionsWithStatus, searchQuery, filter])
-
-  // Close on escape
   React.useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
+    const handleEsc = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
         onClose()
       }
     }
+
     document.addEventListener("keydown", handleEsc)
     return () => document.removeEventListener("keydown", handleEsc)
   }, [onClose])
 
-  // Update name on blur or enter (edit mode only)
-  const handleNameChange = () => {
-    if (group && onUpdateGroup) {
-      if (editName.trim() && editName !== group.name) {
-        onUpdateGroup(group.id, { name: editName.trim() })
-      } else if (!editName.trim()) {
-        setEditName(group.name)
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    const reader = new FileReader()
+    reader.onload = (loadEvent) => {
+      const dataUrl = loadEvent.target?.result as string
+      if (isCreateMode) {
+        setEditIconUrl(dataUrl)
+        return
       }
+
+      if (group && onUpdateGroup) {
+        onUpdateGroup(group.id, { icon: "custom", iconUrl: dataUrl })
+      }
+    }
+    reader.readAsDataURL(file)
+  }
+
+  const handleNameCommit = () => {
+    if (!group || !onUpdateGroup) return
+
+    const nextName = editName.trim()
+    if (!nextName) {
+      setEditName(group.name)
+      return
+    }
+
+    if (nextName !== group.name) {
+      onUpdateGroup(group.id, { name: nextName })
     }
   }
 
-  const handleToggleExtensionMembership = (ext: typeof filteredExtensions[0]) => {
+  const handleToggleMembership = (extension: ExtensionWithStatus) => {
     if (isCreateMode) {
-      // In create mode, toggle selectedExtensions state
-      setSelectedExtensions(prev => {
-        const next = new Set(prev)
-        if (next.has(ext.id)) {
-          next.delete(ext.id)
+      setSelectedExtensions((previous) => {
+        const next = new Set(previous)
+        if (next.has(extension.id)) {
+          next.delete(extension.id)
         } else {
-          next.add(ext.id)
+          next.add(extension.id)
         }
         return next
       })
-    } else if (group && onAddExtension && onRemoveFromGroup) {
-      // In edit mode, call actual handlers
-      if (ext.isInGroup) {
-        onRemoveFromGroup(group.id, ext.id)
-      } else {
-        onAddExtension(group.id, ext.id)
-      }
+      return
     }
-  }
 
-  // Check if all extensions in group are enabled
-  const allEnabled = extensions.length > 0 && extensions.every(ext => ext.enabled)
-  const allDisabled = extensions.length > 0 && extensions.every(ext => !ext.enabled)
-
-  // Toggle all extensions in group
-  const handleToggleAll = () => {
-    if (!onToggleExtension) return
-    if (allEnabled) {
-      // Disable all
-      extensions.forEach(ext => {
-        if (ext.enabled) onToggleExtension(ext.id)
-      })
+    if (!group || !onAddExtension || !onRemoveFromGroup) return
+    if (extension.isInGroup) {
+      onRemoveFromGroup(group.id, extension.id)
     } else {
-      // Enable all
-      extensions.forEach(ext => {
-        if (!ext.enabled) onToggleExtension(ext.id)
-      })
+      onAddExtension(group.id, extension.id)
     }
   }
 
-  // Handle create
+  const handleToggleAll = (enabled: boolean) => {
+    if (disableEnableControls || !onToggleExtension) return
+
+    extensions.forEach((extension) => {
+      if (extension.enabled !== enabled) {
+        onToggleExtension(extension.id)
+      }
+    })
+  }
+
   const handleCreate = () => {
-    if (onCreate && editName.trim()) {
-      onCreate(editName.trim(), selectedColor, Array.from(selectedExtensions), editIconUrl)
-      onClose()
-    }
+    if (!onCreate || !editName.trim()) return
+    onCreate(editName.trim(), group?.color || "#EF4444", Array.from(selectedExtensions), editIconUrl)
+    onClose()
   }
-
-  // Get icon to display (custom image or icon map)
-  const groupIconUrl = (group as any)?.iconUrl
-  const displayIcon = groupIconUrl ? (
-    <img src={groupIconUrl} className="w-full h-full object-cover" alt="" />
-  ) : (
-    ICON_MAP[group?.icon || "folder"] || <Folder className="w-4 h-4" />
-  )
-
-  const canCreate = editName.trim()
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-punk-bg/80 backdrop-blur-sm" onClick={onClose}>
       <div
         className="w-[480px] h-[575px] border border-punk-border bg-punk-bg-alt shadow-[0_0_30px_rgba(124,58,237,0.4)] overflow-hidden flex flex-col"
-        onClick={(e) => e.stopPropagation()}
+        onClick={(event) => event.stopPropagation()}
       >
-        {/* Header - Icon with name input and search */}
-        <div className="flex gap-4 px-4 py-3 border-b border-punk-border/30 bg-punk-bg shrink-0">
-          {/* Icon Upload */}
-          <div className="flex-shrink-0 flex items-center">
-            {isCreateMode ? (
-              <div
-                className="relative w-[96px] h-[96px] border border-punk-border/50 bg-punk-bg rounded overflow-hidden group cursor-pointer"
-                onClick={() => fileInputRef.current?.click()}
-              >
-                {editIconUrl ? (
-                  <>
-                    <img
-                      src={editIconUrl}
-                      alt=""
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-punk-bg/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <label className="cursor-pointer p-2 text-punk-text-muted hover:text-punk-accent transition-colors">
-                        <Upload className="h-5 w-5" />
-                        <input
-                          type="file"
-                          ref={fileInputRef}
-                          accept="image/*"
-                          onChange={handleImageUpload}
-                          className="hidden"
-                        />
-                      </label>
-                    </div>
-                  </>
-                ) : (
-                  <div className="flex flex-col items-center justify-center w-full h-full">
-                    <Image className="h-6 w-6 text-punk-text-muted mb-1" />
-                    <span className="text-[10px] text-punk-text-muted uppercase">UPLOAD</span>
-                  </div>
-                )}
-                {!editIconUrl && (
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="hidden"
-                  />
-                )}
-              </div>
-            ) : (
-              <div className="relative w-[96px] h-[96px] border border-punk-border/50 bg-punk-bg rounded overflow-hidden group">
-                {(group as any)?.iconUrl ? (
-                  <>
-                    <img
-                      src={(group as any).iconUrl}
-                      alt=""
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-punk-bg/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <label className="cursor-pointer p-2 text-punk-text-muted hover:text-punk-accent transition-colors">
-                        <Upload className="h-5 w-5" />
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleImageUpload}
-                          className="hidden"
-                        />
-                      </label>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div
-                      className="flex flex-col items-center justify-center w-full h-full cursor-pointer hover:bg-punk-bg-alt transition-colors"
-                      style={{ color: group.color }}
-                      onClick={() => fileInputRef.current?.click()}
-                    >
-                      {ICON_MAP[group?.icon || "folder"]}
-                    </div>
-                    <input
-                      type="file"
-                      ref={fileInputRef}
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      className="hidden"
-                    />
-                  </>
-                )}
-              </div>
-            )}
-          </div>
+        <GroupEditorPanel
+          group={group}
+          isCreateMode={isCreateMode}
+          editName={editName}
+          editIconUrl={editIconUrl}
+          searchQuery={searchQuery}
+          filter={filter}
+          onEditNameChange={setEditName}
+          onNameCommit={handleNameCommit}
+          onSearchQueryChange={setSearchQuery}
+          onFilterChange={setFilter}
+          onImageUpload={handleImageUpload}
+        />
 
-          {/* Right side: Name input + Search */}
-          <div className="flex-1 flex flex-col gap-3">
-            {/* Name input row with label */}
-            <div className="flex items-center gap-3">
-              <div className="flex-1">
-                <label className="block font-punk-heading text-[13px] text-punk-text-muted uppercase mb-1.5">
-                  GROUP_NAME
-                </label>
-                <input
-                  type="text"
-                  value={editName}
-                  onChange={(e) => setEditName(e.target.value)}
-                  onBlur={isCreateMode ? undefined : handleNameChange}
-                  onKeyDown={(e) => {
-                    if (!isCreateMode && e.key === "Enter") {
-                      handleNameChange()
-                      e.currentTarget.blur()
-                    }
-                  }}
-                  placeholder="e.g., Work Extensions"
-                  className="punk-input w-full h-10 px-3 text-sm"
-                />
-              </div>
-            </div>
+        {!isCreateMode && (
+          <GroupExtensionPicker
+            extensions={extensions}
+            memberExtensions={extensionsWithStatus.filter((extension) => extension.isInGroup)}
+            filteredExtensions={filteredExtensions}
+            disableEnableControls={disableEnableControls}
+            onToggleAll={handleToggleAll}
+            onToggleMembership={handleToggleMembership}
+          />
+        )}
 
-            {/* Search bar */}
-            <label className="block font-punk-heading text-[13px] text-punk-text-muted uppercase mb-1">
-              SEARCH & FILTER
-            </label>
-            <SearchBar
-              value={searchQuery}
-              onChange={setSearchQuery}
-              placeholder="SEARCH_EXTENSIONS..."
-              activeFilter={filter}
-              onFilterChange={setFilter}
+        {isCreateMode && (
+          <div className="flex-1 overflow-y-auto min-h-0">
+            <GroupExtensionPicker
+              extensions={extensionsWithStatus}
+              filteredExtensions={filteredExtensions}
+              disableEnableControls={true}
+              showEnableActions={false}
+              onToggleAll={() => {}}
+              onToggleMembership={handleToggleMembership}
             />
-          </div>
-        </div>
-
-        {/* Full width: ACTIONS */}
-        {isCreateMode ? null : (
-          <div className="flex items-center gap-2 px-4 py-2 border-b border-punk-border/30 bg-punk-bg shrink-0">
-            <span className="font-punk-heading text-[12px] text-punk-text-muted uppercase">ACTIONS</span>
-            <button
-              onClick={() => {
-                if (disableEnableControls || !onToggleExtension) return
-                extensions.forEach(ext => {
-                  if (!ext.enabled) onToggleExtension(ext.id)
-                })
-              }}
-              disabled={disableEnableControls || extensions.length === 0 || allEnabled}
-              className={cn(
-                "px-2 py-1 text-[12px] font-punk-heading uppercase transition-all",
-                disableEnableControls || extensions.length === 0 || allEnabled
-                  ? "bg-punk-success/20 text-punk-success/50 cursor-not-allowed"
-                  : "bg-punk-success/20 text-punk-success border border-punk-success/50 hover:bg-punk-success hover:text-white"
-              )}
-            >
-              ENABLE ALL
-            </button>
-            <button
-              onClick={() => {
-                if (disableEnableControls || !onToggleExtension) return
-                if (!onToggleExtension) return
-                extensions.forEach(ext => {
-                  if (ext.enabled) onToggleExtension(ext.id)
-                })
-              }}
-              disabled={disableEnableControls || extensions.length === 0 || allDisabled}
-              className={cn(
-                "px-2 py-1 text-[12px] font-punk-heading uppercase transition-all",
-                disableEnableControls || extensions.length === 0 || allDisabled
-                  ? "bg-punk-cta/20 text-punk-cta/50 cursor-not-allowed"
-                  : "bg-punk-cta/20 text-punk-cta border border-punk-cta/50 hover:bg-punk-cta hover:text-white"
-              )}
-            >
-              DISABLE ALL
-            </button>
           </div>
         )}
 
-        {/* Group member icons - just icons, no names */}
-        <div className="flex gap-2 px-4 py-2 border-b border-punk-border/30 bg-punk-bg shrink-0 overflow-x-auto">
-          {extensionsWithStatus.filter(ext => ext.isInGroup).map((ext) => (
-            <div
-              key={ext.id}
-              className={cn(
-                "w-8 h-8 flex-shrink-0 border bg-punk-bg-alt flex items-center justify-center overflow-hidden",
-                ext.enabled ? "border-punk-success" : "border-punk-border/30"
-              )}
-              onClick={() => handleToggleExtensionMembership(ext)}
-            >
-              {ext.iconUrl ? (
-                <img src={ext.iconUrl} className="w-full h-full object-cover" alt="" />
-              ) : (
-                <Package className="w-4 h-4 text-punk-text-muted" />
-              )}
-            </div>
-          ))}
-          {extensionsWithStatus.filter(ext => ext.isInGroup).length === 0 && (
-            <div className="h-8 flex items-center">
-              <span className="font-punk-heading text-[12px] text-punk-text-muted uppercase">
-                NO GROUP MEMBERS
-              </span>
-            </div>
-          )}
-        </div>
-
-        {/* Extension List - filtered extensions for adding/removing */}
-        <div className="flex-1 overflow-y-auto min-h-0">
-          {filteredExtensions.length > 0 ? (
-            <div className="grid grid-cols-5 gap-2 p-3" style={{ gridAutoRows: "72px" }}>
-              {filteredExtensions.map((ext) => (
-                <div
-                  key={ext.id}
-                  onClick={() => handleToggleExtensionMembership(ext)}
-                  className={cn(
-                    "relative flex flex-col items-center justify-center p-2 cursor-pointer transition-all border",
-                    ext.isInGroup
-                      ? "border-punk-success/50 bg-punk-success/5 hover:border-punk-success"
-                      : "border-punk-border/20 bg-punk-bg-alt hover:border-punk-primary/50"
-                  )}
-                  style={{ height: "72px" }}
-                >
-                  {/* Status dot */}
-                  <div
-                    className={cn(
-                      "absolute top-1 right-1 w-2 h-2 border border-punk-bg-alt z-10",
-                      ext.enabled ? "bg-punk-success" : "bg-punk-text-muted"
-                    )}
-                  />
-                  {/* Icon */}
-                  {ext.iconUrl ? (
-                    <img src={ext.iconUrl} className="w-8 h-8 border border-punk-border/30 object-cover" alt="" />
-                  ) : (
-                    <div className="w-8 h-8 border border-punk-border/30 bg-punk-bg flex items-center justify-center">
-                      <Package className="w-4 h-4 text-punk-text-muted" />
-                    </div>
-                  )}
-                  {/* Name */}
-                  <span className={cn(
-                    "font-punk-heading text-[10px] uppercase text-center truncate w-full mt-1",
-                    ext.isInGroup ? "text-punk-text-primary" : "text-punk-text-muted"
-                  )}>
-                    {ext.name.substring(0, 8)}
-                  </span>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center py-8 text-center">
-              <p className="font-punk-body text-base text-punk-text-muted">
-                NO_MATCH_FOUND
-              </p>
-            </div>
-          )}
-        </div>
-
-        {/* Bottom Actions */}
         <div className="flex justify-end gap-2 px-4 py-2 border-t border-punk-border/30 shrink-0 mt-auto">
-          {isCreateMode ? null : (
+          {!isCreateMode && (
             <button
               onClick={() => setShowDeleteConfirm(true)}
               className="mr-auto px-3 py-1.5 font-punk-heading text-[12px] text-punk-cta uppercase tracking-wider hover:bg-punk-cta/10 transition-colors"
@@ -574,10 +221,10 @@ export function GroupModal({
           {isCreateMode && (
             <button
               onClick={handleCreate}
-              disabled={!canCreate}
+              disabled={!editName.trim()}
               className={cn(
                 "px-4 py-2 font-punk-heading text-[13px] uppercase tracking-wider transition-colors",
-                canCreate
+                editName.trim()
                   ? "bg-punk-primary text-white hover:bg-punk-primary/80"
                   : "bg-punk-border/50 text-punk-text-muted cursor-not-allowed"
               )}
@@ -587,47 +234,20 @@ export function GroupModal({
           )}
         </div>
 
-        {/* Delete Confirmation Modal */}
-        {showDeleteConfirm && (
-          <div
-            className="fixed inset-0 z-[60] flex items-center justify-center bg-punk-bg/80 backdrop-blur-sm"
-            onClick={() => setShowDeleteConfirm(false)}
-          >
-            <div
-              className="w-[320px] border border-punk-border bg-punk-bg-alt shadow-[0_0_30px_rgba(124,58,237,0.4)] p-4"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex items-center gap-2 mb-3">
-                <AlertTriangle className="w-4 h-4 text-punk-cta" />
-                <span className="font-punk-heading text-[10px] text-punk-text-muted uppercase tracking-wider">
-                  Delete "{group?.name}"?
-                </span>
-              </div>
-              <p className="font-punk-body text-sm text-punk-text-primary mb-4">
-                This action cannot be undone.
-              </p>
-              <div className="flex justify-end gap-2">
-                <button
-                  onClick={() => setShowDeleteConfirm(false)}
-                  className="px-4 py-2 font-punk-heading text-[13px] text-punk-text-muted uppercase tracking-wider hover:text-punk-text-primary transition-colors"
-                >
-                  CANCEL
-                </button>
-                <button
-                  onClick={() => {
-                    if (group && onDeleteGroup) {
-                      onDeleteGroup(group.id)
-                      onClose()
-                    }
-                  }}
-                  className="px-4 py-2 font-punk-heading text-[13px] text-white uppercase tracking-wider bg-punk-cta hover:bg-punk-cta/80 transition-colors"
-                >
-                  DELETE
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        <ConfirmDialog
+          isOpen={showDeleteConfirm}
+          title={`DELETE "${group?.name || "GROUP"}"?`}
+          message="This action cannot be undone."
+          confirmText="DELETE"
+          variant="danger"
+          onConfirm={() => {
+            if (group && onDeleteGroup) {
+              onDeleteGroup(group.id)
+              onClose()
+            }
+          }}
+          onCancel={() => setShowDeleteConfirm(false)}
+        />
       </div>
     </div>
   )

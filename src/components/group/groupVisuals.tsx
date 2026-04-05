@@ -1,0 +1,46 @@
+import * as React from "react"
+import {
+  Folder,
+  Star,
+  Heart,
+  Bookmark,
+  Tag,
+  Flag,
+  Briefcase,
+  Code,
+  Globe,
+  Lock,
+  Settings,
+  Wrench,
+  Zap,
+  Flame,
+  Gem,
+  Crown,
+  Target
+} from "lucide-react"
+
+export const GROUP_COLORS = [
+  "#EF4444", "#F97316", "#F59E0B", "#22C55E",
+  "#14B8A6", "#3B82F6", "#8B5CF6", "#EC4899"
+]
+
+export const GROUP_ICON_MAP: Record<string, React.ReactNode> = {
+  folder: <Folder className="w-4 h-4" />,
+  star: <Star className="w-4 h-4" />,
+  heart: <Heart className="w-4 h-4" />,
+  bookmark: <Bookmark className="w-4 h-4" />,
+  tag: <Tag className="w-4 h-4" />,
+  flag: <Flag className="w-4 h-4" />,
+  briefcase: <Briefcase className="w-4 h-4" />,
+  code: <Code className="w-4 h-4" />,
+  globe: <Globe className="w-4 h-4" />,
+  lock: <Lock className="w-4 h-4" />,
+  settings: <Settings className="w-4 h-4" />,
+  tool: <Wrench className="w-4 h-4" />,
+  zap: <Zap className="w-4 h-4" />,
+  bolt: <Zap className="w-4 h-4" />,
+  flame: <Flame className="w-4 h-4" />,
+  gem: <Gem className="w-4 h-4" />,
+  crown: <Crown className="w-4 h-4" />,
+  target: <Target className="w-4 h-4" />
+}

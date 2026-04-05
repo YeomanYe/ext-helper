@@ -1,5 +1,5 @@
 import type { Extension, Group } from "@/types"
-import { CreateGroupChip, GroupChip } from "@/components/group/GroupModal"
+import { CreateGroupChip, GroupChip } from "@/components/group/GroupChips"
 
 interface GroupsBarProps {
   groups: Group[]
