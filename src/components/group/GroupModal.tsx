@@ -1,5 +1,5 @@
 import * as React from "react"
-import { X, Plus, Folder, Package, Star, Heart, Bookmark, Tag, Flag, Briefcase, Code, Globe, Lock, Settings, Wrench, Zap, Flame, Gem, Crown, Target, Image, Upload, AlertTriangle } from "lucide-react"
+import { X, Plus, Folder, Package, Star, Heart, Bookmark, Tag, Flag, Briefcase, Code, Globe, Lock, Settings, Wrench, Zap, Flame, Gem, Crown, Target, Image, Upload, AlertTriangle, Power, PowerOff } from "lucide-react"
 import { cn } from "@/utils"
 import { SearchBar } from "@/components/popup"
 import type { Group, Extension, FilterType } from "@/types"
@@ -30,6 +30,7 @@ const ICON_OPTIONS = Object.keys(ICON_MAP)
 interface GroupChipProps {
   group: Group
   extensionCount: number
+  allEnabled: boolean
   onClick: () => void
   onToggle: () => void
 }
@@ -37,6 +38,7 @@ interface GroupChipProps {
 export function GroupChip({
   group,
   extensionCount,
+  allEnabled,
   onClick,
   onToggle
 }: GroupChipProps) {
@@ -84,12 +86,9 @@ export function GroupChip({
           "p-0.5 transition-colors",
           "text-punk-text-muted hover:text-punk-success hover:bg-punk-success/10"
         )}
-        title="Enable or disable all in group"
+        title={allEnabled ? "Disable all in group" : "Enable all in group"}
       >
-        <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M18.36 6.64a9 9 0 1 1-12.73 0" />
-          <line x1="12" y1="2" x2="12" y2="12" />
-        </svg>
+        {allEnabled ? <PowerOff className="h-3.5 w-3.5" /> : <Power className="h-3.5 w-3.5" />}
       </button>
     </div>
   )

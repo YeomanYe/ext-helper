@@ -256,12 +256,15 @@ export function PopupPage() {
               <div className="flex flex-wrap gap-2">
                 {/* Group chips */}
                 {displayGroups.map((group) => {
-                  const count = displayExtensions.filter(ext => group.extensionIds.includes(ext.id)).length
+                  const groupExtensions = displayExtensions.filter(ext => group.extensionIds.includes(ext.id))
+                  const count = groupExtensions.length
+                  const allEnabled = count > 0 && groupExtensions.every((ext) => ext.enabled)
                   return (
                     <GroupChip
                       key={group.id}
                       group={group}
                       extensionCount={count}
+                      allEnabled={allEnabled}
                       onClick={() => setSelectedGroupId(group.id)}
                       onToggle={() => handleToggleGroup(group)}
                     />
