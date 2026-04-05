@@ -34,28 +34,39 @@ export function ExtensionCard({
     if (!cardRef.current) return
 
     const rect = cardRef.current.getBoundingClientRect()
-    const viewportWidth = window.innerWidth
-    const viewportHeight = window.innerHeight
+    const surface = cardRef.current.closest("[data-extension-surface='true']")
+    const surfaceRect = surface?.getBoundingClientRect()
+    const boundaryLeft = surfaceRect?.left ?? 0
+    const boundaryTop = surfaceRect?.top ?? 0
+    const boundaryRight = surfaceRect?.right ?? window.innerWidth
+    const boundaryBottom = surfaceRect?.bottom ?? window.innerHeight
+    const boundaryWidth = boundaryRight - boundaryLeft
+    const boundaryHeight = boundaryBottom - boundaryTop
     const padding = 10
     const gap = 6
 
-    const openToLeft = rect.left > viewportWidth / 2
-    const openUpward = rect.top > viewportHeight / 2
-
-    const desiredLeft = openToLeft ? rect.right - menuWidth : rect.left
-    const desiredTop = openUpward ? rect.top - menuHeight - gap : rect.bottom + gap
+    const desiredLeft = isDetail
+      ? rect.left
+      : rect.left - boundaryLeft > boundaryWidth / 2
+        ? rect.right - menuWidth
+        : rect.left
+    const desiredTop = isDetail
+      ? rect.top
+      : rect.top - boundaryTop > boundaryHeight / 2
+        ? rect.top - menuHeight - gap
+        : rect.bottom + gap
 
     const left = Math.min(
-      Math.max(desiredLeft, padding),
-      viewportWidth - menuWidth - padding
+      Math.max(desiredLeft, boundaryLeft + padding),
+      boundaryRight - menuWidth - padding
     )
     const top = Math.min(
-      Math.max(desiredTop, padding),
-      viewportHeight - menuHeight - padding
+      Math.max(desiredTop, boundaryTop + padding),
+      boundaryBottom - menuHeight - padding
     )
 
     setMenuPosition({ top, left })
-  }, [menuHeight, menuWidth])
+  }, [isDetail, menuHeight, menuWidth])
 
   // Calculate menu position based on card location
   React.useEffect(() => {
