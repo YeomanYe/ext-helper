@@ -1,5 +1,5 @@
 import { create } from "zustand"
-import type { ExtensionStore, FilterType, SortType } from "@/types"
+import type { BisectSession, ExtensionStore, FilterType, SortType } from "@/types"
 import { browserAdapter } from "@/services/browser/adapter"
 import { devStorage } from "@/services/devStorage"
 import { isDevMode } from "@/services/mockData"
@@ -11,12 +11,70 @@ const cloneExtensions = (extensions: typeof MOCK_EXTENSIONS) =>
     permissions: [...extension.permissions]
   }))
 
+const createIdleBisectSession = (): BisectSession => ({
+  active: false,
+  phase: "idle",
+  baselineExtensions: [],
+  allCandidateIds: [],
+  candidateIds: [],
+  currentTestIds: [],
+  parkedIds: [],
+  step: 0
+})
+
+const splitCandidateIds = (candidateIds: string[]) => {
+  const midpoint = Math.ceil(candidateIds.length / 2)
+  return {
+    currentTestIds: candidateIds.slice(0, midpoint),
+    parkedIds: candidateIds.slice(midpoint)
+  }
+}
+
+const buildBisectExtensions = (
+  baselineExtensions: typeof MOCK_EXTENSIONS,
+  allCandidateIds: string[],
+  currentTestIds: string[]
+) => {
+  const allCandidates = new Set(allCandidateIds)
+  const currentTests = new Set(currentTestIds)
+
+  return baselineExtensions.map((extension) => {
+    if (!allCandidates.has(extension.id)) {
+      return { ...extension, permissions: [...extension.permissions] }
+    }
+
+    return {
+      ...extension,
+      permissions: [...extension.permissions],
+      enabled: currentTests.has(extension.id)
+    }
+  })
+}
+
+const applyExtensionsState = async (
+  previousExtensions: typeof MOCK_EXTENSIONS,
+  nextExtensions: typeof MOCK_EXTENSIONS
+) => {
+  if (isDevMode()) {
+    devStorage.setExtensions(nextExtensions)
+    return
+  }
+
+  const previousById = new Map(previousExtensions.map((extension) => [extension.id, extension.enabled]))
+  await Promise.all(
+    nextExtensions
+      .filter((extension) => previousById.get(extension.id) !== extension.enabled)
+      .map((extension) => browserAdapter.setExtensionEnabled(extension.id, extension.enabled))
+  )
+}
+
 const withHistoryCleared = (extensions: typeof MOCK_EXTENSIONS) => ({
   extensions,
   canUndo: false,
   canRedo: false,
   undoCount: 0,
   redoCount: 0,
+  bisectSession: createIdleBisectSession(),
   history: [],
   future: []
 })
@@ -32,6 +90,7 @@ export const useExtensionStore = create<ExtensionStore>((set, get) => ({
   canRedo: false,
   undoCount: 0,
   redoCount: 0,
+  bisectSession: createIdleBisectSession(),
 
   fetchExtensions: async () => {
     set({ loading: true, error: null })
@@ -57,6 +116,8 @@ export const useExtensionStore = create<ExtensionStore>((set, get) => ({
   },
 
   toggleExtension: async (id: string) => {
+    if (get().bisectSession.active) return
+
     const { extensions } = get()
     const ext = extensions.find((e) => e.id === id)
     if (!ext) return
@@ -97,6 +158,8 @@ export const useExtensionStore = create<ExtensionStore>((set, get) => ({
   },
 
   removeExtension: async (id: string) => {
+    if (get().bisectSession.active) return
+
     const { extensions } = get()
     const exists = extensions.some((extension) => extension.id === id)
     if (!exists) return
@@ -135,6 +198,8 @@ export const useExtensionStore = create<ExtensionStore>((set, get) => ({
   },
 
   setExtensionsEnabled: async (ids: string[], enabled: boolean) => {
+    if (get().bisectSession.active) return
+
     const uniqueIds = Array.from(new Set(ids))
     if (uniqueIds.length === 0) return
 
@@ -188,6 +253,8 @@ export const useExtensionStore = create<ExtensionStore>((set, get) => ({
   },
 
   undoExtensions: async () => {
+    if (get().bisectSession.active) return
+
     const state = get() as any
     const history = state.history || []
     if (history.length === 0) return
@@ -233,6 +300,8 @@ export const useExtensionStore = create<ExtensionStore>((set, get) => ({
   },
 
   redoExtensions: async () => {
+    if (get().bisectSession.active) return
+
     const state = get() as any
     const future = state.future || []
     if (future.length === 0) return
@@ -275,6 +344,199 @@ export const useExtensionStore = create<ExtensionStore>((set, get) => ({
         error: error instanceof Error ? error.message : "Failed to redo extension changes"
       })
     }
+  },
+
+  startBisect: async () => {
+    const state = get()
+    if (state.bisectSession.active) return
+
+    const baselineExtensions = cloneExtensions(state.extensions)
+    const allCandidateIds = baselineExtensions
+      .filter((extension) => extension.enabled)
+      .map((extension) => extension.id)
+
+    if (allCandidateIds.length < 2) {
+      set({ error: "Need at least two enabled extensions to start bisect" })
+      return
+    }
+
+    const { currentTestIds, parkedIds } = splitCandidateIds(allCandidateIds)
+    const nextExtensions = buildBisectExtensions(
+      baselineExtensions,
+      allCandidateIds,
+      currentTestIds
+    )
+
+    set({
+      error: null,
+      extensions: nextExtensions,
+      bisectSession: {
+        active: true,
+        phase: "running",
+        baselineExtensions,
+        allCandidateIds,
+        candidateIds: allCandidateIds,
+        currentTestIds,
+        parkedIds,
+        step: 1
+      }
+    })
+
+    try {
+      await applyExtensionsState(baselineExtensions, nextExtensions)
+    } catch (error) {
+      set({
+        extensions: baselineExtensions,
+        bisectSession: createIdleBisectSession(),
+        error: error instanceof Error ? error.message : "Failed to start bisect"
+      })
+    }
+  },
+
+  markBisectGood: async () => {
+    const state = get()
+    const session = state.bisectSession
+    if (!session.active || session.phase !== "running") return
+
+    const nextCandidateIds = session.parkedIds
+    if (nextCandidateIds.length === 0) {
+      set({ error: "Bisect could not determine a remaining candidate" })
+      return
+    }
+
+    const { currentTestIds, parkedIds } = splitCandidateIds(nextCandidateIds)
+    const nextPhase = nextCandidateIds.length === 1 ? "resolved" : "running"
+    const nextExtensions = buildBisectExtensions(
+      session.baselineExtensions,
+      session.allCandidateIds,
+      currentTestIds
+    )
+
+    set({
+      error: null,
+      extensions: nextExtensions,
+      bisectSession: {
+        ...session,
+        phase: nextPhase,
+        candidateIds: nextCandidateIds,
+        currentTestIds,
+        parkedIds,
+        step: session.step + 1,
+        resultId: nextCandidateIds.length === 1 ? nextCandidateIds[0] : undefined,
+        resultIds: nextCandidateIds.length > 1 ? nextCandidateIds : undefined
+      }
+    })
+
+    try {
+      await applyExtensionsState(state.extensions, nextExtensions)
+    } catch (error) {
+      set({
+        extensions: state.extensions,
+        bisectSession: session,
+        error: error instanceof Error ? error.message : "Failed to apply bisect result"
+      })
+    }
+  },
+
+  markBisectBad: async () => {
+    const state = get()
+    const session = state.bisectSession
+    if (!session.active || session.phase !== "running") return
+
+    const nextCandidateIds = session.currentTestIds
+    if (nextCandidateIds.length === 0) {
+      set({ error: "Bisect could not determine a remaining candidate" })
+      return
+    }
+
+    const { currentTestIds, parkedIds } = splitCandidateIds(nextCandidateIds)
+    const nextPhase = nextCandidateIds.length === 1 ? "resolved" : "running"
+    const nextExtensions = buildBisectExtensions(
+      session.baselineExtensions,
+      session.allCandidateIds,
+      currentTestIds
+    )
+
+    set({
+      error: null,
+      extensions: nextExtensions,
+      bisectSession: {
+        ...session,
+        phase: nextPhase,
+        candidateIds: nextCandidateIds,
+        currentTestIds,
+        parkedIds,
+        step: session.step + 1,
+        resultId: nextCandidateIds.length === 1 ? nextCandidateIds[0] : undefined,
+        resultIds: nextCandidateIds.length > 1 ? nextCandidateIds : undefined
+      }
+    })
+
+    try {
+      await applyExtensionsState(state.extensions, nextExtensions)
+    } catch (error) {
+      set({
+        extensions: state.extensions,
+        bisectSession: session,
+        error: error instanceof Error ? error.message : "Failed to apply bisect result"
+      })
+    }
+  },
+
+  cancelBisect: async () => {
+    const state = get()
+    const session = state.bisectSession
+    if (!session.active) return
+
+    const baselineExtensions = cloneExtensions(session.baselineExtensions)
+    set({
+      error: null,
+      extensions: baselineExtensions,
+      bisectSession: createIdleBisectSession()
+    })
+
+    try {
+      await applyExtensionsState(state.extensions, baselineExtensions)
+    } catch (error) {
+      set({
+        extensions: state.extensions,
+        bisectSession: session,
+        error: error instanceof Error ? error.message : "Failed to cancel bisect"
+      })
+    }
+  },
+
+  finishBisectRestore: async () => {
+    const state = get()
+    const session = state.bisectSession
+    if (!session.active) return
+
+    const baselineExtensions = cloneExtensions(session.baselineExtensions)
+    set({
+      error: null,
+      extensions: baselineExtensions,
+      bisectSession: createIdleBisectSession()
+    })
+
+    try {
+      await applyExtensionsState(state.extensions, baselineExtensions)
+    } catch (error) {
+      set({
+        extensions: state.extensions,
+        bisectSession: session,
+        error: error instanceof Error ? error.message : "Failed to restore bisect baseline"
+      })
+    }
+  },
+
+  finishBisectKeepCurrent: () => {
+    const state = get()
+    if (!state.bisectSession.active) return
+
+    set({
+      error: null,
+      bisectSession: createIdleBisectSession()
+    })
   },
 
   setFilter: (filter: FilterType) => set({ filter }),

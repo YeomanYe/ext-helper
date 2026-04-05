@@ -31,6 +31,7 @@ interface GroupChipProps {
   group: Group
   extensionCount: number
   allEnabled: boolean
+  disabled?: boolean
   onClick: () => void
   onToggle: () => void
 }
@@ -39,6 +40,7 @@ export function GroupChip({
   group,
   extensionCount,
   allEnabled,
+  disabled = false,
   onClick,
   onToggle
 }: GroupChipProps) {
@@ -80,11 +82,15 @@ export function GroupChip({
       <button
         onClick={(e) => {
           e.stopPropagation()
+          if (disabled) return
           onToggle()
         }}
+        disabled={disabled}
         className={cn(
           "p-0.5 transition-colors",
-          "text-punk-text-muted hover:text-punk-success hover:bg-punk-success/10"
+          disabled
+            ? "cursor-not-allowed text-punk-text-muted/40"
+            : "text-punk-text-muted hover:text-punk-success hover:bg-punk-success/10"
         )}
         title={allEnabled ? "Disable all in group" : "Enable all in group"}
       >
@@ -124,6 +130,7 @@ interface GroupModalProps {
   group?: Group
   extensions?: Extension[]
   allExtensions?: Extension[]
+  disableEnableControls?: boolean
   onClose: () => void
   onCreate?: (name: string, color: string, extensionIds: string[], iconUrl?: string) => void
   onToggleExtension?: (id: string) => void
@@ -139,6 +146,7 @@ export function GroupModal({
   group,
   extensions = [],
   allExtensions = [],
+  disableEnableControls = false,
   onClose,
   onCreate,
   onToggleExtension,
@@ -434,15 +442,15 @@ export function GroupModal({
             <span className="font-punk-heading text-[12px] text-punk-text-muted uppercase">ACTIONS</span>
             <button
               onClick={() => {
-                if (!onToggleExtension) return
+                if (disableEnableControls || !onToggleExtension) return
                 extensions.forEach(ext => {
                   if (!ext.enabled) onToggleExtension(ext.id)
                 })
               }}
-              disabled={extensions.length === 0 || allEnabled}
+              disabled={disableEnableControls || extensions.length === 0 || allEnabled}
               className={cn(
                 "px-2 py-1 text-[12px] font-punk-heading uppercase transition-all",
-                extensions.length === 0 || allEnabled
+                disableEnableControls || extensions.length === 0 || allEnabled
                   ? "bg-punk-success/20 text-punk-success/50 cursor-not-allowed"
                   : "bg-punk-success/20 text-punk-success border border-punk-success/50 hover:bg-punk-success hover:text-white"
               )}
@@ -451,15 +459,16 @@ export function GroupModal({
             </button>
             <button
               onClick={() => {
+                if (disableEnableControls || !onToggleExtension) return
                 if (!onToggleExtension) return
                 extensions.forEach(ext => {
                   if (ext.enabled) onToggleExtension(ext.id)
                 })
               }}
-              disabled={extensions.length === 0 || allDisabled}
+              disabled={disableEnableControls || extensions.length === 0 || allDisabled}
               className={cn(
                 "px-2 py-1 text-[12px] font-punk-heading uppercase transition-all",
-                extensions.length === 0 || allDisabled
+                disableEnableControls || extensions.length === 0 || allDisabled
                   ? "bg-punk-cta/20 text-punk-cta/50 cursor-not-allowed"
                   : "bg-punk-cta/20 text-punk-cta border border-punk-cta/50 hover:bg-punk-cta hover:text-white"
               )}

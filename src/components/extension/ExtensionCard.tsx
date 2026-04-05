@@ -10,6 +10,8 @@ interface ExtensionCardProps {
   onToggle: () => void
   onOpenOptions?: () => void
   onRemove?: () => void
+  disableEnableControls?: boolean
+  disableRemove?: boolean
   viewMode?: ViewMode
   className?: string
 }
@@ -19,6 +21,8 @@ export function ExtensionCard({
   onToggle,
   onOpenOptions,
   onRemove,
+  disableEnableControls = false,
+  disableRemove = false,
   viewMode = "compact",
   className
 }: ExtensionCardProps) {
@@ -143,10 +147,12 @@ export function ExtensionCard({
         <button
           onClick={(e) => {
             e.stopPropagation()
+            if (disableEnableControls) return
             onToggle()
             setShowMenu(false)
           }}
-          className="flex w-full items-center gap-2 px-3 py-2 text-left font-punk-body text-sm text-punk-text-secondary hover:text-punk-accent hover:bg-punk-bg transition-colors"
+          disabled={disableEnableControls}
+          className="flex w-full items-center gap-2 px-3 py-2 text-left font-punk-body text-sm text-punk-text-secondary hover:text-punk-accent hover:bg-punk-bg transition-colors disabled:cursor-not-allowed disabled:opacity-40"
         >
           {extension.enabled ? (
             <>
@@ -186,9 +192,11 @@ export function ExtensionCard({
         <button
           onClick={(e) => {
             e.stopPropagation()
+            if (disableRemove) return
             handleRemoveClick()
           }}
-          className="flex w-full items-center gap-2 px-3 py-2 text-left font-punk-body text-sm text-punk-cta hover:bg-punk-cta/10 transition-colors"
+          disabled={disableRemove}
+          className="flex w-full items-center gap-2 px-3 py-2 text-left font-punk-body text-sm text-punk-cta hover:bg-punk-cta/10 transition-colors disabled:cursor-not-allowed disabled:opacity-40"
         >
           <Trash2 className="h-4 w-4" />
           REMOVE
@@ -369,6 +377,7 @@ export function ExtensionCard({
                 </div>
                 <Switch
                   checked={extension.enabled}
+                  disabled={disableEnableControls}
                   onCheckedChange={() => onToggle()}
                 />
               </div>
@@ -440,9 +449,11 @@ export function ExtensionCard({
             <button
               onClick={(e) => {
                 e.stopPropagation()
+                if (disableRemove) return
                 handleRemoveClick()
               }}
-              className="flex items-center gap-1 px-2 py-1 text-[11px] font-punk-heading text-punk-text-muted hover:text-punk-cta border border-punk-border/30 hover:border-punk-cta/50 transition-all"
+              disabled={disableRemove}
+              className="flex items-center gap-1 px-2 py-1 text-[11px] font-punk-heading text-punk-text-muted hover:text-punk-cta border border-punk-border/30 hover:border-punk-cta/50 transition-all disabled:cursor-not-allowed disabled:opacity-40"
             >
               <Trash2 className="w-3 h-3" />
               REMOVE
@@ -526,6 +537,7 @@ export function ExtensionCard({
         <div onClick={(e) => e.stopPropagation()}>
           <Switch
             checked={extension.enabled}
+            disabled={disableEnableControls}
             onCheckedChange={() => onToggle()}
           />
         </div>
@@ -562,7 +574,10 @@ export function ExtensionCard({
         className
       )}
       onContextMenu={handleContextMenu}
-      onClick={() => onToggle()}
+      onClick={() => {
+        if (disableEnableControls) return
+        onToggle()
+      }}
     >
       {/* Extension Icon */}
       <div className="relative flex-shrink-0">

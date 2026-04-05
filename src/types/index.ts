@@ -29,6 +29,20 @@ export interface Group {
 export type FilterType = 'all' | 'enabled' | 'disabled' | 'favorites'
 export type SortType = 'name' | 'enabled' | 'recentlyUsed'
 export type ViewMode = 'compact' | 'card' | 'detail'
+export type BisectPhase = 'idle' | 'running' | 'resolved' | 'cancelled'
+
+export interface BisectSession {
+  active: boolean
+  phase: BisectPhase
+  baselineExtensions: Extension[]
+  allCandidateIds: string[]
+  candidateIds: string[]
+  currentTestIds: string[]
+  parkedIds: string[]
+  step: number
+  resultId?: string
+  resultIds?: string[]
+}
 
 export interface Preferences {
   theme: 'light' | 'dark' | 'system'
@@ -49,12 +63,19 @@ export interface ExtensionStore {
   canRedo: boolean
   undoCount: number
   redoCount: number
+  bisectSession: BisectSession
   fetchExtensions: () => Promise<void>
   toggleExtension: (id: string) => Promise<void>
   removeExtension: (id: string) => Promise<void>
   setExtensionsEnabled: (ids: string[], enabled: boolean) => Promise<void>
   undoExtensions: () => Promise<void>
   redoExtensions: () => Promise<void>
+  startBisect: () => Promise<void>
+  markBisectGood: () => Promise<void>
+  markBisectBad: () => Promise<void>
+  cancelBisect: () => Promise<void>
+  finishBisectRestore: () => Promise<void>
+  finishBisectKeepCurrent: () => void
   setFilter: (filter: FilterType) => void
   setSearchQuery: (query: string) => void
   setSortBy: (sort: SortType) => void

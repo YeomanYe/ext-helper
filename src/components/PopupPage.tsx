@@ -31,10 +31,17 @@ export function PopupPage() {
     setExtensionsEnabled,
     undoExtensions,
     redoExtensions,
+    startBisect,
+    markBisectGood,
+    markBisectBad,
+    cancelBisect,
+    finishBisectRestore,
+    finishBisectKeepCurrent,
     canUndo,
     canRedo,
     undoCount,
-    redoCount
+    redoCount,
+    bisectSession
   } = useExtensionStore()
 
   const {
@@ -81,6 +88,12 @@ export function PopupPage() {
   }, [selectedGroup, displayExtensions])
 
   const displayedExtensions = filteredExtensions
+  const bisectResultExtension = React.useMemo(
+    () => extensions.find((extension) => extension.id === bisectSession.resultId) ?? null,
+    [bisectSession.resultId, extensions]
+  )
+  const isBisectActive = bisectSession.active
+  const isBisectResolved = bisectSession.phase === "resolved"
 
   // Initialize on mount
   React.useEffect(() => {
@@ -122,17 +135,19 @@ export function PopupPage() {
   }, [devMode, fetchExtensions, removeExtension])
 
   const handleToggleExtension = React.useCallback((id: string) => {
+    if (isBisectActive) return
     toggleExtension(id)
-  }, [toggleExtension])
+  }, [isBisectActive, toggleExtension])
 
   // Toggle all extensions in a group
   const handleToggleGroup = React.useCallback((group: typeof displayGroups[0]) => {
+    if (isBisectActive) return
     const groupExtensions = displayExtensions.filter((ext) => group.extensionIds.includes(ext.id))
     if (groupExtensions.length === 0) return
 
     const shouldEnableAll = groupExtensions.some((ext) => !ext.enabled)
     void setExtensionsEnabled(groupExtensions.map((ext) => ext.id), shouldEnableAll)
-  }, [displayExtensions, setExtensionsEnabled])
+  }, [displayExtensions, isBisectActive, setExtensionsEnabled])
 
   const enabledCount = displayedExtensions.filter((e) => e.enabled).length
   const totalCount = displayedExtensions.length
@@ -192,11 +207,55 @@ export function PopupPage() {
               </button>
               {showTabActions && (
                 <div className="absolute right-0 top-full z-50 mt-1 w-40 border border-punk-border bg-punk-bg-alt shadow-[0_0_20px_rgba(124,58,237,0.3)]">
+                  {!isBisectActive && (
+                    <button
+                      onClick={() => {
+                        void startBisect()
+                        setShowTabActions(false)
+                      }}
+                      disabled={extensions.filter((ext) => ext.enabled).length < 2}
+                      className="w-full px-3 py-2 text-left font-punk-heading text-[11px] uppercase tracking-wider text-punk-text-secondary transition-colors hover:bg-punk-bg hover:text-punk-text-primary disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      Start Bisect
+                    </button>
+                  )}
+                  {isBisectActive && !isBisectResolved && (
+                    <>
+                      <button
+                        onClick={() => {
+                          void markBisectGood()
+                          setShowTabActions(false)
+                        }}
+                        className="w-full px-3 py-2 text-left font-punk-heading text-[11px] uppercase tracking-wider text-punk-success transition-colors hover:bg-punk-bg"
+                      >
+                        Bisect Good
+                      </button>
+                      <button
+                        onClick={() => {
+                          void markBisectBad()
+                          setShowTabActions(false)
+                        }}
+                        className="w-full px-3 py-2 text-left font-punk-heading text-[11px] uppercase tracking-wider text-punk-cta transition-colors hover:bg-punk-bg"
+                      >
+                        Bisect Bad
+                      </button>
+                      <button
+                        onClick={() => {
+                          void cancelBisect()
+                          setShowTabActions(false)
+                        }}
+                        className="w-full px-3 py-2 text-left font-punk-heading text-[11px] uppercase tracking-wider text-punk-text-secondary transition-colors hover:bg-punk-bg hover:text-punk-text-primary"
+                      >
+                        Cancel Bisect
+                      </button>
+                    </>
+                  )}
                   <button
                     onClick={() => {
                       void setExtensionsEnabled(displayedExtensions.map((ext) => ext.id), true)
                       setShowTabActions(false)
                     }}
+                    disabled={isBisectActive}
                     className="w-full px-3 py-2 text-left font-punk-heading text-[11px] uppercase tracking-wider text-punk-text-secondary transition-colors hover:bg-punk-bg hover:text-punk-text-primary"
                   >
                     Enable All
@@ -206,6 +265,7 @@ export function PopupPage() {
                       void setExtensionsEnabled(displayedExtensions.map((ext) => ext.id), false)
                       setShowTabActions(false)
                     }}
+                    disabled={isBisectActive}
                     className="w-full px-3 py-2 text-left font-punk-heading text-[11px] uppercase tracking-wider text-punk-text-secondary transition-colors hover:bg-punk-bg hover:text-punk-text-primary"
                   >
                     Disable All
@@ -215,7 +275,7 @@ export function PopupPage() {
                       void undoExtensions()
                       setShowTabActions(false)
                     }}
-                    disabled={!canUndo}
+                    disabled={!canUndo || isBisectActive}
                     className="w-full px-3 py-2 text-left font-punk-heading text-[11px] uppercase tracking-wider text-punk-text-secondary transition-colors hover:bg-punk-bg hover:text-punk-text-primary disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     Undo [{undoCount}]
@@ -225,7 +285,7 @@ export function PopupPage() {
                       void redoExtensions()
                       setShowTabActions(false)
                     }}
-                    disabled={!canRedo}
+                    disabled={!canRedo || isBisectActive}
                     className="w-full px-3 py-2 text-left font-punk-heading text-[11px] uppercase tracking-wider text-punk-text-secondary transition-colors hover:bg-punk-bg hover:text-punk-text-primary disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     Redo [{redoCount}]
@@ -251,6 +311,66 @@ export function PopupPage() {
               />
             </div>
 
+            {isBisectActive && (
+              <div className="flex-shrink-0 border-b border-punk-border/30 bg-punk-bg px-3 py-3">
+                <div className="border border-punk-warning/40 bg-punk-bg-alt px-3 py-2.5">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="space-y-1">
+                      <p className="font-punk-heading text-[12px] uppercase tracking-wider text-punk-warning">
+                        {isBisectResolved ? "Bisect Resolved" : `Bisect Step ${bisectSession.step}`}
+                      </p>
+                      <p className="font-punk-body text-sm text-punk-text-secondary">
+                        {isBisectResolved
+                          ? `Suspect: ${bisectResultExtension?.name ?? bisectSession.resultId ?? "Unknown extension"}`
+                          : "Good means the issue disappeared. Bad means the issue is still present."}
+                      </p>
+                      <p className="font-punk-code text-[10px] uppercase tracking-wider text-punk-text-muted">
+                        Candidates {bisectSession.candidateIds.length} · Testing {bisectSession.currentTestIds.length}
+                      </p>
+                    </div>
+                    {!isBisectResolved && (
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => void markBisectGood()}
+                          className="border border-punk-success/50 bg-punk-success/10 px-3 py-1.5 font-punk-heading text-[11px] uppercase tracking-wider text-punk-success transition-colors hover:bg-punk-success/20"
+                        >
+                          Good
+                        </button>
+                        <button
+                          onClick={() => void markBisectBad()}
+                          className="border border-punk-cta/50 bg-punk-cta/10 px-3 py-1.5 font-punk-heading text-[11px] uppercase tracking-wider text-punk-cta transition-colors hover:bg-punk-cta/20"
+                        >
+                          Bad
+                        </button>
+                        <button
+                          onClick={() => void cancelBisect()}
+                          className="border border-punk-border/30 px-3 py-1.5 font-punk-heading text-[11px] uppercase tracking-wider text-punk-text-muted transition-colors hover:border-punk-accent/50 hover:text-punk-text-primary"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    )}
+                    {isBisectResolved && (
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => void finishBisectRestore()}
+                          className="border border-punk-border/30 px-3 py-1.5 font-punk-heading text-[11px] uppercase tracking-wider text-punk-text-muted transition-colors hover:border-punk-accent/50 hover:text-punk-text-primary"
+                        >
+                          Restore Original
+                        </button>
+                        <button
+                          onClick={() => finishBisectKeepCurrent()}
+                          className="border border-punk-warning/50 bg-punk-warning/10 px-3 py-1.5 font-punk-heading text-[11px] uppercase tracking-wider text-punk-warning transition-colors hover:bg-punk-warning/20"
+                        >
+                          Keep Current
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Group Chips */}
             <div className="flex-shrink-0 px-3 py-2 border-b border-punk-border/30">
               <div className="flex flex-wrap gap-2">
@@ -265,6 +385,7 @@ export function PopupPage() {
                       group={group}
                       extensionCount={count}
                       allEnabled={allEnabled}
+                      disabled={isBisectActive}
                       onClick={() => setSelectedGroupId(group.id)}
                       onToggle={() => handleToggleGroup(group)}
                     />
@@ -298,6 +419,8 @@ export function PopupPage() {
                       key={ext.id}
                       extension={ext}
                       viewMode={viewMode}
+                      disableEnableControls={isBisectActive}
+                      disableRemove={isBisectActive}
                       onToggle={() => handleToggleExtension(ext.id)}
                       onOpenOptions={() => handleOpenOptions(ext.id)}
                       onRemove={() => handleRemoveExtension(ext.id)}
@@ -345,9 +468,10 @@ export function PopupPage() {
               setSelectedGroupId(latestGroup.id)
             }
           } : undefined}
-          onToggleExtension={selectedGroup ? handleToggleExtension : undefined}
+          disableEnableControls={isBisectActive}
+          onToggleExtension={selectedGroup && !isBisectActive ? handleToggleExtension : undefined}
           onOpenOptions={selectedGroup ? handleOpenOptions : undefined}
-          onRemove={selectedGroup ? handleRemoveExtension : undefined}
+          onRemove={selectedGroup && !isBisectActive ? handleRemoveExtension : undefined}
           onDeleteGroup={selectedGroup ? deleteGroup : undefined}
           onAddExtension={selectedGroup ? addToGroup : undefined}
           onRemoveFromGroup={selectedGroup ? removeFromGroup : undefined}
