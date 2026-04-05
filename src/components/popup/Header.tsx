@@ -210,7 +210,7 @@ interface FooterProps {
 }
 
 export function Footer({ totalCount, enabledCount }: FooterProps) {
-  const percentage = Math.round((enabledCount / totalCount) * 100)
+  const percentage = totalCount > 0 ? Math.round((enabledCount / totalCount) * 100) : 0
 
   return (
     <footer className="relative flex items-center justify-between border-t-2 border-punk-primary bg-punk-bg-alt px-4 py-2 overflow-hidden">

@@ -78,6 +78,17 @@ class DevStorage {
     this.notify("extensions")
   }
 
+  removeExtension(id: string) {
+    this.extensions = this.extensions.filter((e) => e.id !== id)
+    this.groups = this.groups.map((group) => ({
+      ...group,
+      extensionIds: group.extensionIds.filter((extId) => extId !== id)
+    }))
+    this.save()
+    this.notify("extensions")
+    this.notify("groups")
+  }
+
   // Groups
   getGroups(): Group[] {
     return [...this.groups]

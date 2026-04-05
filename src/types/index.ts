@@ -45,8 +45,15 @@ export interface ExtensionStore {
   filter: FilterType
   searchQuery: string
   sortBy: SortType
+  canUndo: boolean
+  canRedo: boolean
   fetchExtensions: () => Promise<void>
   toggleExtension: (id: string) => Promise<void>
+  removeExtension: (id: string) => Promise<void>
+  setExtensionsEnabled: (ids: string[], enabled: boolean) => Promise<void>
+  undoExtensions: () => Promise<void>
+  redoExtensions: () => Promise<void>
+  bisectExtensions: (ids: string[]) => Promise<void>
   setFilter: (filter: FilterType) => void
   setSearchQuery: (query: string) => void
   setSortBy: (sort: SortType) => void

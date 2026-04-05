@@ -1,4 +1,5 @@
 import * as React from "react"
+import { ChevronDown } from "lucide-react"
 import { Header, Footer, SearchBar } from "@/components/popup"
 import { ExtensionCard } from "@/components/extension"
 import { GroupChip, CreateGroupChip, GroupModal } from "@/components/group"
@@ -25,7 +26,14 @@ export function PopupPage() {
     setSearchQuery,
     setFilter,
     fetchExtensions,
-    toggleExtension
+    toggleExtension,
+    removeExtension,
+    setExtensionsEnabled,
+    undoExtensions,
+    redoExtensions,
+    bisectExtensions,
+    canUndo,
+    canRedo
   } = useExtensionStore()
 
   const {
@@ -56,6 +64,8 @@ export function PopupPage() {
   // Modal state
   const [selectedGroupId, setSelectedGroupId] = React.useState<string | null>(null)
   const [showCreateModal, setShowCreateModal] = React.useState(false)
+  const [showTabActions, setShowTabActions] = React.useState(false)
+  const tabActionsRef = React.useRef<HTMLDivElement>(null)
 
   // Get selected group
   const selectedGroup = React.useMemo(() => {
@@ -69,15 +79,7 @@ export function PopupPage() {
     return displayExtensions.filter(ext => selectedGroup.extensionIds.includes(ext.id))
   }, [selectedGroup, displayExtensions])
 
-  // Filter extensions based on filter
-  const displayedExtensions = React.useMemo(() => {
-    if (filter === "enabled") {
-      return displayExtensions.filter(e => e.enabled)
-    } else if (filter === "disabled") {
-      return displayExtensions.filter(e => !e.enabled)
-    }
-    return displayExtensions
-  }, [displayExtensions, filter])
+  const displayedExtensions = filteredExtensions
 
   // Initialize on mount
   React.useEffect(() => {
@@ -85,6 +87,16 @@ export function PopupPage() {
     fetchExtensions()
     fetchGroups()
   }, [fetchExtensions, fetchGroups])
+
+  React.useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (tabActionsRef.current && !tabActionsRef.current.contains(event.target as Node)) {
+        setShowTabActions(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
 
   const handleOpenOptions = React.useCallback(async (id: string) => {
     if (devMode) return
@@ -95,15 +107,18 @@ export function PopupPage() {
     }
   }, [devMode])
 
-  const handleRemove = React.useCallback(async (id: string) => {
-    if (devMode) return
+  const handleRemoveExtension = React.useCallback(async (id: string) => {
+    if (devMode) {
+      await removeExtension(id)
+      return
+    }
     try {
       await browserAdapter.uninstallExtension(id)
       fetchExtensions()
     } catch (err) {
       console.error("Failed to uninstall extension:", err)
     }
-  }, [devMode, fetchExtensions])
+  }, [devMode, fetchExtensions, removeExtension])
 
   const handleToggleExtension = React.useCallback((id: string) => {
     toggleExtension(id)
@@ -118,7 +133,7 @@ export function PopupPage() {
   }, [toggleExtension])
 
   const enabledCount = displayedExtensions.filter((e) => e.enabled).length
-  const totalCount = displayExtensions.length
+  const totalCount = displayedExtensions.length
 
   // Determine grid columns based on view mode
   // Card mode: single column (full-width cards with toggle switch)
@@ -139,7 +154,7 @@ export function PopupPage() {
 
       {/* Tab Bar */}
       <div className="flex-shrink-0 px-3 pt-2 border-b border-punk-border/30">
-        <div className="flex gap-1">
+        <div className="flex items-center gap-1">
           <button
             onClick={() => setActiveTab("extensions")}
             className={cn(
@@ -151,6 +166,69 @@ export function PopupPage() {
           >
             EXTENSIONS
           </button>
+          {activeTab === "extensions" && (
+            <div className="relative" ref={tabActionsRef}>
+              <button
+                onClick={() => setShowTabActions((value) => !value)}
+                className="flex h-8 items-center gap-1 border border-punk-border/30 bg-punk-bg-alt px-2 text-[11px] font-punk-heading uppercase tracking-wider text-punk-text-muted transition-all hover:border-punk-accent/50 hover:text-punk-accent"
+              >
+                ACTIONS
+                <ChevronDown className={cn("h-3 w-3 transition-transform", showTabActions && "rotate-180")} />
+              </button>
+              {showTabActions && (
+                <div className="absolute left-0 top-full z-50 mt-1 w-40 border border-punk-border bg-punk-bg-alt shadow-[0_0_20px_rgba(124,58,237,0.3)]">
+                  <button
+                    onClick={() => {
+                      void setExtensionsEnabled(displayedExtensions.map((ext) => ext.id), true)
+                      setShowTabActions(false)
+                    }}
+                    className="w-full px-3 py-2 text-left font-punk-heading text-[11px] uppercase tracking-wider text-punk-text-secondary transition-colors hover:bg-punk-bg hover:text-punk-text-primary"
+                  >
+                    全部启用
+                  </button>
+                  <button
+                    onClick={() => {
+                      void setExtensionsEnabled(displayedExtensions.map((ext) => ext.id), false)
+                      setShowTabActions(false)
+                    }}
+                    className="w-full px-3 py-2 text-left font-punk-heading text-[11px] uppercase tracking-wider text-punk-text-secondary transition-colors hover:bg-punk-bg hover:text-punk-text-primary"
+                  >
+                    全部禁用
+                  </button>
+                  <button
+                    onClick={() => {
+                      void undoExtensions()
+                      setShowTabActions(false)
+                    }}
+                    disabled={!canUndo}
+                    className="w-full px-3 py-2 text-left font-punk-heading text-[11px] uppercase tracking-wider text-punk-text-secondary transition-colors hover:bg-punk-bg hover:text-punk-text-primary disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    撤销
+                  </button>
+                  <button
+                    onClick={() => {
+                      void redoExtensions()
+                      setShowTabActions(false)
+                    }}
+                    disabled={!canRedo}
+                    className="w-full px-3 py-2 text-left font-punk-heading text-[11px] uppercase tracking-wider text-punk-text-secondary transition-colors hover:bg-punk-bg hover:text-punk-text-primary disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    反撤销
+                  </button>
+                  <button
+                    onClick={() => {
+                      void bisectExtensions(displayedExtensions.map((ext) => ext.id))
+                      setShowTabActions(false)
+                    }}
+                    disabled={displayedExtensions.length < 2}
+                    className="w-full px-3 py-2 text-left font-punk-heading text-[11px] uppercase tracking-wider text-punk-text-secondary transition-colors hover:bg-punk-bg hover:text-punk-text-primary disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    二分查找
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
           <button
             onClick={() => setActiveTab("rules")}
             className={cn(
@@ -225,7 +303,7 @@ export function PopupPage() {
                       viewMode={viewMode}
                       onToggle={() => handleToggleExtension(ext.id)}
                       onOpenOptions={() => handleOpenOptions(ext.id)}
-                      onRemove={() => handleRemove(ext.id)}
+                      onRemove={() => handleRemoveExtension(ext.id)}
                     />
                   ))}
                 </div>
@@ -272,7 +350,7 @@ export function PopupPage() {
           } : undefined}
           onToggleExtension={selectedGroup ? handleToggleExtension : undefined}
           onOpenOptions={selectedGroup ? handleOpenOptions : undefined}
-          onRemove={selectedGroup ? handleRemove : undefined}
+          onRemove={selectedGroup ? handleRemoveExtension : undefined}
           onDeleteGroup={selectedGroup ? deleteGroup : undefined}
           onAddExtension={selectedGroup ? addToGroup : undefined}
           onRemoveFromGroup={selectedGroup ? removeFromGroup : undefined}
