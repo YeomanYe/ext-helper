@@ -127,11 +127,12 @@ export function PopupPage() {
 
   // Toggle all extensions in a group
   const handleToggleGroup = React.useCallback((group: typeof displayGroups[0]) => {
-    const groupExtIds = group.extensionIds
-    groupExtIds.forEach(id => {
-      toggleExtension(id)
-    })
-  }, [toggleExtension])
+    const groupExtensions = displayExtensions.filter((ext) => group.extensionIds.includes(ext.id))
+    if (groupExtensions.length === 0) return
+
+    const shouldEnableAll = groupExtensions.some((ext) => !ext.enabled)
+    void setExtensionsEnabled(groupExtensions.map((ext) => ext.id), shouldEnableAll)
+  }, [displayExtensions, setExtensionsEnabled])
 
   const enabledCount = displayedExtensions.filter((e) => e.enabled).length
   const totalCount = displayedExtensions.length

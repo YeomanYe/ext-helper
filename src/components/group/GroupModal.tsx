@@ -84,7 +84,7 @@ export function GroupChip({
           "p-0.5 transition-colors",
           "text-punk-text-muted hover:text-punk-success hover:bg-punk-success/10"
         )}
-        title="Toggle all in group"
+        title="Enable or disable all in group"
       >
         <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M18.36 6.64a9 9 0 1 1-12.73 0" />
