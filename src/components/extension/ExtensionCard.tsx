@@ -1,6 +1,6 @@
 import * as React from "react"
 import { createPortal } from "react-dom"
-import { Settings, Trash2, Package, Power, PowerOff, Shield } from "lucide-react"
+import { Settings, Trash2, Package, Power, PowerOff, Shield, Info, X, ExternalLink } from "lucide-react"
 import { cn } from "@/utils"
 import type { Extension, ViewMode } from "@/types"
 import { Switch, ConfirmDialog } from "@/components/common"
@@ -24,13 +24,14 @@ export function ExtensionCard({
 }: ExtensionCardProps) {
   const [showMenu, setShowMenu] = React.useState(false)
   const [showConfirmRemove, setShowConfirmRemove] = React.useState(false)
+  const [showDetails, setShowDetails] = React.useState(false)
   const [menuPosition, setMenuPosition] = React.useState<{ top: number; left: number }>({ top: 0, left: 0 })
   const menuRef = React.useRef<HTMLDivElement>(null)
   const cardRef = React.useRef<HTMLDivElement>(null)
   const isCard = viewMode === "card"
   const isDetail = viewMode === "detail"
   const menuWidth = viewMode === "compact" ? 160 : 176
-  const menuHeight = extension.optionsUrl ? 120 : 84
+  const menuHeight = extension.optionsUrl ? 156 : 120
 
   const updateMenuPosition = React.useCallback(() => {
     if (!cardRef.current) return
@@ -46,6 +47,16 @@ export function ExtensionCard({
     const boundaryHeight = boundaryBottom - boundaryTop
     const padding = 10
     const gap = 6
+
+    const isOutsideSurface = rect.bottom <= boundaryTop
+      || rect.top >= boundaryBottom
+      || rect.right <= boundaryLeft
+      || rect.left >= boundaryRight
+
+    if (isOutsideSurface) {
+      setShowMenu(false)
+      return
+    }
 
     const desiredLeft = isDetail
       ? rect.left
@@ -107,6 +118,11 @@ export function ExtensionCard({
     setShowConfirmRemove(true)
   }
 
+  const handleShowDetails = () => {
+    setShowMenu(false)
+    setShowDetails(true)
+  }
+
   const handleConfirmRemove = () => {
     onRemove?.()
     setShowConfirmRemove(false)
@@ -155,8 +171,18 @@ export function ExtensionCard({
           >
             <Settings className="h-4 w-4" />
             OPTIONS
-          </button>
+            </button>
         )}
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            handleShowDetails()
+          }}
+          className="flex w-full items-center gap-2 px-3 py-2 text-left font-punk-body text-sm text-punk-text-secondary hover:text-punk-accent hover:bg-punk-bg transition-colors"
+        >
+          <Info className="h-4 w-4" />
+          DETAILS
+        </button>
         <button
           onClick={(e) => {
             e.stopPropagation()
@@ -167,6 +193,118 @@ export function ExtensionCard({
           <Trash2 className="h-4 w-4" />
           REMOVE
         </button>
+      </div>,
+      document.body
+    )
+  }
+
+  const renderDetailsModal = () => {
+    if (!showDetails || typeof document === "undefined") return null
+
+    return createPortal(
+      <div
+        className="fixed inset-0 z-[100] flex items-center justify-center bg-punk-bg/80 p-4 backdrop-blur-sm"
+        onClick={() => setShowDetails(false)}
+      >
+        <div
+          className="w-full max-w-xl border border-punk-primary bg-punk-bg-alt shadow-[0_0_30px_rgba(124,58,237,0.35)]"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="flex items-center justify-between border-b border-punk-border/30 px-4 py-3">
+            <div className="flex items-center gap-3">
+              {extension.iconUrl ? (
+                <img
+                  src={extension.iconUrl}
+                  alt={extension.name}
+                  className="h-10 w-10 border border-punk-border object-cover"
+                />
+              ) : (
+                <div className="flex h-10 w-10 items-center justify-center border border-punk-border bg-punk-bg">
+                  <Package className="h-5 w-5 text-punk-text-muted" />
+                </div>
+              )}
+              <div>
+                <h3 className="font-punk-heading text-[12px] uppercase tracking-wider text-punk-text-primary">
+                  {extension.name}
+                </h3>
+                <p className="font-punk-code text-[10px] uppercase text-punk-accent">
+                  v{extension.version} · {extension.installType}
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => setShowDetails(false)}
+              className="text-punk-text-muted transition-colors hover:text-punk-text-primary"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+
+          <div className="space-y-4 p-4">
+            <div className="flex items-center gap-2">
+              <span className={cn(
+                "px-2 py-1 text-[10px] font-punk-heading uppercase border tracking-wider",
+                extension.enabled
+                  ? "border-punk-success/50 bg-punk-success/10 text-punk-success"
+                  : "border-punk-border/30 text-punk-text-muted"
+              )}>
+                {extension.enabled ? "ACTIVE" : "INACTIVE"}
+              </span>
+              {extension.homepageUrl && (
+                <a
+                  href={extension.homepageUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-1 font-punk-code text-[10px] uppercase text-punk-accent hover:text-punk-text-primary"
+                >
+                  HOMEPAGE
+                  <ExternalLink className="h-3 w-3" />
+                </a>
+              )}
+              {extension.optionsUrl && (
+                <button
+                  onClick={() => onOpenOptions?.()}
+                  className="flex items-center gap-1 font-punk-code text-[10px] uppercase text-punk-accent hover:text-punk-text-primary"
+                >
+                  OPTIONS
+                  <ExternalLink className="h-3 w-3" />
+                </button>
+              )}
+            </div>
+
+            {extension.description && (
+              <div className="border border-punk-border/30 bg-punk-bg/40 p-3">
+                <div className="mb-2 font-punk-heading text-[10px] uppercase tracking-wider text-punk-text-muted">
+                  DESCRIPTION
+                </div>
+                <p className="font-punk-body text-sm leading-relaxed text-punk-text-secondary">
+                  {extension.description}
+                </p>
+              </div>
+            )}
+
+            <div className="border border-punk-border/30 bg-punk-bg/40 p-3">
+              <div className="mb-2 flex items-center gap-2 font-punk-heading text-[10px] uppercase tracking-wider text-punk-text-muted">
+                <Shield className="h-3 w-3 text-punk-accent" />
+                PERMISSIONS ({extension.permissions.length})
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {extension.permissions.length > 0 ? extension.permissions.map((perm) => (
+                  <span
+                    key={perm}
+                    className="border border-punk-border/20 bg-punk-bg px-2 py-1 font-punk-code text-[10px] text-punk-text-secondary"
+                  >
+                    {perm}
+                  </span>
+                )) : (
+                  <span className="font-punk-code text-[10px] uppercase text-punk-text-muted">
+                    NO PERMISSIONS
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>,
       document.body
     )
@@ -325,6 +463,7 @@ export function ExtensionCard({
           onConfirm={handleConfirmRemove}
           onCancel={() => setShowConfirmRemove(false)}
         />
+        {renderDetailsModal()}
       </div>
     )
   }
@@ -404,6 +543,7 @@ export function ExtensionCard({
           onConfirm={handleConfirmRemove}
           onCancel={() => setShowConfirmRemove(false)}
         />
+        {renderDetailsModal()}
       </div>
     )
   }
@@ -467,6 +607,7 @@ export function ExtensionCard({
         onConfirm={handleConfirmRemove}
         onCancel={() => setShowConfirmRemove(false)}
       />
+      {renderDetailsModal()}
     </div>
   )
 }
