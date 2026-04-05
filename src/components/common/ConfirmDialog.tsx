@@ -63,7 +63,7 @@ export function ConfirmDialog({
         {/* Header */}
         <div className={cn("flex items-center gap-2 px-4 py-3 border-b", borderColor)}>
           <AlertTriangle className={cn("h-4 w-4", iconColor)} />
-          <h3 className="flex-1 font-punk-heading text-[10px] text-punk-text-primary uppercase tracking-wide">
+          <h3 className="flex-1 font-punk-heading text-[10px] text-punk-text-primary uppercase tracking-wider">
             {title}
           </h3>
         </div>
@@ -79,14 +79,14 @@ export function ConfirmDialog({
         <div className="flex justify-end gap-2 px-4 py-3 border-t border-punk-border/30">
           <button
             onClick={onCancel}
-            className="px-4 py-2 font-punk-heading text-[9px] text-punk-text-muted uppercase tracking-wide hover:text-punk-text-primary"
+            className="px-4 py-2 font-punk-heading text-[13px] text-punk-text-muted uppercase tracking-wider hover:text-punk-text-primary"
           >
             {cancelText}
           </button>
           <button
             onClick={handleConfirm}
             className={cn(
-              "px-4 py-2 font-punk-heading text-[9px] uppercase tracking-wide text-white transition-all",
+              "px-4 py-2 font-punk-heading text-[13px] uppercase tracking-wider text-white transition-all",
               confirmBtnClass
             )}
           >

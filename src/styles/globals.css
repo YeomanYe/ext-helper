@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Fira+Code:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -32,7 +32,7 @@
 }
 
 body {
-  font-family: "VT323", monospace;
+  font-family: "Noto Sans SC", "JetBrains Mono", monospace;
   background-color: var(--punk-bg);
   color: var(--punk-text-primary);
   min-width: 380px;
@@ -101,6 +101,7 @@ body::after {
     0 0 5px var(--punk-primary),
     0 0 10px var(--punk-primary),
     0 0 20px var(--punk-primary);
+  letter-spacing: 0.05em;
 }
 
 .neon-text-cyan {
@@ -108,6 +109,7 @@ body::after {
     0 0 5px var(--punk-neon-cyan),
     0 0 10px var(--punk-neon-cyan),
     0 0 20px var(--punk-neon-cyan);
+  letter-spacing: 0.05em;
 }
 
 .neon-text-pink {
@@ -115,6 +117,42 @@ body::after {
     0 0 5px var(--punk-neon-pink),
     0 0 10px var(--punk-neon-pink),
     0 0 20px var(--punk-neon-pink);
+  letter-spacing: 0.05em;
+}
+
+/* ============================================
+   PUNK TYPOGRAPHY SYSTEM
+   ============================================ */
+
+/* Heading/Label style - for titles, labels, badges */
+.punk-label {
+  font-family: "Noto Sans SC", "JetBrains Mono", monospace;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Body text - for descriptions, content */
+.punk-content {
+  font-family: "Noto Sans SC", "JetBrains Mono", monospace;
+  font-weight: 400;
+  line-height: 1.6;
+  letter-spacing: 0.02em;
+}
+
+/* Code/Technical - for versions, technical info */
+.punk-technical {
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  font-size: 0.75rem; /* 12px */
+}
+
+/* Punk UI Text - for buttons, interactive elements */
+.punk-ui {
+  font-family: "Noto Sans SC", "JetBrains Mono", monospace;
+  font-weight: 500;
+  letter-spacing: 0.06em;
 }
 
 /* Punk Border Glow */
@@ -185,7 +223,7 @@ input.punk-input {
   background: var(--punk-bg);
   border: 1px solid var(--punk-primary);
   color: var(--punk-text-primary);
-  font-family: "VT323", monospace;
+  font-family: "Noto Sans SC", "JetBrains Mono", monospace;
   transition: all 0.3s ease;
 }
 
@@ -203,7 +241,7 @@ input.punk-input::placeholder {
 
 /* Punk Button Base */
 button.punk-btn {
-  font-family: "Press Start 2P", monospace;
+  font-family: "Noto Sans SC", "JetBrains Mono", monospace;
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -238,10 +276,11 @@ button.punk-btn-primary:active {
 
 /* Terminal-style text */
 .terminal-text {
-  font-family: "Fira Code", monospace;
+  font-family: "JetBrains Mono", monospace;
   font-size: 14px;
   line-height: 1.6;
   color: var(--punk-success);
+  letter-spacing: 0.03em;
 }
 
 .terminal-text::before {
@@ -283,4 +322,13 @@ button.punk-btn-primary:active {
   outline: 2px solid var(--punk-neon-cyan);
   outline-offset: 2px;
   box-shadow: 0 0 10px var(--punk-neon-cyan);
+}
+
+/* Aspect Ratio Utilities */
+.aspect-square {
+  aspect-ratio: 1 / 1;
+}
+
+.aspect-video {
+  aspect-ratio: 16 / 9;
 }

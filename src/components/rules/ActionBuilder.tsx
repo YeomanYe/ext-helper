@@ -128,7 +128,7 @@ export function ActionBuilder({ actions, onChange }: ActionBuilderProps) {
       {/* Compact Grid */}
       {(activeFilter === "all" || activeFilter === "extensions") && filteredExtensions.length > 0 && (
         <div>
-          <p className="font-punk-heading text-[8px] text-punk-text-muted uppercase tracking-wide mb-1">
+          <p className="font-punk-heading text-[12px] text-punk-text-muted uppercase tracking-wider mb-1">
             EXTENSIONS
           </p>
           <div className="grid grid-cols-2 gap-1 max-h-48 overflow-y-auto">
@@ -149,14 +149,14 @@ export function ActionBuilder({ actions, onChange }: ActionBuilderProps) {
                   <img src={ext.iconUrl} className="h-5 w-5 border border-punk-border/30 object-cover flex-shrink-0" alt="" />
                 ) : (
                   <div className="h-5 w-5 border border-punk-border/30 bg-punk-bg-alt flex items-center justify-center flex-shrink-0">
-                    <span className="font-punk-heading text-[6px] text-punk-text-muted">
+                    <span className="font-punk-heading text-[10px] text-punk-text-muted">
                       {ext.name[0]}
                     </span>
                   </div>
                 )}
 
                 {/* Name */}
-                <span className="flex-1 font-punk-heading text-[7px] text-punk-text-primary uppercase truncate">
+                <span className="flex-1 font-punk-heading text-[11px] text-punk-text-primary uppercase truncate">
                   {ext.name}
                 </span>
 
@@ -165,7 +165,7 @@ export function ActionBuilder({ actions, onChange }: ActionBuilderProps) {
                   <button
                     onClick={() => toggleExtensionEnable(ext.id)}
                     className={cn(
-                      "px-1 py-0.5 text-[6px] font-punk-heading transition-all",
+                      "px-1 py-0.5 text-[10px] font-punk-heading transition-all",
                       enabledExtensions.includes(ext.id)
                         ? "bg-punk-success text-white"
                         : "text-punk-text-muted hover:text-punk-success"
@@ -176,7 +176,7 @@ export function ActionBuilder({ actions, onChange }: ActionBuilderProps) {
                   <button
                     onClick={() => toggleExtensionDisable(ext.id)}
                     className={cn(
-                      "px-1 py-0.5 text-[6px] font-punk-heading transition-all",
+                      "px-1 py-0.5 text-[10px] font-punk-heading transition-all",
                       disabledExtensions.includes(ext.id)
                         ? "bg-punk-cta text-white"
                         : "text-punk-text-muted hover:text-punk-cta"
@@ -194,7 +194,7 @@ export function ActionBuilder({ actions, onChange }: ActionBuilderProps) {
       {/* Groups Grid - Same card style as extensions */}
       {(activeFilter === "all" || activeFilter === "groups") && filteredGroups.length > 0 && (
         <div>
-          <p className="font-punk-heading text-[8px] text-punk-text-muted uppercase tracking-wide mb-1">
+          <p className="font-punk-heading text-[12px] text-punk-text-muted uppercase tracking-wider mb-1">
             SECTORS
           </p>
           <div className="grid grid-cols-2 gap-1 max-h-48 overflow-y-auto">
@@ -226,7 +226,7 @@ export function ActionBuilder({ actions, onChange }: ActionBuilderProps) {
 
                 {/* Name */}
                 <span className={cn(
-                  "flex-1 font-punk-heading text-[7px] uppercase truncate",
+                  "flex-1 font-punk-heading text-[11px] uppercase truncate",
                   isSelected ? "text-punk-text-primary" : "text-punk-text-muted"
                 )}>
                   {group.name}
@@ -237,7 +237,7 @@ export function ActionBuilder({ actions, onChange }: ActionBuilderProps) {
                   <button
                     onClick={() => toggleGroupEnable(group.id)}
                     className={cn(
-                      "px-1 py-0.5 text-[6px] font-punk-heading transition-all",
+                      "px-1 py-0.5 text-[10px] font-punk-heading transition-all",
                       enabledGroups.includes(group.id)
                         ? "bg-punk-success text-white"
                         : "text-punk-text-muted hover:text-punk-success"
@@ -248,7 +248,7 @@ export function ActionBuilder({ actions, onChange }: ActionBuilderProps) {
                   <button
                     onClick={() => toggleGroupDisable(group.id)}
                     className={cn(
-                      "px-1 py-0.5 text-[6px] font-punk-heading transition-all",
+                      "px-1 py-0.5 text-[10px] font-punk-heading transition-all",
                       disabledGroups.includes(group.id)
                         ? "bg-punk-cta text-white"
                         : "text-punk-text-muted hover:text-punk-cta"
@@ -266,7 +266,7 @@ export function ActionBuilder({ actions, onChange }: ActionBuilderProps) {
 
       {/* Empty state */}
       {extensions.length === 0 && groups.length === 0 && (
-        <p className="font-punk-code text-[8px] text-punk-text-muted py-4 text-center">
+        <p className="font-punk-code text-[12px] text-punk-text-muted py-4 text-center">
           NO EXTENSIONS OR SECTORS AVAILABLE
         </p>
       )}

@@ -16,10 +16,10 @@ export function RuleList({ rules, extensions, groups, onToggle, onEdit, onDelete
   if (rules.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-8 text-center">
-        <p className="font-punk-body text-[10px] text-punk-text-muted uppercase tracking-wide">
+        <p className="font-punk-body text-[10px] text-punk-text-muted uppercase tracking-wider">
           NO_RULES_YET
         </p>
-        <p className="font-punk-code text-[8px] text-punk-text-muted mt-1">
+        <p className="font-punk-code text-[12px] text-punk-text-muted mt-1">
           CREATE A NEW RULE TO GET STARTED
         </p>
       </div>
@@ -27,7 +27,7 @@ export function RuleList({ rules, extensions, groups, onToggle, onEdit, onDelete
   }
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className={viewMode === "compact" ? "grid grid-cols-[repeat(auto-fill,minmax(80px,1fr))] gap-2" : "flex flex-wrap gap-2"}>
       {rules.map((rule) => (
         <RuleCard
           key={rule.id}

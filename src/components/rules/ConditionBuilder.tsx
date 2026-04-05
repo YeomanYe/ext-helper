@@ -57,7 +57,7 @@ export function ConditionBuilder({ conditions, onChange }: ConditionBuilderProps
         onClick={addConditionGroup}
         className={cn(
           "w-full flex items-center justify-center gap-2 px-3 py-2.5",
-          "text-[9px] font-punk-heading uppercase tracking-wide",
+          "text-[13px] font-punk-heading uppercase tracking-wider",
           "border border-dashed border-punk-accent/30 text-punk-accent/70",
           "hover:border-punk-accent hover:text-punk-accent hover:bg-punk-accent/5",
           "transition-all duration-200"
@@ -130,7 +130,7 @@ function ConditionGroupRow({
       {/* Header: Domains label + Match mode + Remove */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-[8px] font-punk-heading text-punk-accent uppercase tracking-wider">
+          <span className="text-[12px] font-punk-heading text-punk-accent uppercase tracking-wider">
             DOMAINS
           </span>
           <MatchModeDropdown
@@ -172,7 +172,7 @@ function ConditionGroupRow({
         <button
           onClick={addDomain}
           className={cn(
-            "flex items-center gap-1 text-[8px] font-punk-heading uppercase",
+            "flex items-center gap-1 text-[12px] font-punk-heading uppercase",
             "text-punk-accent/60 hover:text-punk-accent"
           )}
         >
@@ -189,14 +189,14 @@ function ConditionGroupRow({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Calendar className="h-3 w-3 text-punk-success" />
-            <span className="text-[8px] font-punk-heading text-punk-success uppercase tracking-wider">
+            <span className="text-[12px] font-punk-heading text-punk-success uppercase tracking-wider">
               TIME (OPTIONAL)
             </span>
           </div>
           <button
             onClick={toggleSchedule}
             className={cn(
-              "px-2 py-0.5 text-[8px] font-punk-heading uppercase transition-all",
+              "px-2 py-0.5 text-[12px] font-punk-heading uppercase transition-all",
               group.schedule
                 ? "bg-punk-success/10 text-punk-success border border-punk-success/30"
                 : "bg-punk-bg text-punk-text-muted border border-punk-border/30 hover:border-punk-success/30"
@@ -215,7 +215,7 @@ function ConditionGroupRow({
                   key={day.value}
                   onClick={() => toggleDay(day.value)}
                   className={cn(
-                    "w-7 h-6 text-[8px] font-punk-heading transition-all",
+                    "w-7 h-6 text-[12px] font-punk-heading transition-all",
                     group.schedule!.days.includes(day.value)
                       ? "border border-punk-success/50 bg-punk-success/10 text-punk-success"
                       : "border border-punk-border/30 bg-punk-bg text-punk-text-muted hover:border-punk-success/30"
@@ -235,7 +235,7 @@ function ConditionGroupRow({
                 onChange={(e) => updateSchedule({ startTime: e.target.value })}
                 className="punk-input h-8 px-2 text-[11px] border border-punk-border/50"
               />
-              <span className="text-punk-text-muted text-[9px]">TO</span>
+              <span className="text-punk-text-muted text-[13px]">TO</span>
               <input
                 type="time"
                 value={group.schedule.endTime}
@@ -276,7 +276,7 @@ function MatchModeDropdown({
       <button
         onClick={() => setShowDropdown(!showDropdown)}
         className={cn(
-          "h-6 px-2 text-[8px] flex items-center gap-1",
+          "h-6 px-2 text-[12px] flex items-center gap-1",
           "border border-punk-border/50 bg-punk-bg-alt",
           "hover:border-punk-primary transition-colors"
         )}
@@ -297,7 +297,7 @@ function MatchModeDropdown({
                 setShowDropdown(false)
               }}
               className={cn(
-                "w-full px-2 py-1.5 text-left font-punk-heading text-[9px] uppercase tracking-wide transition-all",
+                "w-full px-2 py-1.5 text-left font-punk-heading text-[13px] uppercase tracking-wider transition-all",
                 value === mode.value
                   ? "bg-punk-primary text-white"
                   : "text-punk-text-secondary hover:bg-punk-bg hover:text-punk-text-primary"

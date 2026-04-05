@@ -69,7 +69,7 @@ export function GroupChip({
           <span style={{ color: group.color }}>{displayIcon}</span>
         </div>
       )}
-      <span className="font-punk-heading text-[9px] text-punk-text-primary tracking-wide">
+      <span className="font-punk-heading text-[13px] text-punk-text-primary tracking-wider">
         {group.name}
       </span>
       <span className="font-punk-code text-[10px] text-punk-accent px-1.5 py-0.5 border border-punk-accent/30 bg-punk-accent/5">
@@ -109,7 +109,7 @@ export function CreateGroupChip({ onClick }: CreateGroupChipProps) {
       )}
     >
       <Folder className="h-3.5 w-3.5" />
-      <span className="font-punk-heading text-[8px] uppercase tracking-wide">NEW GROUP</span>
+      <span className="font-punk-heading text-[12px] uppercase tracking-wider">NEW GROUP</span>
     </button>
   )
 }
@@ -334,7 +334,7 @@ export function GroupModal({
                 ) : (
                   <div className="flex flex-col items-center justify-center w-full h-full">
                     <Image className="h-6 w-6 text-punk-text-muted mb-1" />
-                    <span className="text-[6px] text-punk-text-muted uppercase">UPLOAD</span>
+                    <span className="text-[10px] text-punk-text-muted uppercase">UPLOAD</span>
                   </div>
                 )}
                 {!editIconUrl && (
@@ -395,7 +395,7 @@ export function GroupModal({
             {/* Name input row with label */}
             <div className="flex items-center gap-3">
               <div className="flex-1">
-                <label className="block font-punk-heading text-[9px] text-punk-text-muted uppercase mb-1.5">
+                <label className="block font-punk-heading text-[13px] text-punk-text-muted uppercase mb-1.5">
                   GROUP_NAME
                 </label>
                 <input
@@ -416,7 +416,7 @@ export function GroupModal({
             </div>
 
             {/* Search bar */}
-            <label className="block font-punk-heading text-[9px] text-punk-text-muted uppercase mb-1">
+            <label className="block font-punk-heading text-[13px] text-punk-text-muted uppercase mb-1">
               SEARCH & FILTER
             </label>
             <SearchBar
@@ -432,7 +432,7 @@ export function GroupModal({
         {/* Full width: ACTIONS */}
         {isCreateMode ? null : (
           <div className="flex items-center gap-2 px-4 py-2 border-b border-punk-border/30 bg-punk-bg shrink-0">
-            <span className="font-punk-heading text-[8px] text-punk-text-muted uppercase">ACTIONS</span>
+            <span className="font-punk-heading text-[12px] text-punk-text-muted uppercase">ACTIONS</span>
             <button
               onClick={() => {
                 if (!onToggleExtension) return
@@ -442,7 +442,7 @@ export function GroupModal({
               }}
               disabled={extensions.length === 0 || allEnabled}
               className={cn(
-                "px-2 py-1 text-[8px] font-punk-heading uppercase transition-all",
+                "px-2 py-1 text-[12px] font-punk-heading uppercase transition-all",
                 extensions.length === 0 || allEnabled
                   ? "bg-punk-success/20 text-punk-success/50 cursor-not-allowed"
                   : "bg-punk-success/20 text-punk-success border border-punk-success/50 hover:bg-punk-success hover:text-white"
@@ -459,7 +459,7 @@ export function GroupModal({
               }}
               disabled={extensions.length === 0 || allDisabled}
               className={cn(
-                "px-2 py-1 text-[8px] font-punk-heading uppercase transition-all",
+                "px-2 py-1 text-[12px] font-punk-heading uppercase transition-all",
                 extensions.length === 0 || allDisabled
                   ? "bg-punk-cta/20 text-punk-cta/50 cursor-not-allowed"
                   : "bg-punk-cta/20 text-punk-cta border border-punk-cta/50 hover:bg-punk-cta hover:text-white"
@@ -490,7 +490,7 @@ export function GroupModal({
           ))}
           {extensionsWithStatus.filter(ext => ext.isInGroup).length === 0 && (
             <div className="h-8 flex items-center">
-              <span className="font-punk-heading text-[8px] text-punk-text-muted uppercase">
+              <span className="font-punk-heading text-[12px] text-punk-text-muted uppercase">
                 NO GROUP MEMBERS
               </span>
             </div>
@@ -530,7 +530,7 @@ export function GroupModal({
                   )}
                   {/* Name */}
                   <span className={cn(
-                    "font-punk-heading text-[6px] uppercase text-center truncate w-full mt-1",
+                    "font-punk-heading text-[10px] uppercase text-center truncate w-full mt-1",
                     ext.isInGroup ? "text-punk-text-primary" : "text-punk-text-muted"
                   )}>
                     {ext.name.substring(0, 8)}
@@ -552,14 +552,14 @@ export function GroupModal({
           {isCreateMode ? null : (
             <button
               onClick={() => setShowDeleteConfirm(true)}
-              className="mr-auto px-3 py-1.5 font-punk-heading text-[8px] text-punk-cta uppercase tracking-wide hover:bg-punk-cta/10 transition-colors"
+              className="mr-auto px-3 py-1.5 font-punk-heading text-[12px] text-punk-cta uppercase tracking-wider hover:bg-punk-cta/10 transition-colors"
             >
               DELETE
             </button>
           )}
           <button
             onClick={onClose}
-            className="px-4 py-2 font-punk-heading text-[9px] text-punk-text-muted uppercase tracking-wide hover:text-punk-text-primary transition-colors"
+            className="px-4 py-2 font-punk-heading text-[13px] text-punk-text-muted uppercase tracking-wider hover:text-punk-text-primary transition-colors"
           >
             {isCreateMode ? "CANCEL" : "CLOSE"}
           </button>
@@ -568,7 +568,7 @@ export function GroupModal({
               onClick={handleCreate}
               disabled={!canCreate}
               className={cn(
-                "px-4 py-2 font-punk-heading text-[9px] uppercase tracking-wide transition-colors",
+                "px-4 py-2 font-punk-heading text-[13px] uppercase tracking-wider transition-colors",
                 canCreate
                   ? "bg-punk-primary text-white hover:bg-punk-primary/80"
                   : "bg-punk-border/50 text-punk-text-muted cursor-not-allowed"
@@ -591,7 +591,7 @@ export function GroupModal({
             >
               <div className="flex items-center gap-2 mb-3">
                 <AlertTriangle className="w-4 h-4 text-punk-cta" />
-                <span className="font-punk-heading text-[10px] text-punk-text-muted uppercase tracking-wide">
+                <span className="font-punk-heading text-[10px] text-punk-text-muted uppercase tracking-wider">
                   Delete "{group?.name}"?
                 </span>
               </div>
@@ -601,7 +601,7 @@ export function GroupModal({
               <div className="flex justify-end gap-2">
                 <button
                   onClick={() => setShowDeleteConfirm(false)}
-                  className="px-4 py-2 font-punk-heading text-[9px] text-punk-text-muted uppercase tracking-wide hover:text-punk-text-primary transition-colors"
+                  className="px-4 py-2 font-punk-heading text-[13px] text-punk-text-muted uppercase tracking-wider hover:text-punk-text-primary transition-colors"
                 >
                   CANCEL
                 </button>
@@ -612,7 +612,7 @@ export function GroupModal({
                       onClose()
                     }
                   }}
-                  className="px-4 py-2 font-punk-heading text-[9px] text-white uppercase tracking-wide bg-punk-cta hover:bg-punk-cta/80 transition-colors"
+                  className="px-4 py-2 font-punk-heading text-[13px] text-white uppercase tracking-wider bg-punk-cta hover:bg-punk-cta/80 transition-colors"
                 >
                   DELETE
                 </button>

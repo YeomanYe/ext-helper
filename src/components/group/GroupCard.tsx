@@ -68,11 +68,11 @@ export function GroupCard({
 
         <Folder className="h-3 w-3 text-punk-accent" />
 
-        <span className="flex-1 truncate font-punk-heading text-[9px] text-punk-text-primary uppercase tracking-wide">
+        <span className="flex-1 truncate font-punk-heading text-[13px] text-punk-text-primary uppercase tracking-wider">
           {group.name}
         </span>
 
-        <span className="font-punk-code text-[7px] text-punk-text-muted">
+        <span className="font-punk-code text-[11px] text-punk-text-muted">
           ({extensions.length})
         </span>
 
@@ -95,7 +95,7 @@ export function GroupCard({
                   onRename()
                   setShowMenu(false)
                 }}
-                className="flex w-full items-center gap-2 px-3 py-1.5 text-left font-punk-body text-[9px] text-punk-text-secondary hover:text-punk-accent hover:bg-punk-bg transition-colors"
+                className="flex w-full items-center gap-2 px-3 py-1.5 text-left font-punk-body text-[13px] text-punk-text-secondary hover:text-punk-accent hover:bg-punk-bg transition-colors"
               >
                 <Edit2 className="h-3 w-3" />
                 RENAME
@@ -106,7 +106,7 @@ export function GroupCard({
                   onDelete()
                   setShowMenu(false)
                 }}
-                className="flex w-full items-center gap-2 px-3 py-1.5 text-left font-punk-body text-[9px] text-punk-cta hover:bg-punk-cta/10 transition-colors"
+                className="flex w-full items-center gap-2 px-3 py-1.5 text-left font-punk-body text-[13px] text-punk-cta hover:bg-punk-cta/10 transition-colors"
               >
                 <Trash2 className="h-3 w-3" />
                 DELETE
@@ -134,7 +134,7 @@ export function GroupCard({
           ) : (
             <div className="flex flex-col items-center justify-center py-6 text-center">
               <Folder className="h-6 w-6 text-punk-text-muted" />
-              <p className="mt-2 font-punk-body text-[9px] text-punk-text-muted uppercase">
+              <p className="mt-2 font-punk-body text-[13px] text-punk-text-muted uppercase">
                 NO_EXTENSIONS
               </p>
               <button
@@ -142,7 +142,7 @@ export function GroupCard({
                   e.stopPropagation()
                   onAddExtension?.()
                 }}
-                className="mt-2 flex items-center gap-1 font-punk-heading text-[8px] text-punk-accent uppercase hover:text-punk-primary transition-colors"
+                className="mt-2 flex items-center gap-1 font-punk-heading text-[12px] text-punk-accent uppercase hover:text-punk-primary transition-colors"
               >
                 <Plus className="h-3 w-3" />
                 ADD_EXTENSION
@@ -165,7 +165,7 @@ export function CreateGroupCard({ onClick }: CreateGroupCardProps) {
       onClick={onClick}
       className={cn(
         "flex items-center justify-center gap-2 border border-dashed border-punk-border/50",
-        "px-3 py-2 font-punk-heading text-[9px] uppercase text-punk-text-muted",
+        "px-3 py-2 font-punk-heading text-[13px] uppercase text-punk-text-muted",
         "hover:border-punk-primary hover:text-punk-accent hover:shadow-[0_0_10px_rgba(124,58,237,0.3)]",
         "transition-all duration-200"
       )}

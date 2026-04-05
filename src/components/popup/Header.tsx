@@ -32,7 +32,7 @@ export function SearchBar({ value, onChange, placeholder = "SEARCH_EXTENSIONS...
             className={cn(
               "flex items-center gap-2 px-3 h-11",
               "border border-punk-border/50 bg-punk-bg-alt",
-              "font-punk-heading text-[9px] uppercase tracking-wide",
+              "font-punk-heading text-[13px] uppercase tracking-wider",
               "text-punk-text-primary",
               "hover:border-punk-primary hover:shadow-[0_0_10px_rgba(124,58,237,0.3)]",
               "transition-all duration-200"
@@ -54,7 +54,7 @@ export function SearchBar({ value, onChange, placeholder = "SEARCH_EXTENSIONS...
                       setShowDropdown(false)
                     }}
                     className={cn(
-                      "w-full px-3 py-2 text-left font-punk-heading text-[9px] uppercase tracking-wide",
+                      "w-full px-3 py-2 text-left font-punk-heading text-[13px] uppercase tracking-wider",
                       "transition-all duration-150",
                       activeFilter === filter.value
                         ? "bg-punk-primary text-white"
@@ -80,7 +80,7 @@ export function SearchBar({ value, onChange, placeholder = "SEARCH_EXTENSIONS...
           placeholder={placeholder}
           className={cn(
             "punk-input h-11 w-full pl-9 pr-10 text-punk-text-primary",
-            "font-punk-body text-lg"
+            "font-punk-body text-sm placeholder:text-punk-text-muted"
           )}
         />
         {value && (
@@ -170,7 +170,7 @@ export function Header({ viewMode = "compact", onViewModeChange }: HeaderProps) 
             title="Grid view"
           >
             <LayoutGrid className="h-3 w-3" />
-            <span className="text-[6px] font-punk-heading uppercase">GRID</span>
+            <span className="text-[10px] font-punk-heading uppercase">GRID</span>
           </button>
           <button
             onClick={() => onViewModeChange?.("card")}
@@ -183,7 +183,7 @@ export function Header({ viewMode = "compact", onViewModeChange }: HeaderProps) 
             title="Card view"
           >
             <List className="h-3 w-3" />
-            <span className="text-[6px] font-punk-heading uppercase">CARD</span>
+            <span className="text-[10px] font-punk-heading uppercase">CARD</span>
           </button>
           <button
             onClick={() => onViewModeChange?.("detail")}
@@ -196,7 +196,7 @@ export function Header({ viewMode = "compact", onViewModeChange }: HeaderProps) 
             title="Detail view"
           >
             <FileText className="h-3 w-3" />
-            <span className="text-[6px] font-punk-heading uppercase">DETAIL</span>
+            <span className="text-[10px] font-punk-heading uppercase">DETAIL</span>
           </button>
         </div>
       </div>

@@ -34,7 +34,7 @@ function RuleFilterDropdown({
         className={cn(
           "flex items-center gap-2 px-3 h-11",
           "border border-punk-border/50 bg-punk-bg-alt",
-          "font-punk-heading text-[9px] uppercase tracking-wide",
+          "font-punk-heading text-[13px] uppercase tracking-wider",
           "text-punk-text-primary",
           "hover:border-punk-primary hover:shadow-[0_0_10px_rgba(124,58,237,0.3)]",
           "transition-all duration-200"
@@ -56,7 +56,7 @@ function RuleFilterDropdown({
                   setShowDropdown(false)
                 }}
                 className={cn(
-                  "w-full px-3 py-2 text-left font-punk-heading text-[9px] uppercase tracking-wide",
+                  "w-full px-3 py-2 text-left font-punk-heading text-[13px] uppercase tracking-wider",
                   "transition-all duration-150",
                   value === filter.value
                     ? "bg-punk-primary text-white"
@@ -175,7 +175,7 @@ export function RuleManager() {
       {/* Header */}
       <div className="flex items-center gap-2 px-4 py-3 border-b border-punk-border/30">
         <div className="flex items-center gap-2">
-          <span className="font-punk-heading text-[10px] text-punk-text-primary uppercase tracking-wide">
+          <span className="font-punk-heading text-[10px] text-punk-text-primary uppercase tracking-wider">
             AUTO_RULES
           </span>
           <span className="font-punk-code text-[10px] text-punk-accent">
@@ -186,7 +186,7 @@ export function RuleManager() {
         <button
           onClick={handleCreateRule}
           className={cn(
-            "flex items-center gap-1.5 px-2.5 py-1.5 text-[8px] font-punk-heading uppercase",
+            "flex items-center gap-1.5 px-2.5 py-1.5 text-[12px] font-punk-heading uppercase",
             "border border-punk-accent/50 text-punk-accent",
             "hover:bg-punk-accent/10 hover:border-punk-accent transition-all"
           )}

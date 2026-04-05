@@ -122,10 +122,13 @@ export function PopupPage() {
 
   // Determine grid columns based on view mode
   // Card mode: single column (full-width cards with toggle switch)
-  // Compact mode: flexible horizontal layout
+  // Compact mode: CSS grid with auto-fill to fill screen width
+  // Detail mode: single column stacked layout
   const gridClass = viewMode === "card"
     ? "grid grid-cols-1 gap-2"
-    : "flex flex-wrap gap-2"
+    : viewMode === "compact"
+      ? "grid grid-cols-[repeat(auto-fill,minmax(80px,1fr))] gap-2"
+      : "flex flex-col gap-2"
 
   return (
     <div className="flex h-[600px] flex-col bg-punk-bg">
@@ -140,7 +143,7 @@ export function PopupPage() {
           <button
             onClick={() => setActiveTab("extensions")}
             className={cn(
-              "px-3 py-2 text-[9px] font-punk-heading uppercase tracking-wide transition-all",
+              "px-3 py-2 text-[13px] font-punk-heading uppercase tracking-wider transition-all",
               activeTab === "extensions"
                 ? "text-punk-accent border-b-2 border-punk-accent"
                 : "text-punk-text-muted hover:text-punk-text-primary"
@@ -151,7 +154,7 @@ export function PopupPage() {
           <button
             onClick={() => setActiveTab("rules")}
             className={cn(
-              "px-3 py-2 text-[9px] font-punk-heading uppercase tracking-wide transition-all",
+              "px-3 py-2 text-[13px] font-punk-heading uppercase tracking-wider transition-all",
               activeTab === "rules"
                 ? "text-punk-accent border-b-2 border-punk-accent"
                 : "text-punk-text-muted hover:text-punk-text-primary"

@@ -31,7 +31,7 @@ const Switch = React.forwardRef<HTMLButtonElement, SwitchProps>(
         {/* Labels */}
         <span
           className={cn(
-            "absolute font-punk-code text-[8px] transition-all duration-200",
+            "absolute font-punk-code text-[12px] transition-all duration-200",
             checked ? "left-1 text-punk-success" : "right-1 text-punk-text-muted"
           )}
         >

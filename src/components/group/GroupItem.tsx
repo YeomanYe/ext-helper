@@ -98,7 +98,7 @@ export function GroupItem({
           <Folder className="h-4 w-4 text-punk-text-muted" />
         )}
 
-        <span className="flex-1 truncate font-punk-heading text-[9px] text-punk-text-primary uppercase tracking-wide">
+        <span className="flex-1 truncate font-punk-heading text-[13px] text-punk-text-primary uppercase tracking-wider">
           {group.name}
         </span>
 

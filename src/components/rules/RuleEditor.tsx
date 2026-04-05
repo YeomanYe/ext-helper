@@ -89,7 +89,7 @@ export function RuleEditor({ rule, onSave, onClose }: RuleEditorProps) {
       >
         {/* Header */}
         <div className="flex items-center gap-2 px-4 py-3 border-b border-punk-border/30 shrink-0">
-          <h3 className="flex-1 font-punk-heading text-[10px] text-punk-text-primary uppercase tracking-wide">
+          <h3 className="flex-1 font-punk-heading text-[10px] text-punk-text-primary uppercase tracking-wider">
             {rule ? "EDIT RULE" : "NEW RULE"}
           </h3>
           <button
@@ -129,7 +129,7 @@ export function RuleEditor({ rule, onSave, onClose }: RuleEditorProps) {
                 ) : (
                   <label className="flex flex-col items-center justify-center w-full h-full cursor-pointer hover:bg-punk-bg-alt transition-colors">
                     <Image className="h-6 w-6 text-punk-text-muted mb-1" />
-                    <span className="text-[6px] text-punk-text-muted uppercase">UPLOAD</span>
+                    <span className="text-[10px] text-punk-text-muted uppercase">UPLOAD</span>
                     <input
                       type="file"
                       accept="image/*"
@@ -146,7 +146,7 @@ export function RuleEditor({ rule, onSave, onClose }: RuleEditorProps) {
               {/* Rule Name & Priority on same row */}
               <div className="flex gap-4">
                 <div className="flex-1">
-                  <label className="block font-punk-heading text-[9px] text-punk-text-muted uppercase mb-1.5">
+                  <label className="block font-punk-heading text-[13px] text-punk-text-muted uppercase mb-1.5">
                     RULE_NAME
                   </label>
                   <input
@@ -158,7 +158,7 @@ export function RuleEditor({ rule, onSave, onClose }: RuleEditorProps) {
                   />
                 </div>
                 <div className="w-24">
-                  <label className="block font-punk-heading text-[9px] text-punk-text-muted uppercase mb-1.5">
+                  <label className="block font-punk-heading text-[13px] text-punk-text-muted uppercase mb-1.5">
                     PRIORITY
                   </label>
                   <input
@@ -170,7 +170,7 @@ export function RuleEditor({ rule, onSave, onClose }: RuleEditorProps) {
                 </div>
               </div>
               <div>
-                <label className="block font-punk-heading text-[9px] text-punk-text-muted uppercase mb-1.5">
+                <label className="block font-punk-heading text-[13px] text-punk-text-muted uppercase mb-1.5">
                   DESCRIPTION (OPTIONAL)
                 </label>
                 <input
@@ -186,7 +186,7 @@ export function RuleEditor({ rule, onSave, onClose }: RuleEditorProps) {
 
           {/* Conditions */}
           <div>
-            <label className="font-punk-heading text-[9px] text-punk-text-muted uppercase mb-1.5">
+            <label className="font-punk-heading text-[13px] text-punk-text-muted uppercase mb-1.5">
               CONDITIONS (MATCH ANY)
             </label>
             <ConditionBuilder
@@ -197,7 +197,7 @@ export function RuleEditor({ rule, onSave, onClose }: RuleEditorProps) {
 
           {/* Actions */}
           <div>
-            <label className="block font-punk-heading text-[9px] text-punk-text-muted uppercase mb-1.5">
+            <label className="block font-punk-heading text-[13px] text-punk-text-muted uppercase mb-1.5">
               ACTIONS
             </label>
             <ActionBuilder actions={actions} onChange={setActions} />

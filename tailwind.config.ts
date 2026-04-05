@@ -27,10 +27,10 @@ export default {
         }
       },
       fontFamily: {
-        'punk-heading': ['"Press Start 2P"', 'monospace'],
-        'punk-body': ['"VT323"', 'monospace'],
-        'punk-code': ['"Fira Code"', 'monospace'],
-        sans: ['"Inter"', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif']
+        'punk-heading': ['"Noto Sans SC"', '"JetBrains Mono"', 'monospace'],
+        'punk-body': ['"Noto Sans SC"', '"JetBrains Mono"', 'monospace'],
+        'punk-code': ['"JetBrains Mono"', 'monospace'],
+        sans: ['"Noto Sans SC"', '"JetBrains Mono"', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif']
       },
       boxShadow: {
         'neon-purple': '0 0 5px #7C3AED, 0 0 20px #7C3AED, 0 0 40px #7C3AED',
