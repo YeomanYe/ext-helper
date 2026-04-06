@@ -1,22 +1,24 @@
 import * as React from "react"
-import { createPortal } from "react-dom"
-import { Settings, Trash2, Package, Power, PowerOff, Shield, Info, X, ExternalLink } from "lucide-react"
+import { Settings, Trash2, Package, Shield } from "lucide-react"
 import { cn } from "@/utils"
 import type { Extension, ViewMode } from "@/types"
 import { Switch, ConfirmDialog } from "@/components/common"
+import { useContextMenuPosition } from "@/hooks/useContextMenuPosition"
+import { ExtensionContextMenu } from "@/components/extension/ExtensionContextMenu"
+import { ExtensionDetailsModal } from "@/components/extension/ExtensionDetailsModal"
 
 interface ExtensionCardProps {
   extension: Extension
-  onToggle: () => void
-  onOpenOptions?: () => void
-  onRemove?: () => void
+  onToggle: (id: string) => void
+  onOpenOptions?: (id: string) => void
+  onRemove?: (id: string) => void
   disableEnableControls?: boolean
   disableRemove?: boolean
   viewMode?: ViewMode
   className?: string
 }
 
-export function ExtensionCard({
+export const ExtensionCard = React.memo(function ExtensionCard({
   extension,
   onToggle,
   onOpenOptions,
@@ -29,7 +31,6 @@ export function ExtensionCard({
   const [showMenu, setShowMenu] = React.useState(false)
   const [showConfirmRemove, setShowConfirmRemove] = React.useState(false)
   const [showDetails, setShowDetails] = React.useState(false)
-  const [menuPosition, setMenuPosition] = React.useState<{ top: number; left: number }>({ top: 0, left: 0 })
   const menuRef = React.useRef<HTMLDivElement>(null)
   const cardRef = React.useRef<HTMLDivElement>(null)
   const isCard = viewMode === "card"
@@ -37,80 +38,16 @@ export function ExtensionCard({
   const menuWidth = viewMode === "compact" ? 160 : 176
   const menuHeight = extension.optionsUrl ? 156 : 120
 
-  const updateMenuPosition = React.useCallback(() => {
-    if (!cardRef.current) return
+  const handleCloseMenu = React.useCallback(() => setShowMenu(false), [])
 
-    const rect = cardRef.current.getBoundingClientRect()
-    const surface = cardRef.current.closest("[data-extension-surface='true']")
-    const surfaceRect = surface?.getBoundingClientRect()
-    const boundaryLeft = surfaceRect?.left ?? 0
-    const boundaryTop = surfaceRect?.top ?? 0
-    const boundaryRight = surfaceRect?.right ?? window.innerWidth
-    const boundaryBottom = surfaceRect?.bottom ?? window.innerHeight
-    const boundaryWidth = boundaryRight - boundaryLeft
-    const boundaryHeight = boundaryBottom - boundaryTop
-    const padding = 10
-    const gap = 6
-
-    const isOutsideSurface = rect.bottom <= boundaryTop
-      || rect.top >= boundaryBottom
-      || rect.right <= boundaryLeft
-      || rect.left >= boundaryRight
-
-    if (isOutsideSurface) {
-      setShowMenu(false)
-      return
-    }
-
-    const desiredLeft = isDetail
-      ? rect.left
-      : rect.left - boundaryLeft > boundaryWidth / 2
-        ? rect.right - menuWidth
-        : rect.left
-    const desiredTop = isDetail
-      ? rect.top
-      : rect.top - boundaryTop > boundaryHeight / 2
-        ? rect.top - menuHeight - gap
-        : rect.bottom + gap
-
-    const left = Math.min(
-      Math.max(desiredLeft, boundaryLeft + padding),
-      boundaryRight - menuWidth - padding
-    )
-    const top = Math.min(
-      Math.max(desiredTop, boundaryTop + padding),
-      boundaryBottom - menuHeight - padding
-    )
-
-    setMenuPosition({ top, left })
-  }, [isDetail, menuHeight, menuWidth])
-
-  // Calculate menu position based on card location
-  React.useEffect(() => {
-    if (!showMenu) return
-
-    updateMenuPosition()
-
-    const handleViewportChange = () => updateMenuPosition()
-    window.addEventListener("resize", handleViewportChange)
-    window.addEventListener("scroll", handleViewportChange, true)
-
-    return () => {
-      window.removeEventListener("resize", handleViewportChange)
-      window.removeEventListener("scroll", handleViewportChange, true)
-    }
-  }, [showMenu, updateMenuPosition])
-
-  // Close menu when clicking outside
-  React.useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setShowMenu(false)
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside)
-    return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [])
+  const menuPosition = useContextMenuPosition({
+    cardRef,
+    showMenu,
+    isDetail,
+    menuWidth,
+    menuHeight,
+    onClose: handleCloseMenu
+  })
 
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -127,203 +64,60 @@ export function ExtensionCard({
     setShowDetails(true)
   }
 
+  const handleToggle = React.useCallback(() => {
+    onToggle(extension.id)
+  }, [onToggle, extension.id])
+
+  const handleOpenOptions = React.useCallback(() => {
+    onOpenOptions?.(extension.id)
+  }, [onOpenOptions, extension.id])
+
   const handleConfirmRemove = () => {
-    onRemove?.()
+    onRemove?.(extension.id)
     setShowConfirmRemove(false)
   }
 
   const isDimmed = !extension.enabled && !showMenu && !showConfirmRemove
 
-  const renderContextMenu = () => {
-    if (!showMenu || typeof document === "undefined") return null
+  const contextMenu = (
+    <ExtensionContextMenu
+      show={showMenu}
+      menuRef={menuRef}
+      menuPosition={menuPosition}
+      menuWidth={menuWidth}
+      extension={extension}
+      disableEnableControls={disableEnableControls}
+      disableRemove={disableRemove}
+      onToggle={handleToggle}
+      onOpenOptions={handleOpenOptions}
+      onRemove={handleRemoveClick}
+      onShowDetails={handleShowDetails}
+      onClose={handleCloseMenu}
+    />
+  )
 
-    return createPortal(
-      <div
-        ref={menuRef}
-        className="fixed z-[90] border border-punk-border bg-punk-bg-alt py-1 shadow-[0_0_20px_rgba(124,58,237,0.3)]"
-        style={{ top: menuPosition.top, left: menuPosition.left, width: menuWidth }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <button
-          onClick={(e) => {
-            e.stopPropagation()
-            if (disableEnableControls) return
-            onToggle()
-            setShowMenu(false)
-          }}
-          disabled={disableEnableControls}
-          className="flex w-full items-center gap-2 px-3 py-2 text-left font-punk-body text-sm text-punk-text-secondary hover:text-punk-accent hover:bg-punk-bg transition-colors disabled:cursor-not-allowed disabled:opacity-40"
-        >
-          {extension.enabled ? (
-            <>
-              <PowerOff className="h-4 w-4" />
-              DISABLE
-            </>
-          ) : (
-            <>
-              <Power className="h-4 w-4" />
-              ENABLE
-            </>
-          )}
-        </button>
-        {extension.optionsUrl && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation()
-              onOpenOptions?.()
-              setShowMenu(false)
-            }}
-            className="flex w-full items-center gap-2 px-3 py-2 text-left font-punk-body text-sm text-punk-text-secondary hover:text-punk-accent hover:bg-punk-bg transition-colors"
-          >
-            <Settings className="h-4 w-4" />
-            OPTIONS
-            </button>
-        )}
-        <button
-          onClick={(e) => {
-            e.stopPropagation()
-            handleShowDetails()
-          }}
-          className="flex w-full items-center gap-2 px-3 py-2 text-left font-punk-body text-sm text-punk-text-secondary hover:text-punk-accent hover:bg-punk-bg transition-colors"
-        >
-          <Info className="h-4 w-4" />
-          DETAILS
-        </button>
-        <button
-          onClick={(e) => {
-            e.stopPropagation()
-            if (disableRemove) return
-            handleRemoveClick()
-          }}
-          disabled={disableRemove}
-          className="flex w-full items-center gap-2 px-3 py-2 text-left font-punk-body text-sm text-punk-cta hover:bg-punk-cta/10 transition-colors disabled:cursor-not-allowed disabled:opacity-40"
-        >
-          <Trash2 className="h-4 w-4" />
-          REMOVE
-        </button>
-      </div>,
-      document.body
-    )
-  }
+  const confirmDialog = (
+    <ConfirmDialog
+      isOpen={showConfirmRemove}
+      title="REMOVE EXTENSION"
+      message={`Are you sure you want to remove "${extension.name}"? This action cannot be undone.`}
+      confirmText="REMOVE"
+      variant="danger"
+      onConfirm={handleConfirmRemove}
+      onCancel={() => setShowConfirmRemove(false)}
+    />
+  )
 
-  const renderDetailsModal = () => {
-    if (!showDetails || typeof document === "undefined") return null
-
-    return createPortal(
-      <div
-        className="fixed inset-0 z-[100] flex items-center justify-center bg-punk-bg/80 p-4 backdrop-blur-sm"
-        onClick={() => setShowDetails(false)}
-      >
-        <div
-          className="w-full max-w-xl border border-punk-primary bg-punk-bg-alt shadow-[0_0_30px_rgba(124,58,237,0.35)]"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div className="flex items-center justify-between border-b border-punk-border/30 px-4 py-3">
-            <div className="flex items-center gap-3">
-              {extension.iconUrl ? (
-                <img
-                  src={extension.iconUrl}
-                  alt={extension.name}
-                  className="h-10 w-10 border border-punk-border object-cover"
-                />
-              ) : (
-                <div className="flex h-10 w-10 items-center justify-center border border-punk-border bg-punk-bg">
-                  <Package className="h-5 w-5 text-punk-text-muted" />
-                </div>
-              )}
-              <div>
-                <h3 className="font-punk-heading text-[12px] uppercase tracking-wider text-punk-text-primary">
-                  {extension.name}
-                </h3>
-                <p className="font-punk-code text-[10px] uppercase text-punk-accent">
-                  v{extension.version} · {extension.installType}
-                </p>
-              </div>
-            </div>
-            <button
-              onClick={() => setShowDetails(false)}
-              className="text-punk-text-muted transition-colors hover:text-punk-text-primary"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </div>
-
-          <div className="space-y-4 p-4">
-            <div className="flex items-center gap-2">
-              <span className={cn(
-                "px-2 py-1 text-[10px] font-punk-heading uppercase border tracking-wider",
-                extension.enabled
-                  ? "border-punk-success/50 bg-punk-success/10 text-punk-success"
-                  : "border-punk-border/30 text-punk-text-muted"
-              )}>
-                {extension.enabled ? "ACTIVE" : "INACTIVE"}
-              </span>
-              {extension.homepageUrl && (
-                <a
-                  href={extension.homepageUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex items-center gap-1 font-punk-code text-[10px] uppercase text-punk-accent hover:text-punk-text-primary"
-                >
-                  HOMEPAGE
-                  <ExternalLink className="h-3 w-3" />
-                </a>
-              )}
-              {extension.optionsUrl && (
-                <button
-                  onClick={() => onOpenOptions?.()}
-                  className="flex items-center gap-1 font-punk-code text-[10px] uppercase text-punk-accent hover:text-punk-text-primary"
-                >
-                  OPTIONS
-                  <ExternalLink className="h-3 w-3" />
-                </button>
-              )}
-            </div>
-
-            {extension.description && (
-              <div className="border border-punk-border/30 bg-punk-bg/40 p-3">
-                <div className="mb-2 font-punk-heading text-[10px] uppercase tracking-wider text-punk-text-muted">
-                  DESCRIPTION
-                </div>
-                <p className="font-punk-body text-sm leading-relaxed text-punk-text-secondary">
-                  {extension.description}
-                </p>
-              </div>
-            )}
-
-            <div className="border border-punk-border/30 bg-punk-bg/40 p-3">
-              <div className="mb-2 flex items-center gap-2 font-punk-heading text-[10px] uppercase tracking-wider text-punk-text-muted">
-                <Shield className="h-3 w-3 text-punk-accent" />
-                PERMISSIONS ({extension.permissions.length})
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {extension.permissions.length > 0 ? extension.permissions.map((perm) => (
-                  <span
-                    key={perm}
-                    className="border border-punk-border/20 bg-punk-bg px-2 py-1 font-punk-code text-[10px] text-punk-text-secondary"
-                  >
-                    {perm}
-                  </span>
-                )) : (
-                  <span className="font-punk-code text-[10px] uppercase text-punk-text-muted">
-                    NO PERMISSIONS
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>,
-      document.body
-    )
-  }
-
-  // Card mode: horizontal layout with icon, info, and toggle switch
-  // Compact mode: vertical layout with fixed size
-  // Detail mode: expanded layout with full info
+  const detailsModal = (
+    <ExtensionDetailsModal
+      show={showDetails}
+      extension={extension}
+      onClose={() => setShowDetails(false)}
+      onOpenOptions={handleOpenOptions}
+    />
+  )
 
   if (isDetail) {
-    // Detail mode - expanded layout with full info
     return (
       <div
         ref={cardRef as React.RefObject<HTMLDivElement>}
@@ -338,11 +132,8 @@ export function ExtensionCard({
         )}
         onContextMenu={handleContextMenu}
       >
-        {/* Content */}
         <div className="p-3">
-          {/* Header */}
           <div className="flex items-start gap-3 mb-3">
-            {/* Extension Icon */}
             <div className="relative flex-shrink-0">
               {extension.iconUrl ? (
                 <img
@@ -356,7 +147,6 @@ export function ExtensionCard({
                   <Package className="w-7 h-7 text-punk-text-muted" />
                 </div>
               )}
-              {/* Status dot */}
               <div
                 className={cn(
                   "absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 border-2 border-punk-bg-alt rounded-full",
@@ -378,7 +168,7 @@ export function ExtensionCard({
                 <Switch
                   checked={extension.enabled}
                   disabled={disableEnableControls}
-                  onCheckedChange={() => onToggle()}
+                  onCheckedChange={handleToggle}
                 />
               </div>
 
@@ -388,7 +178,6 @@ export function ExtensionCard({
                 </p>
               )}
 
-              {/* Status line */}
               <div className="flex items-center gap-2 mt-2">
                 <span className={cn(
                   "px-2 py-1 text-[10px] font-punk-heading uppercase border tracking-wider",
@@ -405,7 +194,6 @@ export function ExtensionCard({
             </div>
           </div>
 
-          {/* Permissions Section */}
           <div className="border border-punk-border/30 rounded bg-punk-bg/50 mb-2">
             <div className="flex items-center gap-2 px-2 py-1.5 border-b border-punk-border/20">
               <Shield className="w-3 h-3 text-punk-accent" />
@@ -432,13 +220,12 @@ export function ExtensionCard({
             </div>
           </div>
 
-          {/* Actions */}
           <div className="flex items-center justify-end gap-2 pt-2 border-t border-punk-border/20">
             {extension.optionsUrl && (
               <button
                 onClick={(e) => {
                   e.stopPropagation()
-                  onOpenOptions?.()
+                  handleOpenOptions()
                 }}
                 className="flex items-center gap-1 px-2 py-1 text-[11px] font-punk-heading text-punk-text-muted hover:text-punk-accent border border-punk-border/30 hover:border-punk-accent/50 transition-all"
               >
@@ -461,26 +248,14 @@ export function ExtensionCard({
           </div>
         </div>
 
-        {/* Context Menu */}
-        {renderContextMenu()}
-
-        {/* Confirm Remove Dialog */}
-        <ConfirmDialog
-          isOpen={showConfirmRemove}
-          title="REMOVE EXTENSION"
-          message={`Are you sure you want to remove "${extension.name}"? This action cannot be undone.`}
-          confirmText="REMOVE"
-          variant="danger"
-          onConfirm={handleConfirmRemove}
-          onCancel={() => setShowConfirmRemove(false)}
-        />
-        {renderDetailsModal()}
+        {contextMenu}
+        {confirmDialog}
+        {detailsModal}
       </div>
     )
   }
 
   if (isCard) {
-    // Card mode - horizontal layout with more details
     return (
       <div
         ref={cardRef as React.RefObject<HTMLDivElement>}
@@ -495,7 +270,6 @@ export function ExtensionCard({
         )}
         onContextMenu={handleContextMenu}
       >
-        {/* Extension Icon with status indicator */}
         <div className="relative flex-shrink-0">
           {extension.iconUrl ? (
             <img
@@ -509,7 +283,6 @@ export function ExtensionCard({
               <Package className="w-5 h-5 text-punk-text-muted" />
             </div>
           )}
-          {/* Status dot */}
           <div
             className={cn(
               "absolute -bottom-0.5 -right-0.5 w-3 h-3 border border-punk-bg",
@@ -518,7 +291,6 @@ export function ExtensionCard({
           />
         </div>
 
-        {/* Extension Info */}
         <div className="flex-1 min-w-0">
           <h3 className="font-punk-heading text-[12px] text-punk-text-primary truncate uppercase tracking-wider" title={extension.name}>
             {extension.name}
@@ -533,34 +305,21 @@ export function ExtensionCard({
           </p>
         </div>
 
-        {/* Toggle Switch */}
         <div onClick={(e) => e.stopPropagation()}>
           <Switch
             checked={extension.enabled}
             disabled={disableEnableControls}
-            onCheckedChange={() => onToggle()}
+            onCheckedChange={handleToggle}
           />
         </div>
 
-        {/* Context Menu */}
-        {renderContextMenu()}
-
-        {/* Confirm Remove Dialog */}
-        <ConfirmDialog
-          isOpen={showConfirmRemove}
-          title="REMOVE EXTENSION"
-          message={`Are you sure you want to remove "${extension.name}"? This action cannot be undone.`}
-          confirmText="REMOVE"
-          variant="danger"
-          onConfirm={handleConfirmRemove}
-          onCancel={() => setShowConfirmRemove(false)}
-        />
-        {renderDetailsModal()}
+        {contextMenu}
+        {confirmDialog}
+        {detailsModal}
       </div>
     )
   }
 
-  // Compact mode - vertical layout with fixed size
   return (
     <div
       ref={cardRef as React.RefObject<HTMLDivElement>}
@@ -576,10 +335,9 @@ export function ExtensionCard({
       onContextMenu={handleContextMenu}
       onClick={() => {
         if (disableEnableControls) return
-        onToggle()
+        handleToggle()
       }}
     >
-      {/* Extension Icon */}
       <div className="relative flex-shrink-0">
         {extension.iconUrl ? (
           <img
@@ -593,7 +351,6 @@ export function ExtensionCard({
             <Package className="w-5 h-5 text-punk-text-muted" />
           </div>
         )}
-        {/* Status dot */}
         <div
           className={cn(
             "absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 border border-punk-bg-alt",
@@ -602,27 +359,15 @@ export function ExtensionCard({
         />
       </div>
 
-      {/* Extension Name - truncated */}
       <div className="w-full mt-1">
         <h3 className="font-punk-heading text-[10px] text-punk-text-primary text-center uppercase tracking-wider truncate" title={extension.name}>
           {extension.name.substring(0, 14)}
         </h3>
       </div>
 
-      {/* Context Menu */}
-      {renderContextMenu()}
-
-      {/* Confirm Remove Dialog */}
-      <ConfirmDialog
-        isOpen={showConfirmRemove}
-        title="REMOVE EXTENSION"
-        message={`Are you sure you want to remove "${extension.name}"? This action cannot be undone.`}
-        confirmText="REMOVE"
-        variant="danger"
-        onConfirm={handleConfirmRemove}
-        onCancel={() => setShowConfirmRemove(false)}
-      />
-      {renderDetailsModal()}
+      {contextMenu}
+      {confirmDialog}
+      {detailsModal}
     </div>
   )
-}
+})

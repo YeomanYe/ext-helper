@@ -12,7 +12,6 @@ This document describes the punk design system implemented for the ExtHelper bro
 - **Neon Glow Effects**: Key interactive elements use colored glow effects reminiscent of neon signs.
 - **Scanline Overlay**: A subtle CRT-style scanline effect adds depth and nostalgia.
 - **Terminal Typography**: Uses monospace fonts (Press Start 2P, VT323, Fira Code) to evoke a command-line interface.
-- **Wide Panel Layout**: Information-dense layout optimized for browser extension popup (660px width).
 - **Binary Status**: Uses 1/0 instead of ON/OFF text for enabled state.
 - **Minimal Animations**: Prefer static visual effects over continuous animations for better UX.
 
@@ -25,7 +24,7 @@ This document describes the punk design system implemented for the ExtHelper bro
 | CTA | `#F43F5E` | Destructive actions, warnings |
 | Accent | `#22D3EE` | Highlights, links, icons |
 | Success | `#10B981` | Online status, enabled state |
-| Warning | `#FBBF24` | Warning indicators |
+| Warning | `#FBBF24` | Warning indicators (Bisect) |
 | Background | `#0F0F23` | Main background |
 | Background Alt | `#1A1A2E` | Card backgrounds |
 | Text Primary | `#E2E8F0` | Primary text |
@@ -44,7 +43,7 @@ This document describes the punk design system implemented for the ExtHelper bro
 
 | Font | Class | Usage | Size |
 |------|-------|-------|------|
-| Press Start 2P | `font-punk-heading` | Headings, buttons, logo | 6-10px |
+| Press Start 2P | `font-punk-heading` | Headings, buttons, logo | 6-13px |
 | VT323 | `font-punk-body` | Body text, labels | 12-18px |
 | Fira Code | `font-punk-code` | Version numbers, code | 10-14px |
 
@@ -52,10 +51,10 @@ This document describes the punk design system implemented for the ExtHelper bro
 
 ```tsx
 // Heading - uppercase, tracking-wide
-<h3 className="font-punk-heading text-[8px] tracking-wide">EXTENSION_NAME</h3>
+<h3 className="font-punk-heading text-[12px] tracking-wider uppercase">EXTENSION_NAME</h3>
 
 // Body text
-<p className="font-punk-body text-xs">Description text</p>
+<p className="font-punk-body text-sm">Description text</p>
 
 // Version/Code
 <span className="font-punk-code text-[10px]">v1.0.0</span>
@@ -64,21 +63,24 @@ This document describes the punk design system implemented for the ExtHelper bro
 ## Layout Structure
 
 ### Popup Dimensions
-- Width: 660px (max)
-- Height: 600px (max)
+- Height: 600px (fixed via `h-[600px]`)
+- Width: determined by browser popup
 
 ### Main Sections (Top to Bottom)
 
-1. **Header** (~60px) - Cyberpunk logo, title, subtitle, view mode toggle
-2. **Search** (48px) - Terminal-style search bar with filter dropdown
-3. **Sectors** (auto) - Horizontal chip group filters
-4. **Content** (flex) - Extension card grid (flex-wrap)
-5. **Footer** (~40px) - Status bar with progress and LIVE indicator
+1. **Header** (~60px) - Cyberpunk logo, title, subtitle, view mode toggle (GRID/CARD/DETAIL)
+2. **TabBar** - EXTENSIONS / RULES tabs + ACTIONS dropdown
+3. **Search** (48px) - Filter dropdown (ALL/ON/OFF) + terminal-style search bar
+4. **BisectBanner** (auto) - Only visible during active bisect session
+5. **GroupsBar** (auto) - Horizontal chip group filters with power toggle
+6. **Content** (flex) - Extension grid/list or RuleManager
+7. **Footer** (~40px) - Status bar with progress and LIVE indicator
 
 ### View Modes
 
-- **Card Mode**: Single column list with full details
-- **Compact Mode**: Square cards in flex-wrap grid (~7 per row at 660px)
+- **Compact Mode (GRID)**: Square cards in CSS grid `auto-fill, minmax(80px, 1fr)`
+- **Card Mode (CARD)**: Single column list with full details and toggle switch
+- **Detail Mode (DETAIL)**: Single column with permissions, install type, action buttons
 
 ### Spacing System
 
@@ -96,7 +98,7 @@ This document describes the punk design system implemented for the ExtHelper bro
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│ [E]  EXTHELPER                                    [□][□] [⚙]    │
+│ [E]  EXTHELPER                              [GRID][CARD][DETAIL]   │
 │      EXTENSION_MGR_v2.0                                            │
 └─────────────────────────────────────────────────────────────────────┘
 ```
@@ -106,6 +108,7 @@ This document describes the punk design system implemented for the ExtHelper bro
 - Background: punk-bg
 - Padding: px-4 py-3
 - HUD corner decorations
+- Scanline animation
 
 **Logo:**
 - Size: 40x40px
@@ -123,38 +126,33 @@ This document describes the punk design system implemented for the ExtHelper bro
 - Color: text-muted
 - Font: font-punk-body
 
-**Settings Button:**
-- Size: 36x36px
-- Hover: border-cta, shadow-neon-cta
-- Corner accent decorations on hover
+**View Mode Toggle:**
+- Three buttons: GRID / CARD / DETAIL
+- Active state: bg-punk-primary/30 text-punk-accent border-punk-primary/50
+- Inactive: text-punk-text-muted
 
 ```tsx
 <header className="relative flex items-center justify-between border-b-2 border-punk-primary bg-punk-bg px-4 py-3 hud-corner">
-  {/* Decorative scanline */}
   <div className="absolute inset-0 overflow-hidden opacity-20 pointer-events-none">
     <div className="w-full h-1 bg-punk-accent animate-scanline" />
   </div>
-
-  {/* Logo */}
-  <div className="flex items-center gap-3 relative z-10">
-    <div className="relative">
-      <div className="flex h-10 w-10 items-center justify-center border-2 border-punk-neon-cyan bg-punk-bg-alt">
-        <span className="font-punk-heading text-xs text-punk-neon-cyan">E</span>
-      </div>
-      <div className="absolute inset-0 blur-md bg-punk-neon-cyan/30 -z-10" />
-    </div>
-
-    <div className="flex flex-col">
-      <h1 className="font-punk-heading text-xs text-punk-neon-cyan">
-        EXTHELPER
-      </h1>
-      <span className="font-punk-body text-punk-text-muted text-sm tracking-wider">
-        EXTENSION_MGR_v2.0
-      </span>
-    </div>
-  </div>
+  {/* Logo + Title */}
+  {/* View mode buttons: GRID / CARD / DETAIL */}
 </header>
 ```
+
+### TabBar
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│  [EXTENSIONS]  [RULES]                               [ACTIONS ▼]  │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+**Specs:**
+- Active tab: text-punk-accent border-b-2 border-punk-accent
+- Inactive: text-punk-text-muted
+- ACTIONS dropdown aligned right
 
 ### Footer
 
@@ -169,45 +167,20 @@ This document describes the punk design system implemented for the ExtHelper bro
 - Progress bar: bottom edge, shows enabled percentage
 - LIVE indicator: green dot + text
 
-```tsx
-<footer className="relative flex items-center justify-between border-t-2 border-punk-primary bg-punk-bg-alt px-4 py-2">
-  {/* Progress bar */}
-  <div className="absolute bottom-0 left-0 h-0.5 bg-punk-bg w-full">
-    <div className="h-full bg-punk-success transition-all duration-500" style={{ width: `${percentage}%` }} />
-  </div>
-
-  {/* Status text */}
-  <div className="flex items-center gap-3">
-    <span className="font-punk-body text-punk-text-muted text-sm">SYS_STATUS:</span>
-    <span className="font-punk-body text-punk-success text-sm">{enabledCount}/{totalCount} ONLINE</span>
-    <span className="text-punk-text-muted">|</span>
-    <span className="font-punk-body text-punk-accent text-sm">{percentage}%_ACTIVE</span>
-  </div>
-
-  {/* LIVE indicator */}
-  <div className="flex items-center gap-2">
-    <div className="h-2 w-2 bg-punk-success shadow-neon-cyan rounded-full" />
-    <span className="font-punk-body text-punk-success text-xs">LIVE</span>
-  </div>
-</footer>
-```
-
 ### SearchBar with Filter
 
 **Specs:**
 - Height: 44px (h-11)
-- Filter dropdown on left side
+- Filter dropdown on left side (ALL / ON / OFF)
 - Terminal "$" prefix
 - Search input on right (flex-1)
+- Clear button when has value
 
 ```tsx
 <div className="flex items-center gap-3">
-  {/* Filter Dropdown */}
   <button className="punk-btn h-11 px-3">
     {currentFilter.label} <ChevronDown />
   </button>
-
-  {/* Search Input */}
   <div className="relative flex-1">
     <span className="absolute left-3 text-punk-accent">$</span>
     <input className="punk-input h-11 w-full pl-9" />
@@ -215,77 +188,143 @@ This document describes the punk design system implemented for the ExtHelper bro
 </div>
 ```
 
-### ExtensionCard - Card Mode (Full List)
+### ExtensionCard - Compact Mode (Square Grid)
+
+```
+┌─────────────────┐
+│     [Icon]      │
+│       ●         │
+│     NAME        │
+└─────────────────┘
+```
+
+**Specs:**
+- Size: aspect-square (proportional)
+- Grid: `grid-cols-[repeat(auto-fill,minmax(80px,1fr))]`
+- Layout: flex flex-col items-center justify-center
+- Icon: 40x40px centered
+- Status dot: 2.5px (w-2.5 h-2.5), bottom-right of icon
+- Name: Truncated to 14 chars, centered below icon, font-punk-heading text-[10px]
+- Click: Toggle extension
+
+### ExtensionCard - Card Mode (List)
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│ [Icon]  NAME                    v1.0  ●  [1/0]  [⋮]   │
+│ [Icon]  NAME                    v1.0  ●  [1/0]        │
 │         Description text...                             │
 └─────────────────────────────────────────────────────────┘
 ```
 
 **Specs:**
-- Layout: flex items-center gap-3
+- Layout: flex items-center gap-3, min-h-[60px]
 - Icon: 40x40px with border
-- Status dot: 12px, bottom-right of icon
-- Toggle: 1/0 binary switch
-- Menu: Context menu on right-click
+- Status dot: 3px (w-3 h-3), bottom-right of icon
+- Toggle: 1/0 binary switch (right side)
+- Name: font-punk-heading text-[12px]
+- Description: font-punk-body text-sm, truncated
+- Version: font-punk-code text-[10px] text-punk-accent
 
-### ExtensionCard - Compact Mode (Square Grid)
+### ExtensionCard - Detail Mode (Full Info)
 
 ```
-┌─────────────────┐
-│     [Icon]     │
-│       ●        │
-│     NAME       │
-└─────────────────┘
+┌─────────────────────────────────────────────────────────┐
+│ [Icon]  NAME                    v1.0            [1/0]  │
+│    ●    [ACTIVE] development                           │
+│         Description text (full)...                     │
+│                                                         │
+│ ┌─ PERMISSIONS (5) ──────────────────────────────────┐ │
+│ │ [perm1] [perm2] [perm3] [perm4] [perm5]            │ │
+│ └────────────────────────────────────────────────────┘ │
+│                                    [OPTIONS] [REMOVE]  │
+└─────────────────────────────────────────────────────────┘
 ```
 
 **Specs:**
-- Size: 84x84px (square)
-- Layout: flex flex-col items-center justify-center
-- Icon: 40x40px centered
-- Status dot: 10px, bottom-right of icon
-- Name: Truncated to 14 chars, centered below icon
-- Click: Toggle extension
+- Layout: flex flex-col, full width
+- Icon: 56x56px (w-14 h-14)
+- Status dot: 3.5px (w-3.5 h-3.5)
+- Status badge: [ACTIVE] green / [INACTIVE] muted
+- Permissions: flex-wrap, max 6 shown + "+n more"
+- Action buttons: OPTIONS + REMOVE at bottom
 
-**Classes:**
-```tsx
-<div className="min-w-[84px] w-[84px] h-[84px] p-3">
-  <img className="w-10 h-10" />
-  <h3 className="font-punk-heading text-[6px] mt-1">NAME</h3>
-</div>
+### BisectBanner
+
 ```
+┌─────────────────────────────────────────────────────────┐
+│  BISECT STEP 3                    [Good] [Bad] [Cancel] │
+│  Good = issue disappeared, Bad = still present          │
+│  Candidates 4 · Testing 2                               │
+└─────────────────────────────────────────────────────────┘
+```
+
+**Specs:**
+- Border: border-punk-warning/40
+- Background: bg-punk-bg-alt
+- Title: font-punk-heading text-[12px] text-punk-warning
+- Good button: border-punk-success, text-punk-success
+- Bad button: border-punk-cta, text-punk-cta
+- Cancel button: border-punk-border, text-punk-text-muted
+
+### ExtensionsActionsMenu
+
+```
+┌────────────────┐
+│ Start Bisect   │
+│ Enable All     │
+│ Disable All    │
+│ Undo [3]       │
+│ Redo [1]       │
+└────────────────┘
+```
+
+**Specs:**
+- Trigger: "ACTIONS" button with chevron
+- Width: w-40
+- Items: font-punk-heading text-[11px] uppercase
+- Disabled items: opacity-40, cursor-not-allowed
 
 ### GroupDetailModal (Edit Mode)
 
 **Specs:**
-- Width: 400px
+- Width: 480px, Height: 575px
 - Always enters edit mode when opened
 - Two sections: IN SECTOR / NOT IN SECTOR
 - Click extension to toggle group membership
-- 1/0 toggle for enable state
+- 1/0 toggle for enable state (IN SECTOR only)
 
 ```tsx
-<div className="max-h-[560px] flex flex-col">
-  {/* Header with search */}
-  <div className="p-4 border-b">
-    <Search />
-  </div>
-
-  {/* IN SECTOR - Highlighted */}
-  <div className="border border-punk-success/50">
-    <p className="text-punk-success">IN SECTOR [n]</p>
-    <ExtensionItem />
-  </div>
-
-  {/* NOT IN SECTOR - Dimmed */}
-  <div className="opacity-40">
-    <p className="text-punk-text-muted">NOT IN SECTOR [n]</p>
-    <ExtensionItem />
-  </div>
+<div className="w-[480px] h-[575px] border border-punk-border bg-punk-bg-alt">
+  {/* GroupEditorPanel: name edit, icon upload, search, filter */}
+  {/* GroupExtensionPicker: IN SECTOR (highlighted) / NOT IN SECTOR (dimmed) */}
+  {/* Footer: DELETE | CANCEL / CLOSE | CONFIRM */}
 </div>
 ```
+
+### ExtensionContextMenu
+
+```
+┌─────────────────────┐
+│ ⚡ ENABLE/DISABLE   │
+│ ⚙ OPTIONS          │  ← only if optionsUrl exists
+│ ℹ DETAILS          │
+│ 🗑 REMOVE           │
+└─────────────────────┘
+```
+
+**Specs:**
+- Rendered via Portal to document.body
+- Position: calculated by useContextMenuPosition hook
+- Width: 160px (compact) / 176px (card/detail)
+- Disabled items have opacity-40
+
+### ExtensionDetailsModal
+
+**Specs:**
+- Width: max-w-xl
+- Shows: icon, name, version, install type, status badge
+- Sections: description, permissions list
+- Links: homepage, options page
 
 ### Switch Component
 
@@ -304,18 +343,13 @@ This document describes the punk design system implemented for the ExtHelper bro
   <span className={cn("text-[10px]", checked ? "text-punk-success" : "text-punk-text-muted")}>
     {checked ? "1" : "0"}
   </span>
-  <span className={cn(
-    "absolute w-5 h-5 bg-punk-bg-alt border border-punk-border",
-    "transition-transform duration-200",
-    checked && "translate-x-5"
-  )} />
 </button>
 ```
 
 ### Sector Chips (Group Chips)
 
 **Specs:**
-- Display: Horizontal wrap
+- Display: Horizontal flex-wrap
 - Content: Color dot + name + count + power toggle
 - Click: Open group detail modal
 - Power icon: Toggle all in sector
@@ -355,6 +389,7 @@ Animations are optional and can be toggled. Prefer static effects for better UX.
 | Class | Effect | Usage |
 |-------|--------|-------|
 | `animate-pulse` | Pulsing indicator | Status dots |
+| `animate-pulse-neon` | Neon pulsing | Status dots (enabled) |
 | `animate-glitch` | Text skew/shift | Decorative titles |
 | `animate-flicker` | CRT flicker | CRT effect |
 | `animate-scanline` | Moving scanline | Header decoration |
@@ -394,20 +429,38 @@ body::before {
 ```
 src/
 ├── styles/
-│   └── globals.css           # Theme vars, effects, animations
+│   └── globals.css              # Theme vars, effects, animations
 ├── components/
 │   ├── popup/
-│   │   └── Header.tsx       # Header, SearchBar, Footer
+│   │   ├── Header.tsx           # Header, SearchBar, QuickFilters, Footer
+│   │   ├── ExtensionsActionsMenu.tsx  # Actions dropdown
+│   │   └── BisectBanner.tsx     # Bisect status banner
 │   ├── extension/
-│   │   └── ExtensionCard.tsx # Card and compact mode cards
+│   │   ├── ExtensionCard.tsx    # Compact, Card, and Detail mode cards
+│   │   ├── ExtensionContextMenu.tsx   # Right-click context menu (Portal)
+│   │   ├── ExtensionDetailsModal.tsx  # Extension details modal (Portal)
+│   │   └── ExtensionList.tsx    # Extension list container
 │   ├── group/
-│   │   └── GroupModal.tsx   # GroupDetailModal, GroupChip, CreateGroupChip
+│   │   ├── GroupModal.tsx       # GroupModal (create/edit mode)
+│   │   ├── GroupsBar.tsx        # Horizontal group chips container
+│   │   ├── GroupChips.tsx       # GroupChip + CreateGroupChip
+│   │   ├── GroupEditorPanel.tsx # Name/icon/search editor
+│   │   └── GroupExtensionPicker.tsx  # IN/NOT IN SECTOR picker
+│   ├── rules/
+│   │   ├── RuleManager.tsx      # Rule management main view
+│   │   ├── RuleList.tsx         # Rule list
+│   │   ├── RuleCard.tsx         # Rule card
+│   │   ├── RuleEditor.tsx       # Rule editor modal
+│   │   ├── ConditionBuilder.tsx # Condition group editor
+│   │   ├── ActionBuilder.tsx    # Action editor
+│   │   └── RuleBadges.tsx       # Condition/action summary badges
 │   └── common/
-│       ├── Button.tsx        # Punk button variants
-│       ├── Input.tsx         # Terminal input
-│       └── Switch.tsx        # Binary toggle switch
+│       ├── Button.tsx           # Punk button variants
+│       ├── Input.tsx            # Terminal input
+│       ├── Switch.tsx           # Binary toggle switch (1/0)
+│       └── ConfirmDialog.tsx    # Confirmation dialog
 └── components/
-    └── PopupPage.tsx         # Main popup layout
+    └── PopupPage.tsx            # Main popup layout (Tab navigation)
 ```
 
 ## Tailwind Config
@@ -422,6 +475,7 @@ colors: {
     cta: '#F43F5E',
     accent: '#22D3EE',
     success: '#10B981',
+    warning: '#FBBF24',
     bg: '#0F0F23',
     'bg-alt': '#1A1A2E',
     'neon-pink': '#FF00FF',
@@ -451,7 +505,7 @@ The punk design intentionally avoids:
 - Sans-serif fonts (monospace required)
 - Emoji icons (use Lucide SVG icons)
 - ON/OFF text labels (use 1/0 binary)
-- Fixed grid columns in compact mode (use flex-wrap)
+- Fixed grid columns in compact mode (use CSS grid auto-fill)
 - Complex add mode for groups (use edit mode directly)
 - Excessive animations (keep UI responsive)
 
@@ -476,10 +530,36 @@ Animations respect `prefers-reduced-motion` when implemented.
 
 ## Changelog
 
+### v3.0 - Rules & Bisect Update
+
+**New Components:**
+- TabBar: EXTENSIONS / RULES tab navigation
+- BisectBanner: Bisect session status and controls
+- ExtensionsActionsMenu: Batch operations dropdown
+- ExtensionContextMenu: 4-item right-click menu (Portal)
+- ExtensionDetailsModal: Full extension info dialog (Portal)
+- RuleManager: Rule CRUD interface
+- RuleEditor: Condition group + action builder
+- ConditionBuilder: Domain patterns + schedule editor
+- RuleBadges: Condition/action summary display
+
+**View Modes:**
+- Added Detail mode (3 modes total: GRID/CARD/DETAIL)
+- Detail mode shows permissions, install type, action buttons
+
+**Layout:**
+- Added TabBar between Header and SearchBar
+- Added BisectBanner (conditional)
+- ACTIONS dropdown in TabBar
+
+**Group Modal:**
+- Size: 480×575px
+- GroupEditorPanel: name edit, icon upload
+- GroupExtensionPicker: IN/NOT IN SECTOR split view
+
 ### v2.0 - Punk Redesign
 
 **Layout:**
-- Panel width expanded to 660px
 - Header with cyberpunk logo and subtitle
 - Footer with progress bar and LIVE indicator
 - Scanline decoration in header
@@ -489,8 +569,8 @@ Animations respect `prefers-reduced-motion` when implemented.
 - Terminal "$" prompt styling
 
 **Extension Cards:**
-- Compact mode uses flex-wrap layout
-- Square cards (84x84px) instead of 88x100px
+- Compact mode uses CSS grid auto-fill layout
+- Square cards (aspect-square)
 - ON/OFF badge removed (status dot only)
 - 1/0 binary toggle switch
 

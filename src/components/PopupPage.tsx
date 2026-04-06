@@ -260,9 +260,9 @@ export function PopupPage() {
                       viewMode={viewMode}
                       disableEnableControls={isBisectActive}
                       disableRemove={isBisectActive}
-                      onToggle={() => handleToggleExtension(ext.id)}
-                      onOpenOptions={() => handleOpenOptions(ext.id)}
-                      onRemove={() => handleRemoveExtension(ext.id)}
+                      onToggle={handleToggleExtension}
+                      onOpenOptions={handleOpenOptions}
+                      onRemove={handleRemoveExtension}
                     />
                   ))}
                 </div>

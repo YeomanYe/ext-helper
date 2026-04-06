@@ -2,613 +2,79 @@
 import type { Extension, Group } from "@/types"
 import type { Rule } from "@/rules/types"
 
-export const MOCK_EXTENSIONS: Extension[] = [
-  {
-    id: "ext-1",
-    name: "AdBlocker Ultimate",
-    description: "Block all ads and trackers on websites",
-    version: "3.8.5",
-    enabled: true,
-    iconUrl: null,
-    permissions: ["storage", "tabs"],
-    installType: "normal",
-    optionsUrl: null,
-    homepageUrl: "https://example.com"
-  },
-  {
-    id: "ext-2",
-    name: "Dark Reader",
-    description: "Dark mode for every website",
-    version: "4.9.120",
-    enabled: true,
-    iconUrl: null,
-    permissions: ["storage", "activeTab"],
-    installType: "normal",
-    optionsUrl: "options.html",
-    homepageUrl: "https://darkreader.org"
-  },
-  {
-    id: "ext-3",
-    name: "LastPass Password Manager",
-    description: "Secure password manager",
-    version: "4.126.0",
-    enabled: false,
-    iconUrl: null,
-    permissions: ["storage", "tabs"],
-    installType: "normal",
-    optionsUrl: null,
-    homepageUrl: "https://lastpass.com"
-  },
-  {
-    id: "ext-4",
-    name: "Grammarly",
-    description: "AI-powered writing assistant",
-    version: "14.1100.0",
-    enabled: true,
-    iconUrl: null,
-    permissions: ["storage", "activeTab"],
-    installType: "normal",
-    optionsUrl: null,
-    homepageUrl: "https://grammarly.com"
-  },
-  {
-    id: "ext-5",
-    name: "Octotree",
-    description: "GitHub code tree viewer",
-    version: "7.0.2",
-    enabled: true,
-    iconUrl: null,
-    permissions: ["storage", "activeTab"],
-    installType: "normal",
-    optionsUrl: null,
-    homepageUrl: "https://github.com"
-  },
-  {
-    id: "ext-6",
-    name: "JSON Viewer",
-    description: "Format and syntax highlight JSON",
-    version: "2.2.1",
-    enabled: true,
-    iconUrl: null,
-    permissions: ["storage", "activeTab"],
-    installType: "normal",
-    optionsUrl: null,
-    homepageUrl: null
-  },
-  {
-    id: "ext-7",
-    name: "WhatFont",
-    description: "Identify fonts on web pages",
-    version: "3.1.3",
-    enabled: false,
-    iconUrl: null,
-    permissions: ["storage", "activeTab"],
-    installType: "normal",
-    optionsUrl: null,
-    homepageUrl: null
-  },
-  {
-    id: "ext-8",
-    name: "ColorZilla",
-    description: "Advanced color picker",
-    version: "3.9.2",
-    enabled: true,
-    iconUrl: null,
-    permissions: ["storage", "activeTab"],
-    installType: "normal",
-    optionsUrl: null,
-    homepageUrl: "https://colorzilla.com"
-  },
-  {
-    id: "ext-9",
-    name: "Lighthouse",
-    description: "Website auditing and performance testing tool",
-    version: "11.8.0",
-    enabled: false,
-    iconUrl: null,
-    permissions: ["storage", "activeTab", "tabs"],
-    installType: "development",
-    optionsUrl: null,
-    homepageUrl: "https://developers.google.com/lighthouse"
-  },
-  {
-    id: "ext-10",
-    name: "React Developer Tools",
-    description: "React debugging tool",
-    version: "5.1.0",
-    enabled: true,
-    iconUrl: null,
-    permissions: ["storage", "activeTab"],
-    installType: "normal",
-    optionsUrl: null,
-    homepageUrl: null
-  },
-  {
-    id: "ext-11",
-    name: "Vue.js devtools",
-    description: "Vue.js debugging",
-    version: "6.6.0",
-    enabled: false,
-    iconUrl: null,
-    permissions: ["storage", "activeTab"],
-    installType: "normal",
-    optionsUrl: null,
-    homepageUrl: null
-  },
-  {
-    id: "ext-12",
-    name: "Tampermonkey",
-    description: "Userscript manager",
-    version: "5.1.2",
-    enabled: true,
-    iconUrl: null,
-    permissions: ["storage", "tabs", "activeTab"],
-    installType: "normal",
-    optionsUrl: "options.html",
-    homepageUrl: "https://tampermonkey.net"
-  },
-  {
-    id: "ext-13",
-    name: "uBlock Origin",
-    description: "Efficient ad blocker",
-    version: "1.59.0",
-    enabled: true,
-    iconUrl: null,
-    permissions: ["storage", "tabs", "activeTab"],
-    installType: "normal",
-    optionsUrl: null,
-    homepageUrl: "https://ublock.org"
-  },
-  {
-    id: "ext-14",
-    name: "Enhanced GitHub",
-    description: "Adds useful features to GitHub",
-    version: "1.8.5",
-    enabled: true,
-    iconUrl: null,
-    permissions: ["storage", "activeTab"],
-    installType: "normal",
-    optionsUrl: null,
-    homepageUrl: null
-  },
-  {
-    id: "ext-15",
-    name: "Awesome Screenshot",
-    description: "Screen capture and annotation",
-    version: "5.1.82",
-    enabled: false,
-    iconUrl: null,
-    permissions: ["storage", "activeTab", "tabs"],
-    installType: "normal",
-    optionsUrl: null,
-    homepageUrl: null
-  },
-  {
-    id: "ext-16",
-    name: "1Password",
-    description: "Password manager",
-    version: "2.15.0",
-    enabled: true,
-    iconUrl: null,
-    permissions: ["storage", "tabs"],
-    installType: "normal",
-    optionsUrl: null,
-    homepageUrl: "https://1password.com"
-  },
-  {
-    id: "ext-17",
-    name: "Wappalyzer",
-    description: "Technology profiler",
-    version: "6.10.70",
-    enabled: true,
-    iconUrl: null,
-    permissions: ["storage", "activeTab"],
-    installType: "normal",
-    optionsUrl: null,
-    homepageUrl: "https://wappalyzer.com"
-  },
-  {
-    id: "ext-18",
-    name: "Momentum",
-    description: "Personal dashboard",
-    version: "4.5.2",
-    enabled: false,
-    iconUrl: null,
-    permissions: ["storage"],
-    installType: "normal",
-    optionsUrl: null,
-    homepageUrl: "https://momentumdash.com"
-  },
-  {
-    id: "ext-19",
-    name: "Honey",
-    description: "Automatic coupon finder",
-    version: "16.5.1",
-    enabled: true,
-    iconUrl: null,
-    permissions: ["storage", "activeTab", "tabs"],
-    installType: "normal",
-    optionsUrl: null,
-    homepageUrl: "https://joinhoney.com"
-  },
-  {
-    id: "ext-20",
-    name: "Evernote Web Clipper",
-    description: "Save web pages to Evernote",
-    version: "7.34.0",
-    enabled: false,
-    iconUrl: null,
-    permissions: ["storage", "activeTab"],
-    installType: "normal",
-    optionsUrl: null,
-    homepageUrl: "https://evernote.com"
-  },
-  {
-    id: "ext-21",
-    name: "Pocket",
-    description: "Save articles for later",
-    version: "3.1.5",
-    enabled: true,
-    iconUrl: null,
-    permissions: ["storage", "activeTab"],
-    installType: "normal",
-    optionsUrl: null,
-    homepageUrl: "https://getpocket.com"
-  },
-  {
-    id: "ext-22",
-    name: "Todoist",
-    description: "Task manager",
-    version: "9.12.0",
-    enabled: true,
-    iconUrl: null,
-    permissions: ["storage", "tabs"],
-    installType: "normal",
-    optionsUrl: null,
-    homepageUrl: "https://todoist.com"
-  },
-  {
-    id: "ext-23",
-    name: "Trello",
-    description: "Project management board",
-    version: "2.3.5",
-    enabled: false,
-    iconUrl: null,
-    permissions: ["storage", "activeTab"],
-    installType: "normal",
-    optionsUrl: null,
-    homepageUrl: "https://trello.com"
-  },
-  {
-    id: "ext-24",
-    name: "Notion Web Clipper",
-    description: "Save to Notion",
-    version: "0.3.2",
-    enabled: true,
-    iconUrl: null,
-    permissions: ["storage", "activeTab"],
-    installType: "normal",
-    optionsUrl: null,
-    homepageUrl: "https://notion.so"
-  },
-  {
-    id: "ext-25",
-    name: "Google Translate",
-    description: "Translate web pages",
-    version: "2.0.13",
-    enabled: true,
-    iconUrl: null,
-    permissions: ["storage", "activeTab"],
-    installType: "normal",
-    optionsUrl: null,
-    homepageUrl: "https://translate.google.com"
-  },
-  {
-    id: "ext-26",
-    name: "Zoom Scheduler",
-    description: "Schedule Zoom meetings",
-    version: "2.1.0",
-    enabled: false,
-    iconUrl: null,
-    permissions: ["storage", "tabs"],
-    installType: "normal",
-    optionsUrl: null,
-    homepageUrl: "https://zoom.us"
-  },
-  {
-    id: "ext-27",
-    name: "Slack",
-    description: "Team communication",
-    version: "4.28.0",
-    enabled: true,
-    iconUrl: null,
-    permissions: ["storage", "tabs"],
-    installType: "normal",
-    optionsUrl: null,
-    homepageUrl: "https://slack.com"
-  },
-  {
-    id: "ext-28",
-    name: "Loom",
-    description: "Video recording and sharing",
-    version: "1.17.0",
-    enabled: false,
-    iconUrl: null,
-    permissions: ["storage", "activeTab", "tabs"],
-    installType: "normal",
-    optionsUrl: null,
-    homepageUrl: "https://loom.com"
-  },
-  {
-    id: "ext-29",
-    name: "Calendly",
-    description: "Meeting scheduling",
-    version: "3.2.1",
-    enabled: true,
-    iconUrl: null,
-    permissions: ["storage", "activeTab"],
-    installType: "normal",
-    optionsUrl: null,
-    homepageUrl: "https://calendly.com"
-  },
-  {
-    id: "ext-30",
-    name: "Zotero Connector",
-    description: "Save references to Zotero",
-    version: "5.0.115",
-    enabled: true,
-    iconUrl: null,
-    permissions: ["storage", "activeTab"],
-    installType: "normal",
-    optionsUrl: null,
-    homepageUrl: "https://zotero.org"
-  },
-  {
-    id: "ext-31",
-    name: "Zotero Connector",
-    description: "Save references to Zotero",
-    version: "5.0.115",
-    enabled: false,
-    iconUrl: null,
-    permissions: ["storage", "activeTab"],
-    installType: "normal",
-    optionsUrl: null,
-    homepageUrl: "https://zotero.org"
-  },
-  {
-    id: "ext-32",
-    name: "Bitwarden",
-    description: "Open source password manager",
-    version: "2024.1.0",
-    enabled: true,
-    iconUrl: null,
-    permissions: ["storage", "tabs"],
-    installType: "normal",
-    optionsUrl: null,
-    homepageUrl: "https://bitwarden.com"
-  },
-  {
-    id: "ext-33",
-    name: "Privacy Badger",
-    description: "Privacy protector",
-    version: "2024.2.6",
-    enabled: true,
-    iconUrl: null,
-    permissions: ["storage", "tabs"],
-    installType: "normal",
-    optionsUrl: null,
-    homepageUrl: "https://eff.org"
-  },
-  {
-    id: "ext-34",
-    name: "HTTPS Everywhere",
-    description: "Encrypt the web",
-    version: "2023.5.10",
-    enabled: false,
-    iconUrl: null,
-    permissions: ["storage", "tabs"],
-    installType: "normal",
-    optionsUrl: null,
-    homepageUrl: "https://eff.org"
-  },
-  {
-    id: "ext-35",
-    name: "Session Buddy",
-    description: "Session manager",
-    version: "3.6.4",
-    enabled: true,
-    iconUrl: null,
-    permissions: ["storage", "tabs"],
-    installType: "normal",
-    optionsUrl: null,
-    homepageUrl: null
-  },
-  {
-    id: "ext-36",
-    name: "OneTab",
-    description: "Reduce tab clutter",
-    version: "2.4.5",
-    enabled: false,
-    iconUrl: null,
-    permissions: ["storage", "tabs"],
-    installType: "normal",
-    optionsUrl: null,
-    homepageUrl: null
-  },
-  {
-    id: "ext-37",
-    name: "Tree Style Tab",
-    description: "Tree-style tab bar",
-    version: "3.9.23",
-    enabled: true,
-    iconUrl: null,
-    permissions: ["storage", "tabs"],
-    installType: "normal",
-    optionsUrl: null,
-    homepageUrl: null
-  },
-  {
-    id: "ext-38",
-    name: "Tab Wrangler",
-    description: "Automatically close inactive tabs",
-    version: "8.2.0",
-    enabled: false,
-    iconUrl: null,
-    permissions: ["storage", "tabs"],
-    installType: "normal",
-    optionsUrl: null,
-    homepageUrl: null
-  },
-  {
-    id: "ext-39",
-    name: "Vimium",
-    description: "Keyboard navigation",
-    version: "2.0.6",
-    enabled: true,
-    iconUrl: null,
-    permissions: ["storage", "tabs"],
-    installType: "normal",
-    optionsUrl: null,
-    homepageUrl: null
-  },
-  {
-    id: "ext-40",
-    name: "Surfingkeys",
-    description: "Map keys for surfing",
-    version: "1.1.2",
-    enabled: false,
-    iconUrl: null,
-    permissions: ["storage", "tabs"],
-    installType: "normal",
-    optionsUrl: null,
-    homepageUrl: null
-  },
-  {
-    id: "ext-41",
-    name: "Markdown Here",
-    description: "Write email in Markdown",
-    version: "2.14.0",
-    enabled: true,
-    iconUrl: null,
-    permissions: ["storage", "activeTab"],
-    installType: "normal",
-    optionsUrl: null,
-    homepageUrl: null
-  },
-  {
-    id: "ext-42",
-    name: "Copy All URLs",
-    description: "Copy all tab URLs",
-    version: "2.2.0",
-    enabled: false,
-    iconUrl: null,
-    permissions: ["storage", "tabs"],
-    installType: "normal",
-    optionsUrl: null,
-    homepageUrl: null
-  },
-  {
-    id: "ext-43",
-    name: "Full Page Screen Capture",
-    description: "Capture entire pages",
-    version: "1.0.0",
-    enabled: true,
-    iconUrl: null,
-    permissions: ["storage", "activeTab"],
-    installType: "normal",
-    optionsUrl: null,
-    homepageUrl: null
-  },
-  {
-    id: "ext-44",
-    name: "EditThisCookie",
-    description: "Cookie manager",
-    version: "1.6.3",
-    enabled: true,
-    iconUrl: null,
-    permissions: ["storage", "activeTab"],
-    installType: "normal",
-    optionsUrl: null,
-    homepageUrl: null
-  },
-  {
-    id: "ext-45",
-    name: "User-Agent Switcher",
-    description: "Switch user agents",
-    version: "2.0.0",
-    enabled: false,
-    iconUrl: null,
-    permissions: ["storage", "tabs"],
-    installType: "normal",
-    optionsUrl: null,
-    homepageUrl: null
-  },
-  {
-    id: "ext-46",
-    name: "ModHeader",
-    description: "Modify HTTP headers",
-    version: "3.1.10",
-    enabled: true,
-    iconUrl: null,
-    permissions: ["storage", "tabs"],
-    installType: "normal",
-    optionsUrl: null,
-    homepageUrl: null
-  },
-  {
-    id: "ext-47",
-    name: "Redux DevTools",
-    description: "Redux debugging tool",
-    version: "3.2.3",
-    enabled: true,
-    iconUrl: null,
-    permissions: ["storage", "activeTab"],
-    installType: "normal",
-    optionsUrl: null,
-    homepageUrl: null
-  },
-  {
-    id: "ext-48",
-    name: "Angular DevTools",
-    description: "Angular debugging tool",
-    version: "1.0.7",
-    enabled: false,
-    iconUrl: null,
-    permissions: ["storage", "activeTab"],
-    installType: "normal",
-    optionsUrl: null,
-    homepageUrl: null
-  },
-  {
-    id: "ext-49",
-    name: "Web Developer",
-    description: "Web developer toolbar",
-    version: "2.0.5",
-    enabled: true,
-    iconUrl: null,
-    permissions: ["storage", "activeTab", "tabs"],
-    installType: "normal",
-    optionsUrl: null,
-    homepageUrl: null
-  },
-  {
-    id: "ext-50",
-    name: "Stylus",
-    description: "Custom website styles",
-    version: "1.5.46",
-    enabled: false,
-    iconUrl: null,
-    permissions: ["storage", "activeTab"],
-    installType: "normal",
-    optionsUrl: null,
-    homepageUrl: null
-  }
+// ============================================================
+// Mock Extensions
+// ============================================================
+
+const EXTENSION_NAMES = [
+  "AdBlocker Ultimate", "Dark Reader", "LastPass Password Manager", "Grammarly",
+  "Octotree", "JSON Viewer", "WhatFont", "ColorZilla", "Lighthouse",
+  "React Developer Tools", "Vue.js devtools", "Tampermonkey", "uBlock Origin",
+  "Enhanced GitHub", "Awesome Screenshot", "1Password", "Wappalyzer",
+  "Momentum", "Honey", "Evernote Web Clipper"
 ]
+
+const EXTENSION_DESCRIPTIONS = [
+  "Block all ads and trackers on websites", "Dark mode for every website",
+  "Secure password manager", "AI-powered writing assistant",
+  "GitHub code tree viewer", "Format and syntax highlight JSON",
+  "Identify fonts on web pages", "Advanced color picker",
+  "Website auditing and performance testing tool", "React debugging tool",
+  "Vue.js debugging", "Userscript manager", "Efficient ad blocker",
+  "Adds useful features to GitHub", "Screen capture and annotation",
+  "Password manager", "Technology profiler", "Personal dashboard",
+  "Automatic coupon finder", "Save web pages to Evernote"
+]
+
+const HOMEPAGE_URLS = [
+  "https://example.com", "https://darkreader.org", "https://lastpass.com",
+  "https://grammarly.com", "https://github.com", null, null, "https://colorzilla.com",
+  "https://developers.google.com/lighthouse", null, null, "https://tampermonkey.net",
+  "https://ublock.org", null, null, "https://1password.com", "https://wappalyzer.com",
+  "https://momentumdash.com", "https://joinhoney.com", "https://evernote.com"
+]
+
+const PERMISSION_POOLS: string[][] = [
+  ["storage", "tabs"],
+  ["storage", "activeTab"],
+  ["storage", "activeTab", "tabs"],
+  ["storage"]
+]
+
+function createMockExtension(index: number, overrides?: Partial<Extension>): Extension {
+  const nameIndex = (index - 1) % EXTENSION_NAMES.length
+  const major = ((index * 3) % 16) + 1
+  const minor = ((index * 7) % 130)
+  const patch = ((index * 13) % 120)
+
+  return {
+    id: `ext-${index}`,
+    name: EXTENSION_NAMES[nameIndex],
+    description: EXTENSION_DESCRIPTIONS[nameIndex],
+    version: `${major}.${minor}.${patch}`,
+    enabled: index % 3 !== 0,
+    iconUrl: null,
+    permissions: PERMISSION_POOLS[index % PERMISSION_POOLS.length],
+    installType: index === 9 ? "development" : "normal",
+    optionsUrl: (index === 2 || index === 12) ? "options.html" : null,
+    homepageUrl: HOMEPAGE_URLS[nameIndex] ?? null,
+    ...overrides
+  }
+}
+
+export const MOCK_EXTENSIONS: Extension[] = Array.from(
+  { length: 50 },
+  (_, i) => createMockExtension(i + 1)
+)
+
+// ============================================================
+// Mock Groups
+// ============================================================
 
 export const MOCK_GROUPS: Group[] = [
   {
     id: "group-1",
-    name: "工作",
+    name: "\u5DE5\u4F5C",
     color: "#3B82F6",
     icon: "briefcase",
     extensionIds: ["ext-1", "ext-2", "ext-3", "ext-4"],
@@ -619,7 +85,7 @@ export const MOCK_GROUPS: Group[] = [
   },
   {
     id: "group-2",
-    name: "开发工具",
+    name: "\u5F00\u53D1\u5DE5\u5177",
     color: "#22C55E",
     icon: "code",
     extensionIds: ["ext-5", "ext-6", "ext-9", "ext-10", "ext-11", "ext-12"],
@@ -630,7 +96,7 @@ export const MOCK_GROUPS: Group[] = [
   },
   {
     id: "group-3",
-    name: "设计",
+    name: "\u8BBE\u8BA1",
     color: "#8B5CF6",
     icon: "palette",
     extensionIds: ["ext-7", "ext-8", "ext-15"],
@@ -651,23 +117,23 @@ export function isDevMode(): boolean {
 // ============================================================
 
 const RULE_NAMES = [
-  "工作日开发模式", "GitHub增强", "夜间模式", "周末禁用工作扩展", "社交媒体专注",
-  "视频网站去广告", "在线购物比价", "新闻阅读模式", "开发环境隔离", "密码安全管理",
-  "会议专注模式", "设计灵感", "早间新闻", "项目管理", "隐私保护",
-  "屏幕截图工具", "代码片段管理", "网页无障碍", "键盘导航增强", "标签页管理"
+  "\u5DE5\u4F5C\u65E5\u5F00\u53D1\u6A21\u5F0F", "GitHub\u589E\u5F3A", "\u591C\u95F4\u6A21\u5F0F", "\u5468\u672B\u7981\u7528\u5DE5\u4F5C\u6269\u5C55", "\u793E\u4EA4\u5A92\u4F53\u4E13\u6CE8",
+  "\u89C6\u9891\u7F51\u7AD9\u53BB\u5E7F\u544A", "\u5728\u7EBF\u8D2D\u7269\u6BD4\u4EF7", "\u65B0\u95FB\u9605\u8BFB\u6A21\u5F0F", "\u5F00\u53D1\u73AF\u5883\u9694\u79BB", "\u5BC6\u7801\u5B89\u5168\u7BA1\u7406",
+  "\u4F1A\u8BAE\u4E13\u6CE8\u6A21\u5F0F", "\u8BBE\u8BA1\u7075\u611F", "\u65E9\u95F4\u65B0\u95FB", "\u9879\u76EE\u7BA1\u7406", "\u9690\u79C1\u4FDD\u62A4",
+  "\u5C4F\u5E55\u622A\u56FE\u5DE5\u5177", "\u4EE3\u7801\u7247\u6BB5\u7BA1\u7406", "\u7F51\u9875\u65E0\u969C\u788D", "\u952E\u76D8\u5BFC\u822A\u589E\u5F3A", "\u6807\u7B7E\u9875\u7BA1\u7406"
 ]
 
 const RULE_DESCRIPTIONS = [
-  "根据网站和时间自动切换扩展状态",
-  "在目标网站启用相关增强插件",
-  "帮助在固定场景下保持专注",
-  "自动管理工作和娱乐扩展组合",
-  "减少页面干扰并提升浏览效率",
-  "为常用网站启用专用辅助工具",
-  "在特定时段切换到合适的扩展集",
-  "按照访问域名组合自动处理扩展",
-  "为开发、设计和办公场景优化环境",
-  "模拟真实用户的自动化规则配置"
+  "\u6839\u636E\u7F51\u7AD9\u548C\u65F6\u95F4\u81EA\u52A8\u5207\u6362\u6269\u5C55\u72B6\u6001",
+  "\u5728\u76EE\u6807\u7F51\u7AD9\u542F\u7528\u76F8\u5173\u589E\u5F3A\u63D2\u4EF6",
+  "\u5E2E\u52A9\u5728\u56FA\u5B9A\u573A\u666F\u4E0B\u4FDD\u6301\u4E13\u6CE8",
+  "\u81EA\u52A8\u7BA1\u7406\u5DE5\u4F5C\u548C\u5A31\u4E50\u6269\u5C55\u7EC4\u5408",
+  "\u51CF\u5C11\u9875\u9762\u5E72\u6270\u5E76\u63D0\u5347\u6D4F\u89C8\u6548\u7387",
+  "\u4E3A\u5E38\u7528\u7F51\u7AD9\u542F\u7528\u4E13\u7528\u8F85\u52A9\u5DE5\u5177",
+  "\u5728\u7279\u5B9A\u65F6\u6BB5\u5207\u6362\u5230\u5408\u9002\u7684\u6269\u5C55\u96C6",
+  "\u6309\u7167\u8BBF\u95EE\u57DF\u540D\u7EC4\u5408\u81EA\u52A8\u5904\u7406\u6269\u5C55",
+  "\u4E3A\u5F00\u53D1\u3001\u8BBE\u8BA1\u548C\u529E\u516C\u573A\u666F\u4F18\u5316\u73AF\u5883",
+  "\u6A21\u62DF\u771F\u5B9E\u7528\u6237\u7684\u81EA\u52A8\u5316\u89C4\u5219\u914D\u7F6E"
 ]
 
 const RULE_DOMAIN_POOLS = [
@@ -705,7 +171,7 @@ const randomSample = <T,>(items: T[], count: number): T[] => {
   return result
 }
 
-function createMockActions(ruleIndex: number) {
+function createMockActions(_ruleIndex: number) {
   const useGroupAction = Math.random() > 0.5
   if (useGroupAction) {
     const groups = randomSample(MOCK_GROUPS, 1 + Math.floor(Math.random() * 2))

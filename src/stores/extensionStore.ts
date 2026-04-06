@@ -1,114 +1,24 @@
+import * as React from "react"
 import { create } from "zustand"
-import type { BisectSession, Extension, ExtensionStore, FilterType, SortType } from "@/types"
+import type { BisectSession, ExtensionStore, FilterType, SortType } from "@/types"
 import { extensionsRepo } from "@/services/extensionsRepo"
-
-type ExtensionSnapshot = Extension[]
+import {
+  createIdleBisectSession,
+  splitCandidateIds,
+  buildBisectExtensions,
+  isBisectSessionConsistent
+} from "@/stores/bisectUtils"
+import type { ExtensionSnapshot } from "@/stores/bisectUtils"
+import {
+  cloneExtensions,
+  buildHistoryMeta,
+  withHistoryCleared,
+  setPendingHistoryMeta
+} from "@/stores/extensionStoreUtils"
 
 interface ExtensionStoreState extends ExtensionStore {
   history: ExtensionSnapshot[]
   future: ExtensionSnapshot[]
-}
-
-const cloneExtensions = (extensions: Extension[]): ExtensionSnapshot =>
-  extensions.map((extension) => ({
-    ...extension,
-    permissions: [...extension.permissions]
-  }))
-
-const createIdleBisectSession = (): BisectSession => ({
-  active: false,
-  phase: "idle",
-  baselineExtensions: [],
-  allCandidateIds: [],
-  candidateIds: [],
-  currentTestIds: [],
-  parkedIds: [],
-  step: 0
-})
-
-const splitCandidateIds = (candidateIds: string[]) => {
-  const midpoint = Math.ceil(candidateIds.length / 2)
-  return {
-    currentTestIds: candidateIds.slice(0, midpoint),
-    parkedIds: candidateIds.slice(midpoint)
-  }
-}
-
-const buildBisectExtensions = (
-  baselineExtensions: ExtensionSnapshot,
-  allCandidateIds: string[],
-  currentTestIds: string[]
-) => {
-  const allCandidates = new Set(allCandidateIds)
-  const currentTests = new Set(currentTestIds)
-
-  return baselineExtensions.map((extension) => {
-    if (!allCandidates.has(extension.id)) {
-      return {
-        ...extension,
-        permissions: [...extension.permissions]
-      }
-    }
-
-    return {
-      ...extension,
-      permissions: [...extension.permissions],
-      enabled: currentTests.has(extension.id)
-    }
-  })
-}
-
-const buildHistoryMeta = (history: ExtensionSnapshot[], future: ExtensionSnapshot[]) => ({
-  history,
-  future,
-  canUndo: history.length > 0,
-  canRedo: future.length > 0,
-  undoCount: history.length,
-  redoCount: future.length
-})
-
-const withHistoryCleared = (extensions: ExtensionSnapshot) => ({
-  extensions,
-  ...buildHistoryMeta([], []),
-  bisectSession: createIdleBisectSession()
-})
-
-const setPendingHistoryMeta = (history: ExtensionSnapshot[]) => ({
-  canUndo: true,
-  canRedo: false,
-  undoCount: history.length + 1,
-  redoCount: 0,
-  history,
-  future: []
-})
-
-const isBisectSessionConsistent = (
-  session: BisectSession,
-  currentExtensions: ExtensionSnapshot
-) => {
-  if (!session.active) return false
-
-  const currentById = new Map(currentExtensions.map((extension) => [extension.id, extension]))
-  const baselineById = new Map(session.baselineExtensions.map((extension) => [extension.id, extension]))
-  const trackedIds = Array.from(new Set([
-    ...session.allCandidateIds,
-    ...session.baselineExtensions.map((extension) => extension.id)
-  ]))
-
-  if (!trackedIds.every((id) => currentById.has(id) && baselineById.has(id))) {
-    return false
-  }
-
-  const expectedExtensions = buildBisectExtensions(
-    session.baselineExtensions,
-    session.allCandidateIds,
-    session.currentTestIds
-  )
-  const expectedById = new Map(expectedExtensions.map((extension) => [extension.id, extension.enabled]))
-
-  return session.allCandidateIds.every(
-    (id) => currentById.get(id)?.enabled === expectedById.get(id)
-  )
 }
 
 const initialState = {
@@ -506,36 +416,38 @@ export const useExtensionStore = create<ExtensionStoreState>((set, get) => ({
   setSortBy: (sortBy: SortType) => set({ sortBy })
 }))
 
-// Selector for filtered extensions
 export const useFilteredExtensions = () => {
-  const { extensions, filter, searchQuery, sortBy } = useExtensionStore()
+  const extensions = useExtensionStore((s) => s.extensions)
+  const filter = useExtensionStore((s) => s.filter)
+  const searchQuery = useExtensionStore((s) => s.searchQuery)
+  const sortBy = useExtensionStore((s) => s.sortBy)
 
-  const filtered = [...extensions]
-    .filter((extension) => {
-      if (filter === "enabled") return extension.enabled
-      if (filter === "disabled") return !extension.enabled
-      return true
+  return React.useMemo(() => {
+    const filtered = extensions
+      .filter((extension) => {
+        if (filter === "enabled") return extension.enabled
+        if (filter === "disabled") return !extension.enabled
+        return true
+      })
+      .filter((extension) => {
+        if (!searchQuery.trim()) return true
+        const query = searchQuery.toLowerCase()
+        return (
+          extension.name.toLowerCase().includes(query) ||
+          extension.description.toLowerCase().includes(query)
+        )
+      })
+
+    return [...filtered].sort((a, b) => {
+      switch (sortBy) {
+        case "name":
+          return a.name.localeCompare(b.name)
+        case "enabled":
+          return (b.enabled ? 1 : 0) - (a.enabled ? 1 : 0)
+        case "recentlyUsed":
+        default:
+          return 0
+      }
     })
-    .filter((extension) => {
-      if (!searchQuery.trim()) return true
-      const query = searchQuery.toLowerCase()
-      return (
-        extension.name.toLowerCase().includes(query) ||
-        extension.description.toLowerCase().includes(query)
-      )
-    })
-
-  filtered.sort((a, b) => {
-    switch (sortBy) {
-      case "name":
-        return a.name.localeCompare(b.name)
-      case "enabled":
-        return (b.enabled ? 1 : 0) - (a.enabled ? 1 : 0)
-      case "recentlyUsed":
-      default:
-        return 0
-    }
-  })
-
-  return filtered
+  }, [extensions, filter, searchQuery, sortBy])
 }

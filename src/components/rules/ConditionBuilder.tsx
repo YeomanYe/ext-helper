@@ -1,6 +1,7 @@
 import * as React from "react"
 import { Trash2, Plus, X, Calendar, ChevronDown, Clock } from "lucide-react"
 import { cn } from "@/utils"
+import { useClickOutside } from "@/hooks/useClickOutside"
 import type { ConditionGroup, MatchMode } from "@/rules/types"
 import { DAYS_OF_WEEK, MATCH_MODES } from "@/rules/types"
 
@@ -260,16 +261,9 @@ function MatchModeDropdown({
   const [showDropdown, setShowDropdown] = React.useState(false)
   const dropdownRef = React.useRef<HTMLDivElement>(null)
   const currentMode = MATCH_MODES.find((m) => m.value === value) || MATCH_MODES[0]
+  const handleClose = React.useCallback(() => setShowDropdown(false), [])
 
-  React.useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setShowDropdown(false)
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside)
-    return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [])
+  useClickOutside(dropdownRef, handleClose, showDropdown)
 
   return (
     <div className="relative" ref={dropdownRef}>
