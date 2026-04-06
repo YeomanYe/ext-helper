@@ -42,7 +42,7 @@ export function ConditionBuilder({ conditions, onChange }: ConditionBuilderProps
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       {conditions.map((group, index) => (
         <ConditionGroupRow
           key={group.id}
@@ -57,7 +57,7 @@ export function ConditionBuilder({ conditions, onChange }: ConditionBuilderProps
       <button
         onClick={addConditionGroup}
         className={cn(
-          "w-full flex items-center justify-center gap-2 px-3 py-2.5",
+          "w-full flex items-center justify-center gap-2 px-3 py-1.5",
           "text-[13px] font-punk-heading uppercase tracking-wider",
           "border border-dashed border-punk-accent/30 text-punk-accent/70",
           "hover:border-punk-accent hover:text-punk-accent hover:bg-punk-accent/5",
@@ -127,7 +127,7 @@ function ConditionGroupRow({
   }
 
   return (
-    <div className="border border-punk-border/30 bg-punk-bg p-3 space-y-3">
+    <div className="border border-punk-border/30 bg-punk-bg p-2.5 space-y-2">
       {/* Header: Domains label + Match mode + Remove */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">

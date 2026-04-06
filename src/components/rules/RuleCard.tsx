@@ -88,7 +88,7 @@ export const RuleCard = React.memo(function RuleCard({
         </div>
 
         {/* Rule Icon */}
-        <div className="w-8 h-8 flex items-center justify-center border border-punk-border/50 bg-punk-bg rounded mb-1.5 overflow-hidden mt-3">
+        <div className="w-8 h-8 flex items-center justify-center bg-punk-bg rounded mb-1.5 overflow-hidden mt-3">
           {rule.iconUrl ? (
             <img src={rule.iconUrl} alt="" className="w-full h-full object-cover" />
           ) : (
@@ -134,7 +134,7 @@ export const RuleCard = React.memo(function RuleCard({
           {/* Header */}
           <div className="flex items-start gap-3 mb-2">
             {/* Rule Icon */}
-            <div className="w-10 h-10 flex items-center justify-center border border-punk-border/50 bg-punk-bg rounded flex-shrink-0 overflow-hidden">
+            <div className="w-10 h-10 flex items-center justify-center bg-punk-bg rounded flex-shrink-0 overflow-hidden">
               {rule.iconUrl ? (
                 <img src={rule.iconUrl} alt="" className="w-full h-full object-cover" />
               ) : (
@@ -259,7 +259,7 @@ export const RuleCard = React.memo(function RuleCard({
         {/* Header */}
         <div className="flex items-start gap-3 mb-3">
           {/* Rule Icon */}
-          <div className="w-12 h-12 flex items-center justify-center border border-punk-border/50 bg-punk-bg rounded flex-shrink-0 overflow-hidden">
+          <div className="w-12 h-12 flex items-center justify-center bg-punk-bg rounded flex-shrink-0 overflow-hidden">
             {rule.iconUrl ? (
               <img src={rule.iconUrl} alt="" className="w-full h-full object-cover" />
             ) : (

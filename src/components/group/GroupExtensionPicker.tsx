@@ -109,9 +109,9 @@ export function GroupExtensionPicker({
                   )}
                 />
                 {extension.iconUrl ? (
-                  <img src={extension.iconUrl} className="w-8 h-8 border border-punk-border/30 object-cover" alt="" />
+                  <img src={extension.iconUrl} className="w-8 h-8 object-cover" alt="" />
                 ) : (
-                  <div className="w-8 h-8 border border-punk-border/30 bg-punk-bg flex items-center justify-center">
+                  <div className="w-8 h-8 bg-punk-bg flex items-center justify-center">
                     <Package className="w-4 h-4 text-punk-text-muted" />
                   </div>
                 )}

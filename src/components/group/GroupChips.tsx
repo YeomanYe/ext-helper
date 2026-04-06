@@ -37,7 +37,7 @@ export function GroupChip({
       onClick={onClick}
     >
       {group.iconUrl ? (
-        <img src={group.iconUrl} className="h-5 w-5 border border-punk-border/30 object-cover flex-shrink-0" alt="" />
+        <img src={group.iconUrl} className="h-5 w-5 object-cover flex-shrink-0" alt="" />
       ) : (
         <div
           className="h-5 w-5 rounded-sm border border-punk-border/30 flex items-center justify-center flex-shrink-0"

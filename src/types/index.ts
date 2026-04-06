@@ -5,12 +5,20 @@ export interface Extension {
   name: string
   description: string
   version: string
+  versionName: string | null
   enabled: boolean
   iconUrl: string | null
+  type: 'extension' | 'hosted_app' | 'packaged_app' | 'legacy_packaged_app' | 'theme'
   permissions: string[]
-  installType: 'development' | 'normal' | 'sideload'
+  hostPermissions: string[]
+  installType: 'admin' | 'development' | 'normal' | 'sideload' | 'other'
+  mayEnable: boolean
+  mayDisable: boolean
+  disabledReason: 'unknown' | 'permissions_increase' | null
+  offlineEnabled: boolean
   optionsUrl: string | null
   homepageUrl: string | null
+  updateUrl: string | null
 }
 
 export interface Group {

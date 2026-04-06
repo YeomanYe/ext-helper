@@ -84,7 +84,7 @@ export function RuleEditor({ rule, onSave, onClose }: RuleEditorProps) {
       onClick={onClose}
     >
       <div
-        className="w-[480px] max-h-[600px] border border-punk-border bg-punk-bg-alt shadow-[0_0_30px_rgba(124,58,237,0.4)] overflow-hidden flex flex-col"
+        className="w-[480px] max-h-[580px] border border-punk-border bg-punk-bg-alt shadow-[0_0_30px_rgba(124,58,237,0.4)] overflow-hidden flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -101,7 +101,7 @@ export function RuleEditor({ rule, onSave, onClose }: RuleEditorProps) {
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <div className="flex-1 overflow-y-auto p-4 space-y-3">
           {/* Name & Icon */}
           <div className="flex gap-4">
             {/* Icon Upload - centered with right side content */}
@@ -142,11 +142,11 @@ export function RuleEditor({ rule, onSave, onClose }: RuleEditorProps) {
             </div>
 
             {/* Name & Description Stack */}
-            <div className="flex-1 space-y-4">
+            <div className="flex-1 space-y-2">
               {/* Rule Name & Priority on same row */}
-              <div className="flex gap-4">
+              <div className="flex gap-3">
                 <div className="flex-1">
-                  <label className="block font-punk-heading text-[13px] text-punk-text-muted uppercase mb-1.5">
+                  <label className="block font-punk-heading text-[11px] text-punk-text-muted uppercase mb-1">
                     RULE_NAME
                   </label>
                   <input
@@ -158,7 +158,7 @@ export function RuleEditor({ rule, onSave, onClose }: RuleEditorProps) {
                   />
                 </div>
                 <div className="w-24">
-                  <label className="block font-punk-heading text-[13px] text-punk-text-muted uppercase mb-1.5">
+                  <label className="block font-punk-heading text-[11px] text-punk-text-muted uppercase mb-1">
                     PRIORITY
                   </label>
                   <input
@@ -170,7 +170,7 @@ export function RuleEditor({ rule, onSave, onClose }: RuleEditorProps) {
                 </div>
               </div>
               <div>
-                <label className="block font-punk-heading text-[13px] text-punk-text-muted uppercase mb-1.5">
+                <label className="block font-punk-heading text-[11px] text-punk-text-muted uppercase mb-1">
                   DESCRIPTION (OPTIONAL)
                 </label>
                 <input
@@ -186,7 +186,7 @@ export function RuleEditor({ rule, onSave, onClose }: RuleEditorProps) {
 
           {/* Conditions */}
           <div>
-            <label className="font-punk-heading text-[13px] text-punk-text-muted uppercase mb-1.5">
+            <label className="font-punk-heading text-[11px] text-punk-text-muted uppercase mb-1">
               CONDITIONS (MATCH ANY)
             </label>
             <ConditionBuilder
@@ -197,7 +197,7 @@ export function RuleEditor({ rule, onSave, onClose }: RuleEditorProps) {
 
           {/* Actions */}
           <div>
-            <label className="block font-punk-heading text-[13px] text-punk-text-muted uppercase mb-1.5">
+            <label className="block font-punk-heading text-[11px] text-punk-text-muted uppercase mb-1">
               ACTIONS
             </label>
             <ActionBuilder actions={actions} onChange={setActions} />
@@ -205,7 +205,7 @@ export function RuleEditor({ rule, onSave, onClose }: RuleEditorProps) {
         </div>
 
         {/* Footer */}
-        <div className="flex justify-end gap-2 px-4 py-3 border-t border-punk-border/30 shrink-0">
+        <div className="flex justify-end gap-2 px-4 py-2 border-t border-punk-border/30 shrink-0">
           <button
             onClick={onClose}
             className={cn(

@@ -75,9 +75,9 @@ export function ActionBlock({ action, extensions, groups, isEnable }: { action: 
     const ext = extensions.find(e => e.id === action.targetId)
     displayName = ext ? ext.name : action.targetId
     icon = ext?.iconUrl ? (
-      <img src={ext.iconUrl} className="w-6 h-6 border border-punk-border/30 object-cover" alt="" />
+      <img src={ext.iconUrl} className="w-6 h-6 object-cover" alt="" />
     ) : (
-      <div className="w-6 h-6 border border-punk-border/30 bg-punk-bg-alt flex items-center justify-center">
+      <div className="w-6 h-6 bg-punk-bg-alt flex items-center justify-center">
         <Package className="w-4 h-4 text-punk-text-muted" />
       </div>
     )
@@ -123,12 +123,12 @@ export function ActionBadge({ action, extensions, groups, detailed = false }: { 
     displayName = ext ? ext.name : action.targetId
     icon = ext?.iconUrl ? (
       detailed ? (
-        <img src={ext.iconUrl} className="h-5 w-5 border border-punk-border/30 object-cover" alt="" />
+        <img src={ext.iconUrl} className="h-5 w-5 object-cover" alt="" />
       ) : (
-        <img src={ext.iconUrl} className="h-4 w-4 border border-punk-border/30 object-cover" alt="" />
+        <img src={ext.iconUrl} className="h-4 w-4 object-cover" alt="" />
       )
     ) : (
-      <div className={cn(detailed ? "h-5 w-5" : "h-4 w-4", "border border-punk-border/30 bg-punk-bg-alt flex items-center justify-center")}>
+      <div className={cn(detailed ? "h-5 w-5" : "h-4 w-4", "bg-punk-bg-alt flex items-center justify-center")}>
         <span className={cn(detailed ? "font-punk-heading text-[11px]" : "font-punk-heading text-[10px]", "text-punk-text-muted")}>{displayName[0]}</span>
       </div>
     )

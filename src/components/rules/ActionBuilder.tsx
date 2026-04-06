@@ -146,9 +146,9 @@ export function ActionBuilder({ actions, onChange }: ActionBuilderProps) {
               >
                 {/* Icon */}
                 {ext.iconUrl ? (
-                  <img src={ext.iconUrl} className="h-5 w-5 border border-punk-border/30 object-cover flex-shrink-0" alt="" />
+                  <img src={ext.iconUrl} className="h-5 w-5 object-cover flex-shrink-0" alt="" />
                 ) : (
-                  <div className="h-5 w-5 border border-punk-border/30 bg-punk-bg-alt flex items-center justify-center flex-shrink-0">
+                  <div className="h-5 w-5 bg-punk-bg-alt flex items-center justify-center flex-shrink-0">
                     <span className="font-punk-heading text-[10px] text-punk-text-muted">
                       {ext.name[0]}
                     </span>
@@ -214,10 +214,10 @@ export function ActionBuilder({ actions, onChange }: ActionBuilderProps) {
               >
                 {/* Icon */}
                 {group.iconUrl ? (
-                  <img src={group.iconUrl} className="h-5 w-5 border border-punk-border/30 object-cover flex-shrink-0" alt="" />
+                  <img src={group.iconUrl} className="h-5 w-5 object-cover flex-shrink-0" alt="" />
                 ) : (
                   <div
-                    className="h-5 w-5 rounded-sm border border-punk-border/30 flex items-center justify-center flex-shrink-0"
+                    className="h-5 w-5 rounded-sm flex items-center justify-center flex-shrink-0"
                     style={{ backgroundColor: group.color + "20" }}
                   >
                     <Folder className="w-3 h-3" style={{ color: group.color }} />

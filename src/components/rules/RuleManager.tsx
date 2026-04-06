@@ -32,7 +32,7 @@ function RuleFilterDropdown({
       <button
         onClick={() => setShowDropdown(!showDropdown)}
         className={cn(
-          "flex items-center gap-2 px-3 h-11",
+          "flex items-center gap-2 px-3 h-9",
           "border border-punk-border/50 bg-punk-bg-alt",
           "font-punk-heading text-[13px] uppercase tracking-wider",
           "text-punk-text-primary",
@@ -85,7 +85,7 @@ function RuleSearchBar({
   onFilterChange: (v: RuleFilterType) => void
 }) {
   return (
-    <div className="flex items-center gap-3 px-3 py-2 border-b border-punk-border/30">
+    <div className="flex items-center gap-3 px-3 py-1.5 border-b border-punk-border/30">
       <RuleFilterDropdown value={filter} onChange={onFilterChange} />
 
       <div className="relative flex-1">
@@ -96,7 +96,7 @@ function RuleSearchBar({
           onChange={(e) => onChange(e.target.value)}
           placeholder="Search rules..."
           className={cn(
-            "punk-input h-11 w-full pl-9 pr-10 text-punk-text-primary",
+            "punk-input h-9 w-full pl-9 pr-10 text-punk-text-primary",
             "font-punk-body text-sm"
           )}
         />
@@ -174,7 +174,7 @@ export function RuleManager() {
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="flex items-center gap-2 px-4 py-3 border-b border-punk-border/30">
+      <div className="flex items-center gap-2 px-4 py-2 border-b border-punk-border/30">
         <div className="flex items-center gap-2">
           <span className="font-punk-heading text-[13px] text-punk-text-primary uppercase tracking-wider">
             AUTO_RULES

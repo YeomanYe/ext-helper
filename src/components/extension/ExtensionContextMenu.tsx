@@ -8,7 +8,7 @@ interface ExtensionContextMenuProps {
   menuRef: React.RefObject<HTMLDivElement | null>
   menuPosition: { top: number; left: number }
   menuWidth: number
-  extension: { enabled: boolean; optionsUrl: string | null }
+  extension: { enabled: boolean; mayEnable: boolean; optionsUrl: string | null }
   disableEnableControls: boolean
   disableRemove: boolean
   onToggle: () => void
@@ -49,11 +49,13 @@ export function ExtensionContextMenu({
         role="menuitem"
         onClick={(e) => {
           e.stopPropagation()
-          if (disableEnableControls) return
+          const blocked = disableEnableControls || (!extension.enabled && !extension.mayEnable)
+          if (blocked) return
           onToggle()
           onClose()
         }}
-        disabled={disableEnableControls}
+        disabled={disableEnableControls || (!extension.enabled && !extension.mayEnable)}
+        title={!extension.enabled && !extension.mayEnable ? "Blocked by browser policy" : undefined}
         className="flex w-full items-center gap-2 px-3 py-2.5 text-left font-punk-body text-sm text-punk-text-secondary hover:text-punk-accent hover:bg-punk-bg transition-colors disabled:cursor-not-allowed disabled:opacity-40"
       >
         {extension.enabled ? (

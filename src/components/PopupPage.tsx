@@ -99,13 +99,19 @@ export function PopupPage() {
   }, [fetchExtensions, fetchGroups])
 
   const handleOpenOptions = React.useCallback(async (id: string) => {
-    if (devMode) return
+    if (devMode) {
+      const ext = extensions.find((e) => e.id === id)
+      if (ext?.optionsUrl) {
+        window.open(ext.optionsUrl, "_blank")
+      }
+      return
+    }
     try {
       await browserAdapter.openOptionsPage(id)
     } catch (err) {
       console.error("Failed to open options page:", err)
     }
-  }, [devMode])
+  }, [devMode, extensions])
 
   const handleRemoveExtension = React.useCallback(async (id: string) => {
     if (devMode) {

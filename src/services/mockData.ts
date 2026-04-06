@@ -41,23 +41,41 @@ const PERMISSION_POOLS: string[][] = [
   ["storage"]
 ]
 
+const HOST_PERMISSION_POOLS: string[][] = [
+  ["<all_urls>"],
+  ["https://*.google.com/*", "https://*.github.com/*"],
+  ["https://*.example.com/*"],
+  []
+]
+
+const INSTALL_TYPES: Extension["installType"][] = ["normal", "normal", "normal", "development", "sideload"]
+
 function createMockExtension(index: number, overrides?: Partial<Extension>): Extension {
   const nameIndex = (index - 1) % EXTENSION_NAMES.length
   const major = ((index * 3) % 16) + 1
   const minor = ((index * 7) % 130)
   const patch = ((index * 13) % 120)
+  const enabled = index % 3 !== 0
 
   return {
     id: `ext-${index}`,
     name: EXTENSION_NAMES[nameIndex],
     description: EXTENSION_DESCRIPTIONS[nameIndex],
     version: `${major}.${minor}.${patch}`,
-    enabled: index % 3 !== 0,
+    versionName: index % 5 === 0 ? `${major}.${minor} beta` : null,
+    enabled,
     iconUrl: null,
+    type: "extension",
     permissions: PERMISSION_POOLS[index % PERMISSION_POOLS.length],
-    installType: index === 9 ? "development" : "normal",
+    hostPermissions: HOST_PERMISSION_POOLS[index % HOST_PERMISSION_POOLS.length],
+    installType: INSTALL_TYPES[index % INSTALL_TYPES.length],
+    mayEnable: index !== 7,
+    mayDisable: index !== 4,
+    disabledReason: (!enabled && index % 5 === 0) ? "permissions_increase" : null,
+    offlineEnabled: index % 4 === 0,
     optionsUrl: (index === 2 || index === 12) ? "options.html" : null,
     homepageUrl: HOMEPAGE_URLS[nameIndex] ?? null,
+    updateUrl: index % 3 === 0 ? "https://clients2.google.com/service/update2/crx" : null,
     ...overrides
   }
 }

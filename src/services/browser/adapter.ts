@@ -33,17 +33,22 @@ function isManifestV3(): boolean {
 
 async function getExtensions(): Promise<Extension[]> {
   const browserType = detectBrowser()
+  const selfId = typeof chrome !== "undefined" && chrome.runtime?.id
+    ? chrome.runtime.id
+    : typeof browser !== "undefined" && browser.runtime?.id
+      ? browser.runtime.id
+      : null
 
   try {
     if (browserType === "firefox") {
       const extensions = await browser.management.getAll()
       return extensions
-        .filter((ext: any) => ext.type === "extension")
+        .filter((ext: any) => ext.type === "extension" && ext.id !== selfId)
         .map(formatFirefoxExtension)
     } else {
       const extensions = await chrome.management.getAll()
       return extensions
-        .filter((ext: any) => ext.type === "extension")
+        .filter((ext: any) => ext.type === "extension" && ext.id !== selfId)
         .map(formatChromeExtension)
     }
   } catch (error) {
@@ -60,12 +65,20 @@ function formatChromeExtension(ext: any): Extension {
     name: ext.name,
     description: ext.description || "",
     version: ext.version,
+    versionName: ext.versionName || null,
     enabled: ext.enabled,
     iconUrl: ext.icons?.[0]?.url || null,
+    type: ext.type || "extension",
     permissions: ext.permissions || [],
+    hostPermissions: ext.hostPermissions || [],
     installType: ext.installType,
+    mayEnable: ext.mayEnable ?? true,
+    mayDisable: ext.mayDisable ?? true,
+    disabledReason: ext.disabledReason || null,
+    offlineEnabled: ext.offlineEnabled ?? false,
     optionsUrl: ext.optionsUrl || null,
-    homepageUrl: ext.homepageUrl || null
+    homepageUrl: ext.homepageUrl || null,
+    updateUrl: ext.updateUrl || null,
   }
 }
 
@@ -75,10 +88,17 @@ function formatFirefoxExtension(ext: any): Extension {
     name: ext.name,
     description: ext.description || "",
     version: ext.version,
+    versionName: ext.versionName || null,
     enabled: ext.enabled,
     iconUrl: ext.icons?.[0]?.url || null,
+    type: ext.type || "extension",
     permissions: ext.permissions || [],
+    hostPermissions: ext.hostPermissions || [],
     installType: ext.installType,
+    mayEnable: ext.mayEnable ?? true,
+    mayDisable: ext.mayDisable ?? true,
+    disabledReason: ext.disabledReason || null,
+    offlineEnabled: ext.offlineEnabled ?? false,
     optionsUrl: ext.optionsUrl || null,
     homepageUrl: ext.homepageUrl || null
   }
