@@ -87,6 +87,7 @@ export function SearchBar({ value, onChange, placeholder = "SEARCH_EXTENSIONS...
           <button
             onClick={() => onChange("")}
             className="absolute right-3 top-1/2 -translate-y-1/2 text-punk-text-muted hover:text-punk-accent transition-colors"
+            aria-label="Clear search"
           >
             <X className="h-4 w-4" />
           </button>
@@ -158,11 +159,13 @@ export function Header({ viewMode = "compact", onViewModeChange }: HeaderProps) 
 
       <div className="flex items-center gap-1 relative z-10">
         {/* View Mode Toggle */}
-        <div className="flex border border-punk-border/30 bg-punk-bg/50">
+        <div className="flex border border-punk-border/30 bg-punk-bg/50" role="group" aria-label="View mode">
           <button
             onClick={() => onViewModeChange?.("compact")}
+            aria-label="Grid view"
+            aria-pressed={viewMode === "compact"}
             className={cn(
-              "flex items-center gap-1 px-2 py-1 transition-all duration-200",
+              "flex items-center gap-1 px-2.5 py-1.5 transition-all duration-200",
               viewMode === "compact"
                 ? "bg-punk-primary/30 text-punk-accent border border-punk-primary/50"
                 : "text-punk-text-muted hover:text-punk-text-secondary border border-transparent"
@@ -174,8 +177,10 @@ export function Header({ viewMode = "compact", onViewModeChange }: HeaderProps) 
           </button>
           <button
             onClick={() => onViewModeChange?.("card")}
+            aria-label="Card view"
+            aria-pressed={viewMode === "card"}
             className={cn(
-              "flex items-center gap-1 px-2 py-1 transition-all duration-200",
+              "flex items-center gap-1 px-2.5 py-1.5 transition-all duration-200",
               viewMode === "card"
                 ? "bg-punk-primary/30 text-punk-accent border border-punk-primary/50"
                 : "text-punk-text-muted hover:text-punk-text-secondary border border-transparent"
@@ -187,8 +192,10 @@ export function Header({ viewMode = "compact", onViewModeChange }: HeaderProps) 
           </button>
           <button
             onClick={() => onViewModeChange?.("detail")}
+            aria-label="Detail view"
+            aria-pressed={viewMode === "detail"}
             className={cn(
-              "flex items-center gap-1 px-2 py-1 transition-all duration-200",
+              "flex items-center gap-1 px-2.5 py-1.5 transition-all duration-200",
               viewMode === "detail"
                 ? "bg-punk-primary/30 text-punk-accent border border-punk-primary/50"
                 : "text-punk-text-muted hover:text-punk-text-secondary border border-transparent"

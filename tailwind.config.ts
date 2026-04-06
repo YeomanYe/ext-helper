@@ -20,7 +20,7 @@ export default {
           border: '#7C3AED',       // Purple border (glowing)
           'text-primary': '#E2E8F0', // Light text
           'text-secondary': '#94A3B8', // Muted text
-          'text-muted': '#64748B', // Very muted
+          'text-muted': '#78859B', // Muted (WCAG AA compliant)
           'neon-pink': '#FF00FF',  // Magenta
           'neon-cyan': '#00FFFF',   // Cyan
           'neon-yellow': '#FFFF00', // Yellow

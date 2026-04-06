@@ -103,6 +103,7 @@ function RuleSearchBar({
         {value && (
           <button
             onClick={() => onChange("")}
+            aria-label="Clear search"
             className="absolute right-3 top-1/2 -translate-y-1/2 text-punk-text-muted hover:text-punk-accent transition-colors"
           >
             <X className="h-4 w-4" />

@@ -18,7 +18,7 @@
   --punk-border: #7C3AED;
   --punk-text-primary: #E2E8F0;
   --punk-text-secondary: #94A3B8;
-  --punk-text-muted: #64748B;
+  --punk-text-muted: #78859B;
   --punk-neon-pink: #FF00FF;
   --punk-neon-cyan: #00FFFF;
   --punk-neon-yellow: #FFFF00;
@@ -86,7 +86,6 @@ body::after {
 
 ::-webkit-scrollbar-thumb {
   background: var(--punk-primary);
-  border-radius: 3px;
   box-shadow: 0 0 10px var(--punk-primary);
 }
 
@@ -322,6 +321,21 @@ button.punk-btn-primary:active {
   outline: 2px solid var(--punk-neon-cyan);
   outline-offset: 2px;
   box-shadow: 0 0 10px var(--punk-neon-cyan);
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  body::after {
+    animation: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* Aspect Ratio Utilities */

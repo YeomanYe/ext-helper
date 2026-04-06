@@ -55,6 +55,8 @@ export function ExtensionsActionsMenu({
     <div className="relative ml-auto" ref={menuRef}>
       <button
         onClick={() => setOpen((value) => !value)}
+        aria-label="Extension actions menu"
+        aria-expanded={open}
         className="flex h-8 items-center gap-1 border border-punk-border/30 bg-punk-bg-alt px-2 text-[11px] font-punk-heading uppercase tracking-wider text-punk-text-muted transition-all hover:border-punk-accent/50 hover:text-punk-accent"
       >
         ACTIONS

@@ -139,11 +139,11 @@ export function PopupPage() {
   const totalCount = displayedExtensions.length
 
   // Determine grid columns based on view mode
-  // Card mode: single column (full-width cards with toggle switch)
+  // Card mode: flex-wrap, multiple cards per row
   // Compact mode: CSS grid with auto-fill to fill screen width
   // Detail mode: single column stacked layout
   const gridClass = viewMode === "card"
-    ? "grid grid-cols-1 gap-2"
+    ? "flex flex-wrap gap-2"
     : viewMode === "compact"
       ? "grid grid-cols-[repeat(auto-fill,minmax(80px,1fr))] gap-2"
       : "flex flex-col gap-2"

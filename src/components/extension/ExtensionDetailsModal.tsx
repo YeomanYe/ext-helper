@@ -51,6 +51,7 @@ export function ExtensionDetailsModal({
           </div>
           <button
             onClick={onClose}
+            aria-label="Close details"
             className="text-punk-text-muted transition-colors hover:text-punk-text-primary"
           >
             <X className="h-4 w-4" />

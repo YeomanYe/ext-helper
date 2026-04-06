@@ -158,7 +158,7 @@ export const ExtensionCard = React.memo(function ExtensionCard({
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between gap-2">
                 <div>
-                  <h3 className="font-punk-heading text-[11px] text-punk-text-primary uppercase tracking-wider" title={extension.name}>
+                  <h3 className="font-punk-heading text-[14px] text-punk-text-primary uppercase tracking-wider" title={extension.name}>
                     {extension.name}
                   </h3>
                   <p className="font-punk-code text-[10px] text-punk-accent mt-0.5">
@@ -173,7 +173,7 @@ export const ExtensionCard = React.memo(function ExtensionCard({
               </div>
 
               {extension.description && (
-                <p className="font-punk-body text-sm text-punk-text-secondary mt-1.5">
+                <p className="font-punk-body text-xs text-punk-text-secondary mt-1.5">
                   {extension.description}
                 </p>
               )}
@@ -264,7 +264,7 @@ export const ExtensionCard = React.memo(function ExtensionCard({
           "bg-punk-bg-alt",
           "hover:border-punk-primary hover:shadow-[0_0_15px_rgba(124,58,237,0.3)]",
           isDimmed && "opacity-50",
-          "w-full min-h-[60px]",
+          "min-w-[280px] flex-1 min-h-[60px]",
           "punk-border",
           className
         )}
@@ -292,11 +292,11 @@ export const ExtensionCard = React.memo(function ExtensionCard({
         </div>
 
         <div className="flex-1 min-w-0">
-          <h3 className="font-punk-heading text-[12px] text-punk-text-primary truncate uppercase tracking-wider" title={extension.name}>
+          <h3 className="font-punk-heading text-[13px] text-punk-text-primary truncate uppercase tracking-wider" title={extension.name}>
             {extension.name}
           </h3>
           {extension.description && (
-            <p className="font-punk-body text-sm text-punk-text-secondary truncate mt-0.5" title={extension.description}>
+            <p className="font-punk-body text-[11px] text-punk-text-secondary truncate mt-0.5" title={extension.description}>
               {extension.description}
             </p>
           )}
@@ -328,7 +328,7 @@ export const ExtensionCard = React.memo(function ExtensionCard({
         "bg-punk-bg-alt",
         "hover:border-punk-primary hover:shadow-[0_0_15px_rgba(124,58,237,0.3)]",
         isDimmed && "opacity-50",
-        "aspect-square",
+        "aspect-square cursor-pointer",
         "punk-border",
         className
       )}

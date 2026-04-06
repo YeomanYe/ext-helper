@@ -60,12 +60,13 @@ export function GroupChip({
         }}
         disabled={disabled}
         className={cn(
-          "p-0.5 transition-colors",
+          "p-1.5 transition-colors",
           disabled
             ? "cursor-not-allowed text-punk-text-muted/40"
             : "text-punk-text-muted hover:text-punk-success hover:bg-punk-success/10"
         )}
         title={allEnabled ? "Disable all in group" : "Enable all in group"}
+        aria-label={allEnabled ? "Disable all extensions in group" : "Enable all extensions in group"}
       >
         {allEnabled ? <PowerOff className="h-3.5 w-3.5" /> : <Power className="h-3.5 w-3.5" />}
       </button>

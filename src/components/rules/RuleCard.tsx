@@ -146,7 +146,7 @@ export const RuleCard = React.memo(function RuleCard({
                 {rule.name}
               </h4>
               {rule.description && (
-                <p className="font-punk-code text-[12px] text-punk-text-muted truncate mt-0.5">
+                <p className="font-punk-code text-[10px] text-punk-text-muted truncate mt-0.5">
                   {rule.description}
                 </p>
               )}
@@ -270,11 +270,11 @@ export const RuleCard = React.memo(function RuleCard({
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-2">
               <div>
-                <h4 className="font-punk-heading text-[10px] text-punk-text-primary uppercase tracking-wider">
+                <h4 className="font-punk-heading text-[14px] text-punk-text-primary uppercase tracking-wider">
                   {rule.name}
                 </h4>
                 {rule.description && (
-                  <p className="font-punk-code text-[12px] text-punk-text-muted mt-0.5">
+                  <p className="font-punk-code text-[11px] text-punk-text-muted mt-0.5">
                     {rule.description}
                   </p>
                 )}

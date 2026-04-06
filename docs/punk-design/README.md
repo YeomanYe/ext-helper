@@ -29,7 +29,7 @@ This document describes the punk design system implemented for the ExtHelper bro
 | Background Alt | `#1A1A2E` | Card backgrounds |
 | Text Primary | `#E2E8F0` | Primary text |
 | Text Secondary | `#94A3B8` | Secondary text |
-| Text Muted | `#64748B` | Muted text |
+| Text Muted | `#78859B` | Muted text (WCAG AA compliant) |
 | Neon Cyan | `#00FFFF` | HUD corners, logo, decorative |
 | Neon Pink | `#FF00FF` | Glitch effects |
 
@@ -38,14 +38,16 @@ This document describes the punk design system implemented for the ExtHelper bro
 ### Font Stack
 
 ```css
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Fira+Code:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 ```
 
 | Font | Class | Usage | Size |
 |------|-------|-------|------|
-| Press Start 2P | `font-punk-heading` | Headings, buttons, logo | 6-13px |
-| VT323 | `font-punk-body` | Body text, labels | 12-18px |
-| Fira Code | `font-punk-code` | Version numbers, code | 10-14px |
+| Noto Sans SC + JetBrains Mono | `font-punk-heading` | Headings, buttons, logo | 6-13px |
+| Noto Sans SC + JetBrains Mono | `font-punk-body` | Body text, labels | 12-18px |
+| JetBrains Mono | `font-punk-code` | Version numbers, code | 10-14px |
+
+Noto Sans SC provides CJK (Chinese) support. JetBrains Mono provides the monospace terminal aesthetic.
 
 ### Usage Guidelines
 
@@ -526,7 +528,7 @@ The punk design intentionally avoids:
 ```
 
 **Reduced Motion:**
-Animations respect `prefers-reduced-motion` when implemented.
+All animations are disabled when `prefers-reduced-motion: reduce` is set, via a global CSS media query in `globals.css`.
 
 ## Changelog
 
