@@ -8,20 +8,24 @@ import { ruleEngine } from "@/rules/ruleEngine"
 import type { Rule, RuleSettings } from "@/rules/types"
 
 class RuleBackgroundService {
-  private settings: RuleSettings = DEFAULT_RULE_SETTINGS
+  /**
+   * 获取设置（每次从 storage 读取，避免 Service Worker 挂起后内存丢失）
+   */
+  private async getSettings(): Promise<RuleSettings> {
+    const storedSettings = await browserAdapter.getStorage(RULE_SETTINGS_KEY)
+    return { ...DEFAULT_RULE_SETTINGS, ...storedSettings }
+  }
 
   /**
    * 初始化后台服务
    */
   async initialize(): Promise<void> {
     try {
-      // 加载设置
-      const storedSettings = await browserAdapter.getStorage(RULE_SETTINGS_KEY)
-      this.settings = { ...DEFAULT_RULE_SETTINGS, ...storedSettings }
+      const settings = await this.getSettings()
 
       // 设置定时器
-      if (this.settings.enableScheduler) {
-        await this.startScheduler()
+      if (settings.enableScheduler) {
+        await this.startScheduler(settings)
       }
 
       // 设置监听器
@@ -52,8 +56,10 @@ class RuleBackgroundService {
   private setupTabListener(): void {
     // 标签页 URL 更新时检测
     chrome.tabs.onUpdated.addListener(
-      (tabId, changeInfo) => {
-        if (changeInfo.url && this.settings.enableDomainDetection) {
+      async (tabId, changeInfo) => {
+        if (!changeInfo.url) return
+        const settings = await this.getSettings()
+        if (settings.enableDomainDetection) {
           this.checkDomainRules(tabId, changeInfo.url)
         }
       }
@@ -61,7 +67,8 @@ class RuleBackgroundService {
 
     // 标签页激活时检测
     chrome.tabs.onActivated.addListener(async (activeInfo) => {
-      if (!this.settings.enableDomainDetection) return
+      const settings = await this.getSettings()
+      if (!settings.enableDomainDetection) return
 
       try {
         const tab = await chrome.tabs.get(activeInfo.tabId)
@@ -84,9 +91,11 @@ class RuleBackgroundService {
         sendResponse({ success: true })
       }
       if (message.type === "GET_RULE_STATUS") {
-        sendResponse({
-          schedulerEnabled: this.settings.enableScheduler,
-          domainDetectionEnabled: this.settings.enableDomainDetection,
+        this.getSettings().then((settings) => {
+          sendResponse({
+            schedulerEnabled: settings.enableScheduler,
+            domainDetectionEnabled: settings.enableDomainDetection,
+          })
         })
       }
       return true
@@ -96,14 +105,15 @@ class RuleBackgroundService {
   /**
    * 启动定时调度器
    */
-  private async startScheduler(): Promise<void> {
+  private async startScheduler(settings?: RuleSettings): Promise<void> {
+    const s = settings ?? await this.getSettings()
     try {
       await chrome.alarms.create(RULE_ALARM_NAME, {
-        delayInMinutes: this.settings.schedulerInterval / 60000,
-        periodInMinutes: this.settings.schedulerInterval / 60000,
+        delayInMinutes: s.schedulerInterval / 60000,
+        periodInMinutes: s.schedulerInterval / 60000,
       })
       console.log(
-        `[RuleBackground] Scheduler started with interval: ${this.settings.schedulerInterval}ms`
+        `[RuleBackground] Scheduler started with interval: ${s.schedulerInterval}ms`
       )
     } catch (error) {
       console.error("[RuleBackground] Failed to start scheduler:", error)
@@ -138,7 +148,8 @@ class RuleBackgroundService {
       if (!hasTimeCondition) continue
 
       // 检查是否应该触发（避免短时间内重复触发）
-      const cooldown = this.settings.schedulerInterval * 2
+      const settings = await this.getSettings()
+      const cooldown = settings.schedulerInterval * 2
       if (
         rule.lastTriggeredAt &&
         now - rule.lastTriggeredAt < cooldown
@@ -218,8 +229,9 @@ class RuleBackgroundService {
    * 更新设置
    */
   async updateSettings(newSettings: Partial<RuleSettings>): Promise<void> {
-    this.settings = { ...this.settings, ...newSettings }
-    await browserAdapter.setStorage(RULE_SETTINGS_KEY, this.settings)
+    const currentSettings = await this.getSettings()
+    const updatedSettings = { ...currentSettings, ...newSettings }
+    await browserAdapter.setStorage(RULE_SETTINGS_KEY, updatedSettings)
 
     // 更新调度器状态
     if ("enableScheduler" in newSettings) {

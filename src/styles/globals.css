@@ -31,14 +31,15 @@
   box-sizing: border-box;
 }
 
+html, body {
+  width: 680px;
+  height: 600px;
+}
+
 body {
   font-family: "Noto Sans SC", "JetBrains Mono", monospace;
   background-color: var(--punk-bg);
   color: var(--punk-text-primary);
-  min-width: 380px;
-  max-width: 660px;
-  min-height: 200px;
-  max-height: 600px;
   overflow: hidden;
 }
 
