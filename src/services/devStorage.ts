@@ -7,7 +7,12 @@ class DevStorage {
   private extensions: Extension[] = []
   private groups: Group[] = []
   private rules: Rule[] = []
-  private preferences: { theme?: string; compactMode?: boolean; showDisabled?: boolean; viewMode?: string } = {}
+  private preferences: {
+    theme?: string
+    compactMode?: boolean
+    showDisabled?: boolean
+    viewMode?: string
+  } = {}
   private bisectSession: BisectSession | null = null
   private listeners: Map<string, Set<() => void>> = new Map()
 
@@ -82,9 +87,7 @@ class DevStorage {
   }
 
   updateExtension(id: string, updates: Partial<Extension>) {
-    this.extensions = this.extensions.map((e) =>
-      e.id === id ? { ...e, ...updates } : e
-    )
+    this.extensions = this.extensions.map((e) => (e.id === id ? { ...e, ...updates } : e))
     this.save()
     this.notify("extensions")
   }
@@ -93,7 +96,7 @@ class DevStorage {
     this.extensions = this.extensions.filter((e) => e.id !== id)
     this.groups = this.groups.map((group) => ({
       ...group,
-      extensionIds: group.extensionIds.filter((extId) => extId !== id)
+      extensionIds: group.extensionIds.filter((extId) => extId !== id),
     }))
     this.save()
     this.notify("extensions")
@@ -128,11 +131,23 @@ class DevStorage {
   }
 
   // Preferences
-  getPreferences(): { theme?: string; compactMode?: boolean; showDisabled?: boolean; viewMode?: string } {
+  getPreferences(): {
+    theme?: string
+    compactMode?: boolean
+    showDisabled?: boolean
+    viewMode?: string
+  } {
     return { ...this.preferences }
   }
 
-  setPreferences(prefs: Partial<{ theme?: string; compactMode?: boolean; showDisabled?: boolean; viewMode?: string }>) {
+  setPreferences(
+    prefs: Partial<{
+      theme?: string
+      compactMode?: boolean
+      showDisabled?: boolean
+      viewMode?: string
+    }>
+  ) {
     this.preferences = { ...this.preferences, ...prefs }
     this.save()
   }

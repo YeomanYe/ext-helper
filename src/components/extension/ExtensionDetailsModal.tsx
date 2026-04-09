@@ -1,5 +1,16 @@
 import { createPortal } from "react-dom"
-import { Package, Shield, Globe, X, ExternalLink, Wifi, WifiOff, Lock, Unlock, AlertTriangle } from "lucide-react"
+import {
+  Package,
+  Shield,
+  Globe,
+  X,
+  ExternalLink,
+  Wifi,
+  WifiOff,
+  Lock,
+  Unlock,
+  AlertTriangle,
+} from "lucide-react"
 import { cn } from "@/utils"
 import type { Extension } from "@/types"
 
@@ -14,8 +25,14 @@ interface ExtensionDetailsModalProps {
 function DataRow({ label, value, color }: { label: string; value: string; color?: string }) {
   return (
     <div className="flex items-center justify-between py-1 border-b border-punk-border/10 last:border-b-0">
-      <span className="font-punk-code text-[10px] text-punk-text-muted uppercase tracking-wider">{label}</span>
-      <span className={cn("font-punk-code text-[11px] uppercase", color || "text-punk-text-secondary")}>{value}</span>
+      <span className="font-punk-code text-[10px] text-punk-text-muted uppercase tracking-wider">
+        {label}
+      </span>
+      <span
+        className={cn("font-punk-code text-[11px] uppercase", color || "text-punk-text-secondary")}
+      >
+        {value}
+      </span>
     </div>
   )
 }
@@ -23,19 +40,29 @@ function DataRow({ label, value, color }: { label: string; value: string; color?
 /** Status badge */
 function StatusBadge({ active, label }: { active: boolean; label: string }) {
   return (
-    <span className={cn(
-      "px-2 py-0.5 text-[10px] font-punk-heading uppercase border tracking-wider",
-      active
-        ? "border-punk-success/50 bg-punk-success/10 text-punk-success"
-        : "border-punk-border/30 text-punk-text-muted"
-    )}>
+    <span
+      className={cn(
+        "px-2 py-0.5 text-[10px] font-punk-heading uppercase border tracking-wider",
+        active
+          ? "border-punk-success/50 bg-punk-success/10 text-punk-success"
+          : "border-punk-border/30 text-punk-text-muted"
+      )}
+    >
       {label}
     </span>
   )
 }
 
 /** Section header with icon */
-function SectionHeader({ icon, label, count }: { icon: React.ReactNode; label: string; count?: number }) {
+function SectionHeader({
+  icon,
+  label,
+  count,
+}: {
+  icon: React.ReactNode
+  label: string
+  count?: number
+}) {
   return (
     <div className="flex items-center gap-2 font-punk-heading text-[10px] uppercase tracking-[0.15em] text-punk-neon-cyan/70 mb-1.5">
       {icon}
@@ -51,7 +78,7 @@ export function ExtensionDetailsModal({
   show,
   extension,
   onClose,
-  onOpenOptions
+  onOpenOptions,
 }: ExtensionDetailsModalProps) {
   if (!show || typeof document === "undefined") return null
 
@@ -78,7 +105,11 @@ export function ExtensionDetailsModal({
         <div className="flex items-center justify-between border-b border-punk-neon-cyan/15 px-4 py-2.5 bg-punk-neon-cyan/[0.03] shrink-0">
           <div className="flex items-center gap-3">
             {extension.iconUrl ? (
-              <img src={extension.iconUrl} alt={extension.name} className="h-10 w-10 object-cover" />
+              <img
+                src={extension.iconUrl}
+                alt={extension.name}
+                className="h-10 w-10 object-cover"
+              />
             ) : (
               <div className="flex h-10 w-10 items-center justify-center bg-punk-bg-alt">
                 <Package className="h-5 w-5 text-punk-text-muted" />
@@ -89,7 +120,8 @@ export function ExtensionDetailsModal({
                 {extension.name}
               </h3>
               <p className="font-punk-code text-[10px] text-punk-accent">
-                v{extension.version}{extension.versionName ? ` (${extension.versionName})` : ""}
+                v{extension.version}
+                {extension.versionName ? ` (${extension.versionName})` : ""}
               </p>
             </div>
           </div>
@@ -104,11 +136,16 @@ export function ExtensionDetailsModal({
 
         {/* Scrollable content */}
         <div className="flex-1 overflow-y-auto p-4 space-y-3">
-
           {/* Status & Links row */}
           <div className="flex items-center flex-wrap gap-2">
-            <StatusBadge active={extension.enabled} label={extension.enabled ? "ACTIVE" : "INACTIVE"} />
-            <StatusBadge active={extension.offlineEnabled} label={extension.offlineEnabled ? "OFFLINE OK" : "ONLINE ONLY"} />
+            <StatusBadge
+              active={extension.enabled}
+              label={extension.enabled ? "ACTIVE" : "INACTIVE"}
+            />
+            <StatusBadge
+              active={extension.offlineEnabled}
+              label={extension.offlineEnabled ? "OFFLINE OK" : "ONLINE ONLY"}
+            />
             {extension.disabledReason && (
               <span className="flex items-center gap-1 px-2 py-0.5 text-[10px] font-punk-heading uppercase border border-punk-warning/50 bg-punk-warning/10 text-punk-warning tracking-wider">
                 <AlertTriangle className="h-3 w-3" />
@@ -167,7 +204,14 @@ export function ExtensionDetailsModal({
                 color={extension.offlineEnabled ? "text-punk-success" : "text-punk-text-muted"}
               />
               {extension.updateUrl && (
-                <DataRow label="UPDATE_URL" value={extension.updateUrl.length > 40 ? extension.updateUrl.substring(0, 40) + "..." : extension.updateUrl} />
+                <DataRow
+                  label="UPDATE_URL"
+                  value={
+                    extension.updateUrl.length > 40
+                      ? extension.updateUrl.substring(0, 40) + "..."
+                      : extension.updateUrl
+                  }
+                />
               )}
             </div>
           </div>
@@ -180,14 +224,16 @@ export function ExtensionDetailsModal({
               count={extension.permissions.length}
             />
             <div className="flex flex-wrap gap-1">
-              {extension.permissions.length > 0 ? extension.permissions.map((perm) => (
-                <span
-                  key={perm}
-                  className="border border-punk-border/20 bg-punk-bg px-1.5 py-0.5 font-punk-code text-[10px] text-punk-text-secondary"
-                >
-                  {perm}
-                </span>
-              )) : (
+              {extension.permissions.length > 0 ? (
+                extension.permissions.map((perm) => (
+                  <span
+                    key={perm}
+                    className="border border-punk-border/20 bg-punk-bg px-1.5 py-0.5 font-punk-code text-[10px] text-punk-text-secondary"
+                  >
+                    {perm}
+                  </span>
+                ))
+              ) : (
                 <span className="font-punk-code text-[10px] uppercase text-punk-text-muted">
                   NONE
                 </span>
@@ -203,19 +249,21 @@ export function ExtensionDetailsModal({
               count={extension.hostPermissions.length}
             />
             <div className="flex flex-wrap gap-1">
-              {extension.hostPermissions.length > 0 ? extension.hostPermissions.map((host) => (
-                <span
-                  key={host}
-                  className={cn(
-                    "border px-1.5 py-0.5 font-punk-code text-[10px]",
-                    host === "<all_urls>"
-                      ? "border-punk-warning/30 bg-punk-warning/5 text-punk-warning"
-                      : "border-punk-border/20 bg-punk-bg text-punk-text-secondary"
-                  )}
-                >
-                  {host}
-                </span>
-              )) : (
+              {extension.hostPermissions.length > 0 ? (
+                extension.hostPermissions.map((host) => (
+                  <span
+                    key={host}
+                    className={cn(
+                      "border px-1.5 py-0.5 font-punk-code text-[10px]",
+                      host === "<all_urls>"
+                        ? "border-punk-warning/30 bg-punk-warning/5 text-punk-warning"
+                        : "border-punk-border/20 bg-punk-bg text-punk-text-secondary"
+                    )}
+                  >
+                    {host}
+                  </span>
+                ))
+              ) : (
                 <span className="font-punk-code text-[10px] uppercase text-punk-text-muted">
                   NONE
                 </span>

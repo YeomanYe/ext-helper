@@ -15,7 +15,7 @@ export function BisectBanner({
   onGood,
   onBad,
   onCancel,
-  onRestore
+  onRestore,
 }: BisectBannerProps) {
   const isResolved = bisectSession.phase === "resolved"
 
@@ -35,7 +35,8 @@ export function BisectBanner({
                 : "Good means the issue disappeared. Bad means the issue is still present."}
             </p>
             <p className="font-punk-code text-[10px] uppercase tracking-wider text-punk-text-muted">
-              Candidates {bisectSession.candidateIds.length} · Testing {bisectSession.currentTestIds.length}
+              Candidates {bisectSession.candidateIds.length} · Testing{" "}
+              {bisectSession.currentTestIds.length}
             </p>
           </div>
           {!isResolved && (

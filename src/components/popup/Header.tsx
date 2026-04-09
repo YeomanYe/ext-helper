@@ -14,13 +14,19 @@ interface SearchBarProps {
 const FILTERS: { value: FilterType; label: string }[] = [
   { value: "all", label: "ALL" },
   { value: "enabled", label: "ON" },
-  { value: "disabled", label: "OFF" }
+  { value: "disabled", label: "OFF" },
 ]
 
-export function SearchBar({ value, onChange, placeholder = "SEARCH_EXTENSIONS...", activeFilter = "all", onFilterChange }: SearchBarProps) {
+export function SearchBar({
+  value,
+  onChange,
+  placeholder = "SEARCH_EXTENSIONS...",
+  activeFilter = "all",
+  onFilterChange,
+}: SearchBarProps) {
   const [showDropdown, setShowDropdown] = React.useState(false)
 
-  const currentFilter = FILTERS.find(f => f.value === activeFilter) || FILTERS[0]
+  const currentFilter = FILTERS.find((f) => f.value === activeFilter) || FILTERS[0]
 
   return (
     <div className="flex items-center gap-3">
@@ -39,7 +45,9 @@ export function SearchBar({ value, onChange, placeholder = "SEARCH_EXTENSIONS...
             )}
           >
             <span>{currentFilter.label}</span>
-            <ChevronDown className={cn("h-3 w-3 transition-transform", showDropdown && "rotate-180")} />
+            <ChevronDown
+              className={cn("h-3 w-3 transition-transform", showDropdown && "rotate-180")}
+            />
           </button>
 
           {showDropdown && (
@@ -72,7 +80,9 @@ export function SearchBar({ value, onChange, placeholder = "SEARCH_EXTENSIONS...
 
       {/* Search Input */}
       <div className="relative flex-1">
-        <span className="absolute left-3 top-1/2 -translate-y-1/2 font-punk-body text-punk-accent text-lg">$</span>
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 font-punk-body text-punk-accent text-lg">
+          $
+        </span>
         <input
           type="text"
           value={value}
@@ -141,16 +151,16 @@ export function Header({ viewMode = "compact", onViewModeChange }: HeaderProps) 
         {/* Cyberpunk Logo */}
         <div className="relative">
           <div className="flex h-10 w-10 items-center justify-center border-2 border-punk-neon-cyan bg-punk-bg-alt">
-            <span className="font-punk-heading text-xs text-punk-neon-cyan animate-pulse-neon">E</span>
+            <span className="font-punk-heading text-xs text-punk-neon-cyan animate-pulse-neon">
+              E
+            </span>
           </div>
           {/* Glow effect */}
           <div className="absolute inset-0 blur-md bg-punk-neon-cyan/30 -z-10" />
         </div>
 
         <div className="flex flex-col">
-          <h1 className="font-punk-heading text-xs text-punk-neon-cyan">
-            EXTHELPER
-          </h1>
+          <h1 className="font-punk-heading text-xs text-punk-neon-cyan">EXTHELPER</h1>
           <span className="font-punk-body text-punk-text-muted text-sm tracking-wider">
             EXTENSION_MGR_v2.0
           </span>
@@ -159,7 +169,11 @@ export function Header({ viewMode = "compact", onViewModeChange }: HeaderProps) 
 
       <div className="flex items-center gap-1 relative z-10">
         {/* View Mode Toggle */}
-        <div className="flex border border-punk-border/30 bg-punk-bg/50" role="group" aria-label="View mode">
+        <div
+          className="flex border border-punk-border/30 bg-punk-bg/50"
+          role="group"
+          aria-label="View mode"
+        >
           <button
             onClick={() => onViewModeChange?.("compact")}
             aria-label="Grid view"
@@ -231,16 +245,12 @@ export function Footer({ totalCount, enabledCount }: FooterProps) {
 
       {/* Status text */}
       <div className="flex items-center gap-3">
-        <span className="font-punk-body text-punk-text-muted text-sm">
-          SYS_STATUS:
-        </span>
+        <span className="font-punk-body text-punk-text-muted text-sm">SYS_STATUS:</span>
         <span className="font-punk-body text-punk-success text-sm">
           {enabledCount}/{totalCount} ONLINE
         </span>
         <span className="text-punk-text-muted">|</span>
-        <span className="font-punk-body text-punk-accent text-sm">
-          {percentage}%_ACTIVE
-        </span>
+        <span className="font-punk-body text-punk-accent text-sm">{percentage}%_ACTIVE</span>
       </div>
 
       {/* Blinking indicator */}

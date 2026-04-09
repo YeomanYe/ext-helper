@@ -8,7 +8,7 @@ import {
   useFilteredExtensions,
   useGroupStore,
   useUIStore,
-  initializeUIStore
+  initializeUIStore,
 } from "@/stores"
 import { browserAdapter } from "@/services/browser/adapter"
 import { isDevMode } from "@/services/mockData"
@@ -39,7 +39,7 @@ export function PopupPage() {
     canRedo,
     undoCount,
     redoCount,
-    bisectSession
+    bisectSession,
   } = useExtensionStore()
 
   const {
@@ -49,13 +49,10 @@ export function PopupPage() {
     addToGroup,
     removeFromGroup,
     updateGroup,
-    deleteGroup
+    deleteGroup,
   } = useGroupStore()
 
-  const {
-    viewMode,
-    setViewMode
-  } = useUIStore()
+  const { viewMode, setViewMode } = useUIStore()
 
   const filteredExtensions = useFilteredExtensions()
   const devMode = isDevMode()
@@ -74,13 +71,13 @@ export function PopupPage() {
   // Get selected group
   const selectedGroup = React.useMemo(() => {
     if (!selectedGroupId) return null
-    return displayGroups.find(g => g.id === selectedGroupId) || null
+    return displayGroups.find((g) => g.id === selectedGroupId) || null
   }, [selectedGroupId, displayGroups])
 
   // Get extensions in selected group
   const selectedGroupExtensions = React.useMemo(() => {
     if (!selectedGroup) return []
-    return displayExtensions.filter(ext => selectedGroup.extensionIds.includes(ext.id))
+    return displayExtensions.filter((ext) => selectedGroup.extensionIds.includes(ext.id))
   }, [selectedGroup, displayExtensions])
 
   const displayedExtensions = filteredExtensions
@@ -98,47 +95,62 @@ export function PopupPage() {
     fetchGroups()
   }, [fetchExtensions, fetchGroups])
 
-  const handleOpenOptions = React.useCallback(async (id: string) => {
-    const ext = extensions.find((e) => e.id === id)
-    if (!ext?.optionsUrl) return
-    if (devMode) {
-      window.open(ext.optionsUrl, "_blank")
-      return
-    }
-    try {
-      await browserAdapter.openOptionsPage(ext.optionsUrl)
-    } catch (err) {
-      console.error("Failed to open options page:", err)
-    }
-  }, [devMode, extensions])
+  const handleOpenOptions = React.useCallback(
+    async (id: string) => {
+      const ext = extensions.find((e) => e.id === id)
+      if (!ext?.optionsUrl) return
+      if (devMode) {
+        window.open(ext.optionsUrl, "_blank")
+        return
+      }
+      try {
+        await browserAdapter.openOptionsPage(ext.optionsUrl)
+      } catch (err) {
+        console.error("Failed to open options page:", err)
+      }
+    },
+    [devMode, extensions]
+  )
 
-  const handleRemoveExtension = React.useCallback(async (id: string) => {
-    if (devMode) {
-      await removeExtension(id)
-      return
-    }
-    try {
-      await browserAdapter.uninstallExtension(id)
-      fetchExtensions()
-    } catch (err) {
-      console.error("Failed to uninstall extension:", err)
-    }
-  }, [devMode, fetchExtensions, removeExtension])
+  const handleRemoveExtension = React.useCallback(
+    async (id: string) => {
+      if (devMode) {
+        await removeExtension(id)
+        return
+      }
+      try {
+        await browserAdapter.uninstallExtension(id)
+        fetchExtensions()
+      } catch (err) {
+        console.error("Failed to uninstall extension:", err)
+      }
+    },
+    [devMode, fetchExtensions, removeExtension]
+  )
 
-  const handleToggleExtension = React.useCallback((id: string) => {
-    if (isBisectActive) return
-    toggleExtension(id)
-  }, [isBisectActive, toggleExtension])
+  const handleToggleExtension = React.useCallback(
+    (id: string) => {
+      if (isBisectActive) return
+      toggleExtension(id)
+    },
+    [isBisectActive, toggleExtension]
+  )
 
   // Toggle all extensions in a group
-  const handleToggleGroup = React.useCallback((group: typeof displayGroups[0]) => {
-    if (isBisectActive) return
-    const groupExtensions = displayExtensions.filter((ext) => group.extensionIds.includes(ext.id))
-    if (groupExtensions.length === 0) return
+  const handleToggleGroup = React.useCallback(
+    (group: (typeof displayGroups)[0]) => {
+      if (isBisectActive) return
+      const groupExtensions = displayExtensions.filter((ext) => group.extensionIds.includes(ext.id))
+      if (groupExtensions.length === 0) return
 
-    const shouldEnableAll = groupExtensions.some((ext) => !ext.enabled)
-    void setExtensionsEnabled(groupExtensions.map((ext) => ext.id), shouldEnableAll)
-  }, [displayExtensions, isBisectActive, setExtensionsEnabled])
+      const shouldEnableAll = groupExtensions.some((ext) => !ext.enabled)
+      void setExtensionsEnabled(
+        groupExtensions.map((ext) => ext.id),
+        shouldEnableAll
+      )
+    },
+    [displayExtensions, isBisectActive, setExtensionsEnabled]
+  )
 
   const enabledCount = displayedExtensions.filter((e) => e.enabled).length
   const totalCount = displayedExtensions.length
@@ -147,18 +159,16 @@ export function PopupPage() {
   // Card mode: flex-wrap, multiple cards per row
   // Compact mode: CSS grid with auto-fill to fill screen width
   // Detail mode: single column stacked layout
-  const gridClass = viewMode === "card"
-    ? "flex flex-wrap gap-2"
-    : viewMode === "compact"
-      ? "grid grid-cols-[repeat(auto-fill,minmax(80px,1fr))] gap-2"
-      : "flex flex-col gap-2"
+  const gridClass =
+    viewMode === "card"
+      ? "flex flex-wrap gap-2"
+      : viewMode === "compact"
+        ? "grid grid-cols-[repeat(auto-fill,minmax(80px,1fr))] gap-2"
+        : "flex flex-col gap-2"
 
   return (
     <div className="flex h-[600px] flex-col bg-punk-bg">
-      <Header
-        viewMode={viewMode}
-        onViewModeChange={setViewMode}
-      />
+      <Header viewMode={viewMode} onViewModeChange={setViewMode} />
 
       {/* Tab Bar */}
       <div className="flex-shrink-0 px-3 pt-2 border-b border-punk-border/30">
@@ -200,8 +210,18 @@ export function PopupPage() {
               onBisectGood={() => void markBisectGood()}
               onBisectBad={() => void markBisectBad()}
               onCancelBisect={() => void cancelBisect()}
-              onEnableAll={() => void setExtensionsEnabled(displayedExtensions.map((ext) => ext.id), true)}
-              onDisableAll={() => void setExtensionsEnabled(displayedExtensions.map((ext) => ext.id), false)}
+              onEnableAll={() =>
+                void setExtensionsEnabled(
+                  displayedExtensions.map((ext) => ext.id),
+                  true
+                )
+              }
+              onDisableAll={() =>
+                void setExtensionsEnabled(
+                  displayedExtensions.map((ext) => ext.id),
+                  false
+                )
+              }
               onUndo={() => void undoExtensions()}
               onRedo={() => void redoExtensions()}
             />
@@ -242,10 +262,7 @@ export function PopupPage() {
             />
 
             {/* Extension List */}
-            <div
-              className="flex-1 min-h-0 overflow-y-auto p-3"
-              data-extension-surface="true"
-            >
+            <div className="flex-1 min-h-0 overflow-y-auto p-3" data-extension-surface="true">
               {error ? (
                 <div className="flex flex-col items-center justify-center py-12 text-center">
                   <p className="font-punk-body text-base text-punk-cta">ERROR: {error}</p>
@@ -292,15 +309,19 @@ export function PopupPage() {
             setSelectedGroupId(null)
             setShowCreateModal(false)
           }}
-          onCreate={showCreateModal ? async (name, color, extensionIds, iconUrl) => {
-            await createGroup(name, color, extensionIds)
-            if (iconUrl) {
-              const latestGroup = useGroupStore.getState().groups.at(-1)
-              if (latestGroup) {
-                updateGroup(latestGroup.id, { icon: "custom", iconUrl })
-              }
-            }
-          } : undefined}
+          onCreate={
+            showCreateModal
+              ? async (name, color, extensionIds, iconUrl) => {
+                  await createGroup(name, color, extensionIds)
+                  if (iconUrl) {
+                    const latestGroup = useGroupStore.getState().groups.at(-1)
+                    if (latestGroup) {
+                      updateGroup(latestGroup.id, { icon: "custom", iconUrl })
+                    }
+                  }
+                }
+              : undefined
+          }
           disableEnableControls={isBisectActive}
           onToggleExtension={selectedGroup && !isBisectActive ? handleToggleExtension : undefined}
           onOpenOptions={selectedGroup ? handleOpenOptions : undefined}

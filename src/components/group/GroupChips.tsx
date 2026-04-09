@@ -18,7 +18,7 @@ export function GroupChip({
   allEnabled,
   disabled = false,
   onClick,
-  onToggle
+  onToggle,
 }: GroupChipProps) {
   const displayIcon = group.iconUrl ? (
     <img src={group.iconUrl} className="w-full h-full object-cover" alt="" />
@@ -66,7 +66,9 @@ export function GroupChip({
             : "text-punk-text-muted hover:text-punk-success hover:bg-punk-success/10"
         )}
         title={allEnabled ? "Disable all in group" : "Enable all in group"}
-        aria-label={allEnabled ? "Disable all extensions in group" : "Enable all extensions in group"}
+        aria-label={
+          allEnabled ? "Disable all extensions in group" : "Enable all extensions in group"
+        }
       >
         {allEnabled ? <PowerOff className="h-3.5 w-3.5" /> : <Power className="h-3.5 w-3.5" />}
       </button>

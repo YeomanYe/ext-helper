@@ -30,7 +30,7 @@ export function ExtensionContextMenu({
   onOpenOptions,
   onRemove,
   onShowDetails,
-  onClose
+  onClose,
 }: ExtensionContextMenuProps) {
   useClickOutside(menuRef, onClose, show)
 
@@ -82,7 +82,7 @@ export function ExtensionContextMenu({
         >
           <Settings className="h-4 w-4" />
           OPTIONS
-          </button>
+        </button>
       )}
       <button
         role="menuitem"

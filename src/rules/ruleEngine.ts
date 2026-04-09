@@ -2,7 +2,13 @@
 // 规则引擎
 // ============================================================
 
-import type { Action, Condition, ConditionGroup, ConditionOperator, ScheduleCondition } from "./types"
+import type {
+  Action,
+  Condition,
+  ConditionGroup,
+  ConditionOperator,
+  ScheduleCondition,
+} from "./types"
 import { domainMatcher } from "./domainMatcher"
 import { browserAdapter } from "@/services/browser/adapter"
 import { RULES_STORAGE_KEY } from "./constants"
@@ -19,9 +25,7 @@ export class RuleEngine {
     const domainMatch =
       nonEmptyDomains.length === 0
         ? true // 无域名限制 = 全站生效
-        : nonEmptyDomains.some((domain) =>
-            domainMatcher.matches(domain, group.matchMode, url)
-          )
+        : nonEmptyDomains.some((domain) => domainMatcher.matches(domain, group.matchMode, url))
 
     if (!domainMatch) return false
 
@@ -56,11 +60,7 @@ export class RuleEngine {
 
     const results = domainConditions.map((condition) => {
       if (condition.type !== "domain") return false
-      return domainMatcher.matches(
-        condition.pattern,
-        condition.matchMode,
-        url
-      )
+      return domainMatcher.matches(condition.pattern, condition.matchMode, url)
     })
 
     return this.combineResults(results, operator)
@@ -69,10 +69,7 @@ export class RuleEngine {
   /**
    * 评估时间表条件（兼容旧数据）
    */
-  evaluateScheduleConditions(
-    conditions: Condition[],
-    operator: ConditionOperator
-  ): boolean {
+  evaluateScheduleConditions(conditions: Condition[], operator: ConditionOperator): boolean {
     const scheduleConditions = conditions.filter((c) => c.type === "schedule")
     if (scheduleConditions.length === 0) return false
 
@@ -87,11 +84,7 @@ export class RuleEngine {
   /**
    * 评估所有条件（兼容旧数据）
    */
-  evaluateConditions(
-    conditions: Condition[],
-    operator: ConditionOperator,
-    url?: string
-  ): boolean {
+  evaluateConditions(conditions: Condition[], operator: ConditionOperator, url?: string): boolean {
     const results: boolean[] = []
 
     // 评估域名条件
@@ -120,14 +113,9 @@ export class RuleEngine {
   /**
    * 组合结果
    */
-  private combineResults(
-    results: boolean[],
-    operator: ConditionOperator
-  ): boolean {
+  private combineResults(results: boolean[], operator: ConditionOperator): boolean {
     if (results.length === 0) return false
-    return operator === "AND"
-      ? results.every(Boolean)
-      : results.some(Boolean)
+    return operator === "AND" ? results.every(Boolean) : results.some(Boolean)
   }
 
   /**
@@ -199,11 +187,8 @@ export class RuleEngine {
   /**
    * 批量切换分组扩展
    */
-  private async toggleGroupExtensions(
-    groupId: string,
-    enabled: boolean
-  ): Promise<void> {
-    const groups = await browserAdapter.getStorage("ext-helper-groups") || []
+  private async toggleGroupExtensions(groupId: string, enabled: boolean): Promise<void> {
+    const groups = (await browserAdapter.getStorage("ext-helper-groups")) || []
     const group = groups.find((g: any) => g.id === groupId)
 
     if (group) {
@@ -211,10 +196,7 @@ export class RuleEngine {
         try {
           await browserAdapter.setExtensionEnabled(extId, enabled)
         } catch (error) {
-          console.error(
-            `Failed to ${enabled ? "enable" : "disable"} extension ${extId}:`,
-            error
-          )
+          console.error(`Failed to ${enabled ? "enable" : "disable"} extension ${extId}:`, error)
         }
       }
     }

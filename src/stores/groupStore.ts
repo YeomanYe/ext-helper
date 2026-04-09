@@ -29,7 +29,7 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
       createdAt: Date.now(),
       updatedAt: Date.now(),
       isExpanded: true,
-      order: groups.length
+      order: groups.length,
     }
 
     const newGroups = [...groups, newGroup]
@@ -41,7 +41,7 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
       onError: (error) => {
         console.error("Failed to save group:", error)
         return {}
-      }
+      },
     })
   },
 
@@ -51,29 +51,27 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
     await runOptimisticMutation(set, get, {
       snapshot: (state) => ({
         groups: state.groups,
-        activeGroupId: state.activeGroupId
+        activeGroupId: state.activeGroupId,
       }),
       apply: () => ({
         groups: newGroups,
-        activeGroupId: activeGroupId === id ? null : activeGroupId
+        activeGroupId: activeGroupId === id ? null : activeGroupId,
       }),
       persist: () => groupsRepo.saveAll(newGroups),
       rollback: (snapshot) => ({
         groups: snapshot.groups,
-        activeGroupId: snapshot.activeGroupId
+        activeGroupId: snapshot.activeGroupId,
       }),
       onError: (error) => {
         console.error("Failed to delete group:", error)
         return {}
-      }
+      },
     })
   },
 
   renameGroup: async (id: string, name: string) => {
     const { groups } = get()
-    const newGroups = groups.map((g) =>
-      g.id === id ? { ...g, name, updatedAt: Date.now() } : g
-    )
+    const newGroups = groups.map((g) => (g.id === id ? { ...g, name, updatedAt: Date.now() } : g))
     await runOptimisticMutation(set, get, {
       snapshot: (state) => state.groups,
       apply: () => ({ groups: newGroups }),
@@ -82,11 +80,14 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
       onError: (error) => {
         console.error("Failed to rename group:", error)
         return {}
-      }
+      },
     })
   },
 
-  updateGroup: async (id: string, updates: Partial<Pick<Group, "name" | "color" | "icon" | "iconUrl">>) => {
+  updateGroup: async (
+    id: string,
+    updates: Partial<Pick<Group, "name" | "color" | "icon" | "iconUrl">>
+  ) => {
     const { groups } = get()
     const newGroups = groups.map((g) =>
       g.id === id ? { ...g, ...updates, updatedAt: Date.now() } : g
@@ -99,7 +100,7 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
       onError: (error) => {
         console.error("Failed to update group:", error)
         return {}
-      }
+      },
     })
   },
 
@@ -124,13 +125,13 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
         return {
           ...g,
           extensionIds: [...g.extensionIds, extId],
-          updatedAt: Date.now()
+          updatedAt: Date.now(),
         }
       }
       return {
         ...g,
         extensionIds: g.extensionIds.filter((id) => id !== extId),
-        updatedAt: Date.now()
+        updatedAt: Date.now(),
       }
     })
     await runOptimisticMutation(set, get, {
@@ -141,7 +142,7 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
       onError: (error) => {
         console.error("Failed to add extension to group:", error)
         return {}
-      }
+      },
     })
   },
 
@@ -152,7 +153,7 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
         ? {
             ...g,
             extensionIds: g.extensionIds.filter((id) => id !== extId),
-            updatedAt: Date.now()
+            updatedAt: Date.now(),
           }
         : g
     )
@@ -164,9 +165,9 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
       onError: (error) => {
         console.error("Failed to remove extension from group:", error)
         return {}
-      }
+      },
     })
   },
 
-  setDraggedExtension: (id: string | null) => set({ draggedExtensionId: id })
+  setDraggedExtension: (id: string | null) => set({ draggedExtensionId: id }),
 }))

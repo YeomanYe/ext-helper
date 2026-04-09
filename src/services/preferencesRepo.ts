@@ -27,7 +27,8 @@ export const preferencesRepo = {
       return
     }
 
-    const current = ((await browserAdapter.getStorage(PREFERENCES_STORAGE_KEY)) || {}) as StoredPreferences
+    const current = ((await browserAdapter.getStorage(PREFERENCES_STORAGE_KEY)) ||
+      {}) as StoredPreferences
     await browserAdapter.setStorage(PREFERENCES_STORAGE_KEY, { ...current, ...updates })
-  }
+  },
 }

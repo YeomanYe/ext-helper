@@ -23,7 +23,7 @@ export function GroupExtensionPicker({
   disableEnableControls,
   showEnableActions = true,
   onToggleAll,
-  onToggleMembership
+  onToggleMembership,
 }: GroupExtensionPickerProps) {
   const allEnabled = extensions.length > 0 && extensions.every((extension) => extension.enabled)
   const allDisabled = extensions.length > 0 && extensions.every((extension) => !extension.enabled)
@@ -33,7 +33,9 @@ export function GroupExtensionPicker({
     <>
       {showEnableActions && (
         <div className="flex items-center gap-2 px-4 py-2 border-b border-punk-border/30 bg-punk-bg shrink-0">
-          <span className="font-punk-heading text-[12px] text-punk-text-muted uppercase">ACTIONS</span>
+          <span className="font-punk-heading text-[12px] text-punk-text-muted uppercase">
+            ACTIONS
+          </span>
           <button
             onClick={() => onToggleAll(true)}
             disabled={disableEnableControls || extensions.length === 0 || allEnabled}
@@ -115,10 +117,12 @@ export function GroupExtensionPicker({
                     <Package className="w-4 h-4 text-punk-text-muted" />
                   </div>
                 )}
-                <span className={cn(
-                  "font-punk-heading text-[10px] uppercase text-center truncate w-full mt-1",
-                  extension.isInGroup ? "text-punk-text-primary" : "text-punk-text-muted"
-                )}>
+                <span
+                  className={cn(
+                    "font-punk-heading text-[10px] uppercase text-center truncate w-full mt-1",
+                    extension.isInGroup ? "text-punk-text-primary" : "text-punk-text-muted"
+                  )}
+                >
                   {extension.name.substring(0, 8)}
                 </span>
               </div>
@@ -126,9 +130,7 @@ export function GroupExtensionPicker({
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-8 text-center">
-            <p className="font-punk-body text-base text-punk-text-muted">
-              NO_MATCH_FOUND
-            </p>
+            <p className="font-punk-body text-base text-punk-text-muted">NO_MATCH_FOUND</p>
           </div>
         )}
       </div>

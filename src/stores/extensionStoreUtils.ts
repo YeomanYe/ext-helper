@@ -8,7 +8,7 @@ type ExtensionSnapshot = Extension[]
 export const cloneExtensions = (extensions: Extension[]): ExtensionSnapshot =>
   extensions.map((extension) => ({
     ...extension,
-    permissions: [...extension.permissions]
+    permissions: [...extension.permissions],
   }))
 
 export const buildHistoryMeta = (history: ExtensionSnapshot[], future: ExtensionSnapshot[]) => ({
@@ -17,13 +17,13 @@ export const buildHistoryMeta = (history: ExtensionSnapshot[], future: Extension
   canUndo: history.length > 0,
   canRedo: future.length > 0,
   undoCount: history.length,
-  redoCount: future.length
+  redoCount: future.length,
 })
 
 export const withHistoryCleared = (extensions: ExtensionSnapshot) => ({
   extensions,
   ...buildHistoryMeta([], []),
-  bisectSession: createIdleBisectSession()
+  bisectSession: createIdleBisectSession(),
 })
 
 export const setPendingHistoryMeta = (history: ExtensionSnapshot[]) => ({
@@ -32,5 +32,5 @@ export const setPendingHistoryMeta = (history: ExtensionSnapshot[]) => ({
   undoCount: history.length + 1,
   redoCount: 0,
   history,
-  future: []
+  future: [],
 })

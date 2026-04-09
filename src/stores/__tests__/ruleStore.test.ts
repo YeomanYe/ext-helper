@@ -4,11 +4,11 @@ import type { Rule } from "@/rules/types"
 const repo = vi.hoisted(() => ({
   fetchAll: vi.fn(),
   saveAll: vi.fn(),
-  generateId: vi.fn()
+  generateId: vi.fn(),
 }))
 
 vi.mock("@/services/rulesRepo", () => ({
-  rulesRepo: repo
+  rulesRepo: repo,
 }))
 
 const baseRule: Rule = {
@@ -21,7 +21,7 @@ const baseRule: Rule = {
   priority: 1,
   createdAt: 1,
   updatedAt: 1,
-  triggerCount: 5
+  triggerCount: 5,
 }
 
 const secondRule: Rule = {
@@ -34,7 +34,7 @@ const secondRule: Rule = {
   priority: 2,
   createdAt: 2,
   updatedAt: 2,
-  triggerCount: 0
+  triggerCount: 0,
 }
 
 describe("ruleStore", () => {
@@ -60,7 +60,7 @@ describe("ruleStore", () => {
         conditionGroups: [],
         conditionOperator: "AND" as const,
         actions: [{ type: "disableExtension" as const, targetId: "ext-2" }],
-        priority: 3
+        priority: 3,
       }
 
       await useRuleStore.getState().createRule(ruleData)
@@ -86,7 +86,7 @@ describe("ruleStore", () => {
         conditionGroups: [],
         conditionOperator: "AND",
         actions: [],
-        priority: 1
+        priority: 1,
       })
 
       expect(useRuleStore.getState().error).toBeNull()
@@ -103,7 +103,7 @@ describe("ruleStore", () => {
         conditionGroups: [],
         conditionOperator: "AND",
         actions: [],
-        priority: 1
+        priority: 1,
       })
 
       expect(useRuleStore.getState().rules).toHaveLength(2)
@@ -131,7 +131,9 @@ describe("ruleStore", () => {
       const { useRuleStore } = await import("../ruleStore")
       await useRuleStore.getState().fetchRules()
 
-      await useRuleStore.getState().updateRule("r1", { name: "New Name", priority: 10, enabled: false })
+      await useRuleStore
+        .getState()
+        .updateRule("r1", { name: "New Name", priority: 10, enabled: false })
 
       const updated = useRuleStore.getState().rules[0]
       expect(updated.name).toBe("New Name")

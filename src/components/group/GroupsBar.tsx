@@ -19,7 +19,7 @@ export function GroupsBar({
   disabled = false,
   onSelectGroup,
   onToggleGroup,
-  onCreateGroup
+  onCreateGroup,
 }: GroupsBarProps) {
   const [showMore, setShowMore] = React.useState(false)
   const [visibleCount, setVisibleCount] = React.useState(-1)
@@ -42,10 +42,16 @@ export function GroupsBar({
   React.useLayoutEffect(() => {
     if (visibleCount !== -1) return
     const container = containerRef.current
-    if (!container) { setVisibleCount(chipData.length); return }
+    if (!container) {
+      setVisibleCount(chipData.length)
+      return
+    }
 
     const children = Array.from(container.children) as HTMLElement[]
-    if (children.length <= 1) { setVisibleCount(chipData.length); return }
+    if (children.length <= 1) {
+      setVisibleCount(chipData.length)
+      return
+    }
 
     const firstTop = children[0].offsetTop
     let secondRowTop = -1
@@ -101,9 +107,7 @@ export function GroupsBar({
           />
         ))}
 
-        {(isMeasuring || !needsCollapse) && (
-          <CreateGroupChip onClick={onCreateGroup} />
-        )}
+        {(isMeasuring || !needsCollapse) && <CreateGroupChip onClick={onCreateGroup} />}
 
         {needsCollapse && (
           <div className="relative flex-1" ref={moreRef}>

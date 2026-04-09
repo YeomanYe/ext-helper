@@ -2,10 +2,11 @@ import { beforeEach, describe, expect, it, vi } from "vitest"
 
 // Mock isDevMode to return true so we exercise devStorage paths
 vi.mock("@/services/mockData", async (importOriginal) => {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-imports
   const original = await importOriginal<typeof import("@/services/mockData")>()
   return {
     ...original,
-    isDevMode: () => true
+    isDevMode: () => true,
   }
 })
 
@@ -13,9 +14,15 @@ vi.mock("@/services/mockData", async (importOriginal) => {
 const store: Record<string, string> = {}
 vi.stubGlobal("localStorage", {
   getItem: (key: string) => store[key] ?? null,
-  setItem: (key: string, value: string) => { store[key] = value },
-  removeItem: (key: string) => { delete store[key] },
-  clear: () => { Object.keys(store).forEach((k) => delete store[k]) }
+  setItem: (key: string, value: string) => {
+    store[key] = value
+  },
+  removeItem: (key: string) => {
+    delete store[key]
+  },
+  clear: () => {
+    Object.keys(store).forEach((k) => delete store[k])
+  },
 })
 
 // Clear localStorage between tests
@@ -78,7 +85,11 @@ describe("extensionsRepo", () => {
   it("normal: applySnapshot replaces all extensions", async () => {
     const { extensionsRepo } = await import("@/services/extensionsRepo")
     const original = await extensionsRepo.fetchAll()
-    const snapshot = original.map((e) => ({ ...e, enabled: false, permissions: [...e.permissions] }))
+    const snapshot = original.map((e) => ({
+      ...e,
+      enabled: false,
+      permissions: [...e.permissions],
+    }))
 
     await extensionsRepo.applySnapshot(original, snapshot)
 
@@ -99,7 +110,7 @@ describe("extensionsRepo", () => {
       candidateIds: ["a"],
       currentTestIds: ["a"],
       parkedIds: [],
-      step: 1
+      step: 1,
     }
 
     await extensionsRepo.saveBisectSession(session)
@@ -121,7 +132,7 @@ describe("extensionsRepo", () => {
       candidateIds: [],
       currentTestIds: [],
       parkedIds: [],
-      step: 0
+      step: 0,
     })
     expect(await extensionsRepo.loadBisectSession()).not.toBeNull()
 
@@ -181,8 +192,8 @@ describe("groupsRepo", () => {
         createdAt: Date.now(),
         updatedAt: Date.now(),
         isExpanded: true,
-        order: 0
-      }
+        order: 0,
+      },
     ]
 
     await groupsRepo.saveAll(newGroups)
@@ -259,16 +270,16 @@ describe("rulesRepo", () => {
             id: "cg-1",
             domains: ["example.com"],
             matchMode: "exact" as const,
-            schedule: null
-          }
+            schedule: null,
+          },
         ],
         conditionOperator: "AND" as const,
         actions: [{ type: "enableExtension" as const, targetId: "ext-1" }],
         priority: 1,
         createdAt: Date.now(),
         updatedAt: Date.now(),
-        triggerCount: 0
-      }
+        triggerCount: 0,
+      },
     ]
 
     await rulesRepo.saveAll(newRules)
@@ -303,17 +314,17 @@ describe("rulesRepo", () => {
             schedule: {
               days: [1, 2, 3],
               startTime: "09:00",
-              endTime: "17:00"
-            }
-          }
+              endTime: "17:00",
+            },
+          },
         ],
         conditionOperator: "AND" as const,
         actions: [{ type: "disableExtension" as const, targetId: "ext-2" }],
         priority: 0,
         createdAt: Date.now(),
         updatedAt: Date.now(),
-        triggerCount: 0
-      }
+        triggerCount: 0,
+      },
     ]
 
     await rulesRepo.saveAll(rules)
@@ -322,7 +333,7 @@ describe("rulesRepo", () => {
     expect(loaded[0].conditionGroups[0].schedule).toEqual({
       days: [1, 2, 3],
       startTime: "09:00",
-      endTime: "17:00"
+      endTime: "17:00",
     })
     // Schedule should be a clone
     expect(loaded[0].conditionGroups[0].schedule!.days).not.toBe(

@@ -1,0 +1,8 @@
+dist/
+dist-web/
+build/
+.plasmo/
+node_modules/
+pnpm-lock.yaml
+*.png
+*.svg

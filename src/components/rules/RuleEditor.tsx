@@ -3,11 +3,7 @@ import { X, Image, Upload } from "lucide-react"
 import { cn } from "@/utils"
 import { ConditionBuilder } from "./ConditionBuilder"
 import { ActionBuilder } from "./ActionBuilder"
-import type {
-  Rule,
-  ConditionGroup,
-  Action,
-} from "@/rules/types"
+import type { Rule, ConditionGroup, Action } from "@/rules/types"
 
 interface RuleEditorProps {
   rule: Rule | null
@@ -68,7 +64,7 @@ export function RuleEditor({ rule, onSave, onClose }: RuleEditorProps) {
     if (file) {
       const reader = new FileReader()
       reader.onload = (event) => {
-        setIconUrl(event.target?.result as string || "")
+        setIconUrl((event.target?.result as string) || "")
       }
       reader.readAsDataURL(file)
     }
@@ -105,11 +101,7 @@ export function RuleEditor({ rule, onSave, onClose }: RuleEditorProps) {
               <div className="relative w-[96px] h-[96px] border border-punk-border/50 bg-punk-bg rounded overflow-hidden group">
                 {iconUrl ? (
                   <>
-                    <img
-                      src={iconUrl}
-                      alt="Rule icon"
-                      className="w-full h-full object-cover"
-                    />
+                    <img src={iconUrl} alt="Rule icon" className="w-full h-full object-cover" />
                     <div className="absolute inset-0 bg-punk-bg/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                       <label className="cursor-pointer p-2 text-punk-text-muted hover:text-punk-accent transition-colors">
                         <Upload className="h-5 w-5" />
@@ -185,10 +177,7 @@ export function RuleEditor({ rule, onSave, onClose }: RuleEditorProps) {
             <label className="font-punk-heading text-[11px] text-punk-text-muted uppercase mb-1">
               CONDITIONS (MATCH ANY)
             </label>
-            <ConditionBuilder
-              conditions={conditionGroups}
-              onChange={setConditionGroups}
-            />
+            <ConditionBuilder conditions={conditionGroups} onChange={setConditionGroups} />
           </div>
 
           {/* Actions */}

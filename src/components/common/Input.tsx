@@ -10,9 +10,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="relative">
         {icon && (
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-punk-accent">
-            {icon}
-          </div>
+          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-punk-accent">{icon}</div>
         )}
         <input
           type={type}

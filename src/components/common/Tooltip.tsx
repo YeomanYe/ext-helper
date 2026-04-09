@@ -57,32 +57,34 @@ export function Tooltip({ content, children, className }: TooltipProps) {
   return (
     <>
       {child}
-      {visible && typeof document !== "undefined" && createPortal(
-        <div
-          ref={tooltipRef}
-          className={cn(
-            "fixed z-[200] px-2.5 py-1.5 pointer-events-none",
-            "border border-punk-neon-cyan/30 bg-punk-bg",
-            "shadow-[0_0_12px_rgba(0,255,255,0.15),0_2px_8px_rgba(0,0,0,0.6)]",
-            "font-punk-code text-[11px] text-punk-text-primary leading-relaxed",
-            "max-w-[260px]",
-            className
-          )}
-          style={{
-            top: position.top,
-            left: position.left,
-            transform: "translate(-50%, -100%)",
-          }}
-        >
-          {/* HUD corner accents */}
-          <div className="absolute -top-px -left-px w-1.5 h-1.5 border-t border-l border-punk-neon-cyan/60" />
-          <div className="absolute -top-px -right-px w-1.5 h-1.5 border-t border-r border-punk-neon-cyan/60" />
-          <div className="absolute -bottom-px -left-px w-1.5 h-1.5 border-b border-l border-punk-neon-cyan/60" />
-          <div className="absolute -bottom-px -right-px w-1.5 h-1.5 border-b border-r border-punk-neon-cyan/60" />
-          {content}
-        </div>,
-        document.body
-      )}
+      {visible &&
+        typeof document !== "undefined" &&
+        createPortal(
+          <div
+            ref={tooltipRef}
+            className={cn(
+              "fixed z-[200] px-2.5 py-1.5 pointer-events-none",
+              "border border-punk-neon-cyan/30 bg-punk-bg",
+              "shadow-[0_0_12px_rgba(0,255,255,0.15),0_2px_8px_rgba(0,0,0,0.6)]",
+              "font-punk-code text-[11px] text-punk-text-primary leading-relaxed",
+              "max-w-[260px]",
+              className
+            )}
+            style={{
+              top: position.top,
+              left: position.left,
+              transform: "translate(-50%, -100%)",
+            }}
+          >
+            {/* HUD corner accents */}
+            <div className="absolute -top-px -left-px w-1.5 h-1.5 border-t border-l border-punk-neon-cyan/60" />
+            <div className="absolute -top-px -right-px w-1.5 h-1.5 border-t border-r border-punk-neon-cyan/60" />
+            <div className="absolute -bottom-px -left-px w-1.5 h-1.5 border-b border-l border-punk-neon-cyan/60" />
+            <div className="absolute -bottom-px -right-px w-1.5 h-1.5 border-b border-r border-punk-neon-cyan/60" />
+            {content}
+          </div>,
+          document.body
+        )}
     </>
   )
 }

@@ -42,7 +42,9 @@ const Switch = React.forwardRef<HTMLButtonElement, SwitchProps>(
         <span
           className={cn(
             "pointer-events-none block h-4 w-4 rounded-none bg-punk-text-primary shadow-lg transition-all duration-200",
-            checked ? "translate-x-5 bg-punk-success shadow-[0_0_10px_rgba(16,185,129,0.8)]" : "translate-x-0.5"
+            checked
+              ? "translate-x-5 bg-punk-success shadow-[0_0_10px_rgba(16,185,129,0.8)]"
+              : "translate-x-0.5"
           )}
         />
       </button>

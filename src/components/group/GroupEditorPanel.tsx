@@ -29,10 +29,12 @@ export function GroupEditorPanel({
   onNameCommit,
   onSearchQueryChange,
   onFilterChange,
-  onImageUpload
+  onImageUpload,
 }: GroupEditorPanelProps) {
   const fileInputRef = React.useRef<HTMLInputElement>(null)
-  const groupIcon = group?.iconUrl ? null : GROUP_ICON_MAP[group?.icon || "folder"] || <Folder className="w-4 h-4" />
+  const groupIcon = group?.iconUrl
+    ? null
+    : GROUP_ICON_MAP[group?.icon || "folder"] || <Folder className="w-4 h-4" />
 
   return (
     <div className="flex gap-3 px-4 py-2 border-b border-punk-border/30 bg-punk-bg shrink-0">
@@ -73,7 +75,12 @@ export function GroupEditorPanel({
                 <div className="absolute inset-0 bg-punk-bg/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                   <label className="cursor-pointer p-2 text-punk-text-muted hover:text-punk-accent transition-colors">
                     <Upload className="h-5 w-5" />
-                    <input type="file" accept="image/*" onChange={onImageUpload} className="hidden" />
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={onImageUpload}
+                      className="hidden"
+                    />
                   </label>
                 </div>
               </>

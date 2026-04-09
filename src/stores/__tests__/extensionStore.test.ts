@@ -8,11 +8,11 @@ const repo = vi.hoisted(() => ({
   remove: vi.fn(),
   loadBisectSession: vi.fn(),
   saveBisectSession: vi.fn(),
-  clearBisectSession: vi.fn()
+  clearBisectSession: vi.fn(),
 }))
 
 vi.mock("@/services/extensionsRepo", () => ({
-  extensionsRepo: repo
+  extensionsRepo: repo,
 }))
 
 const makeExtension = (overrides: Partial<Extension> = {}): Extension => ({
@@ -26,12 +26,12 @@ const makeExtension = (overrides: Partial<Extension> = {}): Extension => ({
   installType: "normal",
   optionsUrl: null,
   homepageUrl: null,
-  ...overrides
+  ...overrides,
 })
 
 const sampleExtensions: Extension[] = [
   makeExtension({ id: "a", name: "Alpha", description: "" }),
-  makeExtension({ id: "b", name: "Beta", description: "" })
+  makeExtension({ id: "b", name: "Beta", description: "" }),
 ]
 
 async function createStore(extensions?: Extension[]) {
@@ -89,12 +89,12 @@ describe("extensionStore", () => {
       candidateIds: ["a", "b"],
       currentTestIds: ["a"],
       parkedIds: ["b"],
-      step: 1
+      step: 1,
     }
 
     repo.fetchAll.mockResolvedValue([
       { ...sampleExtensions[0], enabled: true },
-      { ...sampleExtensions[1], enabled: false }
+      { ...sampleExtensions[1], enabled: false },
     ])
     repo.loadBisectSession.mockResolvedValue(persistedSession)
 
@@ -119,7 +119,7 @@ describe("extensionStore", () => {
     it("normal: should toggle a disabled extension to enabled", async () => {
       const exts = [
         makeExtension({ id: "a", name: "Alpha", enabled: false }),
-        makeExtension({ id: "b", name: "Beta" })
+        makeExtension({ id: "b", name: "Beta" }),
       ]
       const store = await createStore(exts)
       await store.getState().toggleExtension("a")
@@ -245,7 +245,7 @@ describe("extensionStore", () => {
     it("normal: should batch-enable extensions that are disabled", async () => {
       const exts = [
         makeExtension({ id: "a", enabled: false }),
-        makeExtension({ id: "b", enabled: false })
+        makeExtension({ id: "b", enabled: false }),
       ]
       const store = await createStore(exts)
       await store.getState().setExtensionsEnabled(["a", "b"], true)
@@ -523,7 +523,7 @@ describe("extensionStore", () => {
     it("edge: should set error when zero enabled extensions", async () => {
       const exts = [
         makeExtension({ id: "a", enabled: false }),
-        makeExtension({ id: "b", enabled: false })
+        makeExtension({ id: "b", enabled: false }),
       ]
       const store = await createStore(exts)
       await store.getState().startBisect()
@@ -590,7 +590,7 @@ describe("extensionStore", () => {
       // markBisectGood => candidates = parkedIds = [ext1], length=1 => resolved
       const exts = [
         makeExtension({ id: "ext0", name: "Ext0" }),
-        makeExtension({ id: "ext1", name: "Ext1" })
+        makeExtension({ id: "ext1", name: "Ext1" }),
       ]
       const store = await createStore(exts)
       await store.getState().startBisect()
@@ -611,10 +611,7 @@ describe("extensionStore", () => {
     })
 
     it("edge: should do nothing when phase is not running", async () => {
-      const exts = [
-        makeExtension({ id: "ext0" }),
-        makeExtension({ id: "ext1" })
-      ]
+      const exts = [makeExtension({ id: "ext0" }), makeExtension({ id: "ext1" })]
       const store = await createStore(exts)
       await store.getState().startBisect()
       // Resolve it first
@@ -687,7 +684,7 @@ describe("extensionStore", () => {
       // markBisectBad => candidates = currentTestIds = [ext0], length=1 => resolved
       const exts = [
         makeExtension({ id: "ext0", name: "Ext0" }),
-        makeExtension({ id: "ext1", name: "Ext1" })
+        makeExtension({ id: "ext1", name: "Ext1" }),
       ]
       const store = await createStore(exts)
       await store.getState().startBisect()
@@ -708,10 +705,7 @@ describe("extensionStore", () => {
     })
 
     it("edge: should do nothing when phase is not running", async () => {
-      const exts = [
-        makeExtension({ id: "ext0" }),
-        makeExtension({ id: "ext1" })
-      ]
+      const exts = [makeExtension({ id: "ext0" }), makeExtension({ id: "ext1" })]
       const store = await createStore(exts)
       await store.getState().startBisect()
       await store.getState().markBisectBad()
@@ -896,7 +890,7 @@ describe("extensionStore", () => {
         candidateIds: ["a", "b"],
         currentTestIds: ["a"],
         parkedIds: ["b"],
-        step: 1
+        step: 1,
       }
       // Extensions don't match expected bisect state (both enabled)
       repo.loadBisectSession.mockResolvedValue(inconsistentSession)
@@ -983,8 +977,7 @@ describe("extensionStore", () => {
           if (!searchQuery.trim()) return true
           const query = searchQuery.toLowerCase()
           return (
-            ext.name.toLowerCase().includes(query) ||
-            ext.description.toLowerCase().includes(query)
+            ext.name.toLowerCase().includes(query) || ext.description.toLowerCase().includes(query)
           )
         })
 
@@ -1004,7 +997,7 @@ describe("extensionStore", () => {
     const exts: Extension[] = [
       makeExtension({ id: "z", name: "Zebra", description: "animal plugin", enabled: true }),
       makeExtension({ id: "a", name: "Apple", description: "fruit plugin", enabled: false }),
-      makeExtension({ id: "m", name: "Mango", description: "fruit plugin", enabled: true })
+      makeExtension({ id: "m", name: "Mango", description: "fruit plugin", enabled: true }),
     ]
 
     it("normal: should return all extensions sorted by name with filter=all", () => {

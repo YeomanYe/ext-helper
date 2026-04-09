@@ -2,11 +2,11 @@ import { beforeEach, describe, expect, it, vi } from "vitest"
 
 const repo = vi.hoisted(() => ({
   fetch: vi.fn(),
-  save: vi.fn()
+  save: vi.fn(),
 }))
 
 vi.mock("@/services/preferencesRepo", () => ({
-  preferencesRepo: repo
+  preferencesRepo: repo,
 }))
 
 describe("uiStore", () => {
@@ -21,7 +21,7 @@ describe("uiStore", () => {
       theme: "dark",
       compactMode: true,
       showDisabled: false,
-      viewMode: "detail"
+      viewMode: "detail",
     })
     repo.save.mockResolvedValue(undefined)
 
@@ -35,17 +35,17 @@ describe("uiStore", () => {
           classList: {
             add: addFn,
             remove: removeFn,
-            toggle: toggleFn
-          }
-        }
+            toggle: toggleFn,
+          },
+        },
       },
-      configurable: true
+      configurable: true,
     })
     Object.defineProperty(globalThis, "window", {
       value: {
-        matchMedia: vi.fn(() => ({ matches: true }))
+        matchMedia: vi.fn(() => ({ matches: true })),
       },
-      configurable: true
+      configurable: true,
     })
   })
 
@@ -102,10 +102,7 @@ describe("uiStore", () => {
 
       // State should still be updated even though save failed
       expect(useUIStore.getState().theme).toBe("dark")
-      expect(consoleSpy).toHaveBeenCalledWith(
-        "Failed to save theme preference:",
-        expect.any(Error)
-      )
+      expect(consoleSpy).toHaveBeenCalledWith("Failed to save theme preference:", expect.any(Error))
       consoleSpy.mockRestore()
     })
   })
@@ -255,7 +252,7 @@ describe("uiStore", () => {
         theme: "light",
         compactMode: false,
         showDisabled: true,
-        viewMode: "compact"
+        viewMode: "compact",
       })
 
       const { initializeUIStore, useUIStore } = await import("../uiStore")
@@ -271,7 +268,7 @@ describe("uiStore", () => {
         theme: "system",
         compactMode: false,
         showDisabled: true,
-        viewMode: "compact"
+        viewMode: "compact",
       })
 
       const { initializeUIStore } = await import("../uiStore")
@@ -320,10 +317,7 @@ describe("uiStore", () => {
       const state = useUIStore.getState()
       expect(state.theme).toBe("system")
       expect(state.compactMode).toBe(false)
-      expect(consoleSpy).toHaveBeenCalledWith(
-        "Failed to initialize UI store:",
-        expect.any(Error)
-      )
+      expect(consoleSpy).toHaveBeenCalledWith("Failed to initialize UI store:", expect.any(Error))
       consoleSpy.mockRestore()
     })
   })

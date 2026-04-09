@@ -304,7 +304,9 @@ function MatchModeDropdown({
         <span className="font-punk-heading uppercase text-punk-text-secondary">
           {currentMode.label}
         </span>
-        <ChevronDown className={cn("h-2.5 w-2.5 text-punk-text-muted", showDropdown && "rotate-180")} />
+        <ChevronDown
+          className={cn("h-2.5 w-2.5 text-punk-text-muted", showDropdown && "rotate-180")}
+        />
       </button>
 
       {showDropdown && (

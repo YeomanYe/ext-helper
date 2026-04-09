@@ -12,7 +12,15 @@ interface RuleListProps {
   viewMode?: ViewMode
 }
 
-export function RuleList({ rules, extensions, groups, onToggle, onEdit, onDelete, viewMode = "card" }: RuleListProps) {
+export function RuleList({
+  rules,
+  extensions,
+  groups,
+  onToggle,
+  onEdit,
+  onDelete,
+  viewMode = "card",
+}: RuleListProps) {
   if (rules.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-8 text-center">
@@ -27,7 +35,13 @@ export function RuleList({ rules, extensions, groups, onToggle, onEdit, onDelete
   }
 
   return (
-    <div className={viewMode === "compact" ? "grid grid-cols-[repeat(auto-fill,minmax(80px,1fr))] gap-2" : "flex flex-wrap gap-2"}>
+    <div
+      className={
+        viewMode === "compact"
+          ? "grid grid-cols-[repeat(auto-fill,minmax(80px,1fr))] gap-2"
+          : "flex flex-wrap gap-2"
+      }
+    >
       {rules.map((rule) => (
         <RuleCard
           key={rule.id}

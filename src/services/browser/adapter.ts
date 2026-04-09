@@ -4,7 +4,10 @@ declare const chrome: any
 declare const browser: any
 
 export class BrowserError extends Error {
-  constructor(message: string, public code?: string) {
+  constructor(
+    message: string,
+    public code?: string
+  ) {
     super(message)
     this.name = "BrowserError"
   }
@@ -33,11 +36,12 @@ function isManifestV3(): boolean {
 
 async function getExtensions(): Promise<Extension[]> {
   const browserType = detectBrowser()
-  const selfId = typeof chrome !== "undefined" && chrome.runtime?.id
-    ? chrome.runtime.id
-    : typeof browser !== "undefined" && browser.runtime?.id
-      ? browser.runtime.id
-      : null
+  const selfId =
+    typeof chrome !== "undefined" && chrome.runtime?.id
+      ? chrome.runtime.id
+      : typeof browser !== "undefined" && browser.runtime?.id
+        ? browser.runtime.id
+        : null
 
   try {
     if (browserType === "firefox") {
@@ -100,7 +104,7 @@ function formatFirefoxExtension(ext: any): Extension {
     disabledReason: ext.disabledReason || null,
     offlineEnabled: ext.offlineEnabled ?? false,
     optionsUrl: ext.optionsUrl || null,
-    homepageUrl: ext.homepageUrl || null
+    homepageUrl: ext.homepageUrl || null,
   }
 }
 
@@ -340,10 +344,7 @@ async function clearAlarm(name: string): Promise<void> {
 
 // ---------- Messaging API ----------
 
-function sendMessage(
-  message: any,
-  callback?: (response: any) => void
-): void {
+function sendMessage(message: any, callback?: (response: any) => void): void {
   const browserType = detectBrowser()
 
   try {

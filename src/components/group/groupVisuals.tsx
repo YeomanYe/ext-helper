@@ -16,12 +16,18 @@ import {
   Flame,
   Gem,
   Crown,
-  Target
+  Target,
 } from "lucide-react"
 
 export const GROUP_COLORS = [
-  "#EF4444", "#F97316", "#F59E0B", "#22C55E",
-  "#14B8A6", "#3B82F6", "#8B5CF6", "#EC4899"
+  "#EF4444",
+  "#F97316",
+  "#F59E0B",
+  "#22C55E",
+  "#14B8A6",
+  "#3B82F6",
+  "#8B5CF6",
+  "#EC4899",
 ]
 
 export const GROUP_ICON_MAP: Record<string, React.ReactNode> = {
@@ -42,5 +48,5 @@ export const GROUP_ICON_MAP: Record<string, React.ReactNode> = {
   flame: <Flame className="w-4 h-4" />,
   gem: <Gem className="w-4 h-4" />,
   crown: <Crown className="w-4 h-4" />,
-  target: <Target className="w-4 h-4" />
+  target: <Target className="w-4 h-4" />,
 }

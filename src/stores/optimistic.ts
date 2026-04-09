@@ -19,7 +19,7 @@ export async function runOptimisticMutation<TState, TSnapshot>(
   const snapshot = options.snapshot(before)
 
   set({
-    ...options.apply(before)
+    ...options.apply(before),
   } as Partial<TState>)
 
   try {
@@ -28,7 +28,7 @@ export async function runOptimisticMutation<TState, TSnapshot>(
     const current = get()
     set({
       ...options.rollback(snapshot, current),
-      ...options.onError(error)
+      ...options.onError(error),
     } as Partial<TState>)
   }
 }

@@ -18,7 +18,10 @@ interface GroupModalProps {
   onDeleteGroup?: (id: string) => void
   onAddExtension?: (groupId: string, extId: string) => void
   onRemoveFromGroup?: (groupId: string, extId: string) => void
-  onUpdateGroup?: (groupId: string, updates: { name?: string; color?: string; icon?: string; iconUrl?: string }) => void
+  onUpdateGroup?: (
+    groupId: string,
+    updates: { name?: string; color?: string; icon?: string; iconUrl?: string }
+  ) => void
 }
 
 interface ExtensionWithStatus extends Extension {
@@ -36,7 +39,7 @@ export function GroupModal({
   onDeleteGroup,
   onAddExtension,
   onRemoveFromGroup,
-  onUpdateGroup
+  onUpdateGroup,
 }: GroupModalProps) {
   const isCreateMode = !group
   const [searchQuery, setSearchQuery] = React.useState("")
@@ -57,23 +60,24 @@ export function GroupModal({
         ...extension,
         isInGroup: isCreateMode
           ? selectedExtensions.has(extension.id)
-          : groupExtensionIds.has(extension.id)
+          : groupExtensionIds.has(extension.id),
       })),
     [allExtensions, groupExtensionIds, isCreateMode, selectedExtensions]
   )
 
   const filteredExtensions = React.useMemo(
-    () => extensionsWithStatus.filter((extension) => {
-      if (filter === "enabled" && !extension.enabled) return false
-      if (filter === "disabled" && extension.enabled) return false
-      if (!searchQuery.trim()) return true
+    () =>
+      extensionsWithStatus.filter((extension) => {
+        if (filter === "enabled" && !extension.enabled) return false
+        if (filter === "disabled" && extension.enabled) return false
+        if (!searchQuery.trim()) return true
 
-      const query = searchQuery.toLowerCase()
-      return (
-        extension.name.toLowerCase().includes(query) ||
-        extension.description.toLowerCase().includes(query)
-      )
-    }),
+        const query = searchQuery.toLowerCase()
+        return (
+          extension.name.toLowerCase().includes(query) ||
+          extension.description.toLowerCase().includes(query)
+        )
+      }),
     [extensionsWithStatus, filter, searchQuery]
   )
 
@@ -155,12 +159,20 @@ export function GroupModal({
 
   const handleCreate = () => {
     if (!onCreate || !editName.trim()) return
-    onCreate(editName.trim(), group?.color || "#EF4444", Array.from(selectedExtensions), editIconUrl)
+    onCreate(
+      editName.trim(),
+      group?.color || "#EF4444",
+      Array.from(selectedExtensions),
+      editIconUrl
+    )
     onClose()
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-punk-bg/80 backdrop-blur-sm" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-punk-bg/80 backdrop-blur-sm"
+      onClick={onClose}
+    >
       <div
         className="w-[480px] h-[575px] border border-punk-border bg-punk-bg-alt shadow-[0_0_30px_rgba(124,58,237,0.4)] overflow-hidden flex flex-col"
         onClick={(event) => event.stopPropagation()}

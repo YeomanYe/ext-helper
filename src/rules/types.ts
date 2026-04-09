@@ -11,7 +11,7 @@ export type ConditionOperator = "AND" | "OR"
 // 域名条件 - 支持多个域名 pattern
 export interface DomainCondition {
   type: "domain"
-  patterns: string[]  // 支持多个域名
+  patterns: string[] // 支持多个域名
   matchMode: MatchMode
 }
 
@@ -25,14 +25,14 @@ export interface ScheduleCondition {
 
 // 条件组：域名列表 + 时间条件（视觉和逻辑上分组）
 export interface ConditionGroup {
-  id: string  // 条件组唯一ID
-  domains: string[]  // 多个域名
-  matchMode: MatchMode  // 匹配模式（适用于所有域名）
+  id: string // 条件组唯一ID
+  domains: string[] // 多个域名
+  matchMode: MatchMode // 匹配模式（适用于所有域名）
   schedule: {
     days: number[]
     startTime: string
     endTime: string
-  } | null  // 可选，不设置表示不限时间
+  } | null // 可选，不设置表示不限时间
 }
 
 // 联合条件类型（兼容旧数据）
@@ -40,11 +40,7 @@ export type Condition = DomainCondition | ScheduleCondition | ConditionGroup
 
 // ---------- 动作类型 ----------
 
-export type ActionType =
-  | "enableExtension"
-  | "disableExtension"
-  | "enableGroup"
-  | "disableGroup"
+export type ActionType = "enableExtension" | "disableExtension" | "enableGroup" | "disableGroup"
 
 export interface Action {
   type: ActionType
@@ -76,9 +72,7 @@ export interface RuleStore {
   loading: boolean
   error: string | null
   fetchRules: () => Promise<void>
-  createRule: (
-    rule: Omit<Rule, "id" | "createdAt" | "updatedAt" | "triggerCount">
-  ) => Promise<void>
+  createRule: (rule: Omit<Rule, "id" | "createdAt" | "updatedAt" | "triggerCount">) => Promise<void>
   updateRule: (id: string, updates: Partial<Rule>) => Promise<void>
   deleteRule: (id: string) => Promise<void>
   toggleRule: (id: string) => Promise<void>

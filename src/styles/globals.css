@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -6,22 +6,22 @@
 
 :root {
   /* Punk Color System */
-  --punk-primary: #7C3AED;
-  --punk-secondary: #A78BFA;
-  --punk-cta: #F43F5E;
-  --punk-accent: #22D3EE;
-  --punk-success: #10B981;
-  --punk-warning: #FBBF24;
-  --punk-error: #F43F5E;
-  --punk-bg: #0F0F23;
-  --punk-bg-alt: #1A1A2E;
-  --punk-border: #7C3AED;
-  --punk-text-primary: #E2E8F0;
-  --punk-text-secondary: #94A3B8;
-  --punk-text-muted: #78859B;
-  --punk-neon-pink: #FF00FF;
-  --punk-neon-cyan: #00FFFF;
-  --punk-neon-yellow: #FFFF00;
+  --punk-primary: #7c3aed;
+  --punk-secondary: #a78bfa;
+  --punk-cta: #f43f5e;
+  --punk-accent: #22d3ee;
+  --punk-success: #10b981;
+  --punk-warning: #fbbf24;
+  --punk-error: #f43f5e;
+  --punk-bg: #0f0f23;
+  --punk-bg-alt: #1a1a2e;
+  --punk-border: #7c3aed;
+  --punk-text-primary: #e2e8f0;
+  --punk-text-secondary: #94a3b8;
+  --punk-text-muted: #78859b;
+  --punk-neon-pink: #ff00ff;
+  --punk-neon-cyan: #00ffff;
+  --punk-neon-yellow: #ffff00;
 }
 
 /* Base Punk Theme */
@@ -31,7 +31,8 @@
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   width: 680px;
   height: 600px;
 }
@@ -198,24 +199,51 @@ body::after {
 }
 
 @keyframes glitch-1 {
-  0%, 100% { transform: translate(0); }
-  20% { transform: translate(-2px, 2px); }
-  40% { transform: translate(-2px, -2px); }
-  60% { transform: translate(2px, 2px); }
-  80% { transform: translate(2px, -2px); }
+  0%,
+  100% {
+    transform: translate(0);
+  }
+  20% {
+    transform: translate(-2px, 2px);
+  }
+  40% {
+    transform: translate(-2px, -2px);
+  }
+  60% {
+    transform: translate(2px, 2px);
+  }
+  80% {
+    transform: translate(2px, -2px);
+  }
 }
 
 @keyframes glitch-2 {
-  0%, 100% { transform: translate(0); }
-  20% { transform: translate(2px, -2px); }
-  40% { transform: translate(2px, 2px); }
-  60% { transform: translate(-2px, -2px); }
-  80% { transform: translate(-2px, 2px); }
+  0%,
+  100% {
+    transform: translate(0);
+  }
+  20% {
+    transform: translate(2px, -2px);
+  }
+  40% {
+    transform: translate(2px, 2px);
+  }
+  60% {
+    transform: translate(-2px, -2px);
+  }
+  80% {
+    transform: translate(-2px, 2px);
+  }
 }
 
 @keyframes flicker {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.97; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.97;
+  }
 }
 
 /* Punk Input Styling */
@@ -255,7 +283,7 @@ button.punk-btn-primary {
   border: 2px solid var(--punk-primary);
   box-shadow:
     0 0 10px var(--punk-primary),
-    0 4px 0 0 #5B21B6;
+    0 4px 0 0 #5b21b6;
 }
 
 button.punk-btn-primary:hover {
@@ -263,7 +291,7 @@ button.punk-btn-primary:hover {
   border-color: var(--punk-secondary);
   box-shadow:
     0 0 20px var(--punk-secondary),
-    0 4px 0 0 #7C3AED;
+    0 4px 0 0 #7c3aed;
   transform: translateY(-2px);
 }
 
@@ -271,7 +299,7 @@ button.punk-btn-primary:active {
   transform: translateY(2px);
   box-shadow:
     0 0 5px var(--punk-primary),
-    0 2px 0 0 #5B21B6;
+    0 2px 0 0 #5b21b6;
 }
 
 /* Terminal-style text */

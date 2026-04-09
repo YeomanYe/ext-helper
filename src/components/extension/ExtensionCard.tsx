@@ -26,7 +26,7 @@ export const ExtensionCard = React.memo(function ExtensionCard({
   disableEnableControls = false,
   disableRemove = false,
   viewMode = "compact",
-  className
+  className,
 }: ExtensionCardProps) {
   const [showMenu, setShowMenu] = React.useState(false)
   const [showConfirmRemove, setShowConfirmRemove] = React.useState(false)
@@ -46,7 +46,7 @@ export const ExtensionCard = React.memo(function ExtensionCard({
     isDetail,
     menuWidth,
     menuHeight,
-    onClose: handleCloseMenu
+    onClose: handleCloseMenu,
   })
 
   const handleContextMenu = (e: React.MouseEvent) => {
@@ -79,14 +79,15 @@ export const ExtensionCard = React.memo(function ExtensionCard({
 
   // Disable toggle when: externally disabled (bisect), or extension is off and can't be enabled
   const isToggleDisabled = disableEnableControls || (!extension.enabled && !extension.mayEnable)
-  const lockedTooltip = !extension.enabled && !extension.mayEnable
-    ? (
+  const lockedTooltip =
+    !extension.enabled && !extension.mayEnable ? (
       <span className="flex items-center gap-1.5">
         <span className="text-punk-cta">BLOCKED</span>
-        <span className="text-punk-text-secondary">This extension is restricted by browser policy and cannot be enabled</span>
+        <span className="text-punk-text-secondary">
+          This extension is restricted by browser policy and cannot be enabled
+        </span>
       </span>
-    )
-    : null
+    ) : null
 
   const isDimmed = !extension.enabled && !showMenu && !showConfirmRemove
 
@@ -169,7 +170,10 @@ export const ExtensionCard = React.memo(function ExtensionCard({
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between gap-2">
                 <div>
-                  <h3 className="font-punk-heading text-[14px] text-punk-text-primary uppercase tracking-wider" title={extension.name}>
+                  <h3
+                    className="font-punk-heading text-[14px] text-punk-text-primary uppercase tracking-wider"
+                    title={extension.name}
+                  >
                     {extension.name}
                   </h3>
                   <p className="font-punk-code text-[10px] text-punk-accent mt-0.5">
@@ -178,10 +182,20 @@ export const ExtensionCard = React.memo(function ExtensionCard({
                 </div>
                 {lockedTooltip ? (
                   <Tooltip content={lockedTooltip}>
-                    <span><Switch checked={extension.enabled} disabled={isToggleDisabled} onCheckedChange={handleToggle} /></span>
+                    <span>
+                      <Switch
+                        checked={extension.enabled}
+                        disabled={isToggleDisabled}
+                        onCheckedChange={handleToggle}
+                      />
+                    </span>
                   </Tooltip>
                 ) : (
-                  <Switch checked={extension.enabled} disabled={isToggleDisabled} onCheckedChange={handleToggle} />
+                  <Switch
+                    checked={extension.enabled}
+                    disabled={isToggleDisabled}
+                    onCheckedChange={handleToggle}
+                  />
                 )}
               </div>
 
@@ -192,12 +206,14 @@ export const ExtensionCard = React.memo(function ExtensionCard({
               )}
 
               <div className="flex items-center flex-wrap gap-1.5 mt-2">
-                <span className={cn(
-                  "px-2 py-0.5 text-[10px] font-punk-heading uppercase border tracking-wider",
-                  extension.enabled
-                    ? "text-punk-success border-punk-success/50 bg-punk-success/10"
-                    : "text-punk-text-muted border-punk-border/30"
-                )}>
+                <span
+                  className={cn(
+                    "px-2 py-0.5 text-[10px] font-punk-heading uppercase border tracking-wider",
+                    extension.enabled
+                      ? "text-punk-success border-punk-success/50 bg-punk-success/10"
+                      : "text-punk-text-muted border-punk-border/30"
+                  )}
+                >
                   {extension.enabled ? "ACTIVE" : "INACTIVE"}
                 </span>
                 <span className="px-2 py-0.5 text-[10px] font-punk-code text-punk-text-muted uppercase border border-punk-border/20">
@@ -345,17 +361,21 @@ export const ExtensionCard = React.memo(function ExtensionCard({
         </div>
 
         <div className="flex-1 min-w-0">
-          <h3 className="font-punk-heading text-[13px] text-punk-text-primary truncate uppercase tracking-wider" title={extension.name}>
+          <h3
+            className="font-punk-heading text-[13px] text-punk-text-primary truncate uppercase tracking-wider"
+            title={extension.name}
+          >
             {extension.name}
           </h3>
           {extension.description && (
-            <p className="font-punk-body text-[11px] text-punk-text-secondary truncate mt-0.5" title={extension.description}>
+            <p
+              className="font-punk-body text-[11px] text-punk-text-secondary truncate mt-0.5"
+              title={extension.description}
+            >
               {extension.description}
             </p>
           )}
-          <p className="font-punk-code text-[10px] text-punk-accent mt-0.5">
-            v{extension.version}
-          </p>
+          <p className="font-punk-code text-[10px] text-punk-accent mt-0.5">v{extension.version}</p>
         </div>
 
         <div onClick={(e) => e.stopPropagation()} className="flex items-center gap-2">
@@ -363,11 +383,19 @@ export const ExtensionCard = React.memo(function ExtensionCard({
             <Tooltip content={lockedTooltip}>
               <span className="flex items-center gap-2">
                 <span className="font-punk-code text-[9px] text-punk-cta uppercase">LOCKED</span>
-                <Switch checked={extension.enabled} disabled={isToggleDisabled} onCheckedChange={handleToggle} />
+                <Switch
+                  checked={extension.enabled}
+                  disabled={isToggleDisabled}
+                  onCheckedChange={handleToggle}
+                />
               </span>
             </Tooltip>
           ) : (
-            <Switch checked={extension.enabled} disabled={isToggleDisabled} onCheckedChange={handleToggle} />
+            <Switch
+              checked={extension.enabled}
+              disabled={isToggleDisabled}
+              onCheckedChange={handleToggle}
+            />
           )}
         </div>
 
@@ -418,7 +446,10 @@ export const ExtensionCard = React.memo(function ExtensionCard({
       </div>
 
       <div className="w-full mt-1">
-        <h3 className="font-punk-heading text-[10px] text-punk-text-primary text-center uppercase tracking-wider truncate" title={extension.name}>
+        <h3
+          className="font-punk-heading text-[10px] text-punk-text-primary text-center uppercase tracking-wider truncate"
+          title={extension.name}
+        >
           {extension.name.substring(0, 14)}
         </h3>
       </div>

@@ -15,7 +15,7 @@ export function ExtensionList({
   onToggle,
   onOpenOptions,
   onRemove,
-  loading
+  loading,
 }: ExtensionListProps) {
   if (loading) {
     return (

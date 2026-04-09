@@ -8,7 +8,7 @@ const GROUPS_STORAGE_KEY = "ext-helper-groups"
 const cloneGroups = (groups: Group[]): Group[] =>
   groups.map((group) => ({
     ...group,
-    extensionIds: [...group.extensionIds]
+    extensionIds: [...group.extensionIds],
   }))
 
 const generateId = () => devStorage.generateId()
@@ -37,5 +37,5 @@ export const groupsRepo = {
     }
 
     await browserAdapter.setStorage(GROUPS_STORAGE_KEY, snapshot)
-  }
+  },
 }

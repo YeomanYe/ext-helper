@@ -4,7 +4,13 @@ import { cn } from "@/utils"
 import type { Rule } from "@/rules/types"
 import type { Extension, Group, ViewMode } from "@/types"
 import { ConfirmDialog } from "@/components/common"
-import { S, ConditionGroupBadge, ConditionGroupDetail, ActionBlock, ActionBadge } from "./RuleBadges"
+import {
+  S,
+  ConditionGroupBadge,
+  ConditionGroupDetail,
+  ActionBlock,
+  ActionBadge,
+} from "./RuleBadges"
 
 interface RuleCardProps {
   rule: Rule
@@ -27,7 +33,7 @@ export const RuleCard = React.memo(function RuleCard({
   onDelete,
   viewMode = "card",
   showDelete = true,
-  className
+  className,
 }: RuleCardProps) {
   const isEnabled = rule.enabled
   const [showConfirmDelete, setShowConfirmDelete] = React.useState(false)
@@ -167,9 +173,7 @@ export const RuleCard = React.memo(function RuleCard({
 
           {/* Conditions */}
           <div className="flex items-center gap-1 mb-2 flex-wrap">
-            <span className="font-punk-heading text-[11px] text-punk-text-muted uppercase">
-              IF
-            </span>
+            <span className="font-punk-heading text-[11px] text-punk-text-muted uppercase">IF</span>
             {rule.conditionGroups.map((group, idx) => (
               <React.Fragment key={idx}>
                 {idx > 0 && (
@@ -189,12 +193,7 @@ export const RuleCard = React.memo(function RuleCard({
             </span>
             <div className="flex flex-wrap gap-1">
               {rule.actions.map((action, idx) => (
-                <ActionBadge
-                  key={idx}
-                  action={action}
-                  extensions={extensions}
-                  groups={groups}
-                />
+                <ActionBadge key={idx} action={action} extensions={extensions} groups={groups} />
               ))}
             </div>
           </div>
@@ -301,69 +300,72 @@ export const RuleCard = React.memo(function RuleCard({
 
             {/* Status line */}
             <div className="flex items-center gap-2 mt-2">
-              <span className={cn(
-                "px-1.5 py-0.5 text-[10px] font-punk-heading uppercase border",
-                isEnabled
-                  ? "text-punk-success border-punk-success/50 bg-punk-success/10"
-                  : "text-punk-text-muted border-punk-border/30"
-              )}>
+              <span
+                className={cn(
+                  "px-1.5 py-0.5 text-[10px] font-punk-heading uppercase border",
+                  isEnabled
+                    ? "text-punk-success border-punk-success/50 bg-punk-success/10"
+                    : "text-punk-text-muted border-punk-border/30"
+                )}
+              >
                 {isEnabled ? "ACTIVE" : "INACTIVE"}
               </span>
               <span className="font-punk-code text-[11px] text-punk-text-muted">
-                {rule.conditionGroups.length} CONDITION{S(rule.conditionGroups.length)} • {rule.actions.length} ACTION{S(rule.actions.length)}
+                {rule.conditionGroups.length} CONDITION{S(rule.conditionGroups.length)} •{" "}
+                {rule.actions.length} ACTION{S(rule.actions.length)}
               </span>
             </div>
           </div>
         </div>
 
         {/* Conditions Section - always expanded */}
-          <div className="border border-punk-border/30 rounded bg-punk-bg/50">
-            <div className="flex items-center gap-2 px-2 py-1.5">
-              <Globe className="w-3 h-3 text-punk-accent" />
-              <span className="font-punk-heading text-[11px] text-punk-text-muted uppercase">
-                CONDITIONS
-              </span>
-            </div>
+        <div className="border border-punk-border/30 rounded bg-punk-bg/50">
+          <div className="flex items-center gap-2 px-2 py-1.5">
+            <Globe className="w-3 h-3 text-punk-accent" />
+            <span className="font-punk-heading text-[11px] text-punk-text-muted uppercase">
+              CONDITIONS
+            </span>
+          </div>
 
-            <div className="px-2 py-2 border-t border-punk-border/20 space-y-1.5">
-              {rule.conditionGroups.map((group, idx) => (
-                <div key={idx}>
-                  {idx > 0 && (
-                    <div className="flex items-center gap-1 mb-1">
-                      <span className="px-1 py-0.5 font-punk-heading text-[10px] text-punk-accent bg-punk-accent/10 border border-punk-accent/30">
-                        OR GROUP {idx + 1}
-                      </span>
-                    </div>
-                  )}
-                  <ConditionGroupDetail group={group} />
-                </div>
+          <div className="px-2 py-2 border-t border-punk-border/20 space-y-1.5">
+            {rule.conditionGroups.map((group, idx) => (
+              <div key={idx}>
+                {idx > 0 && (
+                  <div className="flex items-center gap-1 mb-1">
+                    <span className="px-1 py-0.5 font-punk-heading text-[10px] text-punk-accent bg-punk-accent/10 border border-punk-accent/30">
+                      OR GROUP {idx + 1}
+                    </span>
+                  </div>
+                )}
+                <ConditionGroupDetail group={group} />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Actions Section - display as grid of blocks */}
+        <div className="border border-punk-border/30 rounded bg-punk-bg/50">
+          <div className="flex items-center gap-2 px-2 py-1.5">
+            <Zap className="w-3 h-3 text-punk-cta" />
+            <span className="font-punk-heading text-[11px] text-punk-text-muted uppercase">
+              ACTIONS ({rule.actions.length})
+            </span>
+          </div>
+
+          <div className="px-2 py-2 border-t border-punk-border/20">
+            <div className="flex flex-wrap gap-2">
+              {rule.actions.map((action, idx) => (
+                <ActionBlock
+                  key={idx}
+                  action={action}
+                  extensions={extensions}
+                  groups={groups}
+                  isEnable={action.type.startsWith("enable")}
+                />
               ))}
             </div>
           </div>
-
-          {/* Actions Section - display as grid of blocks */}
-          <div className="border border-punk-border/30 rounded bg-punk-bg/50">
-            <div className="flex items-center gap-2 px-2 py-1.5">
-              <Zap className="w-3 h-3 text-punk-cta" />
-              <span className="font-punk-heading text-[11px] text-punk-text-muted uppercase">
-                ACTIONS ({rule.actions.length})
-              </span>
-            </div>
-
-            <div className="px-2 py-2 border-t border-punk-border/20">
-              <div className="flex flex-wrap gap-2">
-                {rule.actions.map((action, idx) => (
-                  <ActionBlock
-                    key={idx}
-                    action={action}
-                    extensions={extensions}
-                    groups={groups}
-                    isEnable={action.type.startsWith("enable")}
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
+        </div>
 
         {/* Actions */}
         <div className="flex items-center justify-end gap-2 mt-3 pt-2 border-t border-punk-border/20">

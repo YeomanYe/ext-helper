@@ -4,11 +4,11 @@ import type { Group } from "@/types"
 const repo = vi.hoisted(() => ({
   fetchAll: vi.fn(),
   saveAll: vi.fn(),
-  generateId: vi.fn()
+  generateId: vi.fn(),
 }))
 
 vi.mock("@/services/groupsRepo", () => ({
-  groupsRepo: repo
+  groupsRepo: repo,
 }))
 
 const baseGroups: Group[] = [
@@ -21,7 +21,7 @@ const baseGroups: Group[] = [
     createdAt: 1,
     updatedAt: 1,
     isExpanded: true,
-    order: 0
+    order: 0,
   },
   {
     id: "g2",
@@ -32,8 +32,8 @@ const baseGroups: Group[] = [
     createdAt: 1,
     updatedAt: 1,
     isExpanded: true,
-    order: 1
-  }
+    order: 1,
+  },
 ]
 
 describe("groupStore", () => {

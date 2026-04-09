@@ -48,7 +48,9 @@ describe("domainMatcher", () => {
     })
 
     it("normal: should match subdomain via contains", () => {
-      expect(domainMatcher.matches("github.com", "contains", "https://api.github.com/v1")).toBe(true)
+      expect(domainMatcher.matches("github.com", "contains", "https://api.github.com/v1")).toBe(
+        true
+      )
     })
 
     it("normal: should not match unrelated hostname", () => {
@@ -58,11 +60,15 @@ describe("domainMatcher", () => {
 
   describe("matches - wildcard mode", () => {
     it("normal: should match subdomain with *.domain pattern", () => {
-      expect(domainMatcher.matches("*.github.com", "wildcard", "https://api.github.com/v1")).toBe(true)
+      expect(domainMatcher.matches("*.github.com", "wildcard", "https://api.github.com/v1")).toBe(
+        true
+      )
     })
 
     it("normal: should not match root domain with *.domain pattern", () => {
-      expect(domainMatcher.matches("*.github.com", "wildcard", "https://github.com/repo")).toBe(false)
+      expect(domainMatcher.matches("*.github.com", "wildcard", "https://github.com/repo")).toBe(
+        false
+      )
     })
 
     it("normal: should match deep subdomain", () => {

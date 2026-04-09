@@ -14,18 +14,18 @@ type RuleFilterType = "all" | "enabled" | "disabled"
 const FILTERS: { value: RuleFilterType; label: string }[] = [
   { value: "all", label: "ALL" },
   { value: "enabled", label: "ON" },
-  { value: "disabled", label: "OFF" }
+  { value: "disabled", label: "OFF" },
 ]
 
 function RuleFilterDropdown({
   value,
-  onChange
+  onChange,
 }: {
   value: RuleFilterType
   onChange: (v: RuleFilterType) => void
 }) {
   const [showDropdown, setShowDropdown] = React.useState(false)
-  const currentLabel = FILTERS.find(f => f.value === value)?.label || "ALL"
+  const currentLabel = FILTERS.find((f) => f.value === value)?.label || "ALL"
 
   return (
     <div className="relative">
@@ -77,7 +77,7 @@ function RuleSearchBar({
   value,
   onChange,
   filter,
-  onFilterChange
+  onFilterChange,
 }: {
   value: string
   onChange: (v: string) => void
@@ -89,7 +89,9 @@ function RuleSearchBar({
       <RuleFilterDropdown value={filter} onChange={onFilterChange} />
 
       <div className="relative flex-1">
-        <span className="absolute left-3 top-1/2 -translate-y-1/2 font-punk-body text-punk-accent text-lg">$</span>
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 font-punk-body text-punk-accent text-lg">
+          $
+        </span>
         <input
           type="text"
           value={value}
@@ -115,8 +117,7 @@ function RuleSearchBar({
 }
 
 export function RuleManager() {
-  const { rules, fetchRules, createRule, updateRule, deleteRule, toggleRule } =
-    useRuleStore()
+  const { rules, fetchRules, createRule, updateRule, deleteRule, toggleRule } = useRuleStore()
   const { extensions } = useExtensionStore()
   const { groups } = useGroupStore()
   const { viewMode } = useUIStore()
@@ -134,18 +135,16 @@ export function RuleManager() {
 
     // Filter by status
     if (filter === "enabled") {
-      result = result.filter(r => r.enabled)
+      result = result.filter((r) => r.enabled)
     } else if (filter === "disabled") {
-      result = result.filter(r => !r.enabled)
+      result = result.filter((r) => !r.enabled)
     }
 
     // Filter by search
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase()
       result = result.filter(
-        (r) =>
-          r.name.toLowerCase().includes(query) ||
-          r.description?.toLowerCase().includes(query)
+        (r) => r.name.toLowerCase().includes(query) || r.description?.toLowerCase().includes(query)
       )
     }
 
@@ -179,9 +178,7 @@ export function RuleManager() {
           <span className="font-punk-heading text-[13px] text-punk-text-primary uppercase tracking-wider">
             AUTO_RULES
           </span>
-          <span className="font-punk-code text-[13px] text-punk-accent">
-            [{rules.length}]
-          </span>
+          <span className="font-punk-code text-[13px] text-punk-accent">[{rules.length}]</span>
         </div>
         <div className="flex-1" />
         <button

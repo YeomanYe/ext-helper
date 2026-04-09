@@ -1,5 +1,14 @@
 import * as React from "react"
-import { ChevronRight, Folder, FolderOpen, MoreVertical, Pencil, Trash2, Plus, X } from "lucide-react"
+import {
+  ChevronRight,
+  Folder,
+  FolderOpen,
+  MoreVertical,
+  Pencil,
+  Trash2,
+  Plus,
+  X,
+} from "lucide-react"
 import { cn } from "@/utils"
 import type { Group, Extension } from "@/types"
 
@@ -30,7 +39,7 @@ export function GroupItem({
   onDelete,
   onAddExtension,
   onRemoveExtension,
-  className
+  className,
 }: GroupItemProps) {
   const [showMenu, setShowMenu] = React.useState(false)
   const [showExtensionList, setShowExtensionList] = React.useState(false)
@@ -87,10 +96,7 @@ export function GroupItem({
           )}
         </button>
 
-        <div
-          className="flex-shrink-0 h-3 w-3"
-          style={{ backgroundColor: group.color }}
-        />
+        <div className="flex-shrink-0 h-3 w-3" style={{ backgroundColor: group.color }} />
 
         {isExpanded ? (
           <FolderOpen className="h-4 w-4 text-punk-accent" />
@@ -102,9 +108,7 @@ export function GroupItem({
           {group.name}
         </span>
 
-        <span className="font-punk-code text-[10px] text-punk-accent">
-          [{extensionCount}]
-        </span>
+        <span className="font-punk-code text-[10px] text-punk-accent">[{extensionCount}]</span>
 
         <div className="relative" ref={menuRef}>
           <button
@@ -157,7 +161,10 @@ export function GroupItem({
 
           {/* Extension List Popup */}
           {showExtensionList && (
-            <div ref={listRef} className="absolute left-full top-0 z-50 ml-1 w-56 border border-punk-border bg-punk-bg-alt py-2 shadow-[0_0_20px_rgba(124,58,237,0.3)] max-h-64 overflow-y-auto">
+            <div
+              ref={listRef}
+              className="absolute left-full top-0 z-50 ml-1 w-56 border border-punk-border bg-punk-bg-alt py-2 shadow-[0_0_20px_rgba(124,58,237,0.3)] max-h-64 overflow-y-auto"
+            >
               {availableExtensions.length === 0 ? (
                 <div className="px-3 py-2 text-xs text-punk-text-muted">
                   No extensions available

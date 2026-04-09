@@ -1,5 +1,14 @@
 import * as React from "react"
-import { ChevronDown, ChevronRight, Folder, MoreVertical, Plus, Pencil, Trash2, Edit2 } from "lucide-react"
+import {
+  ChevronDown,
+  ChevronRight,
+  Folder,
+  MoreVertical,
+  Plus,
+  Pencil,
+  Trash2,
+  Edit2,
+} from "lucide-react"
 import { ExtensionCard } from "@/components/extension"
 import { cn } from "@/utils"
 import type { Group, Extension } from "@/types"
@@ -27,7 +36,7 @@ export function GroupCard({
   onAddExtension,
   onToggleExtension,
   onOpenOptions,
-  onRemove
+  onRemove,
 }: GroupCardProps) {
   const [showMenu, setShowMenu] = React.useState(false)
   const menuRef = React.useRef<HTMLDivElement>(null)
@@ -54,11 +63,7 @@ export function GroupCard({
         onClick={onToggleExpand}
       >
         <button className="flex-shrink-0 text-punk-text-muted hover:text-punk-accent">
-          {isExpanded ? (
-            <ChevronDown className="h-3 w-3" />
-          ) : (
-            <ChevronRight className="h-3 w-3" />
-          )}
+          {isExpanded ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
         </button>
 
         <div

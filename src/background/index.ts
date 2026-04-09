@@ -3,7 +3,12 @@
 // ============================================================
 
 import { browserAdapter } from "@/services/browser/adapter"
-import { RULES_STORAGE_KEY, RULE_SETTINGS_KEY, DEFAULT_RULE_SETTINGS, RULE_ALARM_NAME } from "@/rules/constants"
+import {
+  RULES_STORAGE_KEY,
+  RULE_SETTINGS_KEY,
+  DEFAULT_RULE_SETTINGS,
+  RULE_ALARM_NAME,
+} from "@/rules/constants"
 import { ruleEngine } from "@/rules/ruleEngine"
 import type { Rule, RuleSettings } from "@/rules/types"
 
@@ -55,15 +60,13 @@ class RuleBackgroundService {
    */
   private setupTabListener(): void {
     // 标签页 URL 更新时检测
-    chrome.tabs.onUpdated.addListener(
-      async (tabId, changeInfo) => {
-        if (!changeInfo.url) return
-        const settings = await this.getSettings()
-        if (settings.enableDomainDetection) {
-          this.checkDomainRules(tabId, changeInfo.url)
-        }
+    chrome.tabs.onUpdated.addListener(async (tabId, changeInfo) => {
+      if (!changeInfo.url) return
+      const settings = await this.getSettings()
+      if (settings.enableDomainDetection) {
+        this.checkDomainRules(tabId, changeInfo.url)
       }
-    )
+    })
 
     // 标签页激活时检测
     chrome.tabs.onActivated.addListener(async (activeInfo) => {
@@ -106,15 +109,13 @@ class RuleBackgroundService {
    * 启动定时调度器
    */
   private async startScheduler(settings?: RuleSettings): Promise<void> {
-    const s = settings ?? await this.getSettings()
+    const s = settings ?? (await this.getSettings())
     try {
       await chrome.alarms.create(RULE_ALARM_NAME, {
         delayInMinutes: s.schedulerInterval / 60000,
         periodInMinutes: s.schedulerInterval / 60000,
       })
-      console.log(
-        `[RuleBackground] Scheduler started with interval: ${s.schedulerInterval}ms`
-      )
+      console.log(`[RuleBackground] Scheduler started with interval: ${s.schedulerInterval}ms`)
     } catch (error) {
       console.error("[RuleBackground] Failed to start scheduler:", error)
     }
@@ -188,9 +189,7 @@ class RuleBackgroundService {
       )
 
       if (shouldTrigger) {
-        console.log(
-          `[RuleBackground] Triggering domain rule: ${rule.name} for ${url}`
-        )
+        console.log(`[RuleBackground] Triggering domain rule: ${rule.name} for ${url}`)
         await ruleEngine.executeActions(rule.actions)
         await ruleEngine.recordTrigger(rule.id)
       }

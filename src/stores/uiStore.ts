@@ -2,7 +2,9 @@ import { create } from "zustand"
 import type { Preferences, UIStore, ViewMode } from "@/types"
 import { preferencesRepo } from "@/services/preferencesRepo"
 
-type PreferenceUpdates = Partial<Pick<Preferences, "theme" | "compactMode" | "showDisabled" | "viewMode">>
+type PreferenceUpdates = Partial<
+  Pick<Preferences, "theme" | "compactMode" | "showDisabled" | "viewMode">
+>
 
 function applyTheme(theme: Preferences["theme"]) {
   if (theme === "dark") {
@@ -62,7 +64,7 @@ export const useUIStore = create<UIStore>((set, get) => ({
     } catch (error) {
       console.error("Failed to save view mode preference:", error)
     }
-  }
+  },
 }))
 
 // Initialize theme on load
@@ -71,7 +73,7 @@ export async function initializeUIStore() {
     const prefs = await preferencesRepo.fetch()
     if (prefs) {
       const nextState: PreferenceUpdates & { lastUpdate: number } = {
-        lastUpdate: Date.now()
+        lastUpdate: Date.now(),
       }
 
       if (prefs.theme) {

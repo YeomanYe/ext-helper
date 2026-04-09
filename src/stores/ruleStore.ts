@@ -43,7 +43,7 @@ export const useRuleStore = create<RuleStore>((set, get) => ({
       onError: (error) => {
         console.error("Failed to save rule:", error)
         return { error: "Failed to save rule" }
-      }
+      },
     })
   },
 
@@ -60,7 +60,7 @@ export const useRuleStore = create<RuleStore>((set, get) => ({
       onError: (error) => {
         console.error("Failed to update rule:", error)
         return { error: "Failed to update rule" }
-      }
+      },
     })
   },
 
@@ -75,7 +75,7 @@ export const useRuleStore = create<RuleStore>((set, get) => ({
       onError: (error) => {
         console.error("Failed to delete rule:", error)
         return { error: "Failed to delete rule" }
-      }
+      },
     })
   },
 
@@ -95,7 +95,7 @@ export const useRuleStore = create<RuleStore>((set, get) => ({
       onError: (error) => {
         console.error("Failed to toggle rule:", error)
         return { error: "Failed to toggle rule" }
-      }
+      },
     })
   },
 
@@ -123,7 +123,7 @@ export const useRuleStore = create<RuleStore>((set, get) => ({
       onError: (error) => {
         console.error("Failed to duplicate rule:", error)
         return { error: "Failed to duplicate rule" }
-      }
+      },
     })
   },
 }))

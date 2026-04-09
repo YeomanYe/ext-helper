@@ -1,4 +1,4 @@
-export type BrowserType = 'chrome' | 'firefox' | 'safari' | 'edge' | 'unknown'
+export type BrowserType = "chrome" | "firefox" | "safari" | "edge" | "unknown"
 
 export interface Extension {
   id: string
@@ -8,13 +8,13 @@ export interface Extension {
   versionName: string | null
   enabled: boolean
   iconUrl: string | null
-  type: 'extension' | 'hosted_app' | 'packaged_app' | 'legacy_packaged_app' | 'theme'
+  type: "extension" | "hosted_app" | "packaged_app" | "legacy_packaged_app" | "theme"
   permissions: string[]
   hostPermissions: string[]
-  installType: 'admin' | 'development' | 'normal' | 'sideload' | 'other'
+  installType: "admin" | "development" | "normal" | "sideload" | "other"
   mayEnable: boolean
   mayDisable: boolean
-  disabledReason: 'unknown' | 'permissions_increase' | null
+  disabledReason: "unknown" | "permissions_increase" | null
   offlineEnabled: boolean
   optionsUrl: string | null
   homepageUrl: string | null
@@ -34,10 +34,10 @@ export interface Group {
   order: number
 }
 
-export type FilterType = 'all' | 'enabled' | 'disabled' | 'favorites'
-export type SortType = 'name' | 'enabled' | 'recentlyUsed'
-export type ViewMode = 'compact' | 'card' | 'detail'
-export type BisectPhase = 'idle' | 'running' | 'resolved' | 'cancelled'
+export type FilterType = "all" | "enabled" | "disabled" | "favorites"
+export type SortType = "name" | "enabled" | "recentlyUsed"
+export type ViewMode = "compact" | "card" | "detail"
+export type BisectPhase = "idle" | "running" | "resolved" | "cancelled"
 
 export interface BisectSession {
   active: boolean
@@ -53,7 +53,7 @@ export interface BisectSession {
 }
 
 export interface Preferences {
-  theme: 'light' | 'dark' | 'system'
+  theme: "light" | "dark" | "system"
   compactMode: boolean
   showDisabled: boolean
   sortBy: SortType
@@ -97,7 +97,10 @@ export interface GroupStore {
   createGroup: (name: string, color?: string, extensionIds?: string[]) => Promise<void>
   deleteGroup: (id: string) => Promise<void>
   renameGroup: (id: string, name: string) => Promise<void>
-  updateGroup: (id: string, updates: { name?: string; color?: string; icon?: string; iconUrl?: string }) => Promise<void>
+  updateGroup: (
+    id: string,
+    updates: { name?: string; color?: string; icon?: string; iconUrl?: string }
+  ) => Promise<void>
   selectGroup: (id: string | null) => void
   toggleGroupExpanded: (id: string) => void
   addToGroup: (groupId: string, extId: string) => Promise<void>
@@ -106,12 +109,12 @@ export interface GroupStore {
 }
 
 export interface UIStore {
-  theme: 'light' | 'dark' | 'system'
+  theme: "light" | "dark" | "system"
   compactMode: boolean
   showDisabled: boolean
   viewMode: ViewMode
   lastUpdate: number
-  setTheme: (theme: 'light' | 'dark' | 'system') => void
+  setTheme: (theme: "light" | "dark" | "system") => void
   toggleCompactMode: () => void
   toggleShowDisabled: () => void
   setViewMode: (mode: ViewMode) => void

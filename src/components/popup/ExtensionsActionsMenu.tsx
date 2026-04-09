@@ -35,7 +35,7 @@ export function ExtensionsActionsMenu({
   onEnableAll,
   onDisableAll,
   onUndo,
-  onRedo
+  onRedo,
 }: ExtensionsActionsMenuProps) {
   const [open, setOpen] = React.useState(false)
   const menuRef = React.useRef<HTMLDivElement>(null)

@@ -22,7 +22,7 @@ export function ConfirmDialog({
   cancelText = "CANCEL",
   variant = "default",
   onConfirm,
-  onCancel
+  onCancel,
 }: ConfirmDialogProps) {
   if (!isOpen) return null
 
@@ -31,23 +31,26 @@ export function ConfirmDialog({
     onCancel()
   }
 
-  const borderColor = variant === "danger"
-    ? "border-punk-cta"
-    : variant === "warning"
-      ? "border-punk-warning"
-      : "border-punk-primary"
+  const borderColor =
+    variant === "danger"
+      ? "border-punk-cta"
+      : variant === "warning"
+        ? "border-punk-warning"
+        : "border-punk-primary"
 
-  const iconColor = variant === "danger"
-    ? "text-punk-cta"
-    : variant === "warning"
-      ? "text-punk-warning"
-      : "text-punk-accent"
+  const iconColor =
+    variant === "danger"
+      ? "text-punk-cta"
+      : variant === "warning"
+        ? "text-punk-warning"
+        : "text-punk-accent"
 
-  const confirmBtnClass = variant === "danger"
-    ? "bg-punk-cta hover:bg-punk-cta/90"
-    : variant === "warning"
-      ? "bg-punk-warning hover:bg-punk-warning/90 text-punk-bg"
-      : "bg-punk-primary hover:bg-punk-primary/90"
+  const confirmBtnClass =
+    variant === "danger"
+      ? "bg-punk-cta hover:bg-punk-cta/90"
+      : variant === "warning"
+        ? "bg-punk-warning hover:bg-punk-warning/90 text-punk-bg"
+        : "bg-punk-primary hover:bg-punk-primary/90"
 
   if (typeof document === "undefined") return null
 

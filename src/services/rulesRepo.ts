@@ -14,11 +14,11 @@ const cloneRules = (rules: Rule[]): Rule[] =>
         ? {
             days: [...group.schedule.days],
             startTime: group.schedule.startTime,
-            endTime: group.schedule.endTime
+            endTime: group.schedule.endTime,
           }
-        : null
+        : null,
     })),
-    actions: rule.actions.map((action) => ({ ...action }))
+    actions: rule.actions.map((action) => ({ ...action })),
   }))
 
 const generateId = () => devStorage.generateId()
@@ -43,5 +43,5 @@ export const rulesRepo = {
     }
 
     await browserAdapter.setStorage(RULES_STORAGE_KEY, snapshot)
-  }
+  },
 }

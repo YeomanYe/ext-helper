@@ -9,7 +9,7 @@ type GroupFilterType = "all" | "hasExtensions" | "empty"
 const FILTERS: { value: GroupFilterType; label: string }[] = [
   { value: "all", label: "ALL" },
   { value: "hasExtensions", label: "WITH EXT" },
-  { value: "empty", label: "EMPTY" }
+  { value: "empty", label: "EMPTY" },
 ]
 
 interface GroupManagerProps {
@@ -35,7 +35,7 @@ const GROUP_COLORS = [
   "#14B8A6", // teal
   "#3B82F6", // blue
   "#8B5CF6", // purple
-  "#EC4899"  // pink
+  "#EC4899", // pink
 ]
 
 export function GroupManager({
@@ -50,7 +50,7 @@ export function GroupManager({
   onRenameGroup,
   onAddToGroup,
   onRemoveFromGroup,
-  className
+  className,
 }: GroupManagerProps) {
   const [showCreateModal, setShowCreateModal] = React.useState(false)
   const [newGroupName, setNewGroupName] = React.useState("")
@@ -157,12 +157,8 @@ export function GroupManager({
         )}
       >
         <Folder className="h-4 w-4 text-gray-500" />
-        <span className="flex-1 text-left text-gray-900 dark:text-gray-100">
-          All Extensions
-        </span>
-        <span className="text-xs text-gray-500 dark:text-gray-400">
-          ({extensions.length})
-        </span>
+        <span className="flex-1 text-left text-gray-900 dark:text-gray-100">All Extensions</span>
+        <span className="text-xs text-gray-500 dark:text-gray-400">({extensions.length})</span>
       </button>
 
       {/* Groups */}
@@ -170,10 +166,7 @@ export function GroupManager({
         <div key={group.id}>
           {editingGroupId === group.id ? (
             <div className="flex items-center gap-2 px-3 py-2">
-              <div
-                className="h-4 w-4 rounded"
-                style={{ backgroundColor: group.color }}
-              />
+              <div className="h-4 w-4 rounded" style={{ backgroundColor: group.color }} />
               <input
                 type="text"
                 value={editingName}

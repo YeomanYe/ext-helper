@@ -8,7 +8,7 @@ const BISECT_STORAGE_KEY = "ext-helper-bisect-session"
 const cloneExtensions = (extensions: Extension[]): Extension[] =>
   extensions.map((extension) => ({
     ...extension,
-    permissions: [...extension.permissions]
+    permissions: [...extension.permissions],
   }))
 
 const cloneBisectSession = (session: BisectSession | null): BisectSession | null =>
@@ -81,5 +81,5 @@ export const extensionsRepo = {
 
   async clearBisectSession(): Promise<void> {
     await this.saveBisectSession(null)
-  }
+  },
 }

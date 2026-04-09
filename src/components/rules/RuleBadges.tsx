@@ -10,35 +10,29 @@ export function S(n: number): string {
 }
 
 export function ConditionGroupBadge({ group }: { group: ConditionGroup }) {
-  const domainsLabel = group.domains.length > 1
-    ? `${group.domains.length} domains`
-    : group.domains[0] || "any"
+  const domainsLabel =
+    group.domains.length > 1 ? `${group.domains.length} domains` : group.domains[0] || "any"
 
   const hasTime = group.schedule !== null
 
   return (
     <div className="flex items-center gap-1 px-1.5 py-0.5 border border-punk-accent/30 bg-punk-accent/5">
       <Globe className="h-2.5 w-2.5 text-punk-accent" />
-      <span className="font-punk-code text-[11px] text-punk-accent">
-        {domainsLabel}
-      </span>
-      {hasTime && (
-        <Calendar className="h-2.5 w-2.5 text-punk-success" />
-      )}
+      <span className="font-punk-code text-[11px] text-punk-accent">{domainsLabel}</span>
+      {hasTime && <Calendar className="h-2.5 w-2.5 text-punk-success" />}
     </div>
   )
 }
 
 export function ConditionGroupDetail({ group }: { group: ConditionGroup }) {
-  const domainsLabel = group.domains.length > 0
-    ? group.domains.join(", ")
-    : "ALL DOMAINS"
+  const domainsLabel = group.domains.length > 0 ? group.domains.join(", ") : "ALL DOMAINS"
 
   const hasTime = group.schedule !== null
 
-  const daysLabel = hasTime && group.schedule
-    ? group.schedule.days.map(d => DAYS_OF_WEEK[d].label).join(", ")
-    : ""
+  const daysLabel =
+    hasTime && group.schedule
+      ? group.schedule.days.map((d) => DAYS_OF_WEEK[d].label).join(", ")
+      : ""
 
   return (
     <div className="flex items-center gap-2 px-2 py-1 border border-punk-border/20 bg-punk-bg rounded">
@@ -65,14 +59,24 @@ export function ConditionGroupDetail({ group }: { group: ConditionGroup }) {
   )
 }
 
-export function ActionBlock({ action, extensions, groups, isEnable }: { action: Action; extensions: Extension[]; groups: Group[]; isEnable: boolean }) {
+export function ActionBlock({
+  action,
+  extensions,
+  groups,
+  isEnable,
+}: {
+  action: Action
+  extensions: Extension[]
+  groups: Group[]
+  isEnable: boolean
+}) {
   const isExtensionType = action.type.endsWith("Extension")
 
   let icon: React.ReactNode
   let displayName = ""
 
   if (isExtensionType) {
-    const ext = extensions.find(e => e.id === action.targetId)
+    const ext = extensions.find((e) => e.id === action.targetId)
     displayName = ext ? ext.name : action.targetId
     icon = ext?.iconUrl ? (
       <img src={ext.iconUrl} className="w-6 h-6 object-cover" alt="" />
@@ -82,7 +86,7 @@ export function ActionBlock({ action, extensions, groups, isEnable }: { action: 
       </div>
     )
   } else {
-    const grp = groups.find(g => g.id === action.targetId)
+    const grp = groups.find((g) => g.id === action.targetId)
     displayName = grp ? grp.name : action.targetId
     icon = (
       <div
@@ -100,26 +104,40 @@ export function ActionBlock({ action, extensions, groups, isEnable }: { action: 
       <span className="font-punk-heading text-[10px] text-punk-text-primary uppercase text-center truncate w-full px-0.5">
         {displayName.substring(0, 8)}
       </span>
-      <span className={cn(
-        "text-[9px] uppercase font-punk-code",
-        isEnable ? "text-punk-success" : "text-punk-cta"
-      )}>
+      <span
+        className={cn(
+          "text-[9px] uppercase font-punk-code",
+          isEnable ? "text-punk-success" : "text-punk-cta"
+        )}
+      >
         {isEnable ? "ON" : "OFF"}
       </span>
     </div>
   )
 }
 
-export function ActionBadge({ action, extensions, groups, detailed = false }: { action: Action; extensions: Extension[]; groups: Group[]; detailed?: boolean }) {
+export function ActionBadge({
+  action,
+  extensions,
+  groups,
+  detailed = false,
+}: {
+  action: Action
+  extensions: Extension[]
+  groups: Group[]
+  detailed?: boolean
+}) {
   const isEnable = action.type.startsWith("enable")
   const isExtensionType = action.type.endsWith("Extension")
 
   let icon: React.ReactNode
   let displayName = ""
-  let colorClass = isEnable ? "text-punk-success border-punk-success/30 bg-punk-success/5" : "text-punk-cta border-punk-cta/30 bg-punk-cta/5"
+  const colorClass = isEnable
+    ? "text-punk-success border-punk-success/30 bg-punk-success/5"
+    : "text-punk-cta border-punk-cta/30 bg-punk-cta/5"
 
   if (isExtensionType) {
-    const ext = extensions.find(e => e.id === action.targetId)
+    const ext = extensions.find((e) => e.id === action.targetId)
     displayName = ext ? ext.name : action.targetId
     icon = ext?.iconUrl ? (
       detailed ? (
@@ -128,35 +146,52 @@ export function ActionBadge({ action, extensions, groups, detailed = false }: { 
         <img src={ext.iconUrl} className="h-4 w-4 object-cover" alt="" />
       )
     ) : (
-      <div className={cn(detailed ? "h-5 w-5" : "h-4 w-4", "bg-punk-bg-alt flex items-center justify-center")}>
-        <span className={cn(detailed ? "font-punk-heading text-[11px]" : "font-punk-heading text-[10px]", "text-punk-text-muted")}>{displayName[0]}</span>
+      <div
+        className={cn(
+          detailed ? "h-5 w-5" : "h-4 w-4",
+          "bg-punk-bg-alt flex items-center justify-center"
+        )}
+      >
+        <span
+          className={cn(
+            detailed ? "font-punk-heading text-[11px]" : "font-punk-heading text-[10px]",
+            "text-punk-text-muted"
+          )}
+        >
+          {displayName[0]}
+        </span>
       </div>
     )
   } else {
-    const grp = groups.find(g => g.id === action.targetId)
+    const grp = groups.find((g) => g.id === action.targetId)
     displayName = grp ? grp.name : action.targetId
     icon = (
       <div
-        className={cn(detailed ? "h-5 w-5" : "h-4 w-4", "rounded border border-punk-border/30 flex items-center justify-center")}
+        className={cn(
+          detailed ? "h-5 w-5" : "h-4 w-4",
+          "rounded border border-punk-border/30 flex items-center justify-center"
+        )}
         style={{ backgroundColor: (grp?.color || "#666") + "20" }}
       >
-        <Folder className={detailed ? "h-3 w-3" : "h-2.5 w-2.5"} style={{ color: grp?.color || "#666" }} />
+        <Folder
+          className={detailed ? "h-3 w-3" : "h-2.5 w-2.5"}
+          style={{ color: grp?.color || "#666" }}
+        />
       </div>
     )
   }
 
   if (detailed) {
     return (
-      <div className={cn(
-        "flex items-center gap-2 px-2 py-1 border font-punk-code",
-        colorClass
-      )}>
+      <div className={cn("flex items-center gap-2 px-2 py-1 border font-punk-code", colorClass)}>
         {icon}
         <span className="uppercase truncate flex-1">{displayName}</span>
-        <span className={cn(
-          "text-[10px] uppercase shrink-0",
-          isEnable ? "text-punk-success" : "text-punk-cta"
-        )}>
+        <span
+          className={cn(
+            "text-[10px] uppercase shrink-0",
+            isEnable ? "text-punk-success" : "text-punk-cta"
+          )}
+        >
           {isEnable ? "ENABLE" : "DISABLE"}
         </span>
       </div>
@@ -164,10 +199,12 @@ export function ActionBadge({ action, extensions, groups, detailed = false }: { 
   }
 
   return (
-    <div className={cn(
-      "flex items-center gap-1 px-1.5 py-0.5 border text-[11px] font-punk-code",
-      colorClass
-    )}>
+    <div
+      className={cn(
+        "flex items-center gap-1 px-1.5 py-0.5 border text-[11px] font-punk-code",
+        colorClass
+      )}
+    >
       {icon}
       <span className="uppercase truncate max-w-[80px]">{displayName.substring(0, 10)}</span>
     </div>

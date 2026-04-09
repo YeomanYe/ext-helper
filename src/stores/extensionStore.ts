@@ -6,14 +6,14 @@ import {
   createIdleBisectSession,
   splitCandidateIds,
   buildBisectExtensions,
-  isBisectSessionConsistent
+  isBisectSessionConsistent,
 } from "@/stores/bisectUtils"
 import type { ExtensionSnapshot } from "@/stores/bisectUtils"
 import {
   cloneExtensions,
   buildHistoryMeta,
   withHistoryCleared,
-  setPendingHistoryMeta
+  setPendingHistoryMeta,
 } from "@/stores/extensionStoreUtils"
 
 interface ExtensionStoreState extends ExtensionStore {
@@ -29,7 +29,7 @@ const initialState = {
   searchQuery: "",
   sortBy: "name" as SortType,
   ...buildHistoryMeta([], []),
-  bisectSession: createIdleBisectSession()
+  bisectSession: createIdleBisectSession(),
 }
 
 export const useExtensionStore = create<ExtensionStoreState>((set, get) => ({
@@ -41,12 +41,10 @@ export const useExtensionStore = create<ExtensionStoreState>((set, get) => ({
     try {
       const extensions = await extensionsRepo.fetchAll()
       const persistedBisectSession = await extensionsRepo.loadBisectSession()
-      const bisectSession = persistedBisectSession && isBisectSessionConsistent(
-        persistedBisectSession,
-        extensions
-      )
-        ? persistedBisectSession
-        : createIdleBisectSession()
+      const bisectSession =
+        persistedBisectSession && isBisectSessionConsistent(persistedBisectSession, extensions)
+          ? persistedBisectSession
+          : createIdleBisectSession()
 
       if (persistedBisectSession && !bisectSession.active) {
         await extensionsRepo.clearBisectSession()
@@ -55,12 +53,12 @@ export const useExtensionStore = create<ExtensionStoreState>((set, get) => ({
       set({
         ...withHistoryCleared(extensions),
         bisectSession,
-        loading: false
+        loading: false,
       })
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : "Failed to load extensions",
-        loading: false
+        loading: false,
       })
     }
   },
@@ -74,28 +72,26 @@ export const useExtensionStore = create<ExtensionStoreState>((set, get) => ({
 
     const previousExtensions = cloneExtensions(state.extensions)
     const nextExtensions = state.extensions.map((extension) =>
-      extension.id === id
-        ? { ...extension, enabled: !extension.enabled }
-        : extension
+      extension.id === id ? { ...extension, enabled: !extension.enabled } : extension
     )
 
     set({
       extensions: nextExtensions,
       error: null,
-      ...setPendingHistoryMeta(state.history)
+      ...setPendingHistoryMeta(state.history),
     })
 
     try {
       await extensionsRepo.setEnabled(id, !currentExtension.enabled)
       set((currentState) => ({
         ...buildHistoryMeta([...currentState.history, previousExtensions], []),
-        extensions: currentState.extensions
+        extensions: currentState.extensions,
       }))
     } catch (error) {
       set({
         extensions: previousExtensions,
         error: error instanceof Error ? error.message : "Failed to toggle extension",
-        ...buildHistoryMeta(state.history, state.future)
+        ...buildHistoryMeta(state.history, state.future),
       })
     }
   },
@@ -111,20 +107,20 @@ export const useExtensionStore = create<ExtensionStoreState>((set, get) => ({
     set({
       extensions: nextExtensions,
       error: null,
-      ...setPendingHistoryMeta(state.history)
+      ...setPendingHistoryMeta(state.history),
     })
 
     try {
       await extensionsRepo.remove(id)
       set((currentState) => ({
         ...buildHistoryMeta([...currentState.history, previousExtensions], []),
-        extensions: currentState.extensions
+        extensions: currentState.extensions,
       }))
     } catch (error) {
       set({
         extensions: previousExtensions,
         error: error instanceof Error ? error.message : "Failed to remove extension",
-        ...buildHistoryMeta(state.history, state.future)
+        ...buildHistoryMeta(state.history, state.future),
       })
     }
   },
@@ -149,20 +145,20 @@ export const useExtensionStore = create<ExtensionStoreState>((set, get) => ({
     set({
       extensions: nextExtensions,
       error: null,
-      ...setPendingHistoryMeta(state.history)
+      ...setPendingHistoryMeta(state.history),
     })
 
     try {
       await extensionsRepo.applySnapshot(previousExtensions, nextExtensions)
       set((currentState) => ({
         ...buildHistoryMeta([...currentState.history, previousExtensions], []),
-        extensions: currentState.extensions
+        extensions: currentState.extensions,
       }))
     } catch (error) {
       set({
         extensions: previousExtensions,
         error: error instanceof Error ? error.message : "Failed to update extensions",
-        ...buildHistoryMeta(state.history, state.future)
+        ...buildHistoryMeta(state.history, state.future),
       })
     }
   },
@@ -179,7 +175,7 @@ export const useExtensionStore = create<ExtensionStoreState>((set, get) => ({
     set({
       extensions: previousExtensions,
       error: null,
-      ...buildHistoryMeta(nextHistory, nextFuture)
+      ...buildHistoryMeta(nextHistory, nextFuture),
     })
 
     try {
@@ -188,7 +184,7 @@ export const useExtensionStore = create<ExtensionStoreState>((set, get) => ({
       set({
         extensions: currentExtensions,
         error: error instanceof Error ? error.message : "Failed to undo extension changes",
-        ...buildHistoryMeta(state.history, state.future)
+        ...buildHistoryMeta(state.history, state.future),
       })
     }
   },
@@ -205,7 +201,7 @@ export const useExtensionStore = create<ExtensionStoreState>((set, get) => ({
     set({
       extensions: nextExtensions,
       error: null,
-      ...buildHistoryMeta(nextHistory, nextFuture)
+      ...buildHistoryMeta(nextHistory, nextFuture),
     })
 
     try {
@@ -214,7 +210,7 @@ export const useExtensionStore = create<ExtensionStoreState>((set, get) => ({
       set({
         extensions: currentExtensions,
         error: error instanceof Error ? error.message : "Failed to redo extension changes",
-        ...buildHistoryMeta(state.history, state.future)
+        ...buildHistoryMeta(state.history, state.future),
       })
     }
   },
@@ -242,7 +238,7 @@ export const useExtensionStore = create<ExtensionStoreState>((set, get) => ({
       candidateIds,
       currentTestIds,
       parkedIds,
-      step: 1
+      step: 1,
     }
     const nextExtensions = buildBisectExtensions(
       baselineExtensions,
@@ -253,7 +249,7 @@ export const useExtensionStore = create<ExtensionStoreState>((set, get) => ({
     set({
       extensions: nextExtensions,
       bisectSession,
-      error: null
+      error: null,
     })
 
     try {
@@ -263,7 +259,7 @@ export const useExtensionStore = create<ExtensionStoreState>((set, get) => ({
       set({
         extensions: state.extensions,
         bisectSession: state.bisectSession,
-        error: error instanceof Error ? error.message : "Failed to start bisect"
+        error: error instanceof Error ? error.message : "Failed to start bisect",
       })
       await extensionsRepo.clearBisectSession()
     }
@@ -289,7 +285,7 @@ export const useExtensionStore = create<ExtensionStoreState>((set, get) => ({
       parkedIds,
       step: session.step + 1,
       resultId: candidateIds.length === 1 ? candidateIds[0] : undefined,
-      resultIds: candidateIds.length > 1 ? candidateIds : undefined
+      resultIds: candidateIds.length > 1 ? candidateIds : undefined,
     }
     const nextExtensions = buildBisectExtensions(
       session.baselineExtensions,
@@ -300,7 +296,7 @@ export const useExtensionStore = create<ExtensionStoreState>((set, get) => ({
     set({
       extensions: nextExtensions,
       bisectSession: nextSession,
-      error: null
+      error: null,
     })
 
     try {
@@ -310,7 +306,7 @@ export const useExtensionStore = create<ExtensionStoreState>((set, get) => ({
       set({
         extensions: state.extensions,
         bisectSession: session,
-        error: error instanceof Error ? error.message : "Failed to apply bisect result"
+        error: error instanceof Error ? error.message : "Failed to apply bisect result",
       })
     }
   },
@@ -335,7 +331,7 @@ export const useExtensionStore = create<ExtensionStoreState>((set, get) => ({
       parkedIds,
       step: session.step + 1,
       resultId: candidateIds.length === 1 ? candidateIds[0] : undefined,
-      resultIds: candidateIds.length > 1 ? candidateIds : undefined
+      resultIds: candidateIds.length > 1 ? candidateIds : undefined,
     }
     const nextExtensions = buildBisectExtensions(
       session.baselineExtensions,
@@ -346,7 +342,7 @@ export const useExtensionStore = create<ExtensionStoreState>((set, get) => ({
     set({
       extensions: nextExtensions,
       bisectSession: nextSession,
-      error: null
+      error: null,
     })
 
     try {
@@ -356,7 +352,7 @@ export const useExtensionStore = create<ExtensionStoreState>((set, get) => ({
       set({
         extensions: state.extensions,
         bisectSession: session,
-        error: error instanceof Error ? error.message : "Failed to apply bisect result"
+        error: error instanceof Error ? error.message : "Failed to apply bisect result",
       })
     }
   },
@@ -371,7 +367,7 @@ export const useExtensionStore = create<ExtensionStoreState>((set, get) => ({
     set({
       extensions: restoredExtensions,
       bisectSession: createIdleBisectSession(),
-      error: null
+      error: null,
     })
 
     try {
@@ -381,7 +377,7 @@ export const useExtensionStore = create<ExtensionStoreState>((set, get) => ({
       set({
         extensions: state.extensions,
         bisectSession: session,
-        error: error instanceof Error ? error.message : "Failed to cancel bisect"
+        error: error instanceof Error ? error.message : "Failed to cancel bisect",
       })
     }
   },
@@ -396,7 +392,7 @@ export const useExtensionStore = create<ExtensionStoreState>((set, get) => ({
     set({
       extensions: restoredExtensions,
       bisectSession: createIdleBisectSession(),
-      error: null
+      error: null,
     })
 
     try {
@@ -406,14 +402,14 @@ export const useExtensionStore = create<ExtensionStoreState>((set, get) => ({
       set({
         extensions: state.extensions,
         bisectSession: session,
-        error: error instanceof Error ? error.message : "Failed to restore bisect baseline"
+        error: error instanceof Error ? error.message : "Failed to restore bisect baseline",
       })
     }
   },
 
   setFilter: (filter: FilterType) => set({ filter }),
   setSearchQuery: (searchQuery: string) => set({ searchQuery }),
-  setSortBy: (sortBy: SortType) => set({ sortBy })
+  setSortBy: (sortBy: SortType) => set({ sortBy }),
 }))
 
 export const useFilteredExtensions = () => {

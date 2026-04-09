@@ -15,9 +15,12 @@ export function useContextMenuPosition({
   isDetail,
   menuWidth,
   menuHeight,
-  onClose
+  onClose,
 }: UseContextMenuPositionOptions) {
-  const [menuPosition, setMenuPosition] = React.useState<{ top: number; left: number }>({ top: 0, left: 0 })
+  const [menuPosition, setMenuPosition] = React.useState<{ top: number; left: number }>({
+    top: 0,
+    left: 0,
+  })
 
   const updateMenuPosition = React.useCallback(() => {
     if (!cardRef.current) return
@@ -34,10 +37,11 @@ export function useContextMenuPosition({
     const padding = 10
     const gap = 6
 
-    const isOutsideSurface = rect.bottom <= boundaryTop
-      || rect.top >= boundaryBottom
-      || rect.right <= boundaryLeft
-      || rect.left >= boundaryRight
+    const isOutsideSurface =
+      rect.bottom <= boundaryTop ||
+      rect.top >= boundaryBottom ||
+      rect.right <= boundaryLeft ||
+      rect.left >= boundaryRight
 
     if (isOutsideSurface) {
       onClose()
