@@ -12,10 +12,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 # Development
 pnpm dev            # Plasmo dev (loads as real browser extension)
 pnpm dev:web        # Vite dev server on port 4173 (web preview with mock data)
+pnpm dev:all        # Both plasmo dev and vite preview simultaneously (uses concurrently)
 pnpm build          # Plasmo production build
 pnpm build:web      # Vite production build (web preview)
 pnpm test           # vitest (watch mode)
 pnpm test -- --run  # vitest single run
+
+# Code Quality
+pnpm lint           # ESLint check
+pnpm lint:fix       # ESLint auto-fix
+pnpm format         # Prettier format all src files
+pnpm format:check   # Prettier check (no write)
 ```
 
 ## Architecture
@@ -66,11 +73,23 @@ Binary search to find a problematic extension (`src/stores/bisectUtils.ts`, `ext
 
 ### Component Organization
 
-- `src/components/popup/` — Top-level popup shell (Header, Footer, SearchBar, BisectBanner)
-- `src/components/extension/` — Extension cards, context menu, details modal
-- `src/components/group/` — Group management (modal, bar, chips, editor)
-- `src/components/rules/` — Rule editor, condition builder, action builder
-- `src/components/common/` — Shared UI primitives (Button, Input, Switch, ConfirmDialog)
+- `src/components/popup/` — Top-level popup shell (Header, Footer, SearchBar, BisectBanner, ExtensionsActionsMenu). Also exports `MAIN_FILTERS` and `GROUP_PANEL_FILTERS` filter constant arrays.
+- `src/components/extension/` — Extension cards, context menu, details modal, list
+- `src/components/group/` — Group management (GroupModal, GroupsBar, GroupChips, GroupEditorPanel, GroupExtensionPicker, GroupCard, GroupItem, GroupManager)
+- `src/components/rules/` — Rule editor, condition builder, action builder, rule list, rule badges (RuleBadges)
+- `src/components/common/` — Shared UI primitives (Button, Input, Switch, ConfirmDialog, Tooltip)
+- `src/hooks/` — Shared hooks (useClickOutside, useContextMenuPosition)
+
+### Filter System
+
+`FilterType` in `src/types/index.ts` supports:
+- `"all"` / `"enabled"` / `"disabled"` — basic status filters
+- `"in-group"` — extensions that belong to at least one group (main popup) / in current group (group panel)
+- `"not-in-group"` — extensions with no group assignment (main popup) / not in current group (group panel)
+- `"favorites"` — reserved
+
+`MAIN_FILTERS` (all 5 options) used in the main popup SearchBar.
+`GROUP_PANEL_FILTERS` (all + in-cur/not-cur labels) used in GroupEditorPanel.
 
 ### Styling
 
@@ -82,3 +101,19 @@ Tailwind CSS with a custom "punk" design system. Classes prefixed with `punk-` (
 - **Optimistic UI** — State updates applied before async persistence; rollback on error
 - **Snapshot-based undo/redo** — Extension store maintains `history[]` and `future[]` arrays of full extension snapshots
 - **Dev/prod branching in repos** — `isDevMode()` check at repo level, not in stores or components
+- **Group creation is atomic** — `createGroup(name, color, extensionIds)` writes all members in one storage operation to avoid race conditions
+
+## Engineering
+
+- **ESLint 9** (flat config `eslint.config.js`) — typescript-eslint + react + react-hooks + prettier
+- **Prettier** (`.prettierrc`) — formaton commit via lint-staged
+- **Husky** — pre-commit runs lint-staged; commit-msg runs commitlint
+- **commitlint** (`commitlint.config.js`) — conventional commits, allows Chinese subjects
+
+## Icon Assets
+
+Only two files needed in `assets/`:
+- `icon.png` — source icon, used by production builds directly
+- `icon.development.png` — same design, tells Plasmo to skip grayscale in dev builds
+
+Plasmo auto-resizes these to all required sizes (16/32/48/64/128).

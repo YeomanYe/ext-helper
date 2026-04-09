@@ -1,5 +1,5 @@
 import * as React from "react"
-import { MoreHorizontal, Plus } from "lucide-react"
+import { MoreHorizontal, Plus, Search, X } from "lucide-react"
 import { cn } from "@/utils"
 import type { Extension, Group } from "@/types"
 import { CreateGroupChip, GroupChip } from "@/components/group/GroupChips"
@@ -22,6 +22,8 @@ export function GroupsBar({
   onCreateGroup,
 }: GroupsBarProps) {
   const [showMore, setShowMore] = React.useState(false)
+  const [overflowSearch, setOverflowSearch] = React.useState("")
+  const searchInputRef = React.useRef<HTMLInputElement>(null)
   const [visibleCount, setVisibleCount] = React.useState(-1)
   const containerRef = React.useRef<HTMLDivElement>(null)
   const moreRef = React.useRef<HTMLDivElement>(null)
@@ -81,16 +83,32 @@ export function GroupsBar({
     function handleClick(e: MouseEvent) {
       if (moreRef.current && !moreRef.current.contains(e.target as Node)) {
         setShowMore(false)
+        setOverflowSearch("")
       }
     }
     document.addEventListener("mousedown", handleClick)
     return () => document.removeEventListener("mousedown", handleClick)
   }, [showMore])
 
+  // Focus search input when dropdown opens
+  React.useEffect(() => {
+    if (showMore) {
+      setTimeout(() => searchInputRef.current?.focus(), 50)
+    } else {
+      setOverflowSearch("")
+    }
+  }, [showMore])
+
   const isMeasuring = visibleCount === -1
   const needsCollapse = !isMeasuring && visibleCount < chipData.length
   const displayChips = isMeasuring ? chipData : chipData.slice(0, visibleCount)
   const overflowChips = needsCollapse ? chipData.slice(visibleCount) : []
+
+  const filteredOverflowChips = overflowSearch.trim()
+    ? overflowChips.filter(({ group }) =>
+        group.name.toLowerCase().includes(overflowSearch.toLowerCase())
+      )
+    : overflowChips
 
   return (
     <div className="flex-shrink-0 px-3 py-2 border-b border-punk-border/30">
@@ -150,8 +168,37 @@ export function GroupsBar({
                     SECTORS
                   </span>
                   <span className="font-punk-code text-[10px] text-punk-text-muted">
-                    {overflowChips.length + visibleCount}/{chipData.length}
+                    {filteredOverflowChips.length}/{chipData.length}
                   </span>
+                </div>
+
+                {/* Search */}
+                <div className="px-2 py-1.5 border-b border-punk-neon-cyan/10">
+                  <div className="relative flex items-center">
+                    <Search className="absolute left-2 h-3 w-3 text-punk-neon-cyan/50 pointer-events-none" />
+                    <input
+                      ref={searchInputRef}
+                      type="text"
+                      value={overflowSearch}
+                      onChange={(e) => setOverflowSearch(e.target.value)}
+                      placeholder="FILTER_SECTORS..."
+                      className={cn(
+                        "w-full h-7 pl-7 pr-7 bg-punk-bg-alt",
+                        "border border-punk-neon-cyan/20 focus:border-punk-neon-cyan/50",
+                        "font-punk-code text-[11px] text-punk-text-primary",
+                        "placeholder:text-punk-text-muted/50",
+                        "outline-none transition-colors"
+                      )}
+                    />
+                    {overflowSearch && (
+                      <button
+                        onClick={() => setOverflowSearch("")}
+                        className="absolute right-2 text-punk-text-muted hover:text-punk-neon-cyan transition-colors"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 {/* Overflow chips */}
@@ -159,20 +206,27 @@ export function GroupsBar({
                   className="p-2 flex flex-wrap gap-2 max-h-48 overflow-y-auto"
                   style={{ width: "min(420px, calc(100vw - 24px))" }}
                 >
-                  {overflowChips.map(({ group, count, allEnabled }) => (
-                    <GroupChip
-                      key={group.id}
-                      group={group}
-                      extensionCount={count}
-                      allEnabled={allEnabled}
-                      disabled={disabled}
-                      onClick={() => {
-                        onSelectGroup(group.id)
-                        setShowMore(false)
-                      }}
-                      onToggle={() => onToggleGroup(group)}
-                    />
-                  ))}
+                  {filteredOverflowChips.length > 0 ? (
+                    filteredOverflowChips.map(({ group, count, allEnabled }) => (
+                      <GroupChip
+                        key={group.id}
+                        group={group}
+                        extensionCount={count}
+                        allEnabled={allEnabled}
+                        disabled={disabled}
+                        onClick={() => {
+                          onSelectGroup(group.id)
+                          setShowMore(false)
+                          setOverflowSearch("")
+                        }}
+                        onToggle={() => onToggleGroup(group)}
+                      />
+                    ))
+                  ) : (
+                    <div className="w-full py-3 text-center font-punk-code text-[11px] text-punk-text-muted uppercase">
+                      NO_MATCH
+                    </div>
+                  )}
                 </div>
 
                 {/* Footer — NEW GROUP */}
