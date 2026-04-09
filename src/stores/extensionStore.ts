@@ -9,6 +9,7 @@ import {
   isBisectSessionConsistent,
 } from "@/stores/bisectUtils"
 import type { ExtensionSnapshot } from "@/stores/bisectUtils"
+import { useGroupStore } from "@/stores/groupStore"
 import {
   cloneExtensions,
   buildHistoryMeta,
@@ -417,12 +418,20 @@ export const useFilteredExtensions = () => {
   const filter = useExtensionStore((s) => s.filter)
   const searchQuery = useExtensionStore((s) => s.searchQuery)
   const sortBy = useExtensionStore((s) => s.sortBy)
+  const groups = useGroupStore((s) => s.groups)
 
   return React.useMemo(() => {
+    const groupedIds =
+      filter === "in-group" || filter === "not-in-group"
+        ? new Set(groups.flatMap((g) => g.extensionIds))
+        : null
+
     const filtered = extensions
       .filter((extension) => {
         if (filter === "enabled") return extension.enabled
         if (filter === "disabled") return !extension.enabled
+        if (filter === "in-group") return groupedIds!.has(extension.id)
+        if (filter === "not-in-group") return !groupedIds!.has(extension.id)
         return true
       })
       .filter((extension) => {
@@ -445,5 +454,5 @@ export const useFilteredExtensions = () => {
           return 0
       }
     })
-  }, [extensions, filter, searchQuery, sortBy])
+  }, [extensions, filter, searchQuery, sortBy, groups])
 }

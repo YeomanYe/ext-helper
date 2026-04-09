@@ -70,6 +70,8 @@ export function GroupModal({
       extensionsWithStatus.filter((extension) => {
         if (filter === "enabled" && !extension.enabled) return false
         if (filter === "disabled" && extension.enabled) return false
+        if (filter === "in-group" && !extension.isInGroup) return false
+        if (filter === "not-in-group" && extension.isInGroup) return false
         if (!searchQuery.trim()) return true
 
         const query = searchQuery.toLowerCase()

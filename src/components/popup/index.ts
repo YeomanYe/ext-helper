@@ -1,3 +1,10 @@
-export { SearchBar, QuickFilters, Header, Footer } from "./Header"
+export {
+  SearchBar,
+  QuickFilters,
+  Header,
+  Footer,
+  MAIN_FILTERS,
+  GROUP_PANEL_FILTERS,
+} from "./Header"
 export { ExtensionsActionsMenu } from "./ExtensionsActionsMenu"
 export { BisectBanner } from "./BisectBanner"

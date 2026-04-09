@@ -1,6 +1,6 @@
 import * as React from "react"
 import { Folder, Image, Upload } from "lucide-react"
-import { SearchBar } from "@/components/popup"
+import { SearchBar, GROUP_PANEL_FILTERS } from "@/components/popup"
 import type { FilterType, Group } from "@/types"
 import { GROUP_ICON_MAP } from "./groupVisuals"
 
@@ -137,6 +137,7 @@ export function GroupEditorPanel({
           onChange={onSearchQueryChange}
           placeholder="SEARCH_EXTENSIONS..."
           activeFilter={filter}
+          filters={GROUP_PANEL_FILTERS}
           onFilterChange={onFilterChange}
         />
       </div>

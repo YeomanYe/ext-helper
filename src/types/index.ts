@@ -34,7 +34,7 @@ export interface Group {
   order: number
 }
 
-export type FilterType = "all" | "enabled" | "disabled" | "favorites"
+export type FilterType = "all" | "enabled" | "disabled" | "favorites" | "in-group" | "not-in-group"
 export type SortType = "name" | "enabled" | "recentlyUsed"
 export type ViewMode = "compact" | "card" | "detail"
 export type BisectPhase = "idle" | "running" | "resolved" | "cancelled"

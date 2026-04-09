@@ -1,5 +1,12 @@
 import * as React from "react"
-import { Header, Footer, SearchBar, ExtensionsActionsMenu, BisectBanner } from "@/components/popup"
+import {
+  Header,
+  Footer,
+  SearchBar,
+  MAIN_FILTERS,
+  ExtensionsActionsMenu,
+  BisectBanner,
+} from "@/components/popup"
 import { ExtensionCard } from "@/components/extension"
 import { GroupModal, GroupsBar } from "@/components/group"
 import { RuleManager } from "@/components/rules"
@@ -240,6 +247,7 @@ export function PopupPage() {
                 onChange={setSearchQuery}
                 activeFilter={filter}
                 onFilterChange={setFilter}
+                filters={MAIN_FILTERS}
               />
             </div>
 

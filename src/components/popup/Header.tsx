@@ -11,11 +11,32 @@ interface SearchBarProps {
   onFilterChange?: (filter: FilterType) => void
 }
 
-const FILTERS: { value: FilterType; label: string }[] = [
+export const BASE_FILTERS: { value: FilterType; label: string }[] = [
   { value: "all", label: "ALL" },
   { value: "enabled", label: "ON" },
   { value: "disabled", label: "OFF" },
 ]
+
+export const MAIN_FILTERS: { value: FilterType; label: string }[] = [
+  ...BASE_FILTERS,
+  { value: "in-group", label: "IN_GRP" },
+  { value: "not-in-group", label: "NO_GRP" },
+]
+
+export const GROUP_PANEL_FILTERS: { value: FilterType; label: string }[] = [
+  ...BASE_FILTERS,
+  { value: "in-group", label: "IN_CUR" },
+  { value: "not-in-group", label: "NOT_CUR" },
+]
+
+interface SearchBarProps {
+  value: string
+  onChange: (value: string) => void
+  placeholder?: string
+  activeFilter?: FilterType
+  onFilterChange?: (filter: FilterType) => void
+  filters?: { value: FilterType; label: string }[]
+}
 
 export function SearchBar({
   value,
@@ -23,10 +44,11 @@ export function SearchBar({
   placeholder = "SEARCH_EXTENSIONS...",
   activeFilter = "all",
   onFilterChange,
+  filters = BASE_FILTERS,
 }: SearchBarProps) {
   const [showDropdown, setShowDropdown] = React.useState(false)
 
-  const currentFilter = FILTERS.find((f) => f.value === activeFilter) || FILTERS[0]
+  const currentFilter = filters.find((f) => f.value === activeFilter) || filters[0]
 
   return (
     <div className="flex items-center gap-3">
@@ -54,7 +76,7 @@ export function SearchBar({
             <>
               <div className="fixed inset-0 z-40" onClick={() => setShowDropdown(false)} />
               <div className="absolute top-full left-0 mt-1 z-50 w-full border border-punk-border bg-punk-bg-alt shadow-[0_0_20px_rgba(124,58,237,0.3)]">
-                {FILTERS.map((filter) => (
+                {filters.map((filter) => (
                   <button
                     key={filter.value}
                     onClick={() => {
@@ -115,7 +137,7 @@ interface QuickFiltersProps {
 export function QuickFilters({ activeFilter, onFilterChange }: QuickFiltersProps) {
   return (
     <div className="flex gap-1">
-      {FILTERS.map((filter) => (
+      {MAIN_FILTERS.map((filter) => (
         <button
           key={filter.value}
           onClick={() => onFilterChange(filter.value)}
