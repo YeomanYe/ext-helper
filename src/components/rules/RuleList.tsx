@@ -38,7 +38,7 @@ export function RuleList({ rules, extensions, groups, onToggle, onEdit, onDelete
           onEdit={onEdit}
           onDelete={onDelete}
           viewMode={viewMode}
-          showDelete={rules.length > 1}
+          showDelete={true}
         />
       ))}
     </div>

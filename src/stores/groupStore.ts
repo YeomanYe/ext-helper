@@ -18,14 +18,14 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
     }
   },
 
-  createGroup: async (name: string, color: string = "#6366F1") => {
+  createGroup: async (name: string, color: string = "#6366F1", extensionIds: string[] = []) => {
     const { groups } = get()
     const newGroup: Group = {
       id: groupsRepo.generateId(),
       name,
       color,
       icon: "folder",
-      extensionIds: [],
+      extensionIds,
       createdAt: Date.now(),
       updatedAt: Date.now(),
       isExpanded: true,

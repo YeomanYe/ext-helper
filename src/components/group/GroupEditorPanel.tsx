@@ -35,11 +35,11 @@ export function GroupEditorPanel({
   const groupIcon = group?.iconUrl ? null : GROUP_ICON_MAP[group?.icon || "folder"] || <Folder className="w-4 h-4" />
 
   return (
-    <div className="flex gap-4 px-4 py-3 border-b border-punk-border/30 bg-punk-bg shrink-0">
+    <div className="flex gap-3 px-4 py-2 border-b border-punk-border/30 bg-punk-bg shrink-0">
       <div className="flex-shrink-0 flex items-center">
         {isCreateMode ? (
           <div
-            className="relative w-[96px] h-[96px] border border-punk-border/50 bg-punk-bg rounded overflow-hidden group cursor-pointer"
+            className="relative w-[72px] h-[72px] border border-punk-border/50 bg-punk-bg rounded overflow-hidden group cursor-pointer"
             onClick={() => fileInputRef.current?.click()}
           >
             {editIconUrl ? (
@@ -66,7 +66,7 @@ export function GroupEditorPanel({
             />
           </div>
         ) : (
-          <div className="relative w-[96px] h-[96px] border border-punk-border/50 bg-punk-bg rounded overflow-hidden group">
+          <div className="relative w-[72px] h-[72px] border border-punk-border/50 bg-punk-bg rounded overflow-hidden group">
             {group?.iconUrl ? (
               <>
                 <img src={group.iconUrl} alt="" className="w-full h-full object-cover" />
@@ -99,10 +99,10 @@ export function GroupEditorPanel({
         )}
       </div>
 
-      <div className="flex-1 flex flex-col gap-3">
-        <div className="flex items-center gap-3">
+      <div className="flex-1 flex flex-col gap-2">
+        <div className="flex items-center gap-2">
           <div className="flex-1">
-            <label className="block font-punk-heading text-[13px] text-punk-text-muted uppercase mb-1.5">
+            <label className="block font-punk-heading text-[13px] text-punk-text-muted uppercase mb-1">
               GROUP_NAME
             </label>
             <input
@@ -122,7 +122,7 @@ export function GroupEditorPanel({
           </div>
         </div>
 
-        <label className="block font-punk-heading text-[13px] text-punk-text-muted uppercase mb-1">
+        <label className="block font-punk-heading text-[13px] text-punk-text-muted uppercase">
           SEARCH & FILTER
         </label>
         <SearchBar

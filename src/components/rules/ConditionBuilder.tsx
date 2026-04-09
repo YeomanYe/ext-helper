@@ -20,11 +20,7 @@ export function ConditionBuilder({ conditions, onChange }: ConditionBuilderProps
       id: generateId(),
       domains: [""],
       matchMode: "wildcard",
-      schedule: {
-        days: [1, 2, 3, 4, 5],
-        startTime: "09:00",
-        endTime: "18:00",
-      },
+      schedule: null, // 默认不限时间
     }
     onChange([...conditions, newGroup])
   }
@@ -82,6 +78,17 @@ function ConditionGroupRow({
   onChange: (updates: Partial<ConditionGroup>) => void
   onRemove: () => void
 }) {
+  // domains 为空数组表示"全站生效"
+  const isAllSites = group.domains.length === 0
+
+  const toggleAllSites = () => {
+    if (isAllSites) {
+      onChange({ domains: [""] })
+    } else {
+      onChange({ domains: [] })
+    }
+  }
+
   // --- Domain handlers ---
   const addDomain = () => {
     onChange({ domains: [...group.domains, ""] })
@@ -94,7 +101,7 @@ function ConditionGroupRow({
   }
 
   const removeDomain = (index: number) => {
-    if (group.domains.length <= 1) return // Keep at least one domain field
+    if (group.domains.length <= 1) return
     onChange({ domains: group.domains.filter((_, i) => i !== index) })
   }
 
@@ -128,16 +135,29 @@ function ConditionGroupRow({
 
   return (
     <div className="border border-punk-border/30 bg-punk-bg p-2.5 space-y-2">
-      {/* Header: Domains label + Match mode + Remove */}
+      {/* Header: Domains label + All Sites toggle + Match mode + Remove */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="text-[12px] font-punk-heading text-punk-accent uppercase tracking-wider">
             DOMAINS
           </span>
-          <MatchModeDropdown
-            value={group.matchMode}
-            onChange={(matchMode) => onChange({ matchMode })}
-          />
+          <button
+            onClick={toggleAllSites}
+            className={cn(
+              "h-6 px-2 text-[11px] font-punk-heading uppercase tracking-wider transition-all border",
+              isAllSites
+                ? "border-punk-success/50 bg-punk-success/10 text-punk-success"
+                : "border-punk-border/30 bg-punk-bg text-punk-text-muted hover:border-punk-success/30 hover:text-punk-success/70"
+            )}
+          >
+            ALL SITES
+          </button>
+          {!isAllSites && (
+            <MatchModeDropdown
+              value={group.matchMode}
+              onChange={(matchMode) => onChange({ matchMode })}
+            />
+          )}
         </div>
         {totalGroups > 1 && (
           <button
@@ -150,37 +170,43 @@ function ConditionGroupRow({
       </div>
 
       {/* Domain inputs */}
-      <div className="space-y-1.5">
-        {group.domains.map((domain, index) => (
-          <div key={index} className="flex items-center gap-1.5">
-            <input
-              type="text"
-              value={domain}
-              onChange={(e) => updateDomain(index, e.target.value)}
-              placeholder="*.example.com or github.com"
-              className="punk-input flex-1 h-8 px-2.5 text-[11px]"
-            />
-            {group.domains.length > 1 && (
-              <button
-                onClick={() => removeDomain(index)}
-                className="p-1 text-punk-text-muted hover:text-punk-cta transition-colors"
-              >
-                <X className="h-3 w-3" />
-              </button>
+      {isAllSites ? (
+        <p className="text-[11px] font-punk-code text-punk-success/80 uppercase tracking-wider">
+          TRIGGERS ON ALL HTTP/HTTPS WEBSITES
+        </p>
+      ) : (
+        <div className="space-y-1.5">
+          {group.domains.map((domain, index) => (
+            <div key={index} className="flex items-center gap-1.5">
+              <input
+                type="text"
+                value={domain}
+                onChange={(e) => updateDomain(index, e.target.value)}
+                placeholder="*.example.com or github.com"
+                className="punk-input flex-1 h-8 px-2.5 text-[11px]"
+              />
+              {group.domains.length > 1 && (
+                <button
+                  onClick={() => removeDomain(index)}
+                  className="p-1 text-punk-text-muted hover:text-punk-cta transition-colors"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              )}
+            </div>
+          ))}
+          <button
+            onClick={addDomain}
+            className={cn(
+              "flex items-center gap-1 text-[12px] font-punk-heading uppercase",
+              "text-punk-accent/60 hover:text-punk-accent"
             )}
-          </div>
-        ))}
-        <button
-          onClick={addDomain}
-          className={cn(
-            "flex items-center gap-1 text-[12px] font-punk-heading uppercase",
-            "text-punk-accent/60 hover:text-punk-accent"
-          )}
-        >
-          <Plus className="h-2.5 w-2.5" />
-          ADD DOMAIN
-        </button>
-      </div>
+          >
+            <Plus className="h-2.5 w-2.5" />
+            ADD DOMAIN
+          </button>
+        </div>
+      )}
 
       {/* Divider */}
       <div className="border-t border-punk-border/20" />

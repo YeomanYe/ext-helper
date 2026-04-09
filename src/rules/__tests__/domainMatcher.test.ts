@@ -72,6 +72,15 @@ describe("domainMatcher", () => {
     it("normal: should not match unrelated domain", () => {
       expect(domainMatcher.matches("*.github.com", "wildcard", "https://gitlab.com")).toBe(false)
     })
+
+    it("normal: bare * should match any http website", () => {
+      expect(domainMatcher.matches("*", "wildcard", "https://github.com")).toBe(true)
+      expect(domainMatcher.matches("*", "wildcard", "https://anything.example.com/path")).toBe(true)
+    })
+
+    it("edge: bare * should not match non-http URLs", () => {
+      expect(domainMatcher.matches("*", "wildcard", "chrome://extensions")).toBe(false)
+    })
   })
 
   describe("matches - regex mode", () => {

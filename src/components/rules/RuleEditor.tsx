@@ -21,11 +21,7 @@ function createDefaultConditionGroup(): ConditionGroup {
     id: Math.random().toString(36).substring(2, 9),
     domains: [""],
     matchMode: "wildcard",
-    schedule: {
-      days: [1, 2, 3, 4, 5],
-      startTime: "09:00",
-      endTime: "18:00",
-    },
+    schedule: null, // 默认不限时间，用户按需开启
   }
 }
 

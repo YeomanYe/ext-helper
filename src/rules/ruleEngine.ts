@@ -2,14 +2,49 @@
 // 规则引擎
 // ============================================================
 
-import type { Action, Condition, ConditionOperator, ScheduleCondition } from "./types"
+import type { Action, Condition, ConditionGroup, ConditionOperator, ScheduleCondition } from "./types"
 import { domainMatcher } from "./domainMatcher"
 import { browserAdapter } from "@/services/browser/adapter"
 import { RULES_STORAGE_KEY } from "./constants"
 
 export class RuleEngine {
   /**
-   * 评估域名条件
+   * 评估单个 ConditionGroup（新数据模型）
+   * - domains 为空或全为空字符串 → 匹配所有网站
+   * - schedule 为 null → 不限时间
+   */
+  evaluateConditionGroup(group: ConditionGroup, url: string): boolean {
+    // 域名检查：空域名列表 = 所有网站
+    const nonEmptyDomains = group.domains.filter((d) => d.trim())
+    const domainMatch =
+      nonEmptyDomains.length === 0
+        ? true // 无域名限制 = 全站生效
+        : nonEmptyDomains.some((domain) =>
+            domainMatcher.matches(domain, group.matchMode, url)
+          )
+
+    if (!domainMatch) return false
+
+    // 时间检查：schedule 为 null = 不限时间
+    if (!group.schedule) return true
+    return this.isScheduleMatch(group.schedule as ScheduleCondition)
+  }
+
+  /**
+   * 评估 ConditionGroup 列表（新数据模型，供 background 使用）
+   */
+  evaluateConditionGroups(
+    groups: ConditionGroup[] | undefined,
+    operator: ConditionOperator,
+    url: string
+  ): boolean {
+    if (!groups || groups.length === 0) return false
+    const results = groups.map((g) => this.evaluateConditionGroup(g, url))
+    return this.combineResults(results, operator)
+  }
+
+  /**
+   * 评估域名条件（兼容旧数据）
    */
   evaluateDomainConditions(
     conditions: Condition[],
@@ -32,7 +67,7 @@ export class RuleEngine {
   }
 
   /**
-   * 评估时间表条件
+   * 评估时间表条件（兼容旧数据）
    */
   evaluateScheduleConditions(
     conditions: Condition[],
@@ -50,7 +85,7 @@ export class RuleEngine {
   }
 
   /**
-   * 评估所有条件
+   * 评估所有条件（兼容旧数据）
    */
   evaluateConditions(
     conditions: Condition[],
@@ -124,7 +159,7 @@ export class RuleEngine {
   }
 
   /**
-   * 检查时间表条件 (星期 + 时间范围)
+   * 检查时间表条件 (星期 + 时间范围)，public 供 background 直接调用
    */
   isScheduleMatch(schedule: ScheduleCondition): boolean {
     // 检查星期

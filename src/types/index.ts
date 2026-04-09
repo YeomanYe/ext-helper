@@ -94,7 +94,7 @@ export interface GroupStore {
   expandedGroups: Set<string>
   draggedExtensionId: string | null
   fetchGroups: () => Promise<void>
-  createGroup: (name: string, color?: string) => Promise<void>
+  createGroup: (name: string, color?: string, extensionIds?: string[]) => Promise<void>
   deleteGroup: (id: string) => Promise<void>
   renameGroup: (id: string, name: string) => Promise<void>
   updateGroup: (id: string, updates: { name?: string; color?: string; icon?: string; iconUrl?: string }) => Promise<void>

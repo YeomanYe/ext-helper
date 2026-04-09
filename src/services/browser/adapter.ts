@@ -138,14 +138,14 @@ async function uninstallExtension(id: string): Promise<void> {
   }
 }
 
-async function openOptionsPage(id: string): Promise<void> {
+async function openOptionsPage(optionsUrl: string): Promise<void> {
   const browserType = detectBrowser()
 
   try {
     if (browserType === "firefox") {
-      await browser.management.openOptionsPage(id)
+      await browser.tabs.create({ url: optionsUrl })
     } else {
-      await chrome.management.openOptionsPage(id)
+      await chrome.tabs.create({ url: optionsUrl })
     }
   } catch (error) {
     throw new BrowserError(

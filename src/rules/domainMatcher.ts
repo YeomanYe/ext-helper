@@ -24,14 +24,22 @@ function extractHostname(url: string): string {
  * 通配符匹配 (*.example.com -> api.github.com)
  */
 function wildcardMatch(pattern: string, hostname: string): boolean {
-  // 转换通配符为正则
-  const regexPattern = pattern
-    .replace(/[.+?^${}()|[\]\\]/g, "\\$&") // 转义特殊字符
-    .replace(/^\*\./, "") // 移除前导 *. -> .example.com
+  // 裸 * = 匹配所有网站
+  if (pattern === "*") return true
 
-  // 检查是否以 . + pattern 结尾
-  const regex = new RegExp(`(\\.${regexPattern})$`, "i")
-  return regex.test(hostname) || hostname === regexPattern
+  // 先移除 *. 前缀，再转义（避免转义后 /^\*\./ 匹配失败的 bug）
+  const isSubdomainWildcard = pattern.startsWith("*.")
+  const domainPart = isSubdomainWildcard ? pattern.slice(2) : pattern
+  const escapedDomain = domainPart.replace(/[.+?^${}()|[\]\\]/g, "\\$&")
+
+  if (isSubdomainWildcard) {
+    // *.github.com 只匹配子域名（不含根域名本身）
+    const regex = new RegExp(`\\.${escapedDomain}$`, "i")
+    return regex.test(hostname)
+  }
+
+  // 无通配符：精确匹配域名
+  return hostname === domainPart
 }
 
 /**

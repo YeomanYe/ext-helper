@@ -133,34 +133,31 @@ class RuleBackgroundService {
   }
 
   /**
-   * 检查时间规则
+   * 检查时间规则（仅评估 conditionGroup 中的 schedule 部分，忽略域名）
    */
   private async checkTimeRules(): Promise<void> {
     const rules = await this.getEnabledRules()
     const now = Date.now()
 
     for (const rule of rules) {
+      if (!rule.conditionGroups) continue
+
       // 只检查有时间条件的规则
-      const hasTimeCondition = rule.conditions.some(
-        (c) => c.type === "time" || c.type === "dayOfWeek"
-      )
+      const hasSchedule = rule.conditionGroups.some((g) => g.schedule !== null)
+      if (!hasSchedule) continue
 
-      if (!hasTimeCondition) continue
-
-      // 检查是否应该触发（避免短时间内重复触发）
+      // 避免短时间内重复触发
       const settings = await this.getSettings()
       const cooldown = settings.schedulerInterval * 2
-      if (
-        rule.lastTriggeredAt &&
-        now - rule.lastTriggeredAt < cooldown
-      ) {
+      if (rule.lastTriggeredAt && now - rule.lastTriggeredAt < cooldown) {
         continue
       }
 
-      const shouldTrigger = ruleEngine.evaluateTimeConditions(
-        rule.conditions,
-        rule.conditionOperator
-      )
+      // 仅评估 schedule，不管域名（时间到了就触发）
+      const shouldTrigger = rule.conditionGroups.some((g) => {
+        if (!g.schedule) return false
+        return ruleEngine.isScheduleMatch(g.schedule as any)
+      })
 
       if (shouldTrigger) {
         console.log(`[RuleBackground] Triggering time rule: ${rule.name}`)
@@ -171,7 +168,7 @@ class RuleBackgroundService {
   }
 
   /**
-   * 检查域名规则
+   * 检查域名规则（基于 conditionGroups）
    */
   private async checkDomainRules(_tabId: number, url: string): Promise<void> {
     // 忽略 chrome:// 等内部页面
@@ -182,15 +179,10 @@ class RuleBackgroundService {
     const rules = await this.getEnabledRules()
 
     for (const rule of rules) {
-      // 只检查有域名条件的规则
-      const hasDomainCondition = rule.conditions.some(
-        (c) => c.type === "domain"
-      )
+      if (!rule.conditionGroups) continue
 
-      if (!hasDomainCondition) continue
-
-      const shouldTrigger = ruleEngine.evaluateDomainConditions(
-        rule.conditions,
+      const shouldTrigger = ruleEngine.evaluateConditionGroups(
+        rule.conditionGroups,
         rule.conditionOperator,
         url
       )

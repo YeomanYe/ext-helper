@@ -99,15 +99,14 @@ export function PopupPage() {
   }, [fetchExtensions, fetchGroups])
 
   const handleOpenOptions = React.useCallback(async (id: string) => {
+    const ext = extensions.find((e) => e.id === id)
+    if (!ext?.optionsUrl) return
     if (devMode) {
-      const ext = extensions.find((e) => e.id === id)
-      if (ext?.optionsUrl) {
-        window.open(ext.optionsUrl, "_blank")
-      }
+      window.open(ext.optionsUrl, "_blank")
       return
     }
     try {
-      await browserAdapter.openOptionsPage(id)
+      await browserAdapter.openOptionsPage(ext.optionsUrl)
     } catch (err) {
       console.error("Failed to open options page:", err)
     }
@@ -294,23 +293,12 @@ export function PopupPage() {
             setShowCreateModal(false)
           }}
           onCreate={showCreateModal ? async (name, color, extensionIds, iconUrl) => {
-            await createGroup(name, color)
-            // Get fresh groups from store after state update
-            const latestGroups = useGroupStore.getState().groups
-            const latestGroup = latestGroups[latestGroups.length - 1]
-            if (latestGroup) {
-              // Add selected extensions to the new group
-              if (extensionIds.length > 0) {
-                extensionIds.forEach(extId => {
-                  addToGroup(latestGroup.id, extId)
-                })
-              }
-              // Update icon if provided
-              if (iconUrl) {
+            await createGroup(name, color, extensionIds)
+            if (iconUrl) {
+              const latestGroup = useGroupStore.getState().groups.at(-1)
+              if (latestGroup) {
                 updateGroup(latestGroup.id, { icon: "custom", iconUrl })
               }
-              // Keep the new group highlighted after creation
-              setSelectedGroupId(latestGroup.id)
             }
           } : undefined}
           disableEnableControls={isBisectActive}
