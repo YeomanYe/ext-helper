@@ -9,12 +9,14 @@ import { RuleList } from "./RuleList"
 import { RuleEditor } from "./RuleEditor"
 import type { Rule } from "@/rules/types"
 
-type RuleFilterType = "all" | "enabled" | "disabled"
+type RuleFilterType = "all" | "enabled" | "disabled" | "has-group" | "no-group"
 
 const FILTERS: { value: RuleFilterType; label: string }[] = [
   { value: "all", label: "ALL" },
   { value: "enabled", label: "ON" },
   { value: "disabled", label: "OFF" },
+  { value: "has-group", label: "HAS_GRP" },
+  { value: "no-group", label: "NO_GRP" },
 ]
 
 function RuleFilterDropdown({
@@ -47,7 +49,7 @@ function RuleFilterDropdown({
       {showDropdown && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setShowDropdown(false)} />
-          <div className="absolute top-full left-0 mt-1 z-50 w-28 border border-punk-border bg-punk-bg-alt shadow-[0_0_20px_rgba(124,58,237,0.3)]">
+          <div className="absolute top-full left-0 mt-1 z-50 min-w-full w-max border border-punk-border bg-punk-bg-alt shadow-[0_0_20px_rgba(124,58,237,0.3)]">
             {FILTERS.map((filter) => (
               <button
                 key={filter.value}
@@ -138,6 +140,14 @@ export function RuleManager() {
       result = result.filter((r) => r.enabled)
     } else if (filter === "disabled") {
       result = result.filter((r) => !r.enabled)
+    } else if (filter === "has-group") {
+      result = result.filter((r) =>
+        r.actions.some((a) => a.type === "enableGroup" || a.type === "disableGroup")
+      )
+    } else if (filter === "no-group") {
+      result = result.filter((r) =>
+        r.actions.every((a) => a.type === "enableExtension" || a.type === "disableExtension")
+      )
     }
 
     // Filter by search

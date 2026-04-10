@@ -29,6 +29,12 @@ export const GROUP_PANEL_FILTERS: { value: FilterType; label: string }[] = [
   { value: "not-in-group", label: "NOT_CUR" },
 ]
 
+export const ACTION_FILTERS: { value: FilterType; label: string }[] = [
+  { value: "all", label: "ALL" },
+  { value: "in-rule", label: "SELECTED" },
+  { value: "no-rule", label: "UNSELECT" },
+]
+
 interface SearchBarProps {
   value: string
   onChange: (value: string) => void
@@ -49,6 +55,7 @@ export function SearchBar({
   const [showDropdown, setShowDropdown] = React.useState(false)
 
   const currentFilter = filters.find((f) => f.value === activeFilter) || filters[0]
+  const longestLabel = filters.reduce((a, b) => (a.label.length >= b.label.length ? a : b)).label
 
   return (
     <div className="flex items-center gap-3">
@@ -66,7 +73,13 @@ export function SearchBar({
               "transition-all duration-200"
             )}
           >
-            <span>{currentFilter.label}</span>
+            {/* Stable-width: invisible widest label sets button width */}
+            <span className="relative inline-flex items-center">
+              <span className="invisible select-none" aria-hidden="true">
+                {longestLabel}
+              </span>
+              <span className="absolute inset-0 flex items-center">{currentFilter.label}</span>
+            </span>
             <ChevronDown
               className={cn("h-3 w-3 transition-transform", showDropdown && "rotate-180")}
             />
@@ -75,7 +88,7 @@ export function SearchBar({
           {showDropdown && (
             <>
               <div className="fixed inset-0 z-40" onClick={() => setShowDropdown(false)} />
-              <div className="absolute top-full left-0 mt-1 z-50 w-full border border-punk-border bg-punk-bg-alt shadow-[0_0_20px_rgba(124,58,237,0.3)]">
+              <div className="absolute top-full left-0 mt-1 z-50 min-w-full w-max border border-punk-border bg-punk-bg-alt shadow-[0_0_20px_rgba(124,58,237,0.3)]">
                 {filters.map((filter) => (
                   <button
                     key={filter.value}

@@ -1,7 +1,7 @@
 import * as React from "react"
 import { Power, Folder, X } from "lucide-react"
 import { cn } from "@/utils"
-import { SearchBar } from "@/components/popup"
+import { SearchBar, ACTION_FILTERS } from "@/components/popup"
 import type { Action } from "@/rules/types"
 import { useExtensionStore } from "@/stores/extensionStore"
 import { useGroupStore } from "@/stores/groupStore"
@@ -11,7 +11,7 @@ interface ActionBuilderProps {
   onChange: (actions: Action[]) => void
 }
 
-type ActionFilterType = "all" | "extensions" | "groups"
+type ActionFilterType = "all" | "in-rule" | "no-rule"
 
 export function ActionBuilder({ actions, onChange }: ActionBuilderProps) {
   const { extensions } = useExtensionStore()
@@ -31,17 +31,39 @@ export function ActionBuilder({ actions, onChange }: ActionBuilderProps) {
 
   // Filtered extensions
   const filteredExtensions = React.useMemo(() => {
-    if (!searchQuery.trim()) return extensions
-    const query = searchQuery.toLowerCase()
-    return extensions.filter((ext) => ext.name.toLowerCase().includes(query))
-  }, [extensions, searchQuery])
+    let result = extensions
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase()
+      result = result.filter((ext) => ext.name.toLowerCase().includes(query))
+    }
+    if (activeFilter === "in-rule")
+      result = result.filter(
+        (ext) => enabledExtensions.includes(ext.id) || disabledExtensions.includes(ext.id)
+      )
+    else if (activeFilter === "no-rule")
+      result = result.filter(
+        (ext) => !enabledExtensions.includes(ext.id) && !disabledExtensions.includes(ext.id)
+      )
+    return result
+  }, [extensions, searchQuery, activeFilter, enabledExtensions, disabledExtensions])
 
   // Filtered groups
   const filteredGroups = React.useMemo(() => {
-    if (!searchQuery.trim()) return groups
-    const query = searchQuery.toLowerCase()
-    return groups.filter((grp) => grp.name.toLowerCase().includes(query))
-  }, [groups, searchQuery])
+    let result = groups
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase()
+      result = result.filter((grp) => grp.name.toLowerCase().includes(query))
+    }
+    if (activeFilter === "in-rule")
+      result = result.filter(
+        (grp) => enabledGroups.includes(grp.id) || disabledGroups.includes(grp.id)
+      )
+    else if (activeFilter === "no-rule")
+      result = result.filter(
+        (grp) => !enabledGroups.includes(grp.id) && !disabledGroups.includes(grp.id)
+      )
+    return result
+  }, [groups, searchQuery, activeFilter, enabledGroups, disabledGroups])
 
   const toggleExtensionEnable = (extId: string) => {
     if (enabledExtensions.includes(extId)) {
@@ -131,80 +153,80 @@ export function ActionBuilder({ actions, onChange }: ActionBuilderProps) {
       <SearchBar
         value={searchQuery}
         onChange={setSearchQuery}
-        placeholder="SEARCH_EXTENSIONS..."
+        placeholder="SEARCH_TARGETS..."
         activeFilter={activeFilter}
-        onFilterChange={setActiveFilter}
+        onFilterChange={(f) => setActiveFilter(f as ActionFilterType)}
+        filters={ACTION_FILTERS}
       />
 
       {/* Compact Grid */}
-      {(activeFilter === "all" || activeFilter === "extensions") &&
-        filteredExtensions.length > 0 && (
-          <div>
-            <p className="font-punk-heading text-[12px] text-punk-text-muted uppercase tracking-wider mb-1">
-              EXTENSIONS
-            </p>
-            <div className="grid grid-cols-2 gap-1 max-h-48 overflow-y-auto">
-              {filteredExtensions.map((ext) => (
-                <div
-                  key={ext.id}
-                  className={cn(
-                    "flex items-center gap-1.5 px-2 py-1.5 border transition-all",
-                    enabledExtensions.includes(ext.id)
-                      ? "border-punk-success/50 bg-punk-success/5"
-                      : disabledExtensions.includes(ext.id)
-                        ? "border-punk-cta/50 bg-punk-cta/5"
-                        : "border-punk-border/20 bg-punk-bg hover:border-punk-border/50"
-                  )}
-                >
-                  {/* Icon */}
-                  {ext.iconUrl ? (
-                    <img src={ext.iconUrl} className="h-5 w-5 object-cover flex-shrink-0" alt="" />
-                  ) : (
-                    <div className="h-5 w-5 bg-punk-bg-alt flex items-center justify-center flex-shrink-0">
-                      <span className="font-punk-heading text-[10px] text-punk-text-muted">
-                        {ext.name[0]}
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Name */}
-                  <span className="flex-1 font-punk-heading text-[11px] text-punk-text-primary uppercase truncate">
-                    {ext.name}
-                  </span>
-
-                  {/* ON/OFF */}
-                  <div className="flex gap-0.5">
-                    <button
-                      onClick={() => toggleExtensionEnable(ext.id)}
-                      className={cn(
-                        "px-1 py-0.5 text-[10px] font-punk-heading transition-all",
-                        enabledExtensions.includes(ext.id)
-                          ? "bg-punk-success text-white"
-                          : "text-punk-text-muted hover:text-punk-success"
-                      )}
-                    >
-                      ON
-                    </button>
-                    <button
-                      onClick={() => toggleExtensionDisable(ext.id)}
-                      className={cn(
-                        "px-1 py-0.5 text-[10px] font-punk-heading transition-all",
-                        disabledExtensions.includes(ext.id)
-                          ? "bg-punk-cta text-white"
-                          : "text-punk-text-muted hover:text-punk-cta"
-                      )}
-                    >
-                      OFF
-                    </button>
+      {filteredExtensions.length > 0 && (
+        <div>
+          <p className="font-punk-heading text-[12px] text-punk-text-muted uppercase tracking-wider mb-1">
+            EXTENSIONS
+          </p>
+          <div className="grid grid-cols-2 gap-1 max-h-48 overflow-y-auto">
+            {filteredExtensions.map((ext) => (
+              <div
+                key={ext.id}
+                className={cn(
+                  "flex items-center gap-1.5 px-2 py-1.5 border transition-all",
+                  enabledExtensions.includes(ext.id)
+                    ? "border-punk-success/50 bg-punk-success/5"
+                    : disabledExtensions.includes(ext.id)
+                      ? "border-punk-cta/50 bg-punk-cta/5"
+                      : "border-punk-border/20 bg-punk-bg hover:border-punk-border/50"
+                )}
+              >
+                {/* Icon */}
+                {ext.iconUrl ? (
+                  <img src={ext.iconUrl} className="h-5 w-5 object-cover flex-shrink-0" alt="" />
+                ) : (
+                  <div className="h-5 w-5 bg-punk-bg-alt flex items-center justify-center flex-shrink-0">
+                    <span className="font-punk-heading text-[10px] text-punk-text-muted">
+                      {ext.name[0]}
+                    </span>
                   </div>
+                )}
+
+                {/* Name */}
+                <span className="flex-1 font-punk-heading text-[11px] text-punk-text-primary uppercase truncate">
+                  {ext.name}
+                </span>
+
+                {/* ON/OFF */}
+                <div className="flex gap-0.5">
+                  <button
+                    onClick={() => toggleExtensionEnable(ext.id)}
+                    className={cn(
+                      "px-1 py-0.5 text-[10px] font-punk-heading transition-all",
+                      enabledExtensions.includes(ext.id)
+                        ? "bg-punk-success text-white"
+                        : "text-punk-text-muted hover:text-punk-success"
+                    )}
+                  >
+                    ON
+                  </button>
+                  <button
+                    onClick={() => toggleExtensionDisable(ext.id)}
+                    className={cn(
+                      "px-1 py-0.5 text-[10px] font-punk-heading transition-all",
+                      disabledExtensions.includes(ext.id)
+                        ? "bg-punk-cta text-white"
+                        : "text-punk-text-muted hover:text-punk-cta"
+                    )}
+                  >
+                    OFF
+                  </button>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
-        )}
+        </div>
+      )}
 
       {/* Groups Grid - Same card style as extensions */}
-      {(activeFilter === "all" || activeFilter === "groups") && filteredGroups.length > 0 && (
+      {filteredGroups.length > 0 && (
         <div>
           <p className="font-punk-heading text-[12px] text-punk-text-muted uppercase tracking-wider mb-1">
             SECTORS
