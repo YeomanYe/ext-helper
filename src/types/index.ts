@@ -43,6 +43,8 @@ export type FilterType =
   | "not-in-group"
   | "in-rule"
   | "no-rule"
+  | "in-any-group"
+  | "no-any-group"
 export type SortType = "name" | "enabled" | "recentlyUsed"
 export type ViewMode = "compact" | "card" | "detail"
 export type BisectPhase = "idle" | "running" | "resolved" | "cancelled"

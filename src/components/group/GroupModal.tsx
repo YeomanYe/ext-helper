@@ -4,6 +4,7 @@ import { GroupEditorPanel } from "@/components/group/GroupEditorPanel"
 import { GroupExtensionPicker } from "@/components/group/GroupExtensionPicker"
 import type { Group, Extension, FilterType } from "@/types"
 import { cn } from "@/utils"
+import { useGroupStore } from "@/stores/groupStore"
 
 interface GroupModalProps {
   group?: Group
@@ -42,8 +43,12 @@ export function GroupModal({
   onUpdateGroup,
 }: GroupModalProps) {
   const isCreateMode = !group
+  const { groups } = useGroupStore()
   const [searchQuery, setSearchQuery] = React.useState("")
   const [filter, setFilter] = React.useState<FilterType>("all")
+
+  // IDs in any group (across all groups, not just the current one)
+  const anyGroupIds = React.useMemo(() => new Set(groups.flatMap((g) => g.extensionIds)), [groups])
   const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false)
   const [editName, setEditName] = React.useState(group?.name || "New Group")
   const [editIconUrl, setEditIconUrl] = React.useState(group?.iconUrl || "")
@@ -72,6 +77,8 @@ export function GroupModal({
         if (filter === "disabled" && extension.enabled) return false
         if (filter === "in-group" && !extension.isInGroup) return false
         if (filter === "not-in-group" && extension.isInGroup) return false
+        if (filter === "in-any-group" && !anyGroupIds.has(extension.id)) return false
+        if (filter === "no-any-group" && anyGroupIds.has(extension.id)) return false
         if (!searchQuery.trim()) return true
 
         const query = searchQuery.toLowerCase()
@@ -80,7 +87,7 @@ export function GroupModal({
           extension.description.toLowerCase().includes(query)
         )
       }),
-    [extensionsWithStatus, filter, searchQuery]
+    [extensionsWithStatus, filter, searchQuery, anyGroupIds]
   )
 
   React.useEffect(() => {

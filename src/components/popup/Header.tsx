@@ -27,6 +27,8 @@ export const GROUP_PANEL_FILTERS: { value: FilterType; label: string }[] = [
   ...BASE_FILTERS,
   { value: "in-group", label: "IN_CUR" },
   { value: "not-in-group", label: "NOT_CUR" },
+  { value: "in-any-group", label: "ANY_GRP" },
+  { value: "no-any-group", label: "NO_GRP" },
 ]
 
 export const ACTION_FILTERS: { value: FilterType; label: string }[] = [
