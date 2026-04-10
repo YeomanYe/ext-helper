@@ -56,8 +56,6 @@ export function SearchBar({
   const [dropUp, setDropUp] = React.useState(false)
   const buttonRef = React.useRef<HTMLButtonElement>(null)
 
-  const currentFilter = filters.find((f) => f.value === activeFilter) || filters[0]
-
   const handleToggle = () => {
     if (!showDropdown && buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect()
@@ -108,7 +106,7 @@ export function SearchBar({
               <div className="fixed inset-0 z-40" onClick={() => setShowDropdown(false)} />
               <div
                 className={cn(
-                  "absolute left-0 z-50 min-w-full w-max border border-punk-border bg-punk-bg-alt shadow-[0_0_20px_rgba(124,58,237,0.3)]",
+                  "absolute left-0 z-50 min-w-full border border-punk-border bg-punk-bg-alt shadow-[0_0_20px_rgba(124,58,237,0.3)]",
                   dropUp ? "bottom-full mb-1" : "top-full mt-1"
                 )}
               >

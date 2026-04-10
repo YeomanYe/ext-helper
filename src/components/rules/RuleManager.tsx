@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Search, Plus, X, ChevronDown } from "lucide-react"
+import { Plus, X, ChevronDown } from "lucide-react"
 import { cn } from "@/utils"
 import { useRuleStore } from "@/stores/ruleStore"
 import { useExtensionStore } from "@/stores/extensionStore"
@@ -29,8 +29,6 @@ function RuleFilterDropdown({
   const [showDropdown, setShowDropdown] = React.useState(false)
   const [dropUp, setDropUp] = React.useState(false)
   const buttonRef = React.useRef<HTMLButtonElement>(null)
-  const currentLabel = FILTERS.find((f) => f.value === value)?.label || "ALL"
-
   const handleToggle = () => {
     if (!showDropdown && buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect()
@@ -75,7 +73,7 @@ function RuleFilterDropdown({
           <div className="fixed inset-0 z-40" onClick={() => setShowDropdown(false)} />
           <div
             className={cn(
-              "absolute left-0 z-50 min-w-full w-max border border-punk-border bg-punk-bg-alt shadow-[0_0_20px_rgba(124,58,237,0.3)]",
+              "absolute left-0 z-50 min-w-full border border-punk-border bg-punk-bg-alt shadow-[0_0_20px_rgba(124,58,237,0.3)]",
               dropUp ? "bottom-full mb-1" : "top-full mt-1"
             )}
           >
