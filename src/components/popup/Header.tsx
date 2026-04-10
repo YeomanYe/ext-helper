@@ -53,9 +53,18 @@ export function SearchBar({
   filters = BASE_FILTERS,
 }: SearchBarProps) {
   const [showDropdown, setShowDropdown] = React.useState(false)
+  const [dropUp, setDropUp] = React.useState(false)
+  const buttonRef = React.useRef<HTMLButtonElement>(null)
 
   const currentFilter = filters.find((f) => f.value === activeFilter) || filters[0]
-  const longestLabel = filters.reduce((a, b) => (a.label.length >= b.label.length ? a : b)).label
+
+  const handleToggle = () => {
+    if (!showDropdown && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect()
+      setDropUp(window.innerHeight - rect.bottom < filters.length * 36 + 8)
+    }
+    setShowDropdown((v) => !v)
+  }
 
   return (
     <div className="flex items-center gap-3">
@@ -63,7 +72,8 @@ export function SearchBar({
       {onFilterChange && (
         <div className="relative">
           <button
-            onClick={() => setShowDropdown(!showDropdown)}
+            ref={buttonRef}
+            onClick={handleToggle}
             className={cn(
               "flex items-center gap-2 px-3 h-11",
               "border border-punk-border/50 bg-punk-bg-alt",
@@ -73,12 +83,20 @@ export function SearchBar({
               "transition-all duration-200"
             )}
           >
-            {/* Stable-width: invisible widest label sets button width */}
-            <span className="relative inline-flex items-center">
-              <span className="invisible select-none" aria-hidden="true">
-                {longestLabel}
-              </span>
-              <span className="absolute inset-0 flex items-center">{currentFilter.label}</span>
+            {/* Grid-stack: all labels occupy same cell, width = widest rendered label */}
+            <span className="inline-grid">
+              {filters.map((f) => (
+                <span
+                  key={f.value}
+                  className={cn(
+                    "col-start-1 row-start-1",
+                    f.value !== activeFilter && "invisible select-none"
+                  )}
+                  aria-hidden={f.value !== activeFilter ? "true" : undefined}
+                >
+                  {f.label}
+                </span>
+              ))}
             </span>
             <ChevronDown
               className={cn("h-3 w-3 transition-transform", showDropdown && "rotate-180")}
@@ -88,7 +106,12 @@ export function SearchBar({
           {showDropdown && (
             <>
               <div className="fixed inset-0 z-40" onClick={() => setShowDropdown(false)} />
-              <div className="absolute top-full left-0 mt-1 z-50 min-w-full w-max border border-punk-border bg-punk-bg-alt shadow-[0_0_20px_rgba(124,58,237,0.3)]">
+              <div
+                className={cn(
+                  "absolute left-0 z-50 min-w-full w-max border border-punk-border bg-punk-bg-alt shadow-[0_0_20px_rgba(124,58,237,0.3)]",
+                  dropUp ? "bottom-full mb-1" : "top-full mt-1"
+                )}
+              >
                 {filters.map((filter) => (
                   <button
                     key={filter.value}

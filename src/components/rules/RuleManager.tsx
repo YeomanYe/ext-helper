@@ -27,12 +27,23 @@ function RuleFilterDropdown({
   onChange: (v: RuleFilterType) => void
 }) {
   const [showDropdown, setShowDropdown] = React.useState(false)
+  const [dropUp, setDropUp] = React.useState(false)
+  const buttonRef = React.useRef<HTMLButtonElement>(null)
   const currentLabel = FILTERS.find((f) => f.value === value)?.label || "ALL"
+
+  const handleToggle = () => {
+    if (!showDropdown && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect()
+      setDropUp(window.innerHeight - rect.bottom < FILTERS.length * 36 + 8)
+    }
+    setShowDropdown((v) => !v)
+  }
 
   return (
     <div className="relative">
       <button
-        onClick={() => setShowDropdown(!showDropdown)}
+        ref={buttonRef}
+        onClick={handleToggle}
         className={cn(
           "flex items-center gap-2 px-3 h-9",
           "border border-punk-border/50 bg-punk-bg-alt",
@@ -42,14 +53,32 @@ function RuleFilterDropdown({
           "transition-all duration-200"
         )}
       >
-        <span>{currentLabel}</span>
+        <span className="inline-grid">
+          {FILTERS.map((f) => (
+            <span
+              key={f.value}
+              className={cn(
+                "col-start-1 row-start-1",
+                f.value !== value && "invisible select-none"
+              )}
+              aria-hidden={f.value !== value ? "true" : undefined}
+            >
+              {f.label}
+            </span>
+          ))}
+        </span>
         <ChevronDown className={cn("h-3 w-3 transition-transform", showDropdown && "rotate-180")} />
       </button>
 
       {showDropdown && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setShowDropdown(false)} />
-          <div className="absolute top-full left-0 mt-1 z-50 min-w-full w-max border border-punk-border bg-punk-bg-alt shadow-[0_0_20px_rgba(124,58,237,0.3)]">
+          <div
+            className={cn(
+              "absolute left-0 z-50 min-w-full w-max border border-punk-border bg-punk-bg-alt shadow-[0_0_20px_rgba(124,58,237,0.3)]",
+              dropUp ? "bottom-full mb-1" : "top-full mt-1"
+            )}
+          >
             {FILTERS.map((filter) => (
               <button
                 key={filter.value}
