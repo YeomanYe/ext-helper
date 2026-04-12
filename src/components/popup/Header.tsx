@@ -1,7 +1,18 @@
 import * as React from "react"
 import { X, LayoutGrid, List, ChevronDown, FileText } from "lucide-react"
 import { cn } from "@/utils"
+import { isDevMode } from "@/services/mockData"
 import type { FilterType, ViewMode } from "@/types"
+
+function useExtensionVersion(): string {
+  const [version, setVersion] = React.useState("1.0.0")
+  React.useEffect(() => {
+    if (!isDevMode() && typeof chrome !== "undefined" && chrome.runtime?.getManifest) {
+      setVersion(chrome.runtime.getManifest().version)
+    }
+  }, [])
+  return version
+}
 
 interface SearchBarProps {
   value: string
@@ -197,6 +208,7 @@ interface HeaderProps {
 }
 
 export function Header({ viewMode = "compact", onViewModeChange }: HeaderProps) {
+  const version = useExtensionVersion()
   return (
     <header className="relative flex items-center justify-between border-b-2 border-punk-primary bg-punk-bg px-4 py-3 hud-corner">
       {/* Decorative scanline */}
@@ -206,13 +218,42 @@ export function Header({ viewMode = "compact", onViewModeChange }: HeaderProps) 
 
       {/* Logo and Title */}
       <div className="flex items-center gap-3 relative z-10">
-        {/* Cyberpunk Logo */}
+        {/* Extension Icon */}
         <div className="relative">
-          <div className="flex h-10 w-10 items-center justify-center border-2 border-punk-neon-cyan bg-punk-bg-alt">
-            <span className="font-punk-heading text-xs text-punk-neon-cyan animate-pulse-neon">
+          <svg
+            width="40"
+            height="40"
+            viewBox="0 0 40 40"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            {/* Background */}
+            <rect width="40" height="40" fill="#0D1B2A" />
+            {/* Border */}
+            <rect
+              x="1.5"
+              y="1.5"
+              width="37"
+              height="37"
+              stroke="#00FFFF"
+              strokeWidth="2"
+              fill="none"
+            />
+            {/* E letter with pulse animation */}
+            <text
+              x="20"
+              y="20"
+              textAnchor="middle"
+              dominantBaseline="central"
+              fill="#00FFFF"
+              fontSize="22"
+              fontWeight="bold"
+              fontFamily="monospace"
+              className="animate-pulse-neon"
+            >
               E
-            </span>
-          </div>
+            </text>
+          </svg>
           {/* Glow effect */}
           <div className="absolute inset-0 blur-md bg-punk-neon-cyan/30 -z-10" />
         </div>
@@ -220,7 +261,7 @@ export function Header({ viewMode = "compact", onViewModeChange }: HeaderProps) 
         <div className="flex flex-col">
           <h1 className="font-punk-heading text-xs text-punk-neon-cyan">EXTHELPER</h1>
           <span className="font-punk-body text-punk-text-muted text-sm tracking-wider">
-            EXTENSION_MGR_v2.0
+            EXTENSION_MGR_v{version}
           </span>
         </div>
       </div>
