@@ -15,7 +15,8 @@ const STEPS: Step[] = [
     terminal: (
       <>
         <span style={{ color: "var(--punk-neon-cyan)" }}>// Chrome Web Store</span>
-        <br />Search "Ext Helper"
+        <br />
+        Search "Ext Helper"
         <br />→ Click "Add to Chrome"
       </>
     ),
@@ -39,8 +40,10 @@ const STEPS: Step[] = [
     terminal: (
       <>
         <span style={{ color: "var(--punk-neon-cyan)" }}>// Example rule</span>
-        <br />github.com → enable DEV_TOOLS
-        <br />Mon–Fri 9–18h → enable WORK
+        <br />
+        github.com → enable DEV_TOOLS
+        <br />
+        Mon–Fri 9–18h → enable WORK
       </>
     ),
   },
@@ -53,13 +56,17 @@ export default function HowItWorks() {
     <section className="how-it-works section" id="how-it-works" aria-labelledby="how-title">
       <div className="container">
         <div ref={headerRef} className="reveal">
-          <div className="section-label" aria-hidden="true">Process</div>
+          <div className="section-label" aria-hidden="true">
+            Process
+          </div>
           <h2 className="section-title" id="how-title">
-            Up and Running in<br />
+            Up and Running in
+            <br />
             <span className="neon-text-purple">Three Steps</span>
           </h2>
           <p className="section-desc">
-            No configuration files, no complex setup. Install and start managing your extensions immediately.
+            No configuration files, no complex setup. Install and start managing your extensions
+            immediately.
           </p>
         </div>
 
@@ -82,7 +89,9 @@ function StepCard({ step, index }: { step: Step; index: number }) {
       role="listitem"
       style={{ transitionDelay: `${index * 100}ms` }}
     >
-      <div className="step-number" aria-hidden="true">{step.num}</div>
+      <div className="step-number" aria-hidden="true">
+        {step.num}
+      </div>
       <h3 className="step-title">{step.title}</h3>
       <p className="step-desc">{step.desc}</p>
       <div className="terminal-block" aria-label={`${step.title} example`}>

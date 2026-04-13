@@ -26,8 +26,10 @@ const FEATURES: Feature[] = [
     ],
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="#22d3ee" strokeWidth="2" aria-hidden="true">
-        <rect x="2" y="3" width="6" height="6" /><rect x="9" y="3" width="6" height="6" />
-        <rect x="16" y="3" width="6" height="6" /><rect x="2" y="12" width="6" height="6" />
+        <rect x="2" y="3" width="6" height="6" />
+        <rect x="9" y="3" width="6" height="6" />
+        <rect x="16" y="3" width="6" height="6" />
+        <rect x="2" y="12" width="6" height="6" />
         <rect x="9" y="12" width="6" height="6" />
       </svg>
     ),
@@ -40,7 +42,8 @@ const FEATURES: Feature[] = [
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2" aria-hidden="true">
         <path d="M12 2L2 7l10 5 10-5-10-5z" />
-        <path d="M2 17l10 5 10-5" /><path d="M2 12l10 5 10-5" />
+        <path d="M2 17l10 5 10-5" />
+        <path d="M2 12l10 5 10-5" />
       </svg>
     ),
   },
@@ -63,8 +66,10 @@ const FEATURES: Feature[] = [
     desc: "Binary search algorithm to find the problematic extension causing issues. Mark halves as good or bad — narrows to the culprit in log₂(n) steps.",
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="#f43f5e" strokeWidth="2" aria-hidden="true">
-        <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
-        <line x1="11" y1="8" x2="11" y2="14" /><line x1="8" y1="11" x2="14" y2="11" />
+        <circle cx="11" cy="11" r="8" />
+        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        <line x1="11" y1="8" x2="11" y2="14" />
+        <line x1="8" y1="11" x2="14" y2="11" />
       </svg>
     ),
   },
@@ -75,7 +80,8 @@ const FEATURES: Feature[] = [
     desc: "Full snapshot-based history of all extension state changes. Instantly revert any mistake — never lose your extension configuration again.",
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="#fbbf24" strokeWidth="2" aria-hidden="true">
-        <path d="M3 7v6h6" /><path d="M3 13A9 9 0 1 0 6 6.3" />
+        <path d="M3 7v6h6" />
+        <path d="M3 13A9 9 0 1 0 6 6.3" />
       </svg>
     ),
   },
@@ -86,7 +92,8 @@ const FEATURES: Feature[] = [
     desc: "Works seamlessly on Chrome, Firefox, and Edge. Single codebase, consistent experience across all major browsers.",
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="#a78bfa" strokeWidth="2" aria-hidden="true">
-        <circle cx="12" cy="12" r="10" /><line x1="2" y1="12" x2="22" y2="12" />
+        <circle cx="12" cy="12" r="10" />
+        <line x1="2" y1="12" x2="22" y2="12" />
         <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
       </svg>
     ),
@@ -100,13 +107,17 @@ export default function Features() {
     <section className="features section" id="features" aria-labelledby="features-title">
       <div className="container">
         <div ref={headerRef} className="reveal">
-          <div className="section-label" aria-hidden="true">Features</div>
+          <div className="section-label" aria-hidden="true">
+            Features
+          </div>
           <h2 className="section-title" id="features-title">
-            Everything You Need to<br />
+            Everything You Need to
+            <br />
             <span className="neon-text-cyan">Master Your Extensions</span>
           </h2>
           <p className="section-desc">
-            Purpose-built tools for developers and power users who work with many browser extensions daily.
+            Purpose-built tools for developers and power users who work with many browser extensions
+            daily.
           </p>
         </div>
 

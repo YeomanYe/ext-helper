@@ -37,11 +37,12 @@ lerna-debug.log*
 .DS_Store
 Thumbs.db
 
-# Environment
+# Environment (website/.env is intentionally committed — no secrets)
 .env
 .env.local
 .env.*.local
 *.env
+!website/.env
 
 # Testing
 coverage/

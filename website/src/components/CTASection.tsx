@@ -2,7 +2,15 @@ import { useReveal } from "../hooks/useReveal"
 import { config } from "../config"
 
 const DownloadIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    aria-hidden="true"
+  >
     <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
     <polyline points="7 10 12 15 17 10" />
     <line x1="12" y1="15" x2="12" y2="3" />
@@ -22,9 +30,12 @@ export default function CTASection() {
     <section className="cta-section section" aria-labelledby="cta-title">
       <div className="container">
         <div ref={ref} className="reveal">
-          <div className="cta-terminal" aria-hidden="true">install ext-helper --free</div>
+          <div className="cta-terminal" aria-hidden="true">
+            install ext-helper --free
+          </div>
           <h2 className="cta-title" id="cta-title">
-            Ready to Take Control<br />
+            Ready to Take Control
+            <br />
             <span className="neon-text-cta">of Your Browser?</span>
           </h2>
           <p className="cta-desc">

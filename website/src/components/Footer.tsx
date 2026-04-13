@@ -13,7 +13,9 @@ export default function Footer() {
         <div className="footer-inner">
           <div className="footer-logo">
             <span className="footer-logo-name">ExtHelper</span>
-            <span className="footer-logo-copy">&copy; {new Date().getFullYear()} Ext Helper. MIT License.</span>
+            <span className="footer-logo-copy">
+              &copy; {new Date().getFullYear()} Ext Helper. MIT License.
+            </span>
           </div>
           <nav className="footer-links" aria-label="Footer navigation">
             {LINKS.map((link) => (

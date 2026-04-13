@@ -1,7 +1,15 @@
 import { config } from "../config"
 
 const DownloadIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    aria-hidden="true"
+  >
     <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
     <polyline points="7 10 12 15 17 10" />
     <line x1="12" y1="15" x2="12" y2="3" />
@@ -30,8 +38,27 @@ function PopupMockup() {
           <div className="mockup-logo">
             <svg width="20" height="20" viewBox="0 0 40 40" fill="none" aria-hidden="true">
               <rect width="40" height="40" fill="#0D1B2A" />
-              <rect x="1.5" y="1.5" width="37" height="37" stroke="#00FFFF" strokeWidth="2" fill="none" />
-              <text x="20" y="20" textAnchor="middle" dominantBaseline="central" fill="#00FFFF" fontSize="22" fontWeight="bold" fontFamily="monospace">E</text>
+              <rect
+                x="1.5"
+                y="1.5"
+                width="37"
+                height="37"
+                stroke="#00FFFF"
+                strokeWidth="2"
+                fill="none"
+              />
+              <text
+                x="20"
+                y="20"
+                textAnchor="middle"
+                dominantBaseline="central"
+                fill="#00FFFF"
+                fontSize="22"
+                fontWeight="bold"
+                fontFamily="monospace"
+              >
+                E
+              </text>
             </svg>
             EXTHELPER
           </div>
@@ -40,14 +67,18 @@ function PopupMockup() {
 
         <div className="mockup-tabs">
           {["Extensions", "Groups", "Rules"].map((tab, i) => (
-            <div key={tab} className={`mockup-tab${i === 0 ? " active" : ""}`}>{tab}</div>
+            <div key={tab} className={`mockup-tab${i === 0 ? " active" : ""}`}>
+              {tab}
+            </div>
           ))}
         </div>
 
         <div className="mockup-search">
           <span className="mockup-search-dollar">$</span>
           <span>search extensions...</span>
-          <span style={{ marginLeft: "auto", color: "var(--punk-accent)", fontSize: "0.55rem" }}>ALL ▾</span>
+          <span style={{ marginLeft: "auto", color: "var(--punk-accent)", fontSize: "0.55rem" }}>
+            ALL ▾
+          </span>
         </div>
 
         <div className="mockup-ext-list">
@@ -56,7 +87,9 @@ function PopupMockup() {
               <div className="mockup-ext-dot" style={{ background: ext.color }} />
               <div className="mockup-ext-info">
                 <div className="mockup-ext-name">{ext.name}</div>
-                <div className="mockup-ext-sub">{ext.version} · {ext.enabled ? "enabled" : "disabled"}</div>
+                <div className="mockup-ext-sub">
+                  {ext.version} · {ext.enabled ? "enabled" : "disabled"}
+                </div>
               </div>
               <div className={`mockup-toggle${ext.enabled ? " on" : " off"}`} />
             </div>
@@ -64,7 +97,9 @@ function PopupMockup() {
         </div>
 
         <div className="mockup-footer">
-          <span>SYS_STATUS: <span style={{ color: "var(--punk-success)" }}>3/4 ONLINE</span></span>
+          <span>
+            SYS_STATUS: <span style={{ color: "var(--punk-success)" }}>3/4 ONLINE</span>
+          </span>
           <div className="mockup-footer-live">
             <div className="mockup-footer-dot" />
             LIVE
@@ -81,7 +116,9 @@ export default function Hero() {
       <div className="container">
         <div className="hero-inner">
           <div className="hero-content">
-            <div className="hero-badge" role="status">Browser Extension Manager</div>
+            <div className="hero-badge" role="status">
+              Browser Extension Manager
+            </div>
 
             <h1 className="hero-title" id="hero-title">
               <span className="hero-title-line1">TAKE CONTROL</span>
@@ -95,11 +132,21 @@ export default function Hero() {
             </p>
 
             <div className="hero-actions">
-              <a href={config.chromeStoreUrl} className="btn-primary" aria-label="Install Ext Helper for Chrome">
+              <a
+                href={config.chromeStoreUrl}
+                className="btn-primary"
+                aria-label="Install Ext Helper for Chrome"
+              >
                 <DownloadIcon />
                 Install for Chrome
               </a>
-              <a href={config.githubUrl} className="btn-secondary" target="_blank" rel="noopener noreferrer" aria-label="View source on GitHub">
+              <a
+                href={config.githubUrl}
+                className="btn-secondary"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="View source on GitHub"
+              >
                 <GithubIcon />
                 View Source
               </a>
