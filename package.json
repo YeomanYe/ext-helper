@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "plasmo dev",
-    "dev:all": "concurrently \"plasmo dev\" \"vite --config vite.config.ts\"",
+    "dev:all": "concurrently \"plasmo dev\" \"vite --config vite.config.ts\" \"vite --config vite.website.config.ts\"",
     "dev:web": "vite --config vite.config.ts",
     "dev:hmr": "vite dev --config vite.config.ts",
     "build": "plasmo build",
