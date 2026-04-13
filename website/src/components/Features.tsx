@@ -146,9 +146,9 @@ function FeatureCard({ feature, index }: { feature: Feature; index: number }) {
       <p className="bento-desc">{feature.desc}</p>
       {feature.chips && (
         <div className="bento-demo" aria-label="Example groups">
-          {feature.chips.map((chip) => (
-            <span key={chip.label} className={`bento-chip${chip.active ? " active" : ""}`}>
-              {chip.label}
+          {feature.chips.map(({ label, active }) => (
+            <span key={label} className={`bento-chip${active ? " active" : ""}`}>
+              {label}
             </span>
           ))}
         </div>
