@@ -128,7 +128,8 @@ export default function Hero() {
 
             <p className="hero-desc">
               Organize, automate, and debug all your browser extensions from one powerful dashboard.
-              Smart groups, domain-based rules, and binary search debugging — built for power users.
+              Custom groups, domain-based rules, and binary search debugging — built for power
+              users.
             </p>
 
             <div className="hero-actions">

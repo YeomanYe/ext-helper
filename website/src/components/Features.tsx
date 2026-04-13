@@ -14,7 +14,7 @@ const FEATURES: Feature[] = [
   {
     id: "groups",
     tag: "Organization",
-    title: "Smart Extension Groups",
+    title: "Extension Groups",
     desc: "Organize extensions into named, color-coded groups. Enable or disable an entire group with one click. Perfect for separating work, development, and personal browsing contexts.",
     large: true,
     chips: [
