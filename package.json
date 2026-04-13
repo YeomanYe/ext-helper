@@ -16,7 +16,9 @@
     "lint:fix": "eslint src --fix",
     "format": "prettier --write src",
     "format:check": "prettier --check src",
-    "prepare": "husky"
+    "prepare": "husky",
+    "dev:website": "vite --config vite.website.config.ts",
+    "build:website": "vite build --config vite.website.config.ts"
   },
   "lint-staged": {
     "src/**/*.{ts,tsx}": [

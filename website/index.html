@@ -4,9 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- =============================================
-       PRIMARY SEO
-       ============================================= -->
+  <!-- PRIMARY SEO -->
   <title>Ext Helper — Browser Extension Manager for Chrome, Firefox &amp; Edge</title>
   <meta name="description" content="Ext Helper is a free browser extension manager. Organize extensions into groups, automate enable/disable rules by domain, debug with binary search, and undo/redo changes instantly." />
   <meta name="keywords" content="browser extension manager, chrome extension manager, firefox addon manager, extension groups, extension rules, disable extensions, tab management" />
@@ -14,9 +12,7 @@
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="https://YOUR_DOMAIN/" />
 
-  <!-- =============================================
-       OPEN GRAPH (Facebook / LinkedIn)
-       ============================================= -->
+  <!-- OPEN GRAPH -->
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Ext Helper" />
   <meta property="og:title" content="Ext Helper — Browser Extension Manager" />
@@ -27,17 +23,13 @@
   <meta property="og:image:height" content="630" />
   <meta property="og:locale" content="en_US" />
 
-  <!-- =============================================
-       TWITTER CARD
-       ============================================= -->
+  <!-- TWITTER CARD -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Ext Helper — Browser Extension Manager" />
   <meta name="twitter:description" content="Organize, automate, and debug your browser extensions. Free for Chrome, Firefox, and Edge." />
   <meta name="twitter:image" content="https://YOUR_DOMAIN/og-image.png" />
 
-  <!-- =============================================
-       STRUCTURED DATA — SoftwareApplication
-       ============================================= -->
+  <!-- STRUCTURED DATA -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -48,11 +40,7 @@
     "operatingSystem": "Chrome, Firefox, Edge",
     "description": "A powerful browser extension manager with smart groups, automation rules, bisect debugging, and snapshot-based undo/redo.",
     "url": "https://YOUR_DOMAIN/",
-    "offers": {
-      "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "USD"
-    },
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
     "featureList": [
       "Extension enable/disable toggle",
       "Smart extension groups",
@@ -63,457 +51,15 @@
   }
   </script>
 
-  <!-- =============================================
-       PERFORMANCE — Font preconnect
-       ============================================= -->
+  <!-- FONT PRECONNECT -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
-  <!-- Favicon suppression (extension sets its own) -->
+  <!-- FAVICON -->
   <link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAACXBIWXMAAAsTAAALEwEAmpwYAAACK0lEQVR4nO3dIW4WURSGYXbw/xQDlEJ7riMBFCARWDbDIkgIK0AQRD2ChNQgQJGgIDmuGj1buCSsoKJhpv0e8fozXx53xdyoXqaW2G6sfYAWALQAoAUALQBoAUALAFoA0LINALvd0O7qBUB4BUB2BUB2BUB2BUB2BUB2BUB2BUB2BUB2BUB2BUB2BUB2BUB2BUB2BUB2BUB2BUB2BUB2BUB2dV0AHH/5deGOPpzNwzcfN9H+7hMA/teHbLH9eL753QBoAABoAABoAABoAABoAABoAABoAABoAABoAK4UgJOff+bxt/NNdPPk6eZ3u3YAbr9+u/q9u40EQHgFQHYFQHYFQHYFQHYFQHYFQHYFQHYFQHYFQHYFQHYFQHYFQHYFQHYFQHYFQHaVCOD4+/m8/+nHpXfw+OXqOwCwYreevVp9BwAAmAAAMAEAYAIAwAQAgAkAABMAACYAAEwAAJjxAB6c/Z733n++9A4evlh9BwAukMegAcDa9+42EgDhFQDZFQDZFQDZFQDZFQDZFQDZFQDZFQDZFQDZFQDZFQDZFQDZFQDZFQDZFQDZVSKALbX3vwAAdhvfDYAGAIAGAIAGAIAGAIAGAIAGAIAGAIAGAIAGYHUAR6dfL9zhu9N/7wFbaH/nEQAaAGgAoAGABgAaAGgAoAGABgAaAGgAoAGABgAaAGgAoAGABgAaAGgAoAGAxjoAtFzbAOjsAOjsAOjsAOjsAOjsAOjsAOjsAAjvL8FIH6kksFmjAAAAAElFTkSuQmCC" />
-
-  <link rel="stylesheet" href="/src/style.css" />
 </head>
-
 <body>
-
-  <!-- =============================================
-       NAVIGATION
-       ============================================= -->
-  <nav class="nav" aria-label="Main navigation">
-    <div class="container">
-      <div class="nav-inner">
-        <a href="/" class="nav-logo" aria-label="Ext Helper home">
-          <!-- Extension icon SVG -->
-          <svg class="nav-logo-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <rect width="40" height="40" fill="#0D1B2A"/>
-            <rect x="1.5" y="1.5" width="37" height="37" stroke="#00FFFF" stroke-width="2" fill="none"/>
-            <text x="20" y="20" text-anchor="middle" dominant-baseline="central" fill="#00FFFF" font-size="22" font-weight="bold" font-family="monospace">E</text>
-          </svg>
-          <div class="nav-logo-text">
-            <span class="nav-logo-name">ExtHelper</span>
-            <span class="nav-logo-sub">Extension Manager</span>
-          </div>
-        </a>
-        <a href="#install" class="nav-cta" aria-label="Install Ext Helper browser extension">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Install Free
-        </a>
-      </div>
-    </div>
-  </nav>
-
-  <main>
-
-    <!-- =============================================
-         HERO
-         ============================================= -->
-    <section class="hero section" aria-labelledby="hero-title">
-      <div class="container">
-        <div class="hero-inner">
-
-          <!-- Left: text -->
-          <div class="hero-content">
-            <div class="hero-badge" role="status">Browser Extension Manager</div>
-
-            <h1 class="hero-title" id="hero-title">
-              <span class="hero-title-line1">TAKE CONTROL</span>
-              <span class="hero-title-line2">OF YOUR</span>
-              <span class="hero-title-line3">EXTENSIONS</span>
-            </h1>
-
-            <p class="hero-desc">
-              Organize, automate, and debug all your browser extensions from one powerful dashboard.
-              Smart groups, domain-based rules, and binary search debugging — built for power users.
-            </p>
-
-            <div class="hero-actions">
-              <a href="#install" class="btn-primary" aria-label="Install Ext Helper for Chrome">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                Install for Chrome
-              </a>
-              <a href="https://github.com/YOUR_USERNAME/ext-helper" class="btn-secondary" target="_blank" rel="noopener noreferrer" aria-label="View source code on GitHub">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-                View Source
-              </a>
-            </div>
-
-            <div class="hero-stats" role="list" aria-label="Key statistics">
-              <div class="stat-item" role="listitem">
-                <span class="stat-value">Free</span>
-                <span class="stat-label">Open Source</span>
-              </div>
-              <div class="stat-item" role="listitem">
-                <span class="stat-value">3+</span>
-                <span class="stat-label">Browsers</span>
-              </div>
-              <div class="stat-item" role="listitem">
-                <span class="stat-value">0ms</span>
-                <span class="stat-label">Toggle Delay</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Right: mockup -->
-          <div class="hero-visual" aria-hidden="true">
-            <div class="mockup-wrap">
-              <div class="mockup-glow"></div>
-              <div class="mockup hud-box" role="img" aria-label="Ext Helper popup screenshot mockup">
-                <!-- Header -->
-                <div class="mockup-header">
-                  <div class="mockup-logo">
-                    <svg width="20" height="20" viewBox="0 0 40 40" fill="none"><rect width="40" height="40" fill="#0D1B2A"/><rect x="1.5" y="1.5" width="37" height="37" stroke="#00FFFF" stroke-width="2" fill="none"/><text x="20" y="20" text-anchor="middle" dominant-baseline="central" fill="#00FFFF" font-size="22" font-weight="bold" font-family="monospace">E</text></svg>
-                    EXTHELPER
-                  </div>
-                  <span style="font-size:0.55rem;color:var(--punk-text-muted)">GRID</span>
-                </div>
-                <!-- Tabs -->
-                <div class="mockup-tabs">
-                  <div class="mockup-tab active">Extensions</div>
-                  <div class="mockup-tab">Groups</div>
-                  <div class="mockup-tab">Rules</div>
-                </div>
-                <!-- Search -->
-                <div class="mockup-search">
-                  <span class="mockup-search-dollar">$</span>
-                  <span>search extensions...</span>
-                  <span style="margin-left:auto;color:var(--punk-accent);font-size:0.55rem">ALL ▾</span>
-                </div>
-                <!-- Extension list -->
-                <div class="mockup-ext-list">
-                  <div class="mockup-ext-item">
-                    <div class="mockup-ext-dot" style="background:#4285f4"></div>
-                    <div class="mockup-ext-info">
-                      <div class="mockup-ext-name">uBlock Origin</div>
-                      <div class="mockup-ext-sub">v1.58.0 · enabled</div>
-                    </div>
-                    <div class="mockup-toggle on"></div>
-                  </div>
-                  <div class="mockup-ext-item">
-                    <div class="mockup-ext-dot" style="background:#ff6b35"></div>
-                    <div class="mockup-ext-info">
-                      <div class="mockup-ext-name">React DevTools</div>
-                      <div class="mockup-ext-sub">v4.28.0 · enabled</div>
-                    </div>
-                    <div class="mockup-toggle on"></div>
-                  </div>
-                  <div class="mockup-ext-item">
-                    <div class="mockup-ext-dot" style="background:#78859b"></div>
-                    <div class="mockup-ext-info">
-                      <div class="mockup-ext-name">Grammarly</div>
-                      <div class="mockup-ext-sub">v14.1 · disabled</div>
-                    </div>
-                    <div class="mockup-toggle off"></div>
-                  </div>
-                  <div class="mockup-ext-item">
-                    <div class="mockup-ext-dot" style="background:#10b981"></div>
-                    <div class="mockup-ext-info">
-                      <div class="mockup-ext-name">Vimium</div>
-                      <div class="mockup-ext-sub">v1.67 · enabled</div>
-                    </div>
-                    <div class="mockup-toggle on"></div>
-                  </div>
-                </div>
-                <!-- Footer -->
-                <div class="mockup-footer">
-                  <span>SYS_STATUS: <span style="color:var(--punk-success)">3/4 ONLINE</span></span>
-                  <div class="mockup-footer-live">
-                    <div class="mockup-footer-dot"></div>
-                    LIVE
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </section>
-
-    <!-- =============================================
-         FEATURES
-         ============================================= -->
-    <section class="features section" id="features" aria-labelledby="features-title">
-      <div class="container">
-        <div class="reveal">
-          <div class="section-label" aria-hidden="true">Features</div>
-          <h2 class="section-title" id="features-title">
-            Everything You Need to<br/>
-            <span class="neon-text-cyan">Master Your Extensions</span>
-          </h2>
-          <p class="section-desc">
-            Purpose-built tools for developers and power users who work with many browser extensions daily.
-          </p>
-        </div>
-
-        <div class="bento-grid" role="list">
-
-          <!-- Feature 1: Groups (large) -->
-          <article class="bento-card large reveal" role="listitem">
-            <div class="bento-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="#22d3ee" stroke-width="2"><rect x="2" y="3" width="6" height="6"/><rect x="9" y="3" width="6" height="6"/><rect x="16" y="3" width="6" height="6"/><rect x="2" y="12" width="6" height="6"/><rect x="9" y="12" width="6" height="6"/></svg>
-            </div>
-            <div class="bento-tag">Organization</div>
-            <h3 class="bento-title">Smart Extension Groups</h3>
-            <p class="bento-desc">
-              Organize extensions into named, color-coded groups. Enable or disable an entire group with one click.
-              Perfect for separating work, development, and personal browsing contexts.
-            </p>
-            <div class="bento-demo" aria-label="Example groups">
-              <span class="bento-chip active">DEV_TOOLS</span>
-              <span class="bento-chip active">WORK</span>
-              <span class="bento-chip">SOCIAL</span>
-              <span class="bento-chip">PERSONAL</span>
-              <span class="bento-chip active">SECURITY</span>
-            </div>
-          </article>
-
-          <!-- Feature 2: Rules -->
-          <article class="bento-card reveal" role="listitem">
-            <div class="bento-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-            </div>
-            <div class="bento-tag">Automation</div>
-            <h3 class="bento-title">Domain-Based Rules</h3>
-            <p class="bento-desc">
-              Auto-enable or disable extensions based on the current tab's domain.
-              Set schedules by day and time range for full automated control.
-            </p>
-          </article>
-
-          <!-- Feature 3: Toggle -->
-          <article class="bento-card reveal" role="listitem">
-            <div class="bento-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><rect x="1" y="5" width="22" height="14" rx="7"/><circle cx="16" cy="12" r="4" fill="#10b981"/></svg>
-            </div>
-            <div class="bento-tag">Control</div>
-            <h3 class="bento-title">Instant Toggle</h3>
-            <p class="bento-desc">
-              Enable or disable any extension instantly with zero delay.
-              Bulk actions let you toggle multiple extensions simultaneously.
-            </p>
-          </article>
-
-          <!-- Feature 4: Bisect -->
-          <article class="bento-card reveal" role="listitem">
-            <div class="bento-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
-            </div>
-            <div class="bento-tag">Debug</div>
-            <h3 class="bento-title">Bisect Debugger</h3>
-            <p class="bento-desc">
-              Binary search algorithm to find the problematic extension causing issues.
-              Mark halves as good or bad — narrows to the culprit in log₂(n) steps.
-            </p>
-          </article>
-
-          <!-- Feature 5: Undo/Redo -->
-          <article class="bento-card reveal" role="listitem">
-            <div class="bento-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2"><path d="M3 7v6h6"/><path d="M3 13A9 9 0 1 0 6 6.3"/></svg>
-            </div>
-            <div class="bento-tag">Safety</div>
-            <h3 class="bento-title">Undo / Redo History</h3>
-            <p class="bento-desc">
-              Full snapshot-based history of all extension state changes.
-              Instantly revert any mistake — never lose your extension configuration again.
-            </p>
-          </article>
-
-          <!-- Feature 6: Cross-browser -->
-          <article class="bento-card reveal" role="listitem">
-            <div class="bento-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-            </div>
-            <div class="bento-tag">Compatibility</div>
-            <h3 class="bento-title">Cross-Browser</h3>
-            <p class="bento-desc">
-              Works seamlessly on Chrome, Firefox, and Edge.
-              Single codebase, consistent experience across all major browsers.
-            </p>
-          </article>
-
-        </div>
-      </div>
-    </section>
-
-    <!-- =============================================
-         HOW IT WORKS
-         ============================================= -->
-    <section class="how-it-works section" id="how-it-works" aria-labelledby="how-title">
-      <div class="container">
-        <div class="reveal">
-          <div class="section-label" aria-hidden="true">Process</div>
-          <h2 class="section-title" id="how-title">
-            Up and Running in<br/>
-            <span class="neon-text-purple">Three Steps</span>
-          </h2>
-          <p class="section-desc">
-            No configuration files, no complex setup. Install and start managing your extensions immediately.
-          </p>
-        </div>
-
-        <div class="steps-grid" role="list">
-
-          <article class="step-card reveal" role="listitem">
-            <div class="step-number" aria-hidden="true">01</div>
-            <h3 class="step-title">Install the Extension</h3>
-            <p class="step-desc">
-              Add Ext Helper from the Chrome Web Store, Firefox Add-ons, or Microsoft Edge Add-ons.
-              No account required.
-            </p>
-            <div class="terminal-block" aria-label="Install command example">
-              <span class="prompt">// Chrome Web Store</span><br/>
-              Search "Ext Helper"<br/>
-              → Click "Add to Chrome"
-            </div>
-          </article>
-
-          <article class="step-card reveal" role="listitem">
-            <div class="step-number" aria-hidden="true">02</div>
-            <h3 class="step-title">Organize into Groups</h3>
-            <p class="step-desc">
-              Create named groups for different contexts — development, work, social, security.
-              Drag extensions into groups and assign colors.
-            </p>
-            <div class="terminal-block" aria-label="Groups example">
-              <span class="prompt">// Example groups</span><br/>
-              [ DEV_TOOLS ] — 4 extensions<br/>
-              [ WORK ] ——— 3 extensions
-            </div>
-          </article>
-
-          <article class="step-card reveal" role="listitem">
-            <div class="step-number" aria-hidden="true">03</div>
-            <h3 class="step-title">Set Automation Rules</h3>
-            <p class="step-desc">
-              Define rules to auto-enable/disable extensions when visiting specific domains or at scheduled times.
-              Let Ext Helper do the switching for you.
-            </p>
-            <div class="terminal-block" aria-label="Rule example">
-              <span class="prompt">// Example rule</span><br/>
-              github.com → enable DEV_TOOLS<br/>
-              Mon–Fri 9–18h → enable WORK
-            </div>
-          </article>
-
-        </div>
-      </div>
-    </section>
-
-    <!-- =============================================
-         BROWSER SUPPORT
-         ============================================= -->
-    <section class="browsers section" id="install" aria-labelledby="browsers-title">
-      <div class="container" style="text-align:center">
-        <div class="reveal">
-          <div class="section-label" aria-hidden="true">Compatibility</div>
-          <h2 class="section-title" id="browsers-title" style="margin-bottom:1rem">
-            Available On Your<br/>
-            <span class="neon-text-cyan">Favorite Browser</span>
-          </h2>
-          <p class="section-desc" style="margin-inline:auto;margin-bottom:3.5rem">
-            Ext Helper works on all major Chromium-based browsers and Firefox.
-          </p>
-        </div>
-
-        <div class="browsers-grid reveal" role="list">
-
-          <a href="#" class="browser-card" role="listitem" aria-label="Install Ext Helper for Google Chrome">
-            <!-- Chrome SVG icon -->
-            <svg class="browser-icon" viewBox="0 0 48 48" aria-hidden="true">
-              <circle cx="24" cy="24" r="22" fill="#fff"/>
-              <circle cx="24" cy="24" r="10" fill="#1a73e8"/>
-              <path d="M24 14h20a22 22 0 0 1 0 20" fill="#ea4335"/>
-              <path d="M44 34A22 22 0 0 1 4 34l10-17.3" fill="#fbbc05"/>
-              <path d="M4 34A22 22 0 0 1 24 2v20" fill="#34a853"/>
-              <circle cx="24" cy="24" r="6" fill="#fff"/>
-            </svg>
-            <span class="browser-name">Chrome</span>
-            <span class="browser-status">Available</span>
-          </a>
-
-          <a href="#" class="browser-card" role="listitem" aria-label="Install Ext Helper for Microsoft Edge">
-            <!-- Edge SVG icon -->
-            <svg class="browser-icon" viewBox="0 0 48 48" aria-hidden="true">
-              <defs>
-                <linearGradient id="edge-grad1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0078d7"/><stop offset="100%" stop-color="#00b4d8"/></linearGradient>
-                <linearGradient id="edge-grad2" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00b4d8"/><stop offset="100%" stop-color="#0078d7"/></linearGradient>
-              </defs>
-              <ellipse cx="24" cy="28" rx="20" ry="16" fill="url(#edge-grad1)"/>
-              <path d="M8 24C8 14 15 8 24 8c6 0 11 3 14 8H24c-5 0-9 4-9 9s4 9 9 9h18a22 22 0 0 1-18 8C14 42 8 33.97 8 24z" fill="url(#edge-grad2)"/>
-            </svg>
-            <span class="browser-name">Edge</span>
-            <span class="browser-status">Available</span>
-          </a>
-
-          <a href="#" class="browser-card" role="listitem" aria-label="Install Ext Helper for Firefox">
-            <!-- Firefox SVG icon (simplified) -->
-            <svg class="browser-icon" viewBox="0 0 48 48" aria-hidden="true">
-              <circle cx="24" cy="24" r="20" fill="#ff9500"/>
-              <circle cx="24" cy="24" r="13" fill="#ff6611"/>
-              <path d="M24 11c-7 0-13 6-13 13 0 5 2.8 9.3 7 11.5-1.5-2-2.5-4.5-2.5-7A9.5 9.5 0 0 1 24 19c3 0 5.7 1.4 7.5 3.5C30 17 27.3 14 24 14c-1 0-2 .2-3 .5A9.5 9.5 0 0 1 33.5 24a9.5 9.5 0 0 1-9.5 9.5 9.5 9.5 0 0 1-7-3C19 34 21.3 37 24 37c7 0 13-6 13-13S31 11 24 11z" fill="#ff3750"/>
-            </svg>
-            <span class="browser-name">Firefox</span>
-            <span class="browser-status">Available</span>
-          </a>
-
-        </div>
-      </div>
-    </section>
-
-    <!-- =============================================
-         CTA
-         ============================================= -->
-    <section class="cta-section section" aria-labelledby="cta-title">
-      <div class="container">
-        <div class="reveal">
-          <div class="cta-terminal" aria-hidden="true">install ext-helper --free</div>
-          <h2 class="cta-title" id="cta-title">
-            Ready to Take Control<br/>
-            <span class="neon-text-cta">of Your Browser?</span>
-          </h2>
-          <p class="cta-desc">
-            Free, open-source, and privacy-first. No accounts, no data collection, no subscription.
-          </p>
-          <div class="cta-actions">
-            <a href="#" class="btn-primary" aria-label="Install Ext Helper for Chrome — free browser extension manager">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Install for Free
-            </a>
-            <a href="https://github.com/YOUR_USERNAME/ext-helper" class="btn-secondary" target="_blank" rel="noopener noreferrer" aria-label="View Ext Helper source code on GitHub">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-              Star on GitHub
-            </a>
-          </div>
-        </div>
-      </div>
-    </section>
-
-  </main>
-
-  <!-- =============================================
-       FOOTER
-       ============================================= -->
-  <footer class="footer" role="contentinfo">
-    <div class="container">
-      <div class="footer-inner">
-        <div class="footer-logo">
-          <span class="footer-logo-name">ExtHelper</span>
-          <span class="footer-logo-copy">&copy; 2026 Ext Helper. MIT License.</span>
-        </div>
-        <nav class="footer-links" aria-label="Footer navigation">
-          <a href="https://github.com/YOUR_USERNAME/ext-helper" class="footer-link" target="_blank" rel="noopener noreferrer">GitHub</a>
-          <a href="https://github.com/YOUR_USERNAME/ext-helper/issues" class="footer-link" target="_blank" rel="noopener noreferrer">Issues</a>
-          <a href="https://github.com/YOUR_USERNAME/ext-helper/blob/main/LICENSE" class="footer-link" target="_blank" rel="noopener noreferrer">License</a>
-        </nav>
-        <div class="footer-system" aria-hidden="true">
-          SYS: <span>ONLINE</span> &nbsp;|&nbsp; BUILD: <span>STABLE</span>
-        </div>
-      </div>
-    </div>
-  </footer>
-
-  <script type="module" src="/src/main.js"></script>
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
 </body>
 </html>
