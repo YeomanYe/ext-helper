@@ -1028,163 +1028,162 @@ a { color: inherit; text-decoration: none; }
   .hero-stats { flex-wrap: wrap; gap: 1rem; }
 }
 
-/* ── Screenshot Carousel ──────────────────────────────── */
-.screenshot-carousel {
+/* ── Screenshot Carousel (Grand / Borderless) ────────── */
+.sc-stage {
   position: relative;
-  width: 380px;
-  background: var(--punk-bg-alt);
-  border: 2px solid var(--punk-primary);
-  box-shadow:
-    0 0 30px rgba(124,58,237,0.4),
-    0 0 80px rgba(124,58,237,0.15);
-  font-family: var(--font-mono);
-  overflow: hidden;
-  animation: float 5s ease-in-out infinite;
+  width: 460px;
+  animation: float 6s ease-in-out infinite;
 }
 
-/* scanline overlay */
-.screenshot-carousel::before {
-  content: "";
+/* Ambient spotlight behind the screenshot */
+.sc-spotlight {
+  position: absolute;
+  inset: -50% -35% -10% -35%;
+  pointer-events: none;
+  filter: blur(55px);
+  z-index: 0;
+  transition: background 0.7s ease;
+}
+
+/* Screenshot frame — no border, pure shadow + glow */
+.sc-frame {
+  position: relative;
+  z-index: 1;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow:
+    0 2px 8px rgba(0,0,0,0.4),
+    0 16px 48px rgba(0,0,0,0.65),
+    0 40px 80px rgba(0,0,0,0.4),
+    0 0 0 1px rgba(255,255,255,0.055);
+}
+
+.sc-frame.sc-enter {
+  animation: sc-enter 0.38s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.sc-frame.sc-exit {
+  animation: sc-exit 0.28s ease forwards;
+}
+
+@keyframes sc-enter {
+  from { opacity: 0; transform: translateY(14px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes sc-exit {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to   { opacity: 0; transform: translateY(-10px) scale(1.02); }
+}
+
+.sc-img {
+  width: 100%;
+  display: block;
+}
+
+/* Subtle scanlines on the screenshot */
+.sc-scanlines {
   position: absolute;
   inset: 0;
   background: repeating-linear-gradient(
     to bottom,
-    transparent 0px,
-    transparent 3px,
-    rgba(0,0,0,0.08) 3px,
-    rgba(0,0,0,0.08) 4px
+    transparent 0px, transparent 3px,
+    rgba(0,0,0,0.055) 3px, rgba(0,0,0,0.055) 4px
   );
   pointer-events: none;
-  z-index: 2;
 }
 
-.sc-header {
+/* Caption below screenshot */
+.sc-caption {
+  position: relative;
+  z-index: 2;
+  padding: 1.2rem 0.1rem 0;
+}
+
+.sc-meta {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 0.5rem 0.75rem;
-  border-bottom: 1px solid rgba(124,58,237,0.3);
-  background: rgba(0,0,0,0.2);
+  gap: 0.65rem;
+  margin-bottom: 0.35rem;
 }
 
 .sc-tag {
-  font-size: 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
   font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   color: var(--punk-accent);
+  background: rgba(34, 211, 238, 0.08);
+  border: 1px solid rgba(34, 211, 238, 0.22);
+  padding: 0.18rem 0.55rem;
+  border-radius: 2px;
 }
 
-.sc-dots {
-  display: flex;
-  gap: 0.4rem;
-}
-
-.sc-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  border: 1px solid var(--punk-primary);
-  background: transparent;
-  cursor: pointer;
-  padding: 0;
-  transition: background 0.2s, box-shadow 0.2s;
-}
-
-.sc-dot.active {
-  background: var(--punk-accent);
-  border-color: var(--punk-accent);
-  box-shadow: 0 0 6px var(--punk-accent);
-}
-
-.sc-image-wrap {
-  width: 100%;
-  aspect-ratio: 4/3;
-  overflow: hidden;
-  background: var(--punk-bg);
-  position: relative;
-}
-
-.sc-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: top;
-  display: block;
-}
-
-.sc-image.fade-in {
-  animation: sc-fade-in 0.3s ease forwards;
-}
-
-.sc-image.fade-out {
-  animation: sc-fade-out 0.2s ease forwards;
-}
-
-@keyframes sc-fade-in {
-  from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes sc-fade-out {
-  from { opacity: 1; }
-  to   { opacity: 0; }
-}
-
-.sc-caption {
-  padding: 0.6rem 0.75rem;
-  border-top: 1px solid rgba(124,58,237,0.3);
-  background: rgba(0,0,0,0.25);
-  min-height: 4rem;
-}
-
-.sc-label {
-  font-size: 0.65rem;
-  font-weight: 700;
-  color: var(--punk-neon-cyan);
-  letter-spacing: 0.08em;
-  text-shadow: 0 0 6px var(--punk-neon-cyan);
+.sc-title {
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--punk-text-primary);
+  letter-spacing: 0.02em;
 }
 
 .sc-desc {
-  margin: 0.2rem 0 0;
-  font-size: 0.6rem;
+  margin: 0;
+  font-size: 0.78rem;
   color: var(--punk-text-muted);
-  line-height: 1.5;
+  line-height: 1.65;
 }
 
-.sc-arrow {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background: rgba(0,0,0,0.55);
-  border: 1px solid var(--punk-primary);
-  color: var(--punk-text-primary);
-  font-size: 1.2rem;
-  line-height: 1;
-  width: 26px;
-  height: 26px;
+/* Progress bar dots */
+.sc-nav {
   display: flex;
+  gap: 0.45rem;
+  margin-top: 1rem;
   align-items: center;
-  justify-content: center;
+}
+
+.sc-dot {
+  position: relative;
+  width: 36px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
   cursor: pointer;
-  z-index: 3;
-  transition: background 0.15s, border-color 0.15s;
-  padding: 0;
-  margin-top: -20px; /* offset from caption */
+  padding: 6px 0;
+  background-clip: content-box;
+  border-radius: 2px;
+  overflow: visible;
+  transition: opacity 0.2s;
 }
 
-.sc-arrow:hover {
-  background: rgba(124,58,237,0.4);
-  border-color: var(--punk-accent);
+.sc-dot::after {
+  content: "";
+  position: absolute;
+  inset: 6px 0;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  transition: background 0.2s;
 }
 
-.sc-arrow-prev { left: 6px; }
-.sc-arrow-next { right: 6px; }
-
-@media (max-width: 900px) {
-  .screenshot-carousel { width: 320px; }
+.sc-dot:not(.active):hover::after {
+  background: rgba(255, 255, 255, 0.25);
 }
 
-@media (max-width: 600px) {
-  .screenshot-carousel { width: 100%; max-width: 360px; }
+.sc-dot-fill {
+  position: absolute;
+  inset: 6px 0;
+  background: var(--punk-accent);
+  transform-origin: left center;
+  border-radius: 2px;
+  box-shadow: 0 0 5px var(--punk-accent);
+  z-index: 1;
+}
+
+@media (max-width: 1024px) {
+  .sc-stage { width: 400px; }
+}
+
+@media (max-width: 768px) {
+  .sc-stage { display: none; }
 }
