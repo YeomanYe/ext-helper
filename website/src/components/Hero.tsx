@@ -1,4 +1,5 @@
 import { config } from "../config"
+import { ScreenshotCarousel } from "./ScreenshotCarousel"
 
 const DownloadIcon = () => (
   <svg
@@ -167,8 +168,8 @@ export default function Hero() {
             </div>
           </div>
 
-          <div className="hero-visual" aria-hidden="true">
-            <PopupMockup />
+          <div className="hero-visual">
+            <ScreenshotCarousel />
           </div>
         </div>
       </div>
