@@ -1297,37 +1297,37 @@ a { color: inherit; text-decoration: none; }
   .roadmap-badge { display: none; }
 }
 
-/* ── Carousel: prev/next arrows ──────────────────────── */
+/* ── Carousel: prev/next arrows (outside image) ──────── */
 .sc-arrow {
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
   width: 44px;
   height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(6px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(15, 15, 35, 0.7);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(124, 58, 237, 0.3);
   border-radius: 4px;
-  color: rgba(255, 255, 255, 0.75);
+  color: var(--punk-text-secondary);
   cursor: pointer;
   z-index: 3;
-  opacity: 0;
-  transition: opacity 0.2s, background 0.2s, border-color 0.2s, color 0.2s;
+  /* vertically centered against the image (image is ~75% of stage height) */
+  top: 38%;
+  transform: translateY(-50%);
+  transition: background 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s;
 }
 .sc-arrow svg { width: 18px; height: 18px; }
-.sc-arrow-prev { left: 10px; }
-.sc-arrow-next { right: 10px; }
 
-.sc-frame:hover .sc-arrow { opacity: 1; }
+/* Place arrows just outside the frame edges */
+.sc-arrow-prev { left: -56px; }
+.sc-arrow-next { right: -56px; }
 
 .sc-arrow:hover {
-  background: rgba(124, 58, 237, 0.55);
+  background: rgba(124, 58, 237, 0.45);
   border-color: var(--punk-primary);
   color: #fff;
-  box-shadow: 0 0 12px rgba(124, 58, 237, 0.5);
+  box-shadow: 0 0 14px rgba(124, 58, 237, 0.5);
 }
 
 .sc-nav-row {

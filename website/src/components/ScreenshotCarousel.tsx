@@ -93,33 +93,22 @@ export function ScreenshotCarousel() {
         }}
       />
 
-      {/* Screenshot + overlay arrows */}
+      {/* Prev / Next — outside the image frame */}
+      <button className="sc-arrow sc-arrow-prev" onClick={prev} aria-label="Previous screenshot">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
+          <polyline points="15 18 9 12 15 6" />
+        </svg>
+      </button>
+      <button className="sc-arrow sc-arrow-next" onClick={next} aria-label="Next screenshot">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
+          <polyline points="9 18 15 12 9 6" />
+        </svg>
+      </button>
+
+      {/* Screenshot */}
       <div className={`sc-frame sc-${phase}`}>
         <img src={slide.src} alt={slide.label} className="sc-img" draggable={false} />
         <div className="sc-scanlines" aria-hidden="true" />
-
-        <button className="sc-arrow sc-arrow-prev" onClick={prev} aria-label="Previous screenshot">
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            aria-hidden="true"
-          >
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
-        </button>
-        <button className="sc-arrow sc-arrow-next" onClick={next} aria-label="Next screenshot">
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            aria-hidden="true"
-          >
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
-        </button>
       </div>
 
       {/* Caption */}
