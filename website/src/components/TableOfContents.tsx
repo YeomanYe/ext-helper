@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react"
 
 const SECTIONS = [
-  { id: "hero",         label: "Home" },
-  { id: "features",    label: "Features" },
-  { id: "how-it-works",label: "How It Works" },
-  { id: "roadmap",     label: "Roadmap" },
-  { id: "install",     label: "Download" },
+  { id: "hero", label: "Home" },
+  { id: "features", label: "Features" },
+  { id: "how-it-works", label: "How It Works" },
+  { id: "roadmap", label: "Roadmap" },
+  { id: "install", label: "Download" },
 ]
 
 export function TableOfContents() {
