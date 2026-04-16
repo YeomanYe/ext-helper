@@ -53,24 +53,29 @@ const ITEMS: RoadmapItem[] = [
 function RoadmapCard({ item, index }: { item: RoadmapItem; index: number }) {
   const ref = useReveal<HTMLLIElement>()
   return (
-    <li
-      ref={ref}
-      className="roadmap-card reveal"
-      style={{ transitionDelay: `${index * 100}ms` }}
-    >
+    <li ref={ref} className="roadmap-card reveal" style={{ transitionDelay: `${index * 100}ms` }}>
       <div className="roadmap-card-inner">
         <div className="roadmap-icon" style={{ borderColor: `${item.tagColor}33` }}>
           {item.icon}
         </div>
         <div className="roadmap-body">
-          <div className="roadmap-tag" style={{ color: item.tagColor, borderColor: `${item.tagColor}33`, background: `${item.tagColor}10` }}>
+          <div
+            className="roadmap-tag"
+            style={{
+              color: item.tagColor,
+              borderColor: `${item.tagColor}33`,
+              background: `${item.tagColor}10`,
+            }}
+          >
             {item.tag}
           </div>
           <h3 className="roadmap-title">{item.title}</h3>
           <p className="roadmap-desc">{item.desc}</p>
         </div>
       </div>
-      <div className="roadmap-badge" aria-label="Coming soon">COMING SOON</div>
+      <div className="roadmap-badge" aria-label="Coming soon">
+        COMING SOON
+      </div>
     </li>
   )
 }
@@ -82,7 +87,9 @@ export default function Roadmap() {
     <section className="roadmap section" id="roadmap" aria-labelledby="roadmap-title">
       <div className="container">
         <div ref={headerRef} className="reveal">
-          <div className="section-label" aria-hidden="true">Roadmap</div>
+          <div className="section-label" aria-hidden="true">
+            Roadmap
+          </div>
           <h2 className="section-title" id="roadmap-title">
             What's Coming
             <br />

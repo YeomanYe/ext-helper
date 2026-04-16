@@ -105,10 +105,7 @@ export function ScreenshotCarousel() {
               onClick={() => goTo(i)}
             >
               {i === current && (
-                <span
-                  className="sc-dot-fill"
-                  style={{ transform: `scaleX(${progress})` }}
-                />
+                <span className="sc-dot-fill" style={{ transform: `scaleX(${progress})` }} />
               )}
             </button>
           ))}
