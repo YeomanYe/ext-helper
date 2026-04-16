@@ -6,11 +6,15 @@ import Roadmap from "./components/Roadmap"
 import BrowserSupport from "./components/BrowserSupport"
 import CTASection from "./components/CTASection"
 import Footer from "./components/Footer"
+import { TableOfContents } from "./components/TableOfContents"
+import { DonateBadge } from "./components/DonateBadge"
 
 export default function App() {
   return (
     <>
       <Nav />
+      <TableOfContents />
+      <DonateBadge />
       <main>
         <Hero />
         <Features />

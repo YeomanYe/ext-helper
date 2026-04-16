@@ -50,6 +50,10 @@ export function ScreenshotCarousel() {
     goTo((current + 1) % SLIDES.length)
   }, [current, goTo])
 
+  const prev = useCallback(() => {
+    goTo((current - 1 + SLIDES.length) % SLIDES.length)
+  }, [current, goTo])
+
   useEffect(() => {
     setProgress(0)
     const start = performance.now()
@@ -66,6 +70,16 @@ export function ScreenshotCarousel() {
     return () => cancelAnimationFrame(rafRef.current)
   }, [current]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Keyboard navigation
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") prev()
+      if (e.key === "ArrowRight") next()
+    }
+    window.addEventListener("keydown", onKey)
+    return () => window.removeEventListener("keydown", onKey)
+  }, [prev, next])
+
   const slide = SLIDES[current]
 
   return (
@@ -79,10 +93,21 @@ export function ScreenshotCarousel() {
         }}
       />
 
-      {/* Screenshot */}
+      {/* Screenshot + overlay arrows */}
       <div className={`sc-frame sc-${phase}`}>
         <img src={slide.src} alt={slide.label} className="sc-img" draggable={false} />
         <div className="sc-scanlines" aria-hidden="true" />
+
+        <button className="sc-arrow sc-arrow-prev" onClick={prev} aria-label="Previous screenshot">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+        </button>
+        <button className="sc-arrow sc-arrow-next" onClick={next} aria-label="Next screenshot">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </button>
       </div>
 
       {/* Caption */}
@@ -93,22 +118,27 @@ export function ScreenshotCarousel() {
         </div>
         <p className="sc-desc">{slide.desc}</p>
 
-        {/* Progress dots */}
-        <div className="sc-nav" role="tablist" aria-label="Slide navigation">
-          {SLIDES.map((s, i) => (
-            <button
-              key={s.label}
-              role="tab"
-              aria-selected={i === current}
-              aria-label={`Go to ${s.label}`}
-              className={`sc-dot${i === current ? " active" : ""}`}
-              onClick={() => goTo(i)}
-            >
-              {i === current && (
-                <span className="sc-dot-fill" style={{ transform: `scaleX(${progress})` }} />
-              )}
-            </button>
-          ))}
+        {/* Progress dots + counter */}
+        <div className="sc-nav-row">
+          <div className="sc-nav" role="tablist" aria-label="Slide navigation">
+            {SLIDES.map((s, i) => (
+              <button
+                key={s.label}
+                role="tab"
+                aria-selected={i === current}
+                aria-label={`Go to ${s.label}`}
+                className={`sc-dot${i === current ? " active" : ""}`}
+                onClick={() => goTo(i)}
+              >
+                {i === current && (
+                  <span className="sc-dot-fill" style={{ transform: `scaleX(${progress})` }} />
+                )}
+              </button>
+            ))}
+          </div>
+          <span className="sc-counter" aria-live="polite">
+            {current + 1} / {SLIDES.length}
+          </span>
         </div>
       </div>
     </div>

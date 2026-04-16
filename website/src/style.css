@@ -1296,3 +1296,165 @@ a { color: inherit; text-decoration: none; }
   .roadmap-card-inner { gap: 1rem; }
   .roadmap-badge { display: none; }
 }
+
+/* ── Carousel: prev/next arrows ──────────────────────── */
+.sc-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  color: rgba(255, 255, 255, 0.75);
+  cursor: pointer;
+  z-index: 3;
+  opacity: 0;
+  transition: opacity 0.2s, background 0.2s, border-color 0.2s, color 0.2s;
+}
+.sc-arrow svg { width: 18px; height: 18px; }
+.sc-arrow-prev { left: 10px; }
+.sc-arrow-next { right: 10px; }
+
+.sc-frame:hover .sc-arrow { opacity: 1; }
+
+.sc-arrow:hover {
+  background: rgba(124, 58, 237, 0.55);
+  border-color: var(--punk-primary);
+  color: #fff;
+  box-shadow: 0 0 12px rgba(124, 58, 237, 0.5);
+}
+
+.sc-nav-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+
+.sc-counter {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--punk-text-muted);
+  letter-spacing: 0.08em;
+}
+
+/* ── Table of Contents (floating right sidebar) ──────── */
+.toc {
+  position: fixed;
+  right: 1.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 50;
+  display: none; /* shown via media query */
+}
+
+@media (min-width: 1380px) {
+  .toc { display: block; }
+}
+
+.toc-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.toc-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.3rem 0;
+  color: var(--punk-text-muted);
+  transition: color 0.2s;
+  direction: rtl; /* dot on right, label on left */
+}
+
+.toc-btn:hover { color: var(--punk-text-secondary); }
+.toc-btn.active { color: var(--punk-accent); }
+
+.toc-dot {
+  flex-shrink: 0;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  transition: transform 0.2s, background 0.2s;
+}
+.toc-btn.active .toc-dot {
+  transform: scale(1.6);
+  box-shadow: 0 0 6px var(--punk-accent);
+}
+
+.toc-label {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateX(4px);
+  transition: opacity 0.2s, transform 0.2s;
+  pointer-events: none;
+}
+
+.toc-btn:hover .toc-label,
+.toc-btn.active .toc-label {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* ── Donate Badge (floating bottom-right) ────────────── */
+.donate-badge {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 40;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fff;
+  background: rgba(15, 15, 35, 0.85);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(34, 211, 238, 0.3);
+  border-radius: 4px;
+  cursor: pointer;
+  text-decoration: none;
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(34, 211, 238, 0.05) inset;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+
+.donate-badge:hover {
+  border-color: var(--punk-accent);
+  box-shadow:
+    0 6px 28px rgba(0, 0, 0, 0.5),
+    0 0 16px rgba(34, 211, 238, 0.2);
+  transform: translateY(-2px);
+}
+
+.donate-label { color: var(--punk-accent); }
+
+@media (max-width: 600px) {
+  .donate-badge {
+    bottom: 1rem;
+    right: 1rem;
+    padding: 0.5rem 0.75rem;
+  }
+}

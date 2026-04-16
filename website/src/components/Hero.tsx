@@ -113,7 +113,7 @@ function PopupMockup() {
 
 export default function Hero() {
   return (
-    <section className="hero section" aria-labelledby="hero-title">
+    <section className="hero section" id="hero" aria-labelledby="hero-title">
       <div className="container">
         <div className="hero-inner">
           <div className="hero-content">
