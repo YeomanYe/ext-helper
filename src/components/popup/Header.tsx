@@ -153,6 +153,8 @@ export function SearchBar({
           $
         </span>
         <input
+          id="extension-search"
+          name="extension-search"
           type="text"
           value={value}
           onChange={(e) => onChange(e.target.value)}
