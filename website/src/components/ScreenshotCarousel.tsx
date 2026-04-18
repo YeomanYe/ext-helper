@@ -100,11 +100,7 @@ export function ScreenshotCarousel() {
       <div className="sc-footer">
         {/* [←] [tab1][tab2][tab3] [01/03] [→] */}
         <div className="sc-controls" role="group" aria-label="Screenshot navigation">
-          <button
-            className="sc-ctrl-btn"
-            onClick={prev}
-            aria-label="Previous screenshot"
-          >
+          <button className="sc-ctrl-btn" onClick={prev} aria-label="Previous screenshot">
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -142,11 +138,7 @@ export function ScreenshotCarousel() {
             <span className="sc-count-tot">{String(SLIDES.length).padStart(2, "0")}</span>
           </span>
 
-          <button
-            className="sc-ctrl-btn"
-            onClick={next}
-            aria-label="Next screenshot"
-          >
+          <button className="sc-ctrl-btn" onClick={next} aria-label="Next screenshot">
             <svg
               viewBox="0 0 24 24"
               fill="none"
