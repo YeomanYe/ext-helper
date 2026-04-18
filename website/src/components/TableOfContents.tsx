@@ -12,22 +12,20 @@ export function TableOfContents() {
   const [active, setActive] = useState("hero")
 
   useEffect(() => {
-    const observers: IntersectionObserver[] = []
+    const update = () => {
+      // Trigger line: 30% from the top of the viewport
+      const triggerY = window.scrollY + window.innerHeight * 0.3
+      let current = SECTIONS[0].id
+      for (const { id } of SECTIONS) {
+        const el = document.getElementById(id)
+        if (el && el.offsetTop <= triggerY) current = id
+      }
+      setActive(current)
+    }
 
-    SECTIONS.forEach(({ id }) => {
-      const el = document.getElementById(id)
-      if (!el) return
-      const obs = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting) setActive(id)
-        },
-        { threshold: 0.35, rootMargin: "-10% 0px -55% 0px" }
-      )
-      obs.observe(el)
-      observers.push(obs)
-    })
-
-    return () => observers.forEach((o) => o.disconnect())
+    window.addEventListener("scroll", update, { passive: true })
+    update()
+    return () => window.removeEventListener("scroll", update)
   }, [])
 
   const scrollTo = (id: string) => {
