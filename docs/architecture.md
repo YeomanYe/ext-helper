@@ -37,7 +37,7 @@
 
 | 模式 | 命令 | 说明 |
 |------|------|------|
-| 扩展模式 | `pnpm dev` | Plasmo 框架，使用真实 `chrome.management.*` API |
+| 扩展模式 | `pnpm dev` | Plasmo 框架，使用真实 `browser.*` WebExtension API（Plasmo 内置 polyfill） |
 | Web 预览模式 | `pnpm dev:web` | Vite 开发服务器（端口 4173），使用 `devStorage`（localStorage）+ mock 数据 |
 
 ### 2.3 浏览器兼容性
@@ -47,8 +47,8 @@
 | 120+ | 121+ | 120+ |
 
 **兼容性策略**：
-- 自定义 `browserAdapter` 跨浏览器抽象层
-- 支持 Chrome、Firefox、Edge
+- Plasmo 在构建时注入 `webextension-polyfill`，`browser.*` API 在 Chrome/Edge/Firefox 统一可用
+- `browserAdapter` 封装所有 WebExtension API 调用，内部统一使用 `browser.*`，无手写分支兼容逻辑
 - 遵循 Manifest V3
 
 ### 2.4 项目结构
@@ -128,7 +128,7 @@ ext-helper/
 │    (BrowserAdapter / devStorage / RuleEngine / Background)   │
 ├─────────────────────────────────────────────────────────────┤
 │                       Data Layer                             │
-│    (chrome.storage / chrome.management / localStorage)       │
+│  (browser.storage.local / browser.storage.sync / localStorage)│
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -140,31 +140,41 @@ const browserAdapter = {
   // 环境检测
   detectBrowser(): BrowserType;
   isManifestV3(): boolean;
+  getManifestVersion(): string;
 
   // 扩展管理 API
   getExtensions(): Promise<Extension[]>;
   setExtensionEnabled(id: string, enabled: boolean): Promise<void>;
   uninstallExtension(id: string): Promise<void>;
-  openOptionsPage(id: string): Promise<void>;
-
-  // 存储 API
-  getStorage(key: string): Promise<any>;
-  setStorage(key: string, value: any): Promise<void>;
-
-  // 事件监听
+  openOptionsPage(optionsUrl: string): Promise<void>;
   onExtensionInstalled(callback): () => void;
   onExtensionUninstalled(callback): () => void;
   onExtensionEnabledChanged(callback): () => void;
 
+  // 本地存储 API
+  getStorage(key: string): Promise<any>;
+  setStorage(key: string, value: any): Promise<void>;
+
+  // 同步存储 API (chrome.storage.sync — 同账号跨 Profile 同步)
+  getSyncStorage(key: string): Promise<any>;
+  setSyncStorage(key: string, value: any): Promise<void>;
+  removeSyncStorage(keys: string[]): Promise<void>;
+  onSyncChanged(callback): () => void;
+
   // Tab API
   getCurrentTabUrl(): Promise<string | null>;
   getCurrentTabId(): Promise<number | null>;
+  getTab(tabId: number): Promise<{ url?: string } | null>;
+  onTabUpdated(callback): () => void;
+  onTabActivated(callback): () => void;
 
   // Alarms API
   createAlarm(name, options): Promise<void>;
   clearAlarm(name): Promise<void>;
+  onAlarm(callback): () => void;
 
   // Messaging API
+  onMessage(callback): () => void;
   sendMessage(message, callback?): void;
 }
 ```
@@ -176,15 +186,15 @@ const browserAdapter = {
 ```
 Store → Repository → isDevMode() ?
                        ├─ true  → devStorage (localStorage + mock 数据)
-                       └─ false → browserAdapter (chrome.* API)
+                       └─ false → browserAdapter (WebExtension API)
 ```
 
-| Repository | 职责 |
-|------------|------|
-| `extensionsRepo` | 扩展 CRUD + Bisect 会话持久化 |
-| `groupsRepo` | 分组 CRUD |
-| `rulesRepo` | 规则 CRUD |
-| `preferencesRepo` | UI 偏好读写 |
+| Repository | 存储后端 | 职责 |
+|------------|----------|------|
+| `extensionsRepo` | `browser.storage.local` | 扩展 CRUD + Bisect 会话持久化 |
+| `groupsRepo` | `browser.storage.sync` (per-key) | 分组 CRUD，跨 Profile 同步 |
+| `rulesRepo` | `browser.storage.sync` (per-key) | 规则 CRUD，跨 Profile 同步 |
+| `preferencesRepo` | `browser.storage.local` | UI 偏好读写 |
 
 ### 3.4 状态管理架构
 
@@ -320,6 +330,8 @@ User Action → Store: snapshot + apply（立即更新 UI）
    → RuleEngine.evaluateConditions() → executeActions()
 
    Alarm 定时器 → checkTimeRules() → evaluateScheduleConditions() → executeActions()
+
+   storage.sync 变化（另一个 Profile 写入）→ setupSyncListener() → checkTimeRules()
    ```
 
 ---
@@ -410,9 +422,10 @@ class DevStorage {
 
 ### 7.2 数据安全
 
-- 本地存储优先，不收集用户数据
-- 扩展 ID 和名称本地处理，不上传
-- 用户偏好存储在 chrome.storage.local
+- 不收集用户数据，所有数据存储在本地/同步存储中
+- 扩展 ID 和名称本地处理，不上传至第三方
+- 偏好设置存储在 `browser.storage.local`
+- 分组和规则配置存储在 `browser.storage.sync`（同账号跨 Profile 同步，不经过外部服务器）
 
 ---
 

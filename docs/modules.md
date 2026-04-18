@@ -23,7 +23,7 @@
 │   extensionStore │ groupStore │ ruleStore │ uiStore │ optimistic         │
 ├──────────────────────────────────────────────────────────────────────────┤
 │                         Browser Adapter                                  │
-│   chrome.management │ chrome.storage │ chrome.tabs │ chrome.alarms      │
+│   browser.* (WebExtension API via Plasmo polyfill — Chrome/Edge/Firefox) │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -305,32 +305,49 @@ interface BisectBannerProps {
 
 **职责**：抽象不同浏览器的 API 差异
 
+内部统一使用 `browser.*`，由 Plasmo 构建时注入的 `webextension-polyfill` 保证跨浏览器一致性，无手写兼容分支。
+
 ```typescript
 // src/services/browser/adapter.ts
 export const browserAdapter = {
+  // 环境检测
   detectBrowser(): BrowserType
   isManifestV3(): boolean
+  getManifestVersion(): string
 
   // 扩展管理
   getExtensions(): Promise<Extension[]>
   setExtensionEnabled(id, enabled): Promise<void>
   uninstallExtension(id): Promise<void>
-  openOptionsPage(id): Promise<void>
-
-  // 存储
-  getStorage(key): Promise<any>
-  setStorage(key, value): Promise<void>
-
-  // 事件监听
+  openOptionsPage(optionsUrl): Promise<void>
   onExtensionInstalled(callback): () => void
   onExtensionUninstalled(callback): () => void
   onExtensionEnabledChanged(callback): () => void
 
-  // Tab / Alarms / Messaging
+  // 本地存储
+  getStorage(key): Promise<any>
+  setStorage(key, value): Promise<void>
+
+  // 同步存储（跨 Profile）
+  getSyncStorage(key): Promise<any>
+  setSyncStorage(key, value): Promise<void>
+  removeSyncStorage(keys): Promise<void>
+  onSyncChanged(callback): () => void
+
+  // Tab API
   getCurrentTabUrl(): Promise<string | null>
   getCurrentTabId(): Promise<number | null>
+  getTab(tabId): Promise<{ url?: string } | null>
+  onTabUpdated(callback): () => void
+  onTabActivated(callback): () => void
+
+  // Alarms API
   createAlarm(name, options): Promise<void>
   clearAlarm(name): Promise<void>
+  onAlarm(callback): () => void
+
+  // Messaging API
+  onMessage(callback): () => void
   sendMessage(message, callback?): void
 }
 ```
@@ -389,6 +406,7 @@ class RuleBackgroundService {
   // 监听 tab URL 变化 → checkDomainRules()
   // 监听 alarms → checkTimeRules()
   // 监听 messages → triggerAllRules()
+  // 监听 storage.sync 变化（另一 Profile 写入规则）→ checkTimeRules()
 }
 ```
 
@@ -581,10 +599,10 @@ src/components/
                                    │
                        ┌───────────┴───────────┐
                        ▼                       ▼
-              ┌──────────────┐        ┌──────────────┐
-              │ devStorage   │        │browserAdapter │
-              │ (localStorage)│        │(chrome.* API)│
-              └──────────────┘        └──────────────┘
+              ┌──────────────┐        ┌──────────────────┐
+              │ devStorage   │        │ browserAdapter   │
+              │ (localStorage)│        │ (browser.* API)  │
+              └──────────────┘        └──────────────────┘
 ```
 
 ---
