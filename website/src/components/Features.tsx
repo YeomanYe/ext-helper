@@ -86,6 +86,19 @@ const FEATURES: Feature[] = [
     ),
   },
   {
+    id: "sync-profiles",
+    tag: "Sync",
+    title: "Cross-Profile Sync",
+    desc: "Groups and Rules sync automatically across all Chrome profiles signed into the same account — set it up once, take it everywhere on the same browser.",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="#38bdf8" strokeWidth="2" aria-hidden="true">
+        <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8" />
+        <polyline points="16 6 12 2 8 6" />
+        <line x1="12" y1="2" x2="12" y2="15" />
+      </svg>
+    ),
+  },
+  {
     id: "cross",
     tag: "Compatibility",
     title: "Cross-Browser",
