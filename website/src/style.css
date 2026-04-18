@@ -1413,16 +1413,9 @@ a { color: inherit; text-decoration: none; }
   font-size: 0.6rem;
   letter-spacing: 0.08em;
   white-space: nowrap;
-  text-align: right; /* text anchors to the right, toward the dot */
-  opacity: 0;
-  transform: translateX(8px); /* slides in from dot side */
-  transition: opacity 0.2s, transform 0.2s;
-  pointer-events: none;
-}
-
-.toc:hover .toc-label {
+  text-align: right;
   opacity: 1;
-  transform: translateX(0);
+  pointer-events: none;
 }
 
 /* ── Donate Badge (floating bottom-right) ────────────── */
