@@ -8,8 +8,30 @@ const adapter = vi.hoisted(() => ({
   setStorage: vi.fn(),
 }))
 
+const groupsRepoMock = vi.hoisted(() => ({
+  fetchAll: vi.fn(),
+  saveAll: vi.fn(),
+  generateId: vi.fn(),
+}))
+
+const rulesRepoMock = vi.hoisted(() => ({
+  fetchAll: vi.fn(),
+  saveAll: vi.fn(),
+  generateId: vi.fn(),
+}))
+
 vi.mock("@/services/browser/adapter", () => ({
   browserAdapter: adapter,
+}))
+
+vi.mock("@/services/groupsRepo", () => ({
+  groupsRepo: groupsRepoMock,
+}))
+
+vi.mock("@/services/rulesRepo", () => ({
+  rulesRepo: rulesRepoMock,
+  SYNC_RULES_INDEX: "ext_helper_rules_index",
+  SYNC_RULE_PREFIX: "ext_helper_rule_",
 }))
 
 describe("RuleEngine", () => {
@@ -163,7 +185,9 @@ describe("RuleEngine", () => {
     })
 
     it("normal: should enable/disable groups", async () => {
-      adapter.getStorage.mockResolvedValue([{ id: "group-1", extensionIds: ["ext-1", "ext-2"] }])
+      groupsRepoMock.fetchAll.mockResolvedValue([
+        { id: "group-1", extensionIds: ["ext-1", "ext-2"] },
+      ])
       adapter.setExtensionEnabled.mockResolvedValue(undefined)
 
       const actions: Action[] = [{ type: "enableGroup", targetId: "group-1" }]
@@ -184,7 +208,7 @@ describe("RuleEngine", () => {
     })
 
     it("edge: should handle group not found", async () => {
-      adapter.getStorage.mockResolvedValue([])
+      groupsRepoMock.fetchAll.mockResolvedValue([])
       const actions: Action[] = [{ type: "disableGroup", targetId: "nonexistent" }]
       await engine.executeActions(actions)
       expect(adapter.setExtensionEnabled).not.toHaveBeenCalled()
@@ -194,16 +218,15 @@ describe("RuleEngine", () => {
   describe("recordTrigger", () => {
     it("normal: should update trigger count and timestamp", async () => {
       const existingRules = [
-        { id: "rule-1", triggerCount: 5 },
-        { id: "rule-2", triggerCount: 0 },
+        { id: "rule-1", triggerCount: 5, conditionGroups: [], actions: [] },
+        { id: "rule-2", triggerCount: 0, conditionGroups: [], actions: [] },
       ]
-      adapter.getStorage.mockResolvedValue(existingRules)
-      adapter.setStorage.mockResolvedValue(undefined)
+      rulesRepoMock.fetchAll.mockResolvedValue(existingRules)
+      rulesRepoMock.saveAll.mockResolvedValue(undefined)
 
       await engine.recordTrigger("rule-1")
 
-      expect(adapter.setStorage).toHaveBeenCalledWith(
-        "ext-helper-rules",
+      expect(rulesRepoMock.saveAll).toHaveBeenCalledWith(
         expect.arrayContaining([
           expect.objectContaining({ id: "rule-1", triggerCount: 6 }),
           expect.objectContaining({ id: "rule-2", triggerCount: 0 }),
@@ -212,13 +235,12 @@ describe("RuleEngine", () => {
     })
 
     it("edge: should handle rule with no existing triggerCount", async () => {
-      adapter.getStorage.mockResolvedValue([{ id: "rule-1" }])
-      adapter.setStorage.mockResolvedValue(undefined)
+      rulesRepoMock.fetchAll.mockResolvedValue([{ id: "rule-1", conditionGroups: [], actions: [] }])
+      rulesRepoMock.saveAll.mockResolvedValue(undefined)
 
       await engine.recordTrigger("rule-1")
 
-      expect(adapter.setStorage).toHaveBeenCalledWith(
-        "ext-helper-rules",
+      expect(rulesRepoMock.saveAll).toHaveBeenCalledWith(
         expect.arrayContaining([expect.objectContaining({ id: "rule-1", triggerCount: 1 })])
       )
     })

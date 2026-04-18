@@ -8,6 +8,8 @@ const SYNC_GROUPS_INDEX = "ext_helper_groups_index"
 const SYNC_GROUP_PREFIX = "ext_helper_group_"
 const SYNC_MIGRATION_FLAG = "ext_helper_sync_migrated_groups_v1"
 
+let groupsMigrated = false
+
 const cloneGroups = (groups: Group[]): Group[] =>
   groups.map((group) => ({
     ...group,
@@ -17,8 +19,12 @@ const cloneGroups = (groups: Group[]): Group[] =>
 const generateId = () => devStorage.generateId()
 
 async function migrateGroupsToSync(): Promise<void> {
+  if (groupsMigrated) return
   const migrated = await browserAdapter.getStorage(SYNC_MIGRATION_FLAG)
-  if (migrated) return
+  if (migrated) {
+    groupsMigrated = true
+    return
+  }
 
   const localGroups: Group[] = (await browserAdapter.getStorage(GROUPS_STORAGE_KEY)) || []
   if (localGroups.length > 0) {
@@ -30,6 +36,7 @@ async function migrateGroupsToSync(): Promise<void> {
   }
 
   await browserAdapter.setStorage(SYNC_MIGRATION_FLAG, true)
+  groupsMigrated = true
 }
 
 export const groupsRepo = {

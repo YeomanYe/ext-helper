@@ -8,6 +8,8 @@ export const SYNC_RULES_INDEX = "ext_helper_rules_index"
 export const SYNC_RULE_PREFIX = "ext_helper_rule_"
 const SYNC_MIGRATION_FLAG = "ext_helper_sync_migrated_rules_v1"
 
+let rulesMigrated = false
+
 const cloneRules = (rules: Rule[]): Rule[] =>
   rules.map((rule) => ({
     ...rule,
@@ -28,8 +30,12 @@ const cloneRules = (rules: Rule[]): Rule[] =>
 const generateId = () => devStorage.generateId()
 
 async function migrateRulesToSync(): Promise<void> {
+  if (rulesMigrated) return
   const migrated = await browserAdapter.getStorage(SYNC_MIGRATION_FLAG)
-  if (migrated) return
+  if (migrated) {
+    rulesMigrated = true
+    return
+  }
 
   const localRules: Rule[] = (await browserAdapter.getStorage(RULES_STORAGE_KEY)) || []
   if (localRules.length > 0) {
@@ -41,6 +47,7 @@ async function migrateRulesToSync(): Promise<void> {
   }
 
   await browserAdapter.setStorage(SYNC_MIGRATION_FLAG, true)
+  rulesMigrated = true
 }
 
 export const rulesRepo = {

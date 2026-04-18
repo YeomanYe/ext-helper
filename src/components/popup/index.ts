@@ -9,3 +9,4 @@ export {
 } from "./Header"
 export { ExtensionsActionsMenu } from "./ExtensionsActionsMenu"
 export { BisectBanner } from "./BisectBanner"
+export { ExtensionsTab } from "./ExtensionsTab"

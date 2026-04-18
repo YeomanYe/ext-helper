@@ -11,14 +11,19 @@ export const cloneExtensions = (extensions: Extension[]): ExtensionSnapshot =>
     permissions: [...extension.permissions],
   }))
 
-export const buildHistoryMeta = (history: ExtensionSnapshot[], future: ExtensionSnapshot[]) => ({
-  history,
-  future,
-  canUndo: history.length > 0,
-  canRedo: future.length > 0,
-  undoCount: history.length,
-  redoCount: future.length,
-})
+const MAX_HISTORY = 20
+
+export const buildHistoryMeta = (history: ExtensionSnapshot[], future: ExtensionSnapshot[]) => {
+  const capped = history.length > MAX_HISTORY ? history.slice(-MAX_HISTORY) : history
+  return {
+    history: capped,
+    future,
+    canUndo: capped.length > 0,
+    canRedo: future.length > 0,
+    undoCount: capped.length,
+    redoCount: future.length,
+  }
+}
 
 export const withHistoryCleared = (extensions: ExtensionSnapshot) => ({
   extensions,

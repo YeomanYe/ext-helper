@@ -7,11 +7,13 @@ import type {
   Condition,
   ConditionGroup,
   ConditionOperator,
+  Rule,
   ScheduleCondition,
 } from "./types"
 import { domainMatcher } from "./domainMatcher"
 import { browserAdapter } from "@/services/browser/adapter"
-import { RULES_STORAGE_KEY } from "./constants"
+import { groupsRepo } from "@/services/groupsRepo"
+import { rulesRepo } from "@/services/rulesRepo"
 
 export class RuleEngine {
   /**
@@ -20,16 +22,14 @@ export class RuleEngine {
    * - schedule 为 null → 不限时间
    */
   evaluateConditionGroup(group: ConditionGroup, url: string): boolean {
-    // 域名检查：空域名列表 = 所有网站
     const nonEmptyDomains = group.domains.filter((d) => d.trim())
     const domainMatch =
       nonEmptyDomains.length === 0
-        ? true // 无域名限制 = 全站生效
+        ? true
         : nonEmptyDomains.some((domain) => domainMatcher.matches(domain, group.matchMode, url))
 
     if (!domainMatch) return false
 
-    // 时间检查：schedule 为 null = 不限时间
     if (!group.schedule) return true
     return this.isScheduleMatch(group.schedule as ScheduleCondition)
   }
@@ -87,7 +87,6 @@ export class RuleEngine {
   evaluateConditions(conditions: Condition[], operator: ConditionOperator, url?: string): boolean {
     const results: boolean[] = []
 
-    // 评估域名条件
     const domainResults = conditions
       .filter((c) => c.type === "domain")
       .map((c) => {
@@ -96,7 +95,6 @@ export class RuleEngine {
       })
     results.push(...domainResults)
 
-    // 评估时间表条件
     const scheduleResults = conditions
       .filter((c) => c.type === "schedule")
       .map((c) => {
@@ -110,17 +108,11 @@ export class RuleEngine {
     return this.combineResults(results, operator)
   }
 
-  /**
-   * 组合结果
-   */
   private combineResults(results: boolean[], operator: ConditionOperator): boolean {
     if (results.length === 0) return false
     return operator === "AND" ? results.every(Boolean) : results.some(Boolean)
   }
 
-  /**
-   * 检查时间范围
-   */
   isWithinTimeRange(start: string, end: string): boolean {
     const now = new Date()
     const currentMinutes = now.getHours() * 60 + now.getMinutes()
@@ -130,7 +122,6 @@ export class RuleEngine {
     const startMinutes = startH * 60 + startM
     const endMinutes = endH * 60 + endM
 
-    // 跨天情况 (e.g., 22:00 - 06:00)
     if (startMinutes > endMinutes) {
       return currentMinutes >= startMinutes || currentMinutes <= endMinutes
     }
@@ -138,29 +129,17 @@ export class RuleEngine {
     return currentMinutes >= startMinutes && currentMinutes <= endMinutes
   }
 
-  /**
-   * 检查星期
-   */
   isDayMatch(days: number[]): boolean {
     const today = new Date().getDay()
     return days.includes(today)
   }
 
-  /**
-   * 检查时间表条件 (星期 + 时间范围)，public 供 background 直接调用
-   */
   isScheduleMatch(schedule: ScheduleCondition): boolean {
-    // 检查星期
     const today = new Date().getDay()
     if (!schedule.days.includes(today)) return false
-
-    // 检查时间范围
     return this.isWithinTimeRange(schedule.startTime, schedule.endTime)
   }
 
-  /**
-   * 执行动作
-   */
   async executeActions(actions: Action[]): Promise<void> {
     for (const action of actions) {
       try {
@@ -184,12 +163,9 @@ export class RuleEngine {
     }
   }
 
-  /**
-   * 批量切换分组扩展
-   */
   private async toggleGroupExtensions(groupId: string, enabled: boolean): Promise<void> {
-    const groups = (await browserAdapter.getStorage("ext-helper-groups")) || []
-    const group = groups.find((g: any) => g.id === groupId)
+    const groups = await groupsRepo.fetchAll()
+    const group = groups.find((g) => g.id === groupId)
 
     if (group) {
       for (const extId of group.extensionIds) {
@@ -202,21 +178,14 @@ export class RuleEngine {
     }
   }
 
-  /**
-   * 记录规则触发
-   */
   async recordTrigger(ruleId: string): Promise<void> {
-    const rules = (await browserAdapter.getStorage(RULES_STORAGE_KEY)) || []
-    const newRules = rules.map((r: any) =>
+    const rules = await rulesRepo.fetchAll()
+    const updated = rules.map((r: Rule) =>
       r.id === ruleId
-        ? {
-            ...r,
-            lastTriggeredAt: Date.now(),
-            triggerCount: (r.triggerCount || 0) + 1,
-          }
+        ? { ...r, lastTriggeredAt: Date.now(), triggerCount: (r.triggerCount || 0) + 1 }
         : r
     )
-    await browserAdapter.setStorage(RULES_STORAGE_KEY, newRules)
+    await rulesRepo.saveAll(updated)
   }
 }
 
