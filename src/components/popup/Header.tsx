@@ -2,13 +2,15 @@ import * as React from "react"
 import { X, LayoutGrid, List, ChevronDown, FileText } from "lucide-react"
 import { cn } from "@/utils"
 import { isDevMode } from "@/services/mockData"
+import { browserAdapter } from "@/services/browser/adapter"
 import type { FilterType, ViewMode } from "@/types"
 
 function useExtensionVersion(): string {
   const [version, setVersion] = React.useState("1.0.0")
   React.useEffect(() => {
-    if (!isDevMode() && typeof chrome !== "undefined" && chrome.runtime?.getManifest) {
-      setVersion(chrome.runtime.getManifest().version)
+    if (!isDevMode()) {
+      const v = browserAdapter.getManifestVersion()
+      if (v) setVersion(v)
     }
   }, [])
   return version

@@ -1,3 +1,5 @@
+// Plasmo injects webextension-polyfill at build time, so `browser.*` works
+// uniformly across Chrome, Edge, and Firefox — no manual branching needed.
 import type { BrowserType, Extension } from "@/types"
 
 declare const chrome: any
@@ -15,12 +17,9 @@ export class BrowserError extends Error {
 
 function detectBrowser(): BrowserType {
   if (typeof browser !== "undefined" && browser.runtime?.id) {
-    return "firefox"
-  }
-  if (typeof chrome !== "undefined" && chrome.runtime?.id) {
+    if (typeof chrome === "undefined" || !chrome.runtime?.id) return "firefox"
     const ua = navigator.userAgent
     if (ua.includes("Edg/")) return "edge"
-    if (ua.includes("Safari/") && !ua.includes("Chrome")) return "safari"
     return "chrome"
   }
   return "unknown"
@@ -28,42 +27,23 @@ function detectBrowser(): BrowserType {
 
 function isManifestV3(): boolean {
   try {
-    return chrome.runtime.getManifest().manifest_version === 3
+    return browser.runtime.getManifest().manifest_version === 3
   } catch {
     return false
   }
 }
 
-async function getExtensions(): Promise<Extension[]> {
-  const browserType = detectBrowser()
-  const selfId =
-    typeof chrome !== "undefined" && chrome.runtime?.id
-      ? chrome.runtime.id
-      : typeof browser !== "undefined" && browser.runtime?.id
-        ? browser.runtime.id
-        : null
-
+function getManifestVersion(): string {
   try {
-    if (browserType === "firefox") {
-      const extensions = await browser.management.getAll()
-      return extensions
-        .filter((ext: any) => ext.type === "extension" && ext.id !== selfId)
-        .map(formatFirefoxExtension)
-    } else {
-      const extensions = await chrome.management.getAll()
-      return extensions
-        .filter((ext: any) => ext.type === "extension" && ext.id !== selfId)
-        .map(formatChromeExtension)
-    }
-  } catch (error) {
-    throw new BrowserError(
-      "Failed to get extensions",
-      error instanceof Error ? error.message : "Unknown error"
-    )
+    return browser.runtime.getManifest().version as string
+  } catch {
+    return ""
   }
 }
 
-function formatChromeExtension(ext: any): Extension {
+// ---------- Management API ----------
+
+function formatExtension(ext: any): Extension {
   return {
     id: ext.id,
     name: ext.name,
@@ -86,37 +66,24 @@ function formatChromeExtension(ext: any): Extension {
   }
 }
 
-function formatFirefoxExtension(ext: any): Extension {
-  return {
-    id: ext.id,
-    name: ext.name,
-    description: ext.description || "",
-    version: ext.version,
-    versionName: ext.versionName || null,
-    enabled: ext.enabled,
-    iconUrl: ext.icons?.[0]?.url || null,
-    type: ext.type || "extension",
-    permissions: ext.permissions || [],
-    hostPermissions: ext.hostPermissions || [],
-    installType: ext.installType,
-    mayEnable: ext.mayEnable ?? true,
-    mayDisable: ext.mayDisable ?? true,
-    disabledReason: ext.disabledReason || null,
-    offlineEnabled: ext.offlineEnabled ?? false,
-    optionsUrl: ext.optionsUrl || null,
-    homepageUrl: ext.homepageUrl || null,
+async function getExtensions(): Promise<Extension[]> {
+  try {
+    const selfId = browser.runtime?.id ?? null
+    const extensions = await browser.management.getAll()
+    return extensions
+      .filter((ext: any) => ext.type === "extension" && ext.id !== selfId)
+      .map(formatExtension)
+  } catch (error) {
+    throw new BrowserError(
+      "Failed to get extensions",
+      error instanceof Error ? error.message : "Unknown error"
+    )
   }
 }
 
 async function setExtensionEnabled(id: string, enabled: boolean): Promise<void> {
-  const browserType = detectBrowser()
-
   try {
-    if (browserType === "firefox") {
-      await browser.management.setEnabled(id, enabled)
-    } else {
-      await chrome.management.setEnabled(id, enabled)
-    }
+    await browser.management.setEnabled(id, enabled)
   } catch (error) {
     throw new BrowserError(
       `Failed to ${enabled ? "enable" : "disable"} extension`,
@@ -126,14 +93,8 @@ async function setExtensionEnabled(id: string, enabled: boolean): Promise<void> 
 }
 
 async function uninstallExtension(id: string): Promise<void> {
-  const browserType = detectBrowser()
-
   try {
-    if (browserType === "firefox") {
-      await browser.management.uninstall(id)
-    } else {
-      await chrome.management.uninstall(id)
-    }
+    await browser.management.uninstall(id)
   } catch (error) {
     throw new BrowserError(
       "Failed to uninstall extension",
@@ -143,14 +104,8 @@ async function uninstallExtension(id: string): Promise<void> {
 }
 
 async function openOptionsPage(optionsUrl: string): Promise<void> {
-  const browserType = detectBrowser()
-
   try {
-    if (browserType === "firefox") {
-      await browser.tabs.create({ url: optionsUrl })
-    } else {
-      await chrome.tabs.create({ url: optionsUrl })
-    }
+    await browser.tabs.create({ url: optionsUrl })
   } catch (error) {
     throw new BrowserError(
       "Failed to open options page",
@@ -159,17 +114,31 @@ async function openOptionsPage(optionsUrl: string): Promise<void> {
   }
 }
 
-async function getStorage(key: string): Promise<any> {
-  const browserType = detectBrowser()
+function onExtensionInstalled(callback: (info: Extension) => void): () => void {
+  const handler = (info: any) => callback(formatExtension(info))
+  browser.management.onInstalled.addListener(handler)
+  return () => browser.management.onInstalled.removeListener(handler)
+}
 
+function onExtensionUninstalled(callback: (id: string) => void): () => void {
+  // Chrome fires with id string, Firefox with ExtensionInfo object — normalize to id
+  const handler = (info: any) => callback(typeof info === "string" ? info : info.id)
+  browser.management.onUninstalled.addListener(handler)
+  return () => browser.management.onUninstalled.removeListener(handler)
+}
+
+function onExtensionEnabledChanged(callback: (info: Extension) => void): () => void {
+  const handler = (info: any) => callback(formatExtension(info))
+  browser.management.onEnabledChanged.addListener(handler)
+  return () => browser.management.onEnabledChanged.removeListener(handler)
+}
+
+// ---------- Storage API ----------
+
+async function getStorage(key: string): Promise<any> {
   try {
-    if (browserType === "firefox") {
-      const result = await browser.storage.local.get(key)
-      return result[key]
-    } else {
-      const result = await chrome.storage.local.get(key)
-      return result[key]
-    }
+    const result = await browser.storage.local.get(key)
+    return result[key]
   } catch (error) {
     throw new BrowserError(
       "Failed to get storage",
@@ -179,14 +148,8 @@ async function getStorage(key: string): Promise<any> {
 }
 
 async function setStorage(key: string, value: any): Promise<void> {
-  const browserType = detectBrowser()
-
   try {
-    if (browserType === "firefox") {
-      await browser.storage.local.set({ [key]: value })
-    } else {
-      await chrome.storage.local.set({ [key]: value })
-    }
+    await browser.storage.local.set({ [key]: value })
   } catch (error) {
     throw new BrowserError(
       "Failed to set storage",
@@ -196,16 +159,9 @@ async function setStorage(key: string, value: any): Promise<void> {
 }
 
 async function getSyncStorage(key: string): Promise<any> {
-  const browserType = detectBrowser()
-
   try {
-    if (browserType === "firefox") {
-      const result = await browser.storage.sync.get(key)
-      return result[key]
-    } else {
-      const result = await chrome.storage.sync.get(key)
-      return result[key]
-    }
+    const result = await browser.storage.sync.get(key)
+    return result[key]
   } catch (error) {
     throw new BrowserError(
       "Failed to get sync storage",
@@ -215,14 +171,8 @@ async function getSyncStorage(key: string): Promise<any> {
 }
 
 async function setSyncStorage(key: string, value: any): Promise<void> {
-  const browserType = detectBrowser()
-
   try {
-    if (browserType === "firefox") {
-      await browser.storage.sync.set({ [key]: value })
-    } else {
-      await chrome.storage.sync.set({ [key]: value })
-    }
+    await browser.storage.sync.set({ [key]: value })
   } catch (error) {
     throw new BrowserError(
       "Failed to set sync storage",
@@ -233,14 +183,8 @@ async function setSyncStorage(key: string, value: any): Promise<void> {
 
 async function removeSyncStorage(keys: string[]): Promise<void> {
   if (keys.length === 0) return
-  const browserType = detectBrowser()
-
   try {
-    if (browserType === "firefox") {
-      await browser.storage.sync.remove(keys)
-    } else {
-      await chrome.storage.sync.remove(keys)
-    }
+    await browser.storage.sync.remove(keys)
   } catch (error) {
     throw new BrowserError(
       "Failed to remove sync storage",
@@ -252,106 +196,19 @@ async function removeSyncStorage(keys: string[]): Promise<void> {
 type SyncChangeCallback = (changes: Record<string, { oldValue?: any; newValue?: any }>) => void
 
 function onSyncChanged(callback: SyncChangeCallback): () => void {
-  const browserType = detectBrowser()
-
   const handler = (changes: Record<string, { oldValue?: any; newValue?: any }>, area: string) => {
     if (area === "sync") callback(changes)
   }
-
-  if (browserType === "firefox") {
-    browser.storage.onChanged.addListener(handler)
-    return () => browser.storage.onChanged.removeListener(handler)
-  } else {
-    chrome.storage.onChanged.addListener(handler)
-    return () => chrome.storage.onChanged.removeListener(handler)
-  }
-}
-
-function onExtensionInstalled(callback: (info: Extension) => void): () => void {
-  const browserType = detectBrowser()
-
-  const handler = (info: any) => {
-    callback(formatChromeExtension(info))
-  }
-
-  if (browserType === "firefox") {
-    browser.management.onInstalled.addListener(handler)
-  } else {
-    chrome.management.onInstalled.addListener(handler)
-  }
-
-  return () => {
-    if (browserType === "firefox") {
-      browser.management.onInstalled.removeListener(handler)
-    } else {
-      chrome.management.onInstalled.removeListener(handler)
-    }
-  }
-}
-
-function onExtensionUninstalled(callback: (id: string) => void): () => void {
-  const browserType = detectBrowser()
-
-  const handler = (info: any) => {
-    callback(info.id)
-  }
-
-  if (browserType === "firefox") {
-    browser.management.onUninstalled.addListener(handler)
-  } else {
-    chrome.management.onUninstalled.addListener(handler)
-  }
-
-  return () => {
-    if (browserType === "firefox") {
-      browser.management.onUninstalled.removeListener(handler)
-    } else {
-      chrome.management.onUninstalled.removeListener(handler)
-    }
-  }
-}
-
-function onExtensionEnabledChanged(callback: (info: Extension) => void): () => void {
-  const browserType = detectBrowser()
-
-  const handler = (info: any) => {
-    callback(formatChromeExtension(info))
-  }
-
-  if (browserType === "firefox") {
-    browser.management.onEnabledChanged.addListener(handler)
-  } else {
-    chrome.management.onEnabledChanged.addListener(handler)
-  }
-
-  return () => {
-    if (browserType === "firefox") {
-      browser.management.onEnabledChanged.removeListener(handler)
-    } else {
-      chrome.management.onEnabledChanged.removeListener(handler)
-    }
-  }
+  browser.storage.onChanged.addListener(handler)
+  return () => browser.storage.onChanged.removeListener(handler)
 }
 
 // ---------- Tabs API ----------
 
 async function getCurrentTabUrl(): Promise<string | null> {
-  const browserType = detectBrowser()
-
   try {
-    if (browserType === "firefox") {
-      const tabs = await browser.tabs.query({
-        active: true,
-        currentWindow: true,
-      })
-      return tabs[0]?.url || null
-    } else {
-      const [tab] = await chrome.tabs.query({
-        active: true,
-        currentWindow: true,
-      })
-      return tab?.url || null
-    }
+    const tabs = await browser.tabs.query({ active: true, currentWindow: true })
+    return tabs[0]?.url || null
   } catch (error) {
     console.error("Failed to get current tab URL:", error)
     return null
@@ -359,26 +216,34 @@ async function getCurrentTabUrl(): Promise<string | null> {
 }
 
 async function getCurrentTabId(): Promise<number | null> {
-  const browserType = detectBrowser()
-
   try {
-    if (browserType === "firefox") {
-      const tabs = await browser.tabs.query({
-        active: true,
-        currentWindow: true,
-      })
-      return tabs[0]?.id || null
-    } else {
-      const [tab] = await chrome.tabs.query({
-        active: true,
-        currentWindow: true,
-      })
-      return tab?.id || null
-    }
+    const tabs = await browser.tabs.query({ active: true, currentWindow: true })
+    return tabs[0]?.id ?? null
   } catch (error) {
     console.error("Failed to get current tab ID:", error)
     return null
   }
+}
+
+async function getTab(tabId: number): Promise<{ url?: string } | null> {
+  try {
+    return await browser.tabs.get(tabId)
+  } catch {
+    return null
+  }
+}
+
+type TabUpdatedCallback = (tabId: number, changeInfo: { url?: string }) => void
+type TabActivatedCallback = (activeInfo: { tabId: number }) => void
+
+function onTabUpdated(callback: TabUpdatedCallback): () => void {
+  browser.tabs.onUpdated.addListener(callback)
+  return () => browser.tabs.onUpdated.removeListener(callback)
+}
+
+function onTabActivated(callback: TabActivatedCallback): () => void {
+  browser.tabs.onActivated.addListener(callback)
+  return () => browser.tabs.onActivated.removeListener(callback)
 }
 
 // ---------- Alarms API ----------
@@ -387,44 +252,40 @@ async function createAlarm(
   name: string,
   options: { delayInMinutes?: number; periodInMinutes?: number }
 ): Promise<void> {
-  const browserType = detectBrowser()
-
   try {
-    if (browserType === "firefox") {
-      await browser.alarms.create(name, options)
-    } else {
-      await chrome.alarms.create(name, options)
-    }
+    await browser.alarms.create(name, options)
   } catch (error) {
     console.error("Failed to create alarm:", error)
   }
 }
 
 async function clearAlarm(name: string): Promise<void> {
-  const browserType = detectBrowser()
-
   try {
-    if (browserType === "firefox") {
-      await browser.alarms.clear(name)
-    } else {
-      await chrome.alarms.clear(name)
-    }
+    await browser.alarms.clear(name)
   } catch (error) {
     console.error("Failed to clear alarm:", error)
   }
 }
 
+type AlarmCallback = (alarm: { name: string }) => void
+
+function onAlarm(callback: AlarmCallback): () => void {
+  browser.alarms.onAlarm.addListener(callback)
+  return () => browser.alarms.onAlarm.removeListener(callback)
+}
+
 // ---------- Messaging API ----------
 
-function sendMessage(message: any, callback?: (response: any) => void): void {
-  const browserType = detectBrowser()
+type MessageListener = (message: any, sender: any, sendResponse: (r: any) => void) => boolean | void
 
+function onMessage(callback: MessageListener): () => void {
+  browser.runtime.onMessage.addListener(callback)
+  return () => browser.runtime.onMessage.removeListener(callback)
+}
+
+function sendMessage(message: any, callback?: (response: any) => void): void {
   try {
-    if (browserType === "firefox") {
-      browser.runtime.sendMessage(message).then(callback)
-    } else {
-      chrome.runtime.sendMessage(message, callback)
-    }
+    browser.runtime.sendMessage(message).then(callback)
   } catch (error) {
     console.error("Failed to send message:", error)
   }
@@ -433,22 +294,28 @@ function sendMessage(message: any, callback?: (response: any) => void): void {
 export const browserAdapter = {
   detectBrowser,
   isManifestV3,
+  getManifestVersion,
   getExtensions,
   setExtensionEnabled,
   uninstallExtension,
   openOptionsPage,
+  onExtensionInstalled,
+  onExtensionUninstalled,
+  onExtensionEnabledChanged,
   getStorage,
   setStorage,
   getSyncStorage,
   setSyncStorage,
   removeSyncStorage,
   onSyncChanged,
-  onExtensionInstalled,
-  onExtensionUninstalled,
-  onExtensionEnabledChanged,
   getCurrentTabUrl,
   getCurrentTabId,
+  getTab,
+  onTabUpdated,
+  onTabActivated,
   createAlarm,
   clearAlarm,
+  onAlarm,
+  onMessage,
   sendMessage,
 }

@@ -48,7 +48,7 @@ class RuleBackgroundService {
    * 设置 alarms 监听
    */
   private setupAlarmListener(): void {
-    chrome.alarms.onAlarm.addListener((alarm) => {
+    browserAdapter.onAlarm((alarm) => {
       if (alarm.name === RULE_ALARM_NAME) {
         this.checkTimeRules()
       }
@@ -59,8 +59,7 @@ class RuleBackgroundService {
    * 设置标签页监听
    */
   private setupTabListener(): void {
-    // 标签页 URL 更新时检测
-    chrome.tabs.onUpdated.addListener(async (tabId, changeInfo) => {
+    browserAdapter.onTabUpdated(async (tabId, changeInfo) => {
       if (!changeInfo.url) return
       const settings = await this.getSettings()
       if (settings.enableDomainDetection) {
@@ -68,18 +67,12 @@ class RuleBackgroundService {
       }
     })
 
-    // 标签页激活时检测
-    chrome.tabs.onActivated.addListener(async (activeInfo) => {
+    browserAdapter.onTabActivated(async (activeInfo) => {
       const settings = await this.getSettings()
       if (!settings.enableDomainDetection) return
-
-      try {
-        const tab = await chrome.tabs.get(activeInfo.tabId)
-        if (tab.url) {
-          this.checkDomainRules(activeInfo.tabId, tab.url)
-        }
-      } catch {
-        // 忽略错误
+      const tab = await browserAdapter.getTab(activeInfo.tabId)
+      if (tab?.url) {
+        this.checkDomainRules(activeInfo.tabId, tab.url)
       }
     })
   }
@@ -88,7 +81,7 @@ class RuleBackgroundService {
    * 设置消息处理
    */
   private setupMessageHandler(): void {
-    chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+    browserAdapter.onMessage((message, _sender, sendResponse) => {
       if (message.type === "TRIGGER_RULES_NOW") {
         this.triggerAllRules()
         sendResponse({ success: true })
@@ -110,27 +103,19 @@ class RuleBackgroundService {
    */
   private async startScheduler(settings?: RuleSettings): Promise<void> {
     const s = settings ?? (await this.getSettings())
-    try {
-      await chrome.alarms.create(RULE_ALARM_NAME, {
-        delayInMinutes: s.schedulerInterval / 60000,
-        periodInMinutes: s.schedulerInterval / 60000,
-      })
-      console.log(`[RuleBackground] Scheduler started with interval: ${s.schedulerInterval}ms`)
-    } catch (error) {
-      console.error("[RuleBackground] Failed to start scheduler:", error)
-    }
+    await browserAdapter.createAlarm(RULE_ALARM_NAME, {
+      delayInMinutes: s.schedulerInterval / 60000,
+      periodInMinutes: s.schedulerInterval / 60000,
+    })
+    console.log(`[RuleBackground] Scheduler started with interval: ${s.schedulerInterval}ms`)
   }
 
   /**
    * 停止定时调度器
    */
   private async stopScheduler(): Promise<void> {
-    try {
-      await chrome.alarms.clear(RULE_ALARM_NAME)
-      console.log("[RuleBackground] Scheduler stopped")
-    } catch (error) {
-      console.error("[RuleBackground] Failed to stop scheduler:", error)
-    }
+    await browserAdapter.clearAlarm(RULE_ALARM_NAME)
+    console.log("[RuleBackground] Scheduler stopped")
   }
 
   /**
