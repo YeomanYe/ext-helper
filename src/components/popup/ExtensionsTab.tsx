@@ -1,11 +1,10 @@
 import * as React from "react"
-import { SearchBar, MAIN_FILTERS, ExtensionsActionsMenu, BisectBanner } from "@/components/popup"
+import { SearchBar, MAIN_FILTERS, BisectBanner } from "@/components/popup"
 import { ExtensionCard } from "@/components/extension"
 import { GroupModal, GroupsBar } from "@/components/group"
 import { useExtensionStore, useFilteredExtensions, useGroupStore, useUIStore } from "@/stores"
 import { browserAdapter } from "@/services/browser/adapter"
 import { isDevMode } from "@/services/mockData"
-import { cn } from "@/utils"
 import type { Group } from "@/types"
 
 export function ExtensionsTab() {
@@ -14,9 +13,6 @@ export function ExtensionsTab() {
   const toggleExtension = useExtensionStore((s) => s.toggleExtension)
   const removeExtension = useExtensionStore((s) => s.removeExtension)
   const setExtensionsEnabled = useExtensionStore((s) => s.setExtensionsEnabled)
-  const undoExtensions = useExtensionStore((s) => s.undoExtensions)
-  const redoExtensions = useExtensionStore((s) => s.redoExtensions)
-  const startBisect = useExtensionStore((s) => s.startBisect)
   const markBisectGood = useExtensionStore((s) => s.markBisectGood)
   const markBisectBad = useExtensionStore((s) => s.markBisectBad)
   const cancelBisect = useExtensionStore((s) => s.cancelBisect)
@@ -28,10 +24,6 @@ export function ExtensionsTab() {
   const error = useExtensionStore((s) => s.error)
   const searchQuery = useExtensionStore((s) => s.searchQuery)
   const filter = useExtensionStore((s) => s.filter)
-  const canUndo = useExtensionStore((s) => s.canUndo)
-  const canRedo = useExtensionStore((s) => s.canRedo)
-  const undoCount = useExtensionStore((s) => s.undoCount)
-  const redoCount = useExtensionStore((s) => s.redoCount)
   const bisectSession = useExtensionStore((s) => s.bisectSession)
 
   const groups = useGroupStore((s) => s.groups)
@@ -71,7 +63,6 @@ export function ExtensionsTab() {
   )
 
   const isBisectActive = bisectSession.active
-  const isBisectResolved = bisectSession.phase === "resolved"
 
   // Stable callbacks — read latest state via getState() to avoid stale closures
   const handleOpenOptions = React.useCallback(
@@ -131,9 +122,6 @@ export function ExtensionsTab() {
   )
 
   const enabledCount = filteredExtensions.filter((e) => e.enabled).length
-  const totalExtensionsEnabled = useExtensionStore(
-    (s) => s.extensions.filter((e) => e.enabled).length
-  )
 
   const gridClass =
     viewMode === "card"
@@ -144,35 +132,6 @@ export function ExtensionsTab() {
 
   return (
     <>
-      {/* Tab Controls Row */}
-      <ExtensionsActionsMenu
-        enabledExtensionCount={totalExtensionsEnabled}
-        isBisectActive={isBisectActive}
-        isBisectResolved={isBisectResolved}
-        canUndo={canUndo}
-        canRedo={canRedo}
-        undoCount={undoCount}
-        redoCount={redoCount}
-        onStartBisect={() => void startBisect()}
-        onBisectGood={() => void markBisectGood()}
-        onBisectBad={() => void markBisectBad()}
-        onCancelBisect={() => void cancelBisect()}
-        onEnableAll={() =>
-          void setExtensionsEnabled(
-            filteredExtensions.map((ext) => ext.id),
-            true
-          )
-        }
-        onDisableAll={() =>
-          void setExtensionsEnabled(
-            filteredExtensions.map((ext) => ext.id),
-            false
-          )
-        }
-        onUndo={() => void undoExtensions()}
-        onRedo={() => void redoExtensions()}
-      />
-
       {/* Search */}
       <div className="flex-shrink-0 p-3 border-b border-punk-border/30">
         <SearchBar

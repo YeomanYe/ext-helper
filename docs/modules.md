@@ -219,12 +219,12 @@ interface ConditionBuilderProps {
 ┌────────────────────────────────────────┐
 │  Header (Logo + GRID/CARD/DETAIL)      │
 ├────────────────────────────────────────┤
-│  TabBar ([EXTENSIONS] [RULES])         │
+│  TabBar ([EXTENSIONS] [RULES] [ACTIONS]) │
+│  (仅 Extensions Tab 显示 ActionsMenu)  │
 ├────────────────────────────────────────┤
 │  ErrorBoundary (包裹 Tab 内容)         │
 │  ┌──────────────────────────────────┐  │
 │  │ ExtensionsTab                    │  │
-│  │  • ExtensionsActionsMenu         │  │
 │  │  • SearchBar (筛选下拉 + 搜索框) │  │
 │  │  • BisectBanner (仅 Bisect 时)   │  │
 │  │  • GroupsBar (分组标签行)        │  │
@@ -277,7 +277,7 @@ interface SearchBarProps {
 ```
 
 **功能**：
-- ACTIONS 下拉按钮（位于 Tab 栏右侧）
+- ACTIONS 下拉按钮（位于 Tab 栏右侧，由 PopupPage 渲染，仅 Extensions Tab 激活时出现）
 - 菜单项：Start Bisect、Bisect Good/Bad/Cancel、Enable All、Disable All、Undo [n]、Redo [n]
 - 根据状态（bisect active、canUndo/canRedo）禁用对应项
 
@@ -575,8 +575,10 @@ src/components/
 ```
                       ┌─────────────────────────┐
                       │       PopupPage         │
-                      │ Header + Footer         │
+                      │ Header + TabBar         │
+                      │ (ActionsMenu inline)    │
                       │ Tab 路由 + ErrorBoundary│
+                      │ Footer                  │
                       └──────────┬──────────────┘
                                  │
                  ┌───────────────┴────────────────┐
@@ -584,13 +586,13 @@ src/components/
        ┌──────────────────────┐          ┌──────────────────┐
        │    ExtensionsTab     │          │    RuleManager   │
        │ ┌──────────────────┐ │          │    RuleEditor    │
-       │ │ ActionsMenu      │ │          │    RuleList      │
-       │ │ SearchBar        │ │          └────────┬─────────┘
-       │ │ BisectBanner     │ │                   │
-       │ │ GroupsBar        │ │                   ▼
-       │ │ ExtensionCard 列表│ │         ┌──────────────────┐
-       │ │ GroupModal       │ │         │    ruleStore     │
-       │ └──────────────────┘ │         └────────┬─────────┘
+       │ │ SearchBar        │ │          │    RuleList      │
+       │ │ BisectBanner     │ │          └────────┬─────────┘
+       │ │ GroupsBar        │ │                   │
+       │ │ ExtensionCard 列表│ │                   ▼
+       │ │ GroupModal       │ │         ┌──────────────────┐
+       │ └──────────────────┘ │         │    ruleStore     │
+       │                      │         └────────┬─────────┘
        └────────┬─────────────┘                  │
                 │                                │
                 ▼                                ▼
