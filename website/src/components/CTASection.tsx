@@ -30,9 +30,6 @@ export default function CTASection() {
     <section className="cta-section section" aria-labelledby="cta-title">
       <div className="container">
         <div ref={ref} className="reveal">
-          <div className="cta-terminal" aria-hidden="true">
-            install ext-helper --free
-          </div>
           <h2 className="cta-title" id="cta-title">
             Ready to Take Control
             <br />
