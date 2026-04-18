@@ -1420,8 +1420,6 @@ a { color: inherit; text-decoration: none; }
   pointer-events: none;
 }
 
-.toc-btn:hover .toc-label,
-.toc-btn.active .toc-label,
 .toc:hover .toc-label {
   opacity: 1;
   transform: translateX(0);
