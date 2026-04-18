@@ -316,8 +316,8 @@ a { color: inherit; text-decoration: none; }
 
 .hero-inner {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4rem;
+  grid-template-columns: 46fr 54fr;
+  gap: 3.5rem;
   align-items: center;
   position: relative;
   z-index: 1;
@@ -346,9 +346,10 @@ a { color: inherit; text-decoration: none; }
 }
 
 .hero-title {
-  font-size: clamp(2rem, 5vw, 3.5rem);
-  line-height: 1.1;
+  font-size: clamp(2.25rem, 5.5vw, 4rem);
+  line-height: 1.05;
   margin-bottom: 1.5rem;
+  letter-spacing: -0.01em;
 }
 
 .hero-title-line1 { display: block; color: var(--punk-text-primary); }
@@ -1031,7 +1032,7 @@ a { color: inherit; text-decoration: none; }
 /* ── Screenshot Carousel (Grand / Borderless) ────────── */
 .sc-stage {
   position: relative;
-  width: 460px;
+  width: 500px;
   animation: float 6s ease-in-out infinite;
 }
 
@@ -1093,39 +1094,139 @@ a { color: inherit; text-decoration: none; }
   pointer-events: none;
 }
 
-/* Caption below screenshot */
-.sc-caption {
+/* ── Carousel footer: tab controls + caption ─────────── */
+.sc-footer {
   position: relative;
   z-index: 2;
-  padding: 1.2rem 0.1rem 0;
+  padding-top: 1.1rem;
 }
 
-.sc-meta {
+.sc-controls {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
-  margin-bottom: 0.35rem;
+  gap: 0.55rem;
+  margin-bottom: 0.85rem;
 }
 
-.sc-tag {
+/* Prev / Next buttons — flanking the tabs, fully below image */
+.sc-ctrl-btn {
+  flex-shrink: 0;
+  width: 36px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(124, 58, 237, 0.08);
+  border: 1px solid rgba(124, 58, 237, 0.22);
+  border-radius: 3px;
+  color: var(--punk-text-secondary);
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s;
+}
+.sc-ctrl-btn svg { width: 16px; height: 16px; }
+.sc-ctrl-btn:hover {
+  background: rgba(124, 58, 237, 0.32);
+  border-color: var(--punk-primary);
+  color: #fff;
+  box-shadow: 0 0 12px rgba(124, 58, 237, 0.4);
+}
+.sc-ctrl-btn:focus-visible {
+  outline: 2px solid var(--punk-accent);
+  outline-offset: 2px;
+}
+
+/* Slide tab strip — shows all slides, progress bar on active */
+.sc-tabs {
+  flex: 1;
+  display: flex;
+  gap: 0;
+  border: 1px solid rgba(124, 58, 237, 0.18);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.sc-tab {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0.45rem 0.65rem 0.6rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: none;
+  border-right: 1px solid rgba(124, 58, 237, 0.14);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.2s;
+  overflow: hidden;
+}
+.sc-tab:last-child { border-right: none; }
+.sc-tab:hover:not(.active) { background: rgba(124, 58, 237, 0.08); }
+.sc-tab.active { background: rgba(124, 58, 237, 0.13); }
+
+.sc-tab-tag {
+  display: block;
   font-family: var(--font-mono);
-  font-size: 0.58rem;
+  font-size: 0.48rem;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--punk-accent);
-  background: rgba(34, 211, 238, 0.08);
-  border: 1px solid rgba(34, 211, 238, 0.22);
-  padding: 0.18rem 0.55rem;
-  border-radius: 2px;
+  color: var(--punk-text-muted);
+  margin-bottom: 0.2rem;
+  transition: color 0.2s;
+}
+.sc-tab.active .sc-tab-tag { color: var(--punk-accent); }
+
+.sc-tab-name {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: var(--punk-text-muted);
+  transition: color 0.2s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+.sc-tab.active .sc-tab-name { color: var(--punk-text-primary); }
+
+/* Progress fill bar — bottom edge of active tab */
+.sc-tab-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--punk-accent);
+  transform-origin: left center;
+  transform: scaleX(0);
+  box-shadow: 0 0 6px var(--punk-accent);
 }
 
-.sc-title {
+/* Slide counter — 01/03 */
+.sc-count {
+  flex-shrink: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 0.1rem;
   font-family: var(--font-mono);
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: var(--punk-text-primary);
-  letter-spacing: 0.02em;
+}
+.sc-count-cur {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--punk-accent);
+  text-shadow: 0 0 10px rgba(34, 211, 238, 0.5);
+  line-height: 1;
+}
+.sc-count-sep {
+  font-size: 0.6rem;
+  color: var(--punk-text-muted);
+  margin: 0 0.05rem;
+}
+.sc-count-tot {
+  font-size: 0.6rem;
+  color: var(--punk-text-muted);
 }
 
 .sc-desc {
@@ -1135,53 +1236,9 @@ a { color: inherit; text-decoration: none; }
   line-height: 1.65;
 }
 
-/* Progress bar dots */
-.sc-nav {
-  display: flex;
-  gap: 0.45rem;
-  margin-top: 1rem;
-  align-items: center;
-}
-
-.sc-dot {
-  position: relative;
-  width: 36px;
-  height: 2px;
-  background: rgba(255, 255, 255, 0.1);
-  border: none;
-  cursor: pointer;
-  padding: 6px 0;
-  background-clip: content-box;
-  border-radius: 2px;
-  overflow: visible;
-  transition: opacity 0.2s;
-}
-
-.sc-dot::after {
-  content: "";
-  position: absolute;
-  inset: 6px 0;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 2px;
-  transition: background 0.2s;
-}
-
-.sc-dot:not(.active):hover::after {
-  background: rgba(255, 255, 255, 0.25);
-}
-
-.sc-dot-fill {
-  position: absolute;
-  inset: 6px 0;
-  background: var(--punk-accent);
-  transform-origin: left center;
-  border-radius: 2px;
-  box-shadow: 0 0 5px var(--punk-accent);
-  z-index: 1;
-}
-
 @media (max-width: 1024px) {
   .sc-stage { width: 400px; }
+  .sc-tab-tag { display: none; }
 }
 
 @media (max-width: 768px) {
@@ -1297,52 +1354,6 @@ a { color: inherit; text-decoration: none; }
   .roadmap-badge { display: none; }
 }
 
-/* ── Carousel: prev/next arrows (outside image) ──────── */
-.sc-arrow {
-  position: absolute;
-  width: 44px;
-  height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(15, 15, 35, 0.7);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(124, 58, 237, 0.3);
-  border-radius: 4px;
-  color: var(--punk-text-secondary);
-  cursor: pointer;
-  z-index: 3;
-  /* vertically centered against the image (image is ~75% of stage height) */
-  top: 38%;
-  transform: translateY(-50%);
-  transition: background 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s;
-}
-.sc-arrow svg { width: 18px; height: 18px; }
-
-/* Place arrows just outside the frame edges */
-.sc-arrow-prev { left: -56px; }
-.sc-arrow-next { right: -56px; }
-
-.sc-arrow:hover {
-  background: rgba(124, 58, 237, 0.45);
-  border-color: var(--punk-primary);
-  color: #fff;
-  box-shadow: 0 0 14px rgba(124, 58, 237, 0.5);
-}
-
-.sc-nav-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 1rem;
-}
-
-.sc-counter {
-  font-family: var(--font-mono);
-  font-size: 0.6rem;
-  color: var(--punk-text-muted);
-  letter-spacing: 0.08em;
-}
 
 /* ── Table of Contents (floating right sidebar) ──────── */
 .toc {
