@@ -57,12 +57,12 @@
 ext-helper/
 ├── src/
 │   ├── components/           # React组件
-│   │   ├── common/          # 通用组件 (Button, Switch, Input, ConfirmDialog)
+│   │   ├── common/          # 通用组件 (Button, Switch, Input, ConfirmDialog, Tooltip, ErrorBoundary)
 │   │   ├── extension/       # 扩展组件 (ExtensionCard, ExtensionList, ExtensionContextMenu, ExtensionDetailsModal)
-│   │   ├── group/           # 分组组件 (GroupModal, GroupsBar, GroupChips, GroupEditorPanel, GroupExtensionPicker, ...)
-│   │   ├── popup/           # Popup页面组件 (Header, Footer, SearchBar, ExtensionsActionsMenu, BisectBanner)
+│   │   ├── group/           # 分组组件 (GroupModal, GroupsBar, GroupChips, GroupEditorPanel, GroupExtensionPicker, GroupCard, GroupItem, GroupManager, groupVisuals)
+│   │   ├── popup/           # Popup页面组件 (Header, Footer, SearchBar, ExtensionsActionsMenu, BisectBanner, ExtensionsTab)
 │   │   ├── rules/           # 规则组件 (RuleManager, RuleList, RuleCard, RuleEditor, ConditionBuilder, ActionBuilder, RuleBadges)
-│   │   └── PopupPage.tsx    # 主页面入口组件
+│   │   └── PopupPage.tsx    # 主页面入口组件（Tab 路由 + ErrorBoundary 包裹）
 │   ├── stores/              # Zustand状态管理
 │   │   ├── extensionStore.ts    # 扩展状态（含 undo/redo + bisect）
 │   │   ├── groupStore.ts        # 分组状态
@@ -70,7 +70,8 @@ ext-helper/
 │   │   ├── uiStore.ts           # UI偏好状态
 │   │   ├── optimistic.ts        # 乐观更新工具
 │   │   ├── bisectUtils.ts       # Bisect 工具函数
-│   │   └── extensionStoreUtils.ts # 扩展 Store 工具函数
+│   │   ├── extensionStoreUtils.ts # 扩展 Store 工具函数（含 MAX_HISTORY=20 历史上限）
+│   │   └── index.ts             # 桶文件导出
 │   ├── services/            # 数据访问层（Repository 模式）
 │   │   ├── browser/         # 浏览器适配层
 │   │   │   └── adapter.ts   # 跨浏览器 API 抽象
@@ -89,7 +90,8 @@ ext-helper/
 │   │   └── index.ts         # 规则自动执行后台脚本
 │   ├── hooks/               # 自定义 Hooks
 │   │   ├── useClickOutside.ts
-│   │   └── useContextMenuPosition.ts
+│   │   ├── useContextMenuPosition.ts
+│   │   └── index.ts         # 桶文件导出
 │   ├── types/               # TypeScript类型定义
 │   ├── utils/               # 工具函数
 │   └── styles/              # 全局样式（Punk 设计系统）
