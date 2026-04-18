@@ -11,20 +11,6 @@ interface RoadmapItem {
 
 const ITEMS: RoadmapItem[] = [
   {
-    id: "sync-profiles",
-    tag: "Sync",
-    title: "Cross-Profile Sync",
-    desc: "Share Groups and Rules across multiple Chrome profiles on the same browser — keep work and personal environments in sync.",
-    tagColor: "#22d3ee",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="#22d3ee" strokeWidth="2" aria-hidden="true">
-        <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8" />
-        <polyline points="16 6 12 2 8 6" />
-        <line x1="12" y1="2" x2="12" y2="15" />
-      </svg>
-    ),
-  },
-  {
     id: "activity-log",
     tag: "Analytics",
     title: "Extension Activity Log",
