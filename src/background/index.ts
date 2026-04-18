@@ -5,11 +5,8 @@
 import { browserAdapter } from "@/services/browser/adapter"
 import { RULE_SETTINGS_KEY, DEFAULT_RULE_SETTINGS, RULE_ALARM_NAME } from "@/rules/constants"
 import { ruleEngine } from "@/rules/ruleEngine"
-import { rulesRepo } from "@/services/rulesRepo"
+import { rulesRepo, SYNC_RULES_INDEX, SYNC_RULE_PREFIX } from "@/services/rulesRepo"
 import type { Rule, RuleSettings } from "@/rules/types"
-
-const SYNC_RULES_INDEX = "ext_helper_rules_index"
-const SYNC_RULE_PREFIX = "ext_helper_rule_"
 
 class RuleBackgroundService {
   /**

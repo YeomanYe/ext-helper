@@ -4,8 +4,8 @@ import { devStorage } from "@/services/devStorage"
 import { isDevMode } from "@/services/mockData"
 import { RULES_STORAGE_KEY } from "@/rules/constants"
 
-const SYNC_RULES_INDEX = "ext_helper_rules_index"
-const SYNC_RULE_PREFIX = "ext_helper_rule_"
+export const SYNC_RULES_INDEX = "ext_helper_rules_index"
+export const SYNC_RULE_PREFIX = "ext_helper_rule_"
 const SYNC_MIGRATION_FLAG = "ext_helper_sync_migrated_rules_v1"
 
 const cloneRules = (rules: Rule[]): Rule[] =>
