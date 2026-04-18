@@ -195,6 +195,78 @@ async function setStorage(key: string, value: any): Promise<void> {
   }
 }
 
+async function getSyncStorage(key: string): Promise<any> {
+  const browserType = detectBrowser()
+
+  try {
+    if (browserType === "firefox") {
+      const result = await browser.storage.sync.get(key)
+      return result[key]
+    } else {
+      const result = await chrome.storage.sync.get(key)
+      return result[key]
+    }
+  } catch (error) {
+    throw new BrowserError(
+      "Failed to get sync storage",
+      error instanceof Error ? error.message : "Unknown error"
+    )
+  }
+}
+
+async function setSyncStorage(key: string, value: any): Promise<void> {
+  const browserType = detectBrowser()
+
+  try {
+    if (browserType === "firefox") {
+      await browser.storage.sync.set({ [key]: value })
+    } else {
+      await chrome.storage.sync.set({ [key]: value })
+    }
+  } catch (error) {
+    throw new BrowserError(
+      "Failed to set sync storage",
+      error instanceof Error ? error.message : "Unknown error"
+    )
+  }
+}
+
+async function removeSyncStorage(keys: string[]): Promise<void> {
+  if (keys.length === 0) return
+  const browserType = detectBrowser()
+
+  try {
+    if (browserType === "firefox") {
+      await browser.storage.sync.remove(keys)
+    } else {
+      await chrome.storage.sync.remove(keys)
+    }
+  } catch (error) {
+    throw new BrowserError(
+      "Failed to remove sync storage",
+      error instanceof Error ? error.message : "Unknown error"
+    )
+  }
+}
+
+type SyncChangeCallback = (changes: Record<string, { oldValue?: any; newValue?: any }>) => void
+
+function onSyncChanged(callback: SyncChangeCallback): () => void {
+  const browserType = detectBrowser()
+
+  const handler = (changes: Record<string, { oldValue?: any; newValue?: any }>, area: string) => {
+    if (area === "sync") callback(changes)
+  }
+
+  if (browserType === "firefox") {
+    browser.storage.onChanged.addListener(handler)
+    return () => browser.storage.onChanged.removeListener(handler)
+  } else {
+    chrome.storage.onChanged.addListener(handler)
+    return () => chrome.storage.onChanged.removeListener(handler)
+  }
+}
+
 function onExtensionInstalled(callback: (info: Extension) => void): () => void {
   const browserType = detectBrowser()
 
@@ -367,10 +439,13 @@ export const browserAdapter = {
   openOptionsPage,
   getStorage,
   setStorage,
+  getSyncStorage,
+  setSyncStorage,
+  removeSyncStorage,
+  onSyncChanged,
   onExtensionInstalled,
   onExtensionUninstalled,
   onExtensionEnabledChanged,
-  // 新增
   getCurrentTabUrl,
   getCurrentTabId,
   createAlarm,

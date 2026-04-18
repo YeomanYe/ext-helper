@@ -3,14 +3,13 @@
 // ============================================================
 
 import { browserAdapter } from "@/services/browser/adapter"
-import {
-  RULES_STORAGE_KEY,
-  RULE_SETTINGS_KEY,
-  DEFAULT_RULE_SETTINGS,
-  RULE_ALARM_NAME,
-} from "@/rules/constants"
+import { RULE_SETTINGS_KEY, DEFAULT_RULE_SETTINGS, RULE_ALARM_NAME } from "@/rules/constants"
 import { ruleEngine } from "@/rules/ruleEngine"
+import { rulesRepo } from "@/services/rulesRepo"
 import type { Rule, RuleSettings } from "@/rules/types"
+
+const SYNC_RULES_INDEX = "ext_helper_rules_index"
+const SYNC_RULE_PREFIX = "ext_helper_rule_"
 
 class RuleBackgroundService {
   /**
@@ -37,6 +36,7 @@ class RuleBackgroundService {
       this.setupAlarmListener()
       this.setupTabListener()
       this.setupMessageHandler()
+      this.setupSyncListener()
 
       console.log("[RuleBackground] Initialized successfully")
     } catch (error) {
@@ -209,11 +209,26 @@ class RuleBackgroundService {
   }
 
   /**
+   * 监听 sync 变化，当另一个 profile 修改规则时重新触发
+   */
+  private setupSyncListener(): void {
+    browserAdapter.onSyncChanged((changes) => {
+      const ruleChanged = Object.keys(changes).some(
+        (key) => key === SYNC_RULES_INDEX || key.startsWith(SYNC_RULE_PREFIX)
+      )
+      if (ruleChanged) {
+        console.log("[RuleBackground] Sync rules changed, re-evaluating")
+        this.checkTimeRules()
+      }
+    })
+  }
+
+  /**
    * 获取启用的规则
    */
   private async getEnabledRules(): Promise<Rule[]> {
-    const rules = (await browserAdapter.getStorage(RULES_STORAGE_KEY)) || []
-    return (rules as Rule[]).filter((r) => r.enabled)
+    const rules = await rulesRepo.fetchAll()
+    return rules.filter((r) => r.enabled)
   }
 
   /**
