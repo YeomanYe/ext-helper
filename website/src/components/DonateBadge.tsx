@@ -7,7 +7,7 @@ const PayPalIcon = () => (
 export function DonateBadge() {
   return (
     <a
-      href="https://paypal.me/exthelper"
+      href="https://www.paypal.com/paypalme/yeomanye"
       target="_blank"
       rel="noopener noreferrer"
       className="donate-badge"

@@ -1,22 +1,24 @@
 import { useState, useEffect, useCallback, useRef } from "react"
 
+const BASE = import.meta.env.BASE_URL
+
 const SLIDES = [
   {
-    src: "/screenshots/screenshot-card.png",
+    src: `${BASE}screenshots/screenshot-card.png`,
     label: "Card View",
     tag: "ORGANIZATION",
     desc: "Grid layout with color-coded groups — see all your extensions at a glance.",
     glow: "rgba(124,58,237,0.55)",
   },
   {
-    src: "/screenshots/screenshot-bisect.png",
+    src: `${BASE}screenshots/screenshot-bisect.png`,
     label: "Bisect Debugger",
     tag: "DEBUG",
     desc: "Binary search narrows down the problematic extension in log₂(n) steps.",
     glow: "rgba(244,63,94,0.5)",
   },
   {
-    src: "/screenshots/screenshot-rules.png",
+    src: `${BASE}screenshots/screenshot-rules.png`,
     label: "Auto Rules",
     tag: "AUTOMATION",
     desc: "Domain-based rules with schedule conditions auto-manage your extensions.",

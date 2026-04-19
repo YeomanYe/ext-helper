@@ -4,6 +4,7 @@ const LINKS = [
   { label: "GitHub", href: config.githubUrl },
   { label: "Issues", href: `${config.githubUrl}/issues` },
   { label: "License", href: `${config.githubUrl}/blob/master/LICENSE` },
+  { label: "Donate", href: "https://www.paypal.com/paypalme/yeomanye" },
 ]
 
 export default function Footer() {
