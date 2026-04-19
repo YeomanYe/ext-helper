@@ -46,6 +46,7 @@ jobs:
       - name: Build website
         run: pnpm build:website
         env:
+          VITE_BASE_URL: ${{ vars.VITE_BASE_URL || '/ext-helper/' }}
           VITE_SITE_URL: ${{ vars.VITE_SITE_URL }}
           VITE_GITHUB_URL: ${{ vars.VITE_GITHUB_URL }}
           VITE_CHROME_STORE_URL: ${{ vars.VITE_CHROME_STORE_URL }}
