@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ext Helper Privacy Policy</title>
+  <meta
+    name="description"
+    content="Privacy Policy for Ext Helper, a browser extension manager for Chrome, Firefox, and Edge."
+  />
+  <style>
+    :root {
+      --bg: #0f0f23;
+      --panel: rgba(22, 22, 42, 0.96);
+      --line: rgba(124, 58, 237, 0.45);
+      --cyan: #22d3ee;
+      --purple: #a78bfa;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --ok: #34d399;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(124, 58, 237, 0.28), transparent 36%),
+        radial-gradient(circle at 82% 10%, rgba(34, 211, 238, 0.14), transparent 24%),
+        linear-gradient(180deg, #090912 0%, var(--bg) 42%, #111122 100%);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.08),
+        rgba(0, 0, 0, 0.08) 1px,
+        transparent 1px,
+        transparent 2px
+      );
+      opacity: 0.5;
+    }
+
+    main {
+      width: min(960px, calc(100% - 40px));
+      margin: 48px auto;
+      padding: 36px;
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0)),
+        var(--panel);
+      box-shadow: 0 28px 80px rgba(0, 0, 0, 0.45);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--cyan);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 36px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--cyan));
+    }
+
+    h1,
+    h2 {
+      font-family: "JetBrains Mono", "SFMono-Regular", monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    h1 {
+      margin: 16px 0 8px;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      line-height: 1.02;
+    }
+
+    h2 {
+      margin-top: 32px;
+      font-size: 1.1rem;
+      color: var(--purple);
+    }
+
+    p,
+    li,
+    td {
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    .lede {
+      max-width: 720px;
+      color: var(--muted);
+      font-size: 1.05rem;
+    }
+
+    .stamp {
+      margin-top: 16px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .stamp::before {
+      content: "";
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: var(--ok);
+      box-shadow: 0 0 14px rgba(52, 211, 153, 0.6);
+    }
+
+    ul {
+      padding-left: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      overflow: hidden;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    th,
+    td {
+      padding: 14px 16px;
+      text-align: left;
+      vertical-align: top;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    th {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    a {
+      color: var(--cyan);
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <span class="eyebrow">Privacy Policy</span>
+    <h1>Ext Helper Privacy Policy</h1>
+    <p class="lede">
+      Ext Helper is a browser extension manager for Chrome, Firefox, and Edge.
+      This page explains what the extension stores, what it does not collect,
+      and why the requested permissions are needed.
+    </p>
+    <p class="stamp">Last updated: April 19, 2026</p>
+
+    <h2>Overview</h2>
+    <p>
+      Ext Helper does not collect, transmit, or share any user data with
+      external servers.
+    </p>
+
+    <h2>Data Collection</h2>
+    <ul>
+      <li>No personal information is collected.</li>
+      <li>No browsing history is transmitted to any remote service.</li>
+      <li>No analytics, tracking pixels, or third-party sharing are used.</li>
+    </ul>
+
+    <h2>Data Stored Locally</h2>
+    <p>The extension stores the following data locally on the device only:</p>
+    <ul>
+      <li>Extension groups created by the user</li>
+      <li>Automation rules configured by the user</li>
+      <li>UI preferences such as theme and view mode</li>
+      <li>Bisect session state used during extension conflict debugging</li>
+    </ul>
+
+    <h2>Permissions Explanation</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Permission</th>
+          <th>Purpose</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>management</code></td>
+          <td>Read and control installed browser extensions.</td>
+        </tr>
+        <tr>
+          <td><code>storage</code></td>
+          <td>Save groups, rules, and preferences on the local device.</td>
+        </tr>
+        <tr>
+          <td><code>tabs</code></td>
+          <td>Read the active tab URL so domain-based rules can be evaluated.</td>
+        </tr>
+        <tr>
+          <td><code>alarms</code></td>
+          <td>Schedule time-based automation rules.</td>
+        </tr>
+        <tr>
+          <td><code>&lt;all_urls&gt;</code></td>
+          <td>Match the active tab URL against user-defined domain rules only.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Contact</h2>
+    <p>
+      Questions about this policy can be raised in the project issue tracker:
+      <a href="https://github.com/YeomanYe/ext-helper/issues">
+        github.com/YeomanYe/ext-helper/issues
+      </a>
+    </p>
+  </main>
+</body>
+</html>

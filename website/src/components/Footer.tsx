@@ -3,6 +3,7 @@ import { config } from "../config"
 const LINKS = [
   { label: "GitHub", href: config.githubUrl },
   { label: "Issues", href: `${config.githubUrl}/issues` },
+  { label: "Privacy", href: "./privacy/" },
   { label: "License", href: `${config.githubUrl}/blob/master/LICENSE` },
   { label: "Donate", href: "https://www.paypal.com/paypalme/yeomanye" },
 ]

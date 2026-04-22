@@ -1,0 +1,1120 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ext Helper Store Assets</title>
+    <style>
+      :root {
+        --bg: #0f0f23;
+        --bg-alt: #17172b;
+        --panel: rgba(22, 22, 42, 0.94);
+        --panel-strong: rgba(27, 27, 51, 0.98);
+        --line: rgba(124, 58, 237, 0.48);
+        --line-soft: rgba(34, 211, 238, 0.22);
+        --purple: #7c3aed;
+        --pink: #f43f5e;
+        --cyan: #22d3ee;
+        --lime: #10b981;
+        --text: #e2e8f0;
+        --muted: #9aa7c0;
+        --shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background:
+          radial-gradient(circle at top left, rgba(124, 58, 237, 0.34), transparent 38%),
+          radial-gradient(circle at 88% 12%, rgba(34, 211, 238, 0.18), transparent 26%),
+          radial-gradient(circle at 60% 80%, rgba(244, 63, 94, 0.18), transparent 24%),
+          linear-gradient(160deg, #090912 0%, var(--bg) 48%, #121226 100%);
+        color: var(--text);
+        font-family: "SF Pro Display", "Segoe UI", sans-serif;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background:
+          linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+        background-size: 34px 34px;
+        opacity: 0.38;
+        pointer-events: none;
+      }
+
+      body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: repeating-linear-gradient(
+          0deg,
+          rgba(0, 0, 0, 0.08),
+          rgba(0, 0, 0, 0.08) 1px,
+          transparent 1px,
+          transparent 2px
+        );
+        opacity: 0.55;
+        pointer-events: none;
+      }
+
+      .canvas {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        padding: 28px;
+      }
+
+      .frame {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        border: 1px solid var(--line);
+        border-radius: 28px;
+        overflow: hidden;
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0)),
+          linear-gradient(160deg, rgba(124, 58, 237, 0.1), rgba(10, 10, 24, 0.1)),
+          var(--panel-strong);
+        box-shadow: var(--shadow), inset 0 0 0 1px rgba(255, 255, 255, 0.035);
+      }
+
+      .frame::before,
+      .frame::after {
+        content: "";
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        border-color: var(--cyan);
+        border-style: solid;
+        opacity: 0.9;
+      }
+
+      .frame::before {
+        top: 18px;
+        left: 18px;
+        border-width: 3px 0 0 3px;
+      }
+
+      .frame::after {
+        right: 18px;
+        bottom: 18px;
+        border-width: 0 3px 3px 0;
+      }
+
+      .frame.no-corners::before,
+      .frame.no-corners::after {
+        display: none;
+      }
+
+      .shell {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: grid;
+        gap: 18px;
+      }
+
+      .shell.poster {
+        grid-template-columns: minmax(0, 0.98fr) minmax(0, 1.22fr);
+        padding: 40px;
+      }
+
+      .shell.banner {
+        grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.12fr);
+        padding: 30px 34px;
+        gap: 24px;
+      }
+
+      .shell.small {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1.02fr);
+        padding: 20px;
+        gap: 16px;
+      }
+
+      .shell.promo-only {
+        display: block;
+        padding: 0;
+      }
+
+      .copy {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-width: 0;
+      }
+
+      .masthead {
+        display: grid;
+        gap: 18px;
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      .brand img {
+        width: 58px;
+        height: 58px;
+        border-radius: 16px;
+        box-shadow: 0 14px 36px rgba(124, 58, 237, 0.38);
+      }
+
+      .brand-text {
+        display: grid;
+        gap: 4px;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--cyan);
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+      }
+
+      .eyebrow::before {
+        content: "";
+        width: 38px;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--cyan));
+      }
+
+      .name {
+        color: rgba(255, 255, 255, 0.78);
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        margin: 0;
+        font-family: "JetBrains Mono", "SFMono-Regular", monospace;
+        font-size: 62px;
+        line-height: 0.96;
+        letter-spacing: -0.04em;
+        text-transform: uppercase;
+        text-wrap: balance;
+      }
+
+      .banner h1 {
+        font-size: 56px;
+      }
+
+      .small h1 {
+        font-size: 30px;
+      }
+
+      .accent {
+        color: transparent;
+        background: linear-gradient(90deg, #fff, #a78bfa 42%, #22d3ee);
+        -webkit-background-clip: text;
+        background-clip: text;
+      }
+
+      .lede {
+        max-width: 480px;
+        color: var(--muted);
+        font-size: 18px;
+        line-height: 1.58;
+      }
+
+      .banner .lede {
+        font-size: 17px;
+      }
+
+      .small .lede {
+        font-size: 13px;
+        line-height: 1.45;
+        max-width: none;
+      }
+
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .chip {
+        padding: 9px 14px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.04);
+        color: rgba(255, 255, 255, 0.94);
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      .small .chip {
+        padding: 7px 10px;
+        font-size: 10px;
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .stat {
+        padding: 14px 16px;
+        border-radius: 18px;
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02)),
+          rgba(255, 255, 255, 0.035);
+        border: 1px solid rgba(255, 255, 255, 0.07);
+      }
+
+      .stat .value {
+        display: block;
+        margin-bottom: 6px;
+        color: #fff;
+        font-family: "JetBrains Mono", "SFMono-Regular", monospace;
+        font-size: 24px;
+        font-weight: 700;
+      }
+
+      .small .stat .value {
+        font-size: 16px;
+      }
+
+      .stat .label {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .proof {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding-top: 10px;
+        color: rgba(255, 255, 255, 0.78);
+        font-size: 14px;
+      }
+
+      .proof-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        background: var(--lime);
+        box-shadow: 0 0 14px rgba(16, 185, 129, 0.72);
+      }
+
+      .stage {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 0;
+      }
+
+      .stage::before {
+        content: "";
+        position: absolute;
+        inset: 8% 12%;
+        border-radius: 40px;
+        background: radial-gradient(circle, rgba(124, 58, 237, 0.22), transparent 68%);
+        filter: blur(14px);
+      }
+
+      .shot-frame {
+        position: relative;
+        width: min(100%, 720px);
+        border-radius: 28px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.1), transparent 16%),
+          #12121f;
+        box-shadow: 0 28px 80px rgba(0, 0, 0, 0.45);
+      }
+
+      .banner .shot-frame {
+        width: min(100%, 760px);
+      }
+
+      .small .shot-frame {
+        width: min(100%, 210px);
+        border-radius: 18px;
+      }
+
+      .shot-topbar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 14px 16px;
+        background: rgba(255, 255, 255, 0.05);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      }
+
+      .small .shot-topbar {
+        padding: 9px 12px;
+      }
+
+      .shot-topbar span {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.3);
+      }
+
+      .shot-topbar span:nth-child(1) {
+        background: #fb7185;
+      }
+
+      .shot-topbar span:nth-child(2) {
+        background: #fbbf24;
+      }
+
+      .shot-topbar span:nth-child(3) {
+        background: #34d399;
+      }
+
+      .screen {
+        width: 100%;
+        aspect-ratio: var(--screen-ratio, 1.05);
+        object-fit: contain;
+        object-position: top center;
+        display: block;
+        background: linear-gradient(180deg, rgba(124, 58, 237, 0.08), rgba(0, 0, 0, 0));
+      }
+
+      .screen.cover {
+        object-fit: cover;
+      }
+
+      .footer-strip {
+        position: absolute;
+        right: 20px;
+        bottom: 18px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 14px;
+        border-radius: 999px;
+        background: rgba(8, 8, 18, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .footer-strip strong {
+        color: #fff;
+      }
+
+      .badge-stack {
+        position: absolute;
+        left: 24px;
+        top: 24px;
+        display: grid;
+        gap: 10px;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        max-width: fit-content;
+        padding: 10px 14px;
+        border-radius: 999px;
+        background: rgba(7, 7, 18, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .badge::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: currentColor;
+        box-shadow: 0 0 14px currentColor;
+      }
+
+      .badge.purple {
+        color: #c4b5fd;
+      }
+
+      .badge.cyan {
+        color: #67e8f9;
+      }
+
+      .badge.pink {
+        color: #fda4af;
+      }
+
+      .promo-art {
+        position: relative;
+        width: min(100%, 212px);
+        aspect-ratio: 1 / 1;
+        border-radius: 28px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background:
+          radial-gradient(circle at 24% 18%, rgba(34, 211, 238, 0.18), transparent 26%),
+          radial-gradient(circle at 80% 76%, rgba(244, 63, 94, 0.16), transparent 22%),
+          linear-gradient(155deg, rgba(124, 58, 237, 0.24), rgba(8, 10, 22, 0.97));
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.42);
+        overflow: hidden;
+      }
+
+      .promo-art::before {
+        content: "";
+        position: absolute;
+        inset: 12px;
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .promo-art::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+        background-size: 26px 26px;
+        opacity: 0.16;
+        pointer-events: none;
+      }
+
+      .promo-kicker {
+        position: absolute;
+        left: 18px;
+        top: 18px;
+        z-index: 2;
+        padding: 7px 11px;
+        border-radius: 999px;
+        background: rgba(8, 8, 18, 0.78);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        color: var(--cyan);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+
+      .promo-beam {
+        position: absolute;
+        right: -18px;
+        top: 22px;
+        width: 150px;
+        height: 18px;
+        border-radius: 999px;
+        background: linear-gradient(90deg, rgba(34, 211, 238, 0), rgba(34, 211, 238, 0.82));
+        transform: rotate(-28deg);
+        opacity: 0.86;
+        filter: blur(0.2px);
+      }
+
+      .promo-beam::after {
+        content: "";
+        position: absolute;
+        inset: 4px 20px 4px 44px;
+        border-radius: 999px;
+        background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.28));
+      }
+
+      .promo-icon-wrap {
+        position: absolute;
+        left: 24px;
+        top: 54px;
+        z-index: 2;
+        width: 84px;
+        height: 84px;
+        display: grid;
+        place-items: center;
+        border-radius: 24px;
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.03)),
+          rgba(7, 9, 20, 0.9);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.38);
+      }
+
+      .promo-icon-wrap img {
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
+      }
+
+      .promo-column {
+        position: absolute;
+        z-index: 2;
+        right: 18px;
+        top: 56px;
+        width: 92px;
+        display: grid;
+        gap: 10px;
+      }
+
+      .promo-chip {
+        padding: 10px 10px 11px;
+        border-radius: 16px;
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03)),
+          rgba(8, 8, 18, 0.78);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 14px 28px rgba(0, 0, 0, 0.26);
+      }
+
+      .promo-chip-label {
+        display: block;
+        margin-bottom: 7px;
+        color: rgba(255, 255, 255, 0.68);
+        font-size: 8px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .promo-chip-value {
+        display: block;
+        color: #fff;
+        font-family: "JetBrains Mono", "SFMono-Regular", monospace;
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 1.15;
+      }
+
+      .promo-chip-bar {
+        width: 56px;
+        height: 6px;
+        margin-top: 8px;
+        border-radius: 999px;
+        background: linear-gradient(90deg, rgba(124, 58, 237, 0.9), rgba(34, 211, 238, 0.55));
+      }
+
+      .promo-stage {
+        position: absolute;
+        left: 18px;
+        right: 18px;
+        bottom: 24px;
+        height: 70px;
+        z-index: 1;
+        border-radius: 18px;
+        overflow: hidden;
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02)),
+          rgba(7, 9, 18, 0.84);
+        border: 1px solid rgba(255, 255, 255, 0.07);
+      }
+
+      .promo-stage::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, rgba(124, 58, 237, 0.18), transparent 44%, rgba(34, 211, 238, 0.12));
+      }
+
+      .promo-track {
+        position: absolute;
+        left: 14px;
+        right: 14px;
+        top: 17px;
+        height: 14px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .promo-track::before {
+        content: "";
+        position: absolute;
+        left: 8px;
+        top: 3px;
+        width: 64%;
+        height: 6px;
+        border-radius: 999px;
+        background: linear-gradient(90deg, rgba(34, 211, 238, 0.9), rgba(124, 58, 237, 0.76));
+      }
+
+      .promo-track::after {
+        content: "";
+        position: absolute;
+        right: 18px;
+        top: 2px;
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        background: #34d399;
+        box-shadow: 0 0 12px rgba(52, 211, 153, 0.45);
+      }
+
+      .promo-matrix {
+        position: absolute;
+        left: 14px;
+        right: 14px;
+        bottom: 12px;
+        display: grid;
+        grid-template-columns: 1.25fr 0.95fr 0.9fr;
+        gap: 8px;
+      }
+
+      .promo-cell {
+        height: 22px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .promo-cell.accent {
+        background: linear-gradient(90deg, rgba(124, 58, 237, 0.4), rgba(34, 211, 238, 0.22));
+      }
+
+      .promo-line-stack {
+        position: absolute;
+        left: 120px;
+        top: 72px;
+        z-index: 1;
+        display: grid;
+        gap: 8px;
+      }
+
+      .promo-line-stack span {
+        display: block;
+        height: 8px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .promo-line-stack span:nth-child(1) {
+        width: 76px;
+      }
+
+      .promo-line-stack span:nth-child(2) {
+        width: 58px;
+        background: linear-gradient(90deg, rgba(124, 58, 237, 0.75), rgba(244, 63, 94, 0.42));
+      }
+
+      .promo-line-stack span:nth-child(3) {
+        width: 42px;
+      }
+
+      .promo-caption {
+        position: absolute;
+        right: 18px;
+        top: 28px;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 5px;
+        color: rgba(255, 255, 255, 0.72);
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+
+      .promo-caption strong {
+        color: #fff;
+        font-size: 12px;
+      }
+
+      .promo-poster {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 30px 28px 24px;
+        text-align: left;
+      }
+
+      .promo-main {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: stretch;
+        gap: 15px;
+        min-width: 0;
+        width: 100%;
+      }
+
+      .promo-icon-row {
+        position: relative;
+        align-self: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        width: 100%;
+      }
+
+      .promo-icon-row::before,
+      .promo-icon-row::after {
+        content: "";
+        display: block;
+        width: 96px;
+        height: 118px;
+        background:
+          linear-gradient(180deg, transparent 0 8%, rgba(34, 211, 238, 0.92) 8% 12%, transparent 12% 22%, rgba(103, 232, 249, 0.86) 22% 26%, transparent 26% 38%, rgba(196, 181, 253, 0.8) 38% 42%, transparent 42% 56%, rgba(124, 58, 237, 0.82) 56% 60%, transparent 60% 74%, rgba(34, 211, 238, 0.88) 74% 78%, transparent 78% 100%),
+          linear-gradient(180deg, rgba(34, 211, 238, 0.18), rgba(124, 58, 237, 0.24)),
+          linear-gradient(90deg, rgba(34, 211, 238, 0), rgba(34, 211, 238, 0.36) 48%, rgba(124, 58, 237, 0.52) 100%);
+        background-repeat: no-repeat;
+        opacity: 0.96;
+        filter: drop-shadow(0 0 10px rgba(34, 211, 238, 0.18));
+        border: 1px solid rgba(34, 211, 238, 0.2);
+      }
+
+      .promo-icon-row::before {
+        clip-path: polygon(0 10%, 100% 0, 84% 100%, 0 90%, 18% 50%);
+        transform: scaleX(-1);
+        transform-origin: center;
+        border-right: 0;
+      }
+
+      .promo-icon-row::after {
+        clip-path: polygon(100% 10%, 0 0, 16% 100%, 100% 90%, 82% 50%);
+        transform-origin: center;
+        border-left: 0;
+      }
+
+      .promo-center-icon {
+        display: block;
+        width: 72px;
+        height: 72px;
+        object-fit: contain;
+        object-position: center;
+        filter: drop-shadow(0 16px 26px rgba(0, 0, 0, 0.3));
+      }
+
+      .promo-main-head {
+        display: grid;
+        gap: 0;
+        justify-items: start;
+        width: 100%;
+      }
+
+      .promo-main-head .eyebrow-small {
+        display: none;
+      }
+
+      .promo-main-head h2 {
+        margin: 0;
+        font-family: "JetBrains Mono", "SFMono-Regular", monospace;
+        font-size: 15px;
+        line-height: 0.82;
+        letter-spacing: -0.07em;
+        text-transform: uppercase;
+        max-width: none;
+        width: 100%;
+      }
+
+      .promo-main-head h2 .accent {
+        display: block;
+        white-space: nowrap;
+        color: transparent;
+        background: linear-gradient(90deg, #c4b5fd 0%, #8fdcff 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+      }
+
+      .promo-main-head p {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="canvas">
+      <div class="frame">
+        <div id="shell" class="shell"></div>
+      </div>
+    </div>
+    <script>
+      const assets = {
+        overview: {
+          className: "poster",
+          title: "Control every <span class='accent'>extension</span> in one popup",
+          eyebrow: "Cross-browser manager",
+          description:
+            "Organize extensions into color-coded groups, bulk toggle them, and roll changes back instantly.",
+          chips: ["Groups", "Bulk Toggle", "Undo / Redo"],
+          stats: [
+            ["One popup", "Unified control"],
+            ["Instant", "State rollback"],
+            ["Chrome + Edge + Firefox", "Cross-browser"],
+          ],
+          proof: "Uses a real project screenshot of the Card View UI",
+          screenshot: "../../website/public/screenshots/screenshot-card.png",
+          badgePrimary: "Overview shot",
+          badgeSecondary: "Real UI capture",
+          badgeTone: "purple",
+          footer: "Feature focus: <strong>Groups</strong> and quick toggles",
+          hideBadges: true,
+        },
+        bisect: {
+          className: "poster",
+          title: "Find the breaking add-on in <span class='accent'>log2(n)</span> steps",
+          eyebrow: "Bisect debugger",
+          description:
+            "Binary-search through enabled extensions to isolate conflicts without turning them off one by one.",
+          chips: ["Conflict Debugging", "Binary Search", "Fast Triage"],
+          stats: [
+            ["log2(n)", "Search pattern"],
+            ["Guided", "Enable / disable flow"],
+            ["Less guesswork", "Faster isolation"],
+          ],
+          proof: "Uses a real project screenshot of the Bisect Debugger UI",
+          screenshot: "../../website/public/screenshots/screenshot-bisect.png",
+          badgePrimary: "Debugger shot",
+          badgeSecondary: "Real UI capture",
+          badgeTone: "cyan",
+          footer: "Feature focus: <strong>Bisect Debugger</strong>",
+          hideBadges: true,
+        },
+        automation: {
+          className: "poster",
+          title: "Automate extension rules by <span class='accent'>domain</span> and time",
+          eyebrow: "Automation rules",
+          description:
+            "Match exact domains, wildcards, regex, and schedules so the right extensions switch on when you need them.",
+          chips: ["Domain Match", "Schedules", "Hands-off Switching"],
+          stats: [
+            ["Exact / wildcard / regex", "Match modes"],
+            ["Days + time range", "Schedule support"],
+            ["Local rules", "No remote sync needed"],
+          ],
+          proof: "Uses a real project screenshot of the Rules UI",
+          screenshot: "../../website/public/screenshots/screenshot-rules.png",
+          badgePrimary: "Rules shot",
+          badgeSecondary: "Real UI capture",
+          badgeTone: "pink",
+          footer: "Feature focus: <strong>Automation Rules</strong>",
+          hideBadges: true,
+          extraBottomSpace: true,
+          mastheadStyle: "gap: 10px;",
+          titleStyle: "font-size: 66px; line-height: 0.9; max-width: 520px; text-wrap: initial;",
+          ledeStyle: "max-width: 500px; font-size: 16px; line-height: 1.5;",
+          lowerBlockStyle: "padding-top: 10px; padding-bottom: 10px;",
+          statsStyle: "gap: 10px;",
+          proofStyle: "padding-top: 8px;",
+        },
+        chromeSmall: {
+          className: "promo-only",
+          title: "Run a cleaner <span class='accent'>extension workflow</span>",
+          eyebrow: "Chrome promo tile",
+          description:
+            "Group tools, automate switches, and isolate conflicts from one local-first control center.",
+          chips: ["Groups", "Automation", "Bisect"],
+          stats: [
+            ["1 popup", "Unified control"],
+            ["Local-first", "Private state"],
+            ["Fast bisect", "Conflict isolation"],
+          ],
+          proof: "New promo composition built from the project icon, brand colors, and extension feature copy",
+          footer: "Chrome Web Store",
+          artType: "promo-poster",
+          hideBadges: true,
+        },
+        chromeMarquee: {
+          className: "banner",
+          title: "Organize, automate, and debug <span class='accent'>extension chaos</span>",
+          eyebrow: "Chrome marquee",
+          description:
+            "Ext Helper gives you grouped toggles, domain and schedule rules, and a bisect debugger built for fast conflict triage.",
+          chips: ["Group Views", "Auto Rules", "Bisect Debugger"],
+          stats: [
+            ["Cross-browser", "Chrome / Edge / Firefox"],
+            ["Local storage", "On-device only"],
+            ["1.0.0", "Release package"],
+          ],
+          proof: "One real project screenshot is featured in the banner",
+          screenshot: "../../website/public/screenshots/screenshot-card.png",
+          badgePrimary: "Marquee banner",
+          badgeSecondary: "Single real UI shot",
+          badgeTone: "cyan",
+          footer: "Ext Helper for power users",
+          cover: true,
+          hideBadges: true,
+        },
+      };
+
+      const assetId = new URLSearchParams(window.location.search).get("asset") || "overview";
+      const data = assets[assetId];
+
+      if (!data) {
+        throw new Error(`Unknown asset: ${assetId}`);
+      }
+
+      document.title = `Ext Helper ${assetId}`;
+
+      const renderStats = (stats) =>
+        stats
+          .map(
+            ([value, label]) => `
+              <div class="stat">
+                <span class="value">${value}</span>
+                <span class="label">${label}</span>
+              </div>
+            `,
+          )
+          .join("");
+
+      const renderChips = (chips) =>
+        chips.map((chip) => `<span class="chip">${chip}</span>`).join("");
+
+      const secondaryFrame = data.screenshotSecondary
+        ? `
+            <div class="shot-frame" style="position:absolute; right:18px; bottom:18px; width:min(42%, 290px); transform:rotate(4deg);">
+              <div class="shot-topbar"><span></span><span></span><span></span></div>
+              <img class="screen cover" alt="" src="${data.screenshotSecondary}" style="aspect-ratio: 1.18;" />
+            </div>
+          `
+        : "";
+
+      const promoArt = `
+        <div class="stage">
+          <div class="promo-art">
+            <span class="promo-kicker">Control Matrix</span>
+            <span class="promo-beam"></span>
+            <div class="promo-icon-wrap">
+              <img src="../../assets/icon.png" alt="Ext Helper icon" />
+            </div>
+            <div class="promo-caption">
+              <span>Ext Helper</span>
+              <strong>Stack Ops</strong>
+            </div>
+            <div class="promo-line-stack">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <div class="promo-column">
+              <div class="promo-chip">
+                <span class="promo-chip-label">Groups</span>
+                <span class="promo-chip-value">Batch toggle</span>
+                <div class="promo-chip-bar"></div>
+              </div>
+              <div class="promo-chip">
+                <span class="promo-chip-label">Rules</span>
+                <span class="promo-chip-value">Auto switch</span>
+                <div class="promo-chip-bar"></div>
+              </div>
+            </div>
+            <div class="promo-stage">
+              <div class="promo-track"></div>
+              <div class="promo-matrix">
+                <span class="promo-cell accent"></span>
+                <span class="promo-cell"></span>
+                <span class="promo-cell"></span>
+              </div>
+            </div>
+          </div>
+          <div class="footer-strip">${data.footer}</div>
+        </div>
+      `;
+
+      const promoPoster = `
+        <section class="promo-poster">
+          <div class="promo-main">
+            <div class="promo-icon-row">
+              <img class="promo-center-icon" src="../../assets/icon.png" alt="Ext Helper icon" />
+            </div>
+            <div class="promo-main-head">
+              <h2><span class="accent">Group extensions, run rules, and bisect</span><br /><span class="accent">conflicts.</span></h2>
+            </div>
+          </div>
+        </section>
+      `;
+
+      const imageBlock = data.artType === "promo-grid"
+        ? promoArt
+        : `
+        <div class="stage">
+          <div class="shot-frame">
+            <div class="shot-topbar"><span></span><span></span><span></span></div>
+            <img class="screen ${data.cover ? "cover" : ""}" alt="" src="${data.screenshot}" />
+          </div>
+          ${data.hideBadges
+            ? ""
+            : `<div class="badge-stack">
+            <span class="badge ${data.badgeTone || "purple"}">${data.badgePrimary}</span>
+            <span class="badge cyan">${data.badgeSecondary}</span>
+          </div>`}
+          ${secondaryFrame}
+          <div class="footer-strip">${data.footer}</div>
+        </div>
+      `;
+
+      const shell = document.getElementById("shell");
+      shell.className = `shell ${data.className}`;
+      shell.parentElement.classList.toggle("no-corners", data.artType === "promo-poster");
+      shell.innerHTML =
+        data.artType === "promo-poster"
+          ? promoPoster
+          : `
+        <section class="copy" ${data.extraBottomSpace ? 'style="padding-bottom: 18px;"' : ""}>
+          <div class="masthead" ${data.mastheadStyle ? `style="${data.mastheadStyle}"` : ""}>
+            <div class="brand">
+              <img src="../../assets/icon.png" alt="Ext Helper icon" />
+              <div class="brand-text">
+                <span class="eyebrow">${data.eyebrow}</span>
+                <span class="name">Ext Helper</span>
+              </div>
+            </div>
+            <h1 ${data.titleStyle ? `style="${data.titleStyle}"` : ""}>${data.title}</h1>
+            <p class="lede" ${data.ledeStyle ? `style="${data.ledeStyle}"` : ""}>${data.description}</p>
+            <div class="chips">${renderChips(data.chips)}</div>
+          </div>
+          <div ${data.lowerBlockStyle ? `style="${data.lowerBlockStyle}"` : data.extraBottomSpace ? 'style="padding-top: 14px;"' : ""}>
+            <div class="stats" ${data.statsStyle ? `style="${data.statsStyle}"` : ""}>${renderStats(data.stats)}</div>
+            <div class="proof" ${data.proofStyle ? `style="${data.proofStyle}"` : ""}>
+              <span class="proof-dot"></span>
+                    <span>${data.proof}</span>
+                  </div>
+                </div>
+              </section>
+              ${imageBlock}
+            `;
+
+      const images = Array.from(document.images);
+
+      Promise.all(
+        images.map(
+          (img) =>
+            new Promise((resolve) => {
+              if (img.complete) {
+                resolve();
+              } else {
+                img.addEventListener("load", resolve, { once: true });
+                img.addEventListener("error", resolve, { once: true });
+              }
+            }),
+        ),
+      ).then(() => {
+        document.body.dataset.ready = "true";
+      });
+    </script>
+  </body>
+</html>

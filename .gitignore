@@ -64,6 +64,7 @@ coverage/
 .Trashes
 ehthumbs.db
 Thumbs.db
+release/
 
 # Package managers lock files (optional - uncomment if needed)
 # package-lock.json
