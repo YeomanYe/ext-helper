@@ -73,3 +73,5 @@ release/
 # Gemfile.lock
 # composer.lock
 # Cargo.lock
+.claude
+.playwright-mcp
