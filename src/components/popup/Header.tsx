@@ -263,7 +263,7 @@ export function Header({ viewMode = "compact", onViewModeChange }: HeaderProps) 
         </div>
 
         <div className="flex flex-col">
-          <h1 className="font-punk-heading text-xs text-punk-neon-cyan">EXTHELPER</h1>
+          <h1 className="font-punk-heading text-xs text-punk-neon-cyan">EXT HELPER</h1>
           <span className="font-punk-body text-punk-text-muted text-sm tracking-wider">
             EXTENSION_MGR_v{version}
           </span>

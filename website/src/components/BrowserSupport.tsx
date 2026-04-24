@@ -5,14 +5,15 @@ interface Browser {
   name: string
   url: string
   icon: string
+  comingSoon?: boolean
 }
 
 const BASE = import.meta.env.BASE_URL
 
 const BROWSERS: Browser[] = [
   { name: "Chrome", url: config.chromeStoreUrl, icon: `${BASE}icons/chrome.png` },
-  { name: "Edge", url: config.edgeAddonUrl, icon: `${BASE}icons/edge.png` },
-  { name: "Firefox", url: config.firefoxAddonUrl, icon: `${BASE}icons/firefox.svg` },
+  { name: "Edge", url: config.edgeAddonUrl, icon: `${BASE}icons/edge.png`, comingSoon: true },
+  { name: "Firefox", url: config.firefoxAddonUrl, icon: `${BASE}icons/firefox.svg`, comingSoon: true },
 ]
 
 export default function BrowserSupport() {
@@ -37,23 +38,41 @@ export default function BrowserSupport() {
         </div>
 
         <div ref={gridRef} className="browsers-grid reveal" role="list">
-          {BROWSERS.map((browser) => (
-            <a
-              key={browser.name}
-              href={browser.url}
-              className="browser-card"
-              role="listitem"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={`Install Ext Helper for ${browser.name}`}
-            >
-              <div className="browser-icon">
-                <img src={browser.icon} alt={browser.name} width={48} height={48} />
+          {BROWSERS.map((browser) => {
+            const isComingSoon = browser.comingSoon
+            const commonContent = (
+              <>
+                <div className="browser-icon">
+                  <img src={browser.icon} alt={browser.name} width={48} height={48} />
+                </div>
+                <span className="browser-name">{browser.name}</span>
+                <span className="browser-status">{isComingSoon ? "Coming Soon" : "Available"}</span>
+              </>
+            )
+
+            return isComingSoon ? (
+              <div
+                key={browser.name}
+                className="browser-card browser-card--coming-soon"
+                role="listitem"
+                aria-label={`${browser.name} support coming soon`}
+              >
+                {commonContent}
               </div>
-              <span className="browser-name">{browser.name}</span>
-              <span className="browser-status">Available</span>
-            </a>
-          ))}
+            ) : (
+              <a
+                key={browser.name}
+                href={browser.url}
+                className="browser-card"
+                role="listitem"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`Install Ext Helper for ${browser.name}`}
+              >
+                {commonContent}
+              </a>
+            )
+          })}
         </div>
       </div>
     </section>
