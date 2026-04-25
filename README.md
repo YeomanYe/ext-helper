@@ -1,5 +1,7 @@
 # Ext Helper
 
+![Ext Helper — Tame the chaos. Bisect. Group. Automate.](website/public/hero-poster.png)
+
 A browser extension manager for Chrome, Firefox, and Edge. Organize extensions into groups, automate enable/disable with rules, debug conflicts with binary-search bisect, and undo/redo changes instantly.
 
 [Website](https://yeomanye.github.io/ext-helper/) · [Report an issue](https://github.com/YeomanYe/ext-helper/issues) · [Donate via PayPal](https://www.paypal.com/paypalme/yeomanye)
