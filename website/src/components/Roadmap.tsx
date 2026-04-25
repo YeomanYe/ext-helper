@@ -23,14 +23,16 @@ const ITEMS: RoadmapItem[] = [
     ),
   },
   {
-    id: "cloud-sync",
-    tag: "Cloud",
-    title: "Cloud Data Sync",
-    desc: "Store your Groups, Rules, and preferences in the cloud. Switch machines without losing your setup — everything follows you.",
+    id: "cross-browser-sync",
+    tag: "Sync",
+    title: "Cross-Browser Sync",
+    desc: "Sync your Groups, Rules, and preferences across Chrome, Edge, and Firefox. Same setup wherever you browse — transport (cloud, browser-native sync, or file export) is still being decided.",
     tagColor: "#a78bfa",
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="#a78bfa" strokeWidth="2" aria-hidden="true">
-        <path d="M18 10h-1.26A8 8 0 109 20h9a5 5 0 000-10z" />
+      <svg viewBox="0 0 24 24" fill="none" stroke="#a78bfa" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <polyline points="23 4 23 10 17 10" />
+        <polyline points="1 20 1 14 7 14" />
+        <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
       </svg>
     ),
   },

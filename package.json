@@ -2,6 +2,7 @@
   "name": "ext-helper",
   "version": "1.0.0",
   "description": "Browser extension manager with enable/disable and grouping",
+  "author": "Tony Ye (https://github.com/YeomanYe)",
   "type": "module",
   "scripts": {
     "dev": "plasmo dev",

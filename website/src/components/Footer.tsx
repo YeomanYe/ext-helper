@@ -16,7 +16,16 @@ export default function Footer() {
           <div className="footer-logo">
             <span className="footer-logo-name">ExtHelper</span>
             <span className="footer-logo-copy">
-              &copy; {new Date().getFullYear()} Ext Helper. MIT License.
+              Made with ⚡ by{" "}
+              <a
+                href="https://github.com/YeomanYe"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: "inherit", textDecoration: "underline", textUnderlineOffset: "2px" }}
+              >
+                Tony Ye
+              </a>
+              {" · "}&copy; {new Date().getFullYear()} Ext Helper. MIT License.
             </span>
           </div>
           <nav className="footer-links" aria-label="Footer navigation">
