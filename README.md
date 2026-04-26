@@ -26,7 +26,9 @@ A browser extension manager for Chrome, Firefox, and Edge. Organize extensions i
 
 ## Install
 
-Coming soon to the Chrome Web Store, Edge Add-ons, and Firefox Add-ons. In the meantime you can load from source — see [Development](#development).
+[**Install from the Chrome Web Store →**](https://chromewebstore.google.com/detail/ext-helper/bnoomkhaemojkbmdmniifkijjaiiomfl)
+
+Edge Add-ons and Firefox Add-ons coming soon. You can also load from source — see [Development](#development).
 
 ## Development
 
