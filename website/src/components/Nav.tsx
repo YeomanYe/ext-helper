@@ -52,7 +52,7 @@ export default function Nav() {
           <a href="/" className="nav-logo" aria-label="Ext Helper home">
             <ExtIcon />
             <div className="nav-logo-text">
-              <span className="nav-logo-name">ExtHelper</span>
+              <span className="nav-logo-name">Ext Helper</span>
               <span className="nav-logo-sub">Extension Manager</span>
             </div>
           </a>
