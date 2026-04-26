@@ -30,6 +30,16 @@ A browser extension manager for Chrome, Firefox, and Edge. Organize extensions i
 
 Edge Add-ons and Firefox Add-ons coming soon. You can also load from source — see [Development](#development).
 
+## Pricing
+
+| Tier | Price | What you get |
+|------|-------|--------------|
+| **Free Forever** | $0 | All current features — open source, no ads, no telemetry |
+| **Pro** *(coming soon)* | $9 / year | Priority support, custom themes, batch import/export, advanced rule library, early-access features |
+| **Enterprise** *(on request)* | Custom | Self-hosted distribution, team-shared groups & rules, SSO/SCIM, audit log, SLA |
+
+The free tier stays free forever. Pro and Enterprise tiers fund continued development. Contact via the GitHub repo for Enterprise inquiries.
+
 ## Development
 
 Requires Node 20+ and pnpm 9+.
