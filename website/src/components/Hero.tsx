@@ -61,7 +61,7 @@ function PopupMockup() {
                 E
               </text>
             </svg>
-            EXTHELPER
+            EXT HELPER
           </div>
           <span style={{ fontSize: "0.55rem", color: "var(--punk-text-muted)" }}>GRID</span>
         </div>
