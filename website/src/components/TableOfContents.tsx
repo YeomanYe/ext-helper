@@ -5,7 +5,6 @@ const SECTIONS = [
   { id: "features", label: "Features" },
   { id: "how-it-works", label: "How It Works" },
   { id: "roadmap", label: "Roadmap" },
-  { id: "pricing", label: "Pricing" },
   { id: "install", label: "Download" },
 ]
 
