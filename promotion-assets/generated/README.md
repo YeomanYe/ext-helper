@@ -11,7 +11,7 @@ These store assets are rendered from project-owned sources only:
 Render command:
 
 ```bash
-node store-assets/generated/render-store-assets.mjs
+node promotion-assets/generated/render-store-assets.mjs
 ```
 
 Generated outputs:

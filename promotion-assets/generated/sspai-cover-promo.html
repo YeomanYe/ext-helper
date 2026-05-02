@@ -1,0 +1,558 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <title>Ext Helper · sspai cover (promo-style)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=Inter:wght@400;600;700;800&family=Noto+Sans+SC:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0a0a1a;
+        --bg-alt: #14142a;
+        --line: rgba(124, 58, 237, 0.28);
+        --line-soft: rgba(255, 255, 255, 0.05);
+        --purple: #7c3aed;
+        --purple-soft: #a78bfa;
+        --cyan: #22d3ee;
+        --cyan-bright: #67e8f9;
+        --pink: #f43f5e;
+        --magenta: #ff3ea5;
+        --green: #34d399;
+        --text: #e8eefc;
+        --muted: #93a3bf;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        width: 1600px;
+        height: 1200px;
+        background: var(--bg);
+        color: var(--text);
+        font-family: "Inter", "Noto Sans SC", sans-serif;
+        overflow: hidden;
+      }
+
+      body {
+        position: relative;
+        background:
+          radial-gradient(
+            1100px 700px at 18% 22%,
+            rgba(124, 58, 237, 0.32),
+            transparent 60%
+          ),
+          radial-gradient(
+            900px 600px at 90% 88%,
+            rgba(34, 211, 238, 0.16),
+            transparent 60%
+          ),
+          radial-gradient(
+            700px 500px at 70% 18%,
+            rgba(244, 63, 94, 0.1),
+            transparent 60%
+          ),
+          linear-gradient(160deg, #07071a 0%, var(--bg) 48%, #121226 100%);
+      }
+
+      /* grid background */
+      body::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+        background-size: 80px 80px;
+        opacity: 0.55;
+        pointer-events: none;
+      }
+
+      /* faint scanlines */
+      body::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: repeating-linear-gradient(
+          0deg,
+          rgba(0, 0, 0, 0.07),
+          rgba(0, 0, 0, 0.07) 1px,
+          transparent 1px,
+          transparent 3px
+        );
+        pointer-events: none;
+        z-index: 50;
+      }
+
+      .canvas {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+      }
+
+      /* HUD corners */
+      .canvas::before,
+      .canvas::after {
+        content: "";
+        position: absolute;
+        width: 28px;
+        height: 28px;
+        border-color: var(--cyan);
+        border-style: solid;
+      }
+      .canvas::before {
+        top: 22px;
+        left: 22px;
+        border-width: 3px 0 0 3px;
+      }
+      .canvas::after {
+        right: 22px;
+        bottom: 22px;
+        border-width: 0 3px 3px 0;
+      }
+
+      /* extra HUD ticks */
+      .tick {
+        position: absolute;
+        width: 28px;
+        height: 28px;
+        border-color: var(--cyan);
+        border-style: solid;
+      }
+      .tick.tr {
+        top: 22px;
+        right: 22px;
+        border-width: 3px 3px 0 0;
+      }
+      .tick.bl {
+        bottom: 22px;
+        left: 22px;
+        border-width: 0 0 3px 3px;
+      }
+
+      /* ── meta strip top ── */
+      .meta {
+        position: absolute;
+        top: 56px;
+        left: 80px;
+        right: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 14px;
+        letter-spacing: 0.2em;
+        color: var(--muted);
+        text-transform: uppercase;
+        z-index: 5;
+      }
+
+      .meta .left {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      .meta .dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: var(--green);
+        box-shadow: 0 0 10px var(--green);
+      }
+
+      .meta .right {
+        display: flex;
+        gap: 28px;
+      }
+      .meta .right span {
+        position: relative;
+      }
+      .meta .right span + span::before {
+        content: "·";
+        position: absolute;
+        left: -16px;
+        color: var(--purple);
+      }
+
+      /* ── main grid ── */
+      .grid {
+        position: absolute;
+        top: 50%;
+        left: 80px;
+        right: 80px;
+        transform: translateY(-50%);
+        display: grid;
+        grid-template-columns: 460px 1fr;
+        gap: 80px;
+        align-items: center;
+        z-index: 4;
+      }
+
+      /* ── E tile ── */
+      .tile {
+        position: relative;
+        width: 460px;
+        height: 460px;
+        border-radius: 56px;
+        background:
+          radial-gradient(circle at 30% 30%, rgba(34, 211, 238, 0.18), transparent 60%),
+          linear-gradient(160deg, rgba(34, 211, 238, 0.12), rgba(15, 15, 35, 0.95));
+        border: 3px solid var(--cyan);
+        box-shadow:
+          0 0 0 1px rgba(34, 211, 238, 0.3) inset,
+          0 0 60px rgba(34, 211, 238, 0.45),
+          0 0 120px rgba(34, 211, 238, 0.18),
+          0 30px 80px rgba(0, 0, 0, 0.55);
+        display: grid;
+        place-items: center;
+      }
+
+      .tile::before {
+        content: "";
+        position: absolute;
+        inset: 14px;
+        border-radius: 44px;
+        border: 1px solid rgba(34, 211, 238, 0.18);
+        pointer-events: none;
+      }
+
+      .tile-letter {
+        font-family: "JetBrains Mono", monospace;
+        font-weight: 800;
+        font-size: 320px;
+        line-height: 0.85;
+        color: var(--cyan-bright);
+        letter-spacing: -0.04em;
+        text-shadow:
+          0 0 20px rgba(34, 211, 238, 0.85),
+          0 0 60px rgba(34, 211, 238, 0.5),
+          0 0 100px rgba(34, 211, 238, 0.3);
+        transform: translateY(-6px);
+      }
+
+      .tile-corner {
+        position: absolute;
+        width: 24px;
+        height: 24px;
+        border-color: var(--cyan-bright);
+        border-style: solid;
+        opacity: 0.7;
+      }
+      .tile-corner.tl {
+        top: 22px;
+        left: 22px;
+        border-width: 2px 0 0 2px;
+      }
+      .tile-corner.br {
+        bottom: 22px;
+        right: 22px;
+        border-width: 0 2px 2px 0;
+      }
+
+      .tile-tag {
+        position: absolute;
+        bottom: 28px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-family: "JetBrains Mono", monospace;
+        font-size: 13px;
+        letter-spacing: 0.24em;
+        color: var(--muted);
+        text-transform: uppercase;
+      }
+
+      /* ── copy ── */
+      .copy {
+        display: flex;
+        flex-direction: column;
+        gap: 28px;
+        min-width: 0;
+      }
+
+      .pill {
+        align-self: flex-start;
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 20px;
+        border: 1.5px solid var(--cyan);
+        border-radius: 999px;
+        background: rgba(34, 211, 238, 0.08);
+        font-family: "JetBrains Mono", monospace;
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: 0.22em;
+        color: var(--cyan-bright);
+        text-transform: uppercase;
+        box-shadow:
+          0 0 16px rgba(34, 211, 238, 0.25),
+          inset 0 0 12px rgba(34, 211, 238, 0.06);
+      }
+
+      .pill::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--cyan-bright);
+        box-shadow: 0 0 10px var(--cyan-bright);
+      }
+
+      h1 {
+        font-family: "JetBrains Mono", monospace;
+        font-weight: 800;
+        font-size: 158px;
+        line-height: 0.92;
+        letter-spacing: -0.04em;
+        text-transform: uppercase;
+        color: #fff;
+        text-shadow:
+          0 0 24px rgba(34, 211, 238, 0.55),
+          0 0 60px rgba(34, 211, 238, 0.25);
+      }
+
+      h1 .helper {
+        color: var(--cyan-bright);
+        text-shadow:
+          0 0 22px rgba(34, 211, 238, 0.85),
+          0 0 60px rgba(34, 211, 238, 0.5);
+      }
+
+      .features {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 36px;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+      }
+
+      .features .word {
+        color: var(--magenta);
+        text-shadow: 0 0 20px rgba(255, 62, 165, 0.45);
+      }
+
+      .features .sep {
+        color: var(--purple-soft);
+        margin: 0 14px;
+        font-weight: 400;
+      }
+
+      .features .em {
+        color: var(--text);
+        font-weight: 600;
+        margin-left: 18px;
+      }
+
+      .lede {
+        font-family: "Noto Sans SC", "Inter", sans-serif;
+        font-size: 26px;
+        line-height: 1.55;
+        font-weight: 400;
+        color: var(--muted);
+        max-width: 880px;
+      }
+
+      .lede strong {
+        color: var(--text);
+        font-weight: 600;
+      }
+
+      .toolbar {
+        margin-top: 12px;
+        display: flex;
+        align-items: center;
+        gap: 18px;
+      }
+
+      .chip {
+        padding: 12px 20px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.04);
+        font-family: "JetBrains Mono", monospace;
+        font-size: 16px;
+        font-weight: 700;
+        letter-spacing: 0.16em;
+        color: var(--text);
+        text-transform: uppercase;
+      }
+
+      .chip.purple {
+        border-color: rgba(167, 139, 250, 0.55);
+        color: var(--purple-soft);
+        background: rgba(124, 58, 237, 0.08);
+      }
+      .chip.cyan {
+        border-color: rgba(34, 211, 238, 0.55);
+        color: var(--cyan-bright);
+        background: rgba(34, 211, 238, 0.08);
+      }
+      .chip.pink {
+        border-color: rgba(244, 63, 94, 0.55);
+        color: #fda4af;
+        background: rgba(244, 63, 94, 0.08);
+      }
+
+      /* ── toggle bottom right ── */
+      .toggle {
+        position: absolute;
+        right: 80px;
+        bottom: 110px;
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        z-index: 5;
+      }
+
+      .toggle .label {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 16px;
+        letter-spacing: 0.28em;
+        color: var(--muted);
+        text-transform: uppercase;
+      }
+
+      .switch {
+        position: relative;
+        width: 96px;
+        height: 48px;
+        border-radius: 999px;
+        background: linear-gradient(180deg, var(--cyan), #0ea5b8);
+        box-shadow:
+          0 0 24px rgba(34, 211, 238, 0.55),
+          inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        padding: 0 8px;
+      }
+
+      .switch::before {
+        content: "ON";
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #fff;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 13px;
+        font-weight: 800;
+        letter-spacing: 0.16em;
+      }
+
+      .switch::after {
+        content: "";
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: #fff;
+        box-shadow: 0 0 14px rgba(255, 255, 255, 0.5);
+      }
+
+      /* ── footer strip ── */
+      .footer {
+        position: absolute;
+        left: 80px;
+        bottom: 56px;
+        right: 80px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 13px;
+        letter-spacing: 0.2em;
+        color: var(--muted);
+        text-transform: uppercase;
+        z-index: 5;
+      }
+
+      .footer .platforms {
+        display: flex;
+        gap: 22px;
+      }
+
+      .footer .platforms span {
+        position: relative;
+      }
+      .footer .platforms span + span::before {
+        content: "·";
+        position: absolute;
+        left: -14px;
+        color: var(--purple);
+      }
+      .footer .platforms .soon {
+        color: var(--text-dim, #64748b);
+        opacity: 0.65;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="canvas">
+      <span class="tick tr"></span>
+      <span class="tick bl"></span>
+
+      <div class="meta">
+        <div class="left">
+          <span class="dot"></span>
+          <span>SYS · EXT-HELPER</span>
+        </div>
+        <div class="right">
+          <span>v1.0</span>
+          <span>BROWSER · EXTENSION · MANAGER</span>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="tile">
+          <span class="tile-letter">E</span>
+        </div>
+
+        <div class="copy">
+          <span class="pill">Browser Extension Manager</span>
+
+          <h1>EXT <span class="helper">HELPER</span></h1>
+
+          <div class="features">
+            <span class="word">Group</span><span class="sep">·</span><span
+              class="word"
+              >Automate</span
+            ><span class="sep">·</span><span class="word">Bisect</span>
+            <span class="em">— 一键管好所有扩展</span>
+          </div>
+
+          <p class="lede">
+            把扩展当配置写：颜色<strong>分组</strong>、按域名和时段自动<strong>启停</strong>、二分查找搞坏页面的那一个、<strong>撤销/重做</strong>随时回滚。
+          </p>
+
+          <div class="toolbar">
+            <span class="chip purple">01 · Groups</span>
+            <span class="chip cyan">02 · Rules</span>
+            <span class="chip pink">03 · Bisect</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="toggle">
+        <span class="label">Toggle</span>
+        <div class="switch"></div>
+      </div>
+
+      <div class="footer">
+        <span>chromewebstore · ext-helper</span>
+        <div class="platforms">
+          <span>Chrome</span>
+          <span class="soon">Edge — soon</span>
+          <span class="soon">Firefox — soon</span>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
