@@ -1,5 +1,5 @@
 import * as React from "react"
-import { X, LayoutGrid, List, ChevronDown, FileText } from "lucide-react"
+import { X, LayoutGrid, List, ChevronDown, FileText, type LucideIcon } from "lucide-react"
 import { cn } from "@/utils"
 import { isDevMode } from "@/services/mockData"
 import { browserAdapter } from "@/services/browser/adapter"
@@ -14,14 +14,6 @@ function useExtensionVersion(): string {
     }
   }, [])
   return version
-}
-
-interface SearchBarProps {
-  value: string
-  onChange: (value: string) => void
-  placeholder?: string
-  activeFilter?: FilterType
-  onFilterChange?: (filter: FilterType) => void
 }
 
 export const BASE_FILTERS: { value: FilterType; label: string }[] = [
@@ -206,6 +198,47 @@ export function QuickFilters({ activeFilter, onFilterChange }: QuickFiltersProps
   )
 }
 
+const VIEW_MODES: { mode: ViewMode; icon: LucideIcon; label: string }[] = [
+  { mode: "compact", icon: LayoutGrid, label: "GRID" },
+  { mode: "card", icon: List, label: "CARD" },
+  { mode: "detail", icon: FileText, label: "DETAIL" },
+]
+
+function ViewModeToggle({
+  viewMode,
+  onViewModeChange,
+}: {
+  viewMode: ViewMode
+  onViewModeChange?: (mode: ViewMode) => void
+}) {
+  return (
+    <div
+      className="flex border border-punk-border/30 bg-punk-bg/50"
+      role="group"
+      aria-label="View mode"
+    >
+      {VIEW_MODES.map(({ mode, icon: Icon, label }) => (
+        <button
+          key={mode}
+          onClick={() => onViewModeChange?.(mode)}
+          aria-label={`${label.charAt(0) + label.slice(1).toLowerCase()} view`}
+          aria-pressed={viewMode === mode}
+          title={`${label.charAt(0) + label.slice(1).toLowerCase()} view`}
+          className={cn(
+            "flex items-center gap-1 px-2.5 py-1.5 transition-all duration-200",
+            viewMode === mode
+              ? "bg-punk-primary/30 text-punk-accent border border-punk-primary/50"
+              : "text-punk-text-muted hover:text-punk-text-secondary border border-transparent"
+          )}
+        >
+          <Icon className="h-3 w-3" />
+          <span className="text-[10px] font-punk-heading uppercase">{label}</span>
+        </button>
+      ))}
+    </div>
+  )
+}
+
 interface HeaderProps {
   viewMode?: ViewMode
   onViewModeChange?: (mode: ViewMode) => void
@@ -271,58 +304,7 @@ export function Header({ viewMode = "compact", onViewModeChange }: HeaderProps) 
       </div>
 
       <div className="flex items-center gap-1 relative z-10">
-        {/* View Mode Toggle */}
-        <div
-          className="flex border border-punk-border/30 bg-punk-bg/50"
-          role="group"
-          aria-label="View mode"
-        >
-          <button
-            onClick={() => onViewModeChange?.("compact")}
-            aria-label="Grid view"
-            aria-pressed={viewMode === "compact"}
-            className={cn(
-              "flex items-center gap-1 px-2.5 py-1.5 transition-all duration-200",
-              viewMode === "compact"
-                ? "bg-punk-primary/30 text-punk-accent border border-punk-primary/50"
-                : "text-punk-text-muted hover:text-punk-text-secondary border border-transparent"
-            )}
-            title="Grid view"
-          >
-            <LayoutGrid className="h-3 w-3" />
-            <span className="text-[10px] font-punk-heading uppercase">GRID</span>
-          </button>
-          <button
-            onClick={() => onViewModeChange?.("card")}
-            aria-label="Card view"
-            aria-pressed={viewMode === "card"}
-            className={cn(
-              "flex items-center gap-1 px-2.5 py-1.5 transition-all duration-200",
-              viewMode === "card"
-                ? "bg-punk-primary/30 text-punk-accent border border-punk-primary/50"
-                : "text-punk-text-muted hover:text-punk-text-secondary border border-transparent"
-            )}
-            title="Card view"
-          >
-            <List className="h-3 w-3" />
-            <span className="text-[10px] font-punk-heading uppercase">CARD</span>
-          </button>
-          <button
-            onClick={() => onViewModeChange?.("detail")}
-            aria-label="Detail view"
-            aria-pressed={viewMode === "detail"}
-            className={cn(
-              "flex items-center gap-1 px-2.5 py-1.5 transition-all duration-200",
-              viewMode === "detail"
-                ? "bg-punk-primary/30 text-punk-accent border border-punk-primary/50"
-                : "text-punk-text-muted hover:text-punk-text-secondary border border-transparent"
-            )}
-            title="Detail view"
-          >
-            <FileText className="h-3 w-3" />
-            <span className="text-[10px] font-punk-heading uppercase">DETAIL</span>
-          </button>
-        </div>
+        <ViewModeToggle viewMode={viewMode} onViewModeChange={onViewModeChange} />
       </div>
     </header>
   )

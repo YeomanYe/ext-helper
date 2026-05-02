@@ -2,8 +2,7 @@ import type { Extension } from "@/types"
 import { createIdleBisectSession } from "@/stores/bisectUtils"
 
 export type { ExtensionSnapshot } from "@/stores/bisectUtils"
-
-type ExtensionSnapshot = Extension[]
+import type { ExtensionSnapshot } from "@/stores/bisectUtils"
 
 export const cloneExtensions = (extensions: Extension[]): ExtensionSnapshot =>
   extensions.map((extension) => ({

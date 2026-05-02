@@ -122,16 +122,15 @@ class RuleBackgroundService {
     const rules = await this.getEnabledRules()
     const now = Date.now()
 
+    const settings = await this.getSettings()
+    const cooldown = settings.schedulerInterval * 2
+
     for (const rule of rules) {
       if (!rule.conditionGroups) continue
 
-      // 只检查有时间条件的规则
       const hasSchedule = rule.conditionGroups.some((g) => g.schedule !== null)
       if (!hasSchedule) continue
 
-      // 避免短时间内重复触发
-      const settings = await this.getSettings()
-      const cooldown = settings.schedulerInterval * 2
       if (rule.lastTriggeredAt && now - rule.lastTriggeredAt < cooldown) {
         continue
       }

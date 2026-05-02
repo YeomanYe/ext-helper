@@ -364,12 +364,7 @@ export const useExtensionStore = create<ExtensionStoreState>((set, get) => ({
     if (!session.active) return
 
     const restoredExtensions = cloneExtensions(session.baselineExtensions)
-
-    set({
-      extensions: restoredExtensions,
-      bisectSession: createIdleBisectSession(),
-      error: null,
-    })
+    set({ extensions: restoredExtensions, bisectSession: createIdleBisectSession(), error: null })
 
     try {
       await extensionsRepo.applySnapshot(state.extensions, restoredExtensions)
@@ -384,28 +379,7 @@ export const useExtensionStore = create<ExtensionStoreState>((set, get) => ({
   },
 
   finishBisectRestore: async () => {
-    const state = get()
-    const session = state.bisectSession
-    if (!session.active) return
-
-    const restoredExtensions = cloneExtensions(session.baselineExtensions)
-
-    set({
-      extensions: restoredExtensions,
-      bisectSession: createIdleBisectSession(),
-      error: null,
-    })
-
-    try {
-      await extensionsRepo.applySnapshot(state.extensions, restoredExtensions)
-      await extensionsRepo.clearBisectSession()
-    } catch (error) {
-      set({
-        extensions: state.extensions,
-        bisectSession: session,
-        error: error instanceof Error ? error.message : "Failed to restore bisect baseline",
-      })
-    }
+    await get().cancelBisect()
   },
 
   setFilter: (filter: FilterType) => set({ filter }),
