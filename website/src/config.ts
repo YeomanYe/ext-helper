@@ -6,6 +6,8 @@ export const config = {
   chromeStoreUrl:
     import.meta.env.VITE_CHROME_STORE_URL ||
     "https://chromewebstore.google.com/detail/ext-helper/bnoomkhaemojkbmdmniifkijjaiiomfl",
-  firefoxAddonUrl: import.meta.env.VITE_FIREFOX_ADDON_URL || "#",
+  firefoxAddonUrl:
+    import.meta.env.VITE_FIREFOX_ADDON_URL ||
+    "https://addons.mozilla.org/zh-CN/firefox/addon/ext-helper/",
   edgeAddonUrl: import.meta.env.VITE_EDGE_ADDON_URL || "#",
 } as const

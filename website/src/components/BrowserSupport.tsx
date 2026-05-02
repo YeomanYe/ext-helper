@@ -13,7 +13,7 @@ const BASE = import.meta.env.BASE_URL
 const BROWSERS: Browser[] = [
   { name: "Chrome", url: config.chromeStoreUrl, icon: `${BASE}icons/chrome.png` },
   { name: "Edge", url: config.edgeAddonUrl, icon: `${BASE}icons/edge.png`, comingSoon: true },
-  { name: "Firefox", url: config.firefoxAddonUrl, icon: `${BASE}icons/firefox.svg`, comingSoon: true },
+  { name: "Firefox", url: config.firefoxAddonUrl, icon: `${BASE}icons/firefox.svg` },
 ]
 
 export default function BrowserSupport() {
