@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Ext Helper — Edge store logo 300x300</title>
+    <style>
+      :root {
+        --bg: #0f0f23;
+        --bg-alt: #1a1a2e;
+        --accent: #22d3ee;
+        --border: #7c3aed;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        width: 300px;
+        height: 300px;
+        background: var(--bg);
+      }
+      .stage {
+        position: relative;
+        width: 300px;
+        height: 300px;
+        overflow: hidden;
+        background:
+          radial-gradient(
+            circle at 50% 46%,
+            rgba(34, 211, 238, 0.18) 0%,
+            rgba(34, 211, 238, 0.08) 28%,
+            rgba(15, 15, 35, 0) 60%
+          ),
+          linear-gradient(180deg, #14143a 0%, #0f0f23 65%, #0a0a1a 100%);
+      }
+      .corner {
+        position: absolute;
+        width: 22px;
+        height: 22px;
+        border: 1.5px solid rgba(124, 58, 237, 0.55);
+      }
+      .corner.tl {
+        top: 16px;
+        left: 16px;
+        border-right: none;
+        border-bottom: none;
+      }
+      .corner.tr {
+        top: 16px;
+        right: 16px;
+        border-left: none;
+        border-bottom: none;
+      }
+      .corner.bl {
+        bottom: 16px;
+        left: 16px;
+        border-right: none;
+        border-top: none;
+      }
+      .corner.br {
+        bottom: 16px;
+        right: 16px;
+        border-left: none;
+        border-top: none;
+      }
+      .icon-wrap {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .icon {
+        width: 200px;
+        height: 200px;
+        image-rendering: -webkit-optimize-contrast;
+        filter: drop-shadow(0 0 20px rgba(34, 211, 238, 0.45))
+          drop-shadow(0 0 40px rgba(34, 211, 238, 0.25));
+      }
+    </style>
+  </head>
+  <body>
+    <div class="stage" id="stage">
+      <span class="corner tl"></span>
+      <span class="corner tr"></span>
+      <span class="corner bl"></span>
+      <span class="corner br"></span>
+      <div class="icon-wrap">
+        <img class="icon" src="../../assets/icon.png" alt="Ext Helper icon" />
+      </div>
+    </div>
+    <script>
+      const img = document.querySelector(".icon");
+      img.addEventListener("load", () => {
+        document.body.dataset.ready = "true";
+      });
+      img.addEventListener("error", () => {
+        document.body.dataset.ready = "error";
+      });
+      if (img.complete && img.naturalWidth > 0) {
+        document.body.dataset.ready = "true";
+      }
+    </script>
+  </body>
+</html>
