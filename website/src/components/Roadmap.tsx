@@ -36,6 +36,31 @@ const ITEMS: RoadmapItem[] = [
       </svg>
     ),
   },
+  {
+    id: "site-aware-picker",
+    tag: "Context",
+    title: "Site-Aware Extension Picker",
+    desc: "On any website, instantly see which of your installed extensions actually work here — based on host permissions, content-script matches, and how you've used them before.",
+    tagColor: "#34d399",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="#34d399" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <circle cx="11" cy="11" r="7" />
+        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+      </svg>
+    ),
+  },
+  {
+    id: "cloud-suggestions",
+    tag: "Discovery",
+    title: "Cloud-Suggested Extensions",
+    desc: "Query a curated cloud catalog for extensions that target the current website's domain — ranked by community signal so you discover the best tool for the page you're on.",
+    tagColor: "#f472b6",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="#f472b6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M18 10h-1.26A8 8 0 109 20h9a5 5 0 000-10z" />
+      </svg>
+    ),
+  },
 ]
 
 function RoadmapCard({ item, index }: { item: RoadmapItem; index: number }) {

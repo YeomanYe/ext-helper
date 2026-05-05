@@ -59,6 +59,8 @@ See [`TODO.md`](TODO.md).
 
 - [ ] Extension usage log — track enable/disable/install/uninstall history and usage stats
 - [ ] Cloud sync — store groups, rules, and preferences in the cloud with multi-device sync
+- [ ] Site-aware extension picker — on the current website, surface which of your installed extensions actually work here (host permissions, matches, prior usage)
+- [ ] Cloud-suggested extensions — query a cloud catalog for extensions that target the current website's domain, ranked by community signal
 
 ## Support
 
