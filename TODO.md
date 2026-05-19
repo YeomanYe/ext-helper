@@ -8,3 +8,4 @@
 - [ ] 云端推荐可用扩展 — 查询云端目录，推荐可以用在当前网站上的扩展（按域名匹配、社区评分、用户已安装情况过滤）
 - [ ] 主题切换 — 支持深色 / 浅色 / 跟随系统三态，由 uiStore 管理；popup 与 dev:web preview 共用主题逻辑；FOUC 防抖（参考 tab-shelf 的 inline head script 方案）
 - [ ] 设计风格切换 — 把当前 `punk-*` 极客风抽象成可切换的"主题包"，未来可以加入其它风格（如简约 / 拟物 / 卡通等）；建议把 `src/styles/globals.css` 里的 `punk-*` 变量改用 `data-style="punk"` 命名空间，再为每种风格各出一套；和主题切换（dark/light）正交（任一风格都要兼容深浅）
+- [ ] `keyboard-shortcuts` 快捷键操作扩展 — 为常用操作（启用/禁用单个扩展、切换组、bisect 下一步、撤销/重做）配置浏览器命令快捷键 (用 chrome.commands API + Plasmo command handler；快捷键映射存 uiStore)
