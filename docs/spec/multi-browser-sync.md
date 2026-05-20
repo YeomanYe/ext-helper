@@ -1,7 +1,7 @@
 ---
 id: multi-browser-sync
 title: 多浏览器同步
-status: approved
+status: ready-for-review
 created: 2026-05-20
 updated: 2026-05-20
 project_root: /Users/ym/Documents/projects/ext-helper
@@ -54,14 +54,14 @@ needs_visual_check: false
 
 ## 验收标准
 
-- [ ] extension mode 下 `preferencesRepo.fetch()` 首次读取时能把旧 `ext-helper-preferences` local 数据迁移到 sync，并设置一次性迁移标记。
-- [ ] extension mode 下 `preferencesRepo.save()` 合并已有偏好后写入 sync，后续 `fetch()` 返回最新合并结果。
-- [ ] extension mode 下 Groups 仍按 index + item key 从 sync 读取，`saveAll([])` 后不会残留旧 group item key。
-- [ ] extension mode 下 Rules 仍按 index + item key 从 sync 读取，删除规则后不会残留旧 rule item key。
-- [ ] dev:web 模式继续使用 `devStorage`，不访问 `browser.storage.sync`。
-- [ ] 不新增云端服务、账号认证或跨厂商同步依赖；文档或代码注释中明确首版为浏览器原生 sync。
-- [ ] 所有现有测试通过
-- [ ] lint clean / build success
+- [x] extension mode 下 `preferencesRepo.fetch()` 首次读取时能把旧 `ext-helper-preferences` local 数据迁移到 sync，并设置一次性迁移标记。
+- [x] extension mode 下 `preferencesRepo.save()` 合并已有偏好后写入 sync，后续 `fetch()` 返回最新合并结果。
+- [x] extension mode 下 Groups 仍按 index + item key 从 sync 读取，`saveAll([])` 后不会残留旧 group item key。
+- [x] extension mode 下 Rules 仍按 index + item key 从 sync 读取，删除规则后不会残留旧 rule item key。
+- [x] dev:web 模式继续使用 `devStorage`，不访问 `browser.storage.sync`。
+- [x] 不新增云端服务、账号认证或跨厂商同步依赖；文档或代码注释中明确首版为浏览器原生 sync。
+- [x] 所有现有测试通过
+- [x] lint clean / build success
 
 ## 风险
 
@@ -76,3 +76,5 @@ needs_visual_check: false
 
 - **2026-05-20**: 初版 spec，选择浏览器原生 `storage.sync` 作为首版方案，不引入云端或文件导入导出。
 - **2026-05-20**: 高风险信号：存储迁移、跨浏览器同步语义限制（已记入"风险"区段，但仍 approved）
+- **2026-05-20**: 实现完成，Preferences 迁移到浏览器原生 `storage.sync`；Groups/Rules sync 清理行为用 extension-mode 单测锁定。
+- **2026-05-20**: 为满足完整测试 hard gate，顺手修复 `src/stores/extensionStore.ts` 中 `finishBisectRestore()` 复用 cancel fallback 文案的既有失败。
