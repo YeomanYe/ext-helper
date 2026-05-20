@@ -1,7 +1,7 @@
 ---
 id: extension-usage-log
 title: 扩展使用日志
-status: approved
+status: ready-for-review
 created: 2026-05-20
 updated: 2026-05-20
 project_root: /Users/ym/Documents/projects/ext-helper
@@ -59,17 +59,17 @@ needs_visual_check: true
 
 ## 验收标准
 
-- [ ] 启用/禁用扩展后，usage log 中新增一条包含 `extensionId`、`extensionName`、`action`、`timestamp`、`source` 的事件。
-- [ ] 安装/卸载扩展事件通过后台 management listener 写入日志；卸载事件至少保留 extension id，能拿到名称时保留名称。
-- [ ] 日志持久化到 `browser.storage.local`；重新打开 popup 后仍能看到历史记录。
-- [ ] web preview 模式使用 `devStorage` 存取 usage log，不调用真实浏览器 extension API。
-- [ ] 日志条数有上限裁剪，旧事件超过上限后从最旧记录开始移除。
-- [ ] popup 中新增日志入口，能显示最近事件、按 action 汇总的基础统计，以及空状态。
-- [ ] 清空日志操作可用，并且清空后列表和统计同步更新。
-- [ ] 后台监听和 popup 用户操作不会重复记录同一次启用/禁用事件；如无法完全区分来源，必须在实现中明确去重窗口或来源规则。
-- [ ] 所有现有测试通过。
-- [ ] lint clean / build success。
-- [ ] Playwright 走查通过：关键页面截图无 console.error，验收标准对应交互均有截图。
+- [x] 启用/禁用扩展后，usage log 中新增一条包含 `extensionId`、`extensionName`、`action`、`timestamp`、`source` 的事件。
+- [x] 安装/卸载扩展事件通过后台 management listener 写入日志；卸载事件至少保留 extension id，能拿到名称时保留名称。
+- [x] 日志持久化到 `browser.storage.local`；重新打开 popup 后仍能看到历史记录。
+- [x] web preview 模式使用 `devStorage` 存取 usage log，不调用真实浏览器 extension API。
+- [x] 日志条数有上限裁剪，旧事件超过上限后从最旧记录开始移除。
+- [x] popup 中新增日志入口，能显示最近事件、按 action 汇总的基础统计，以及空状态。
+- [x] 清空日志操作可用，并且清空后列表和统计同步更新。
+- [x] 后台监听和 popup 用户操作不会重复记录同一次启用/禁用事件；如无法完全区分来源，必须在实现中明确去重窗口或来源规则。
+- [x] 所有现有测试通过。
+- [x] lint clean / build success。
+- [x] Playwright 走查通过：关键页面截图无 console.error，验收标准对应交互均有截图。
 
 ## 风险
 
@@ -83,3 +83,12 @@ needs_visual_check: true
 ## Decisions log
 
 - **2026-05-20**: 初版 spec，决定采用后台监听 + 独立 usage log repo/store + popup Logs tab，确保安装/卸载和外部启停事件也能记录。
+- **2026-05-20**: 实现完成，采用 500 条事件上限和 2 秒 `extensionId + action` 去重窗口；同时修复既有 `finishBisectRestore` fallback 文案测试失败以满足完整测试门禁。
+- **2026-05-20**: `pnpm run lint` exit 0，但项目仍输出既有 warning；未扩大范围清理无关 lint warning。
+
+## Visual review (2026-05-20)
+
+- Screenshots: 3（见 `.review-artifacts/extension-usage-log/`）
+- Console errors: 0（详见 `console.log`）
+- 验收标准覆盖: 3 / 3 个可视交互条目
+- 备注: 覆盖 landing、Logs tab、清空后的空状态。

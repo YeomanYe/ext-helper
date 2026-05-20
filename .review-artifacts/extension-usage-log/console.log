@@ -1,0 +1,5 @@
+Total messages: 3 (Errors: 0, Warnings: 0)
+
+[DEBUG] [vite] connecting... @ http://localhost:4173/@vite/client:494
+[DEBUG] [vite] connected. @ http://localhost:4173/@vite/client:617
+[INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://localhost:4173/node_modules/.vite/deps/chunk-NLPANMJC.js?v=ae691513:21550
