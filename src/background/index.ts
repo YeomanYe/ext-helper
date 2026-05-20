@@ -6,6 +6,7 @@ import { browserAdapter } from "@/services/browser/adapter"
 import { RULE_SETTINGS_KEY, DEFAULT_RULE_SETTINGS, RULE_ALARM_NAME } from "@/rules/constants"
 import { ruleEngine } from "@/rules/ruleEngine"
 import { rulesRepo, SYNC_RULES_INDEX, SYNC_RULE_PREFIX } from "@/services/rulesRepo"
+import { createUsageLogEvent, usageLogRepo } from "@/services/usageLogRepo"
 import type { Rule, RuleSettings } from "@/rules/types"
 
 class RuleBackgroundService {
@@ -231,8 +232,41 @@ class RuleBackgroundService {
   }
 }
 
+class UsageLogBackgroundService {
+  initialize(): void {
+    try {
+      browserAdapter.onExtensionInstalled((extension) => {
+        void usageLogRepo.append(createUsageLogEvent(extension, "installed", "background"))
+      })
+
+      browserAdapter.onExtensionUninstalled((extensionId) => {
+        void this.recordUninstalled(extensionId)
+      })
+
+      browserAdapter.onExtensionEnabledChanged((extension) => {
+        void usageLogRepo.append(
+          createUsageLogEvent(extension, extension.enabled ? "enabled" : "disabled", "browser")
+        )
+      })
+
+      console.log("[UsageLogBackground] Initialized successfully")
+    } catch (error) {
+      console.error("[UsageLogBackground] Initialization failed:", error)
+    }
+  }
+
+  private async recordUninstalled(extensionId: string): Promise<void> {
+    const extensionName = (await usageLogRepo.findExtensionName(extensionId)) ?? extensionId
+    await usageLogRepo.append(
+      createUsageLogEvent({ id: extensionId, name: extensionName }, "uninstalled", "background")
+    )
+  }
+}
+
 // 创建并导出服务实例
 export const ruleBackgroundService = new RuleBackgroundService()
+export const usageLogBackgroundService = new UsageLogBackgroundService()
 
 // 初始化服务（当 background script 加载时）
 ruleBackgroundService.initialize()
+usageLogBackgroundService.initialize()

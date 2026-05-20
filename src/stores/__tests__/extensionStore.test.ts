@@ -11,8 +11,28 @@ const repo = vi.hoisted(() => ({
   clearBisectSession: vi.fn(),
 }))
 
+const usageLogRepoMock = vi.hoisted(() => ({
+  appendMany: vi.fn(),
+}))
+
 vi.mock("@/services/extensionsRepo", () => ({
   extensionsRepo: repo,
+}))
+
+vi.mock("@/services/usageLogRepo", () => ({
+  usageLogRepo: usageLogRepoMock,
+  createUsageLogEvent: (
+    extension: { id: string; name: string },
+    action: "enabled" | "disabled",
+    source: "popup"
+  ) => ({
+    id: `${extension.id}-${action}`,
+    extensionId: extension.id,
+    extensionName: extension.name,
+    action,
+    timestamp: 1000,
+    source,
+  }),
 }))
 
 const makeExtension = (overrides: Partial<Extension> = {}): Extension => ({
@@ -52,6 +72,7 @@ describe("extensionStore", () => {
     repo.remove.mockResolvedValue(undefined)
     repo.saveBisectSession.mockResolvedValue(undefined)
     repo.clearBisectSession.mockResolvedValue(undefined)
+    usageLogRepoMock.appendMany.mockResolvedValue(undefined)
   })
 
   it("tracks undo/redo with typed history", async () => {
@@ -114,6 +135,14 @@ describe("extensionStore", () => {
 
       expect(store.getState().extensions[0].enabled).toBe(false)
       expect(repo.setEnabled).toHaveBeenCalledWith("a", false)
+      expect(usageLogRepoMock.appendMany).toHaveBeenCalledWith([
+        expect.objectContaining({
+          extensionId: "a",
+          extensionName: "Alpha",
+          action: "disabled",
+          source: "popup",
+        }),
+      ])
     })
 
     it("normal: should toggle a disabled extension to enabled", async () => {
