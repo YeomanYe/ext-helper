@@ -75,3 +75,5 @@ release/
 # Cargo.lock
 .claude
 .playwright-mcp
+.review-artifacts/
+.worktrees/
