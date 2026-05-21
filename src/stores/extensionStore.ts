@@ -1,7 +1,8 @@
 import * as React from "react"
 import { create } from "zustand"
-import type { BisectSession, ExtensionStore, FilterType, SortType } from "@/types"
+import type { BisectSession, Extension, ExtensionStore, FilterType, SortType } from "@/types"
 import { extensionsRepo } from "@/services/extensionsRepo"
+import { createUsageLogEvent, usageLogRepo } from "@/services/usageLogRepo"
 import {
   createIdleBisectSession,
   splitCandidateIds,
@@ -31,6 +32,22 @@ const initialState = {
   sortBy: "name" as SortType,
   ...buildHistoryMeta([], []),
   bisectSession: createIdleBisectSession(),
+}
+
+const recordEnabledChanges = async (
+  previousExtensions: Extension[],
+  nextExtensions: Extension[]
+): Promise<void> => {
+  const previousById = new Map(previousExtensions.map((extension) => [extension.id, extension]))
+  const events = nextExtensions.flatMap((extension) => {
+    const previous = previousById.get(extension.id)
+    if (!previous || previous.enabled === extension.enabled) return []
+    return [createUsageLogEvent(extension, extension.enabled ? "enabled" : "disabled", "popup")]
+  })
+
+  if (events.length > 0) {
+    await usageLogRepo.appendMany(events)
+  }
 }
 
 export const useExtensionStore = create<ExtensionStoreState>((set, get) => ({
@@ -84,6 +101,7 @@ export const useExtensionStore = create<ExtensionStoreState>((set, get) => ({
 
     try {
       await extensionsRepo.setEnabled(id, !currentExtension.enabled)
+      await recordEnabledChanges(previousExtensions, nextExtensions)
       set((currentState) => ({
         ...buildHistoryMeta([...currentState.history, previousExtensions], []),
         extensions: currentState.extensions,
@@ -151,6 +169,7 @@ export const useExtensionStore = create<ExtensionStoreState>((set, get) => ({
 
     try {
       await extensionsRepo.applySnapshot(previousExtensions, nextExtensions)
+      await recordEnabledChanges(previousExtensions, nextExtensions)
       set((currentState) => ({
         ...buildHistoryMeta([...currentState.history, previousExtensions], []),
         extensions: currentState.extensions,
@@ -181,6 +200,7 @@ export const useExtensionStore = create<ExtensionStoreState>((set, get) => ({
 
     try {
       await extensionsRepo.applySnapshot(currentExtensions, previousExtensions)
+      await recordEnabledChanges(currentExtensions, previousExtensions)
     } catch (error) {
       set({
         extensions: currentExtensions,
@@ -207,6 +227,7 @@ export const useExtensionStore = create<ExtensionStoreState>((set, get) => ({
 
     try {
       await extensionsRepo.applySnapshot(currentExtensions, nextExtensions)
+      await recordEnabledChanges(currentExtensions, nextExtensions)
     } catch (error) {
       set({
         extensions: currentExtensions,
@@ -379,7 +400,23 @@ export const useExtensionStore = create<ExtensionStoreState>((set, get) => ({
   },
 
   finishBisectRestore: async () => {
-    await get().cancelBisect()
+    const state = get()
+    const session = state.bisectSession
+    if (!session.active) return
+
+    const restoredExtensions = cloneExtensions(session.baselineExtensions)
+    set({ extensions: restoredExtensions, bisectSession: createIdleBisectSession(), error: null })
+
+    try {
+      await extensionsRepo.applySnapshot(state.extensions, restoredExtensions)
+      await extensionsRepo.clearBisectSession()
+    } catch (error) {
+      set({
+        extensions: state.extensions,
+        bisectSession: session,
+        error: error instanceof Error ? error.message : "Failed to restore bisect baseline",
+      })
+    }
   },
 
   setFilter: (filter: FilterType) => set({ filter }),

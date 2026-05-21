@@ -48,6 +48,42 @@ export type FilterType =
 export type SortType = "name" | "enabled" | "recentlyUsed"
 export type ViewMode = "compact" | "card" | "detail"
 export type BisectPhase = "idle" | "running" | "resolved" | "cancelled"
+export type UsageLogAction = "enabled" | "disabled" | "installed" | "uninstalled"
+export type UsageLogSource = "popup" | "browser" | "background"
+
+export interface UsageLogEvent {
+  id: string
+  extensionId: string
+  extensionName: string
+  action: UsageLogAction
+  timestamp: number
+  source: UsageLogSource
+}
+
+export interface UsageLogExtensionStats {
+  extensionName: string
+  enabled: number
+  disabled: number
+  installed: number
+  uninstalled: number
+  total: number
+  lastEventAt: number
+}
+
+export interface UsageLogStats {
+  total: number
+  byAction: Record<UsageLogAction, number>
+  byExtension: Record<string, UsageLogExtensionStats>
+}
+
+export interface UsageLogStore {
+  events: UsageLogEvent[]
+  stats: UsageLogStats
+  loading: boolean
+  error: string | null
+  fetchUsageLog: () => Promise<void>
+  clearUsageLog: () => Promise<void>
+}
 
 export interface BisectSession {
   active: boolean

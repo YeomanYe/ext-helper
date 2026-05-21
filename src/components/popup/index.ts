@@ -10,3 +10,4 @@ export {
 export { ExtensionsActionsMenu } from "./ExtensionsActionsMenu"
 export { BisectBanner } from "./BisectBanner"
 export { ExtensionsTab } from "./ExtensionsTab"
+export { UsageLogTab } from "./UsageLogTab"

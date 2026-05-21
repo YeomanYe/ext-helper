@@ -1,5 +1,5 @@
 // Development mode storage - simulates browser storage in memory
-import type { BisectSession, Extension, Group } from "@/types"
+import type { BisectSession, Extension, Group, UsageLogEvent } from "@/types"
 import type { Rule } from "@/rules/types"
 import { MOCK_EXTENSIONS, MOCK_GROUPS, MOCK_RULES } from "./mockData"
 
@@ -7,6 +7,7 @@ class DevStorage {
   private extensions: Extension[] = []
   private groups: Group[] = []
   private rules: Rule[] = []
+  private usageLog: UsageLogEvent[] = []
   private preferences: {
     theme?: string
     compactMode?: boolean
@@ -27,6 +28,7 @@ class DevStorage {
       const rls = localStorage.getItem("dev-rules")
       const prefs = localStorage.getItem("dev-preferences")
       const bisect = localStorage.getItem("dev-bisect-session")
+      const usageLog = localStorage.getItem("dev-usage-log")
       if (ext) this.extensions = JSON.parse(ext)
       else this.extensions = MOCK_EXTENSIONS
       if (grp) this.groups = JSON.parse(grp)
@@ -38,11 +40,26 @@ class DevStorage {
       }
       if (prefs) this.preferences = JSON.parse(prefs)
       if (bisect) this.bisectSession = JSON.parse(bisect)
+      if (usageLog) this.usageLog = JSON.parse(usageLog)
+      else this.usageLog = this.buildMockUsageLog()
     } catch {
       this.extensions = MOCK_EXTENSIONS
       this.groups = MOCK_GROUPS
       this.rules = MOCK_RULES
+      this.usageLog = this.buildMockUsageLog()
     }
+  }
+
+  private buildMockUsageLog(): UsageLogEvent[] {
+    const now = Date.now()
+    return this.extensions.slice(0, 8).map((extension, index) => ({
+      id: `dev-log-${index}`,
+      extensionId: extension.id,
+      extensionName: extension.name,
+      action: index % 3 === 0 ? "disabled" : "enabled",
+      timestamp: now - index * 1000 * 60 * 17,
+      source: "browser",
+    }))
   }
 
   private save() {
@@ -51,6 +68,7 @@ class DevStorage {
       localStorage.setItem("dev-groups", JSON.stringify(this.groups))
       localStorage.setItem("dev-rules", JSON.stringify(this.rules))
       localStorage.setItem("dev-preferences", JSON.stringify(this.preferences))
+      localStorage.setItem("dev-usage-log", JSON.stringify(this.usageLog))
       if (this.bisectSession) {
         localStorage.setItem("dev-bisect-session", JSON.stringify(this.bisectSession))
       } else {
@@ -159,6 +177,16 @@ class DevStorage {
   setBisectSession(session: BisectSession | null) {
     this.bisectSession = session ? JSON.parse(JSON.stringify(session)) : null
     this.save()
+  }
+
+  getUsageLog(): UsageLogEvent[] {
+    return this.usageLog.map((event) => ({ ...event }))
+  }
+
+  setUsageLog(events: UsageLogEvent[]) {
+    this.usageLog = events.map((event) => ({ ...event }))
+    this.save()
+    this.notify("usageLog")
   }
 }
 

@@ -1,29 +1,33 @@
 import * as React from "react"
 import { Header, Footer, ExtensionsActionsMenu } from "@/components/popup"
 import { ExtensionsTab } from "@/components/popup/ExtensionsTab"
+import { UsageLogTab } from "@/components/popup/UsageLogTab"
 import { RuleManager } from "@/components/rules"
 import { ErrorBoundary } from "@/components/common/ErrorBoundary"
 import {
   useExtensionStore,
   useFilteredExtensions,
   useGroupStore,
+  useUsageLogStore,
   useUIStore,
   initializeUIStore,
 } from "@/stores"
 import { cn } from "@/utils"
 
-type TabType = "extensions" | "rules"
+type TabType = "extensions" | "rules" | "logs"
 
 export function PopupPage() {
   const viewMode = useUIStore((s) => s.viewMode)
   const setViewMode = useUIStore((s) => s.setViewMode)
   const fetchExtensions = useExtensionStore((s) => s.fetchExtensions)
   const fetchGroups = useGroupStore((s) => s.fetchGroups)
+  const fetchUsageLog = useUsageLogStore((s) => s.fetchUsageLog)
 
   const totalExtensionsEnabled = useExtensionStore(
     (s) => s.extensions.filter((e) => e.enabled).length
   )
   const totalExtensions = useExtensionStore((s) => s.extensions.length)
+  const totalLogEvents = useUsageLogStore((s) => s.stats.total)
 
   const canUndo = useExtensionStore((s) => s.canUndo)
   const canRedo = useExtensionStore((s) => s.canRedo)
@@ -48,7 +52,8 @@ export function PopupPage() {
     initializeUIStore()
     fetchExtensions()
     fetchGroups()
-  }, [fetchExtensions, fetchGroups])
+    fetchUsageLog()
+  }, [fetchExtensions, fetchGroups, fetchUsageLog])
 
   const isBisectActive = bisectSession.active
   const isBisectResolved = bisectSession.phase === "resolved"
@@ -81,6 +86,17 @@ export function PopupPage() {
             )}
           >
             RULES
+          </button>
+          <button
+            onClick={() => setActiveTab("logs")}
+            className={cn(
+              "px-3 py-2 text-[13px] font-punk-heading uppercase tracking-wider transition-all",
+              activeTab === "logs"
+                ? "text-punk-accent border-b-2 border-punk-accent"
+                : "text-punk-text-muted hover:text-punk-text-primary"
+            )}
+          >
+            LOGS
           </button>
           {activeTab === "extensions" && (
             <ExtensionsActionsMenu
@@ -117,13 +133,27 @@ export function PopupPage() {
       {/* Main Content */}
       <div className="flex flex-1 flex-col overflow-hidden">
         <ErrorBoundary>
-          {activeTab === "extensions" ? <ExtensionsTab /> : <RuleManager />}
+          {activeTab === "extensions" && <ExtensionsTab />}
+          {activeTab === "rules" && <RuleManager />}
+          {activeTab === "logs" && <UsageLogTab />}
         </ErrorBoundary>
       </div>
 
       <Footer
-        totalCount={activeTab === "extensions" ? filteredExtensions.length : totalExtensions}
-        enabledCount={activeTab === "extensions" ? filteredEnabledCount : totalExtensionsEnabled}
+        totalCount={
+          activeTab === "extensions"
+            ? filteredExtensions.length
+            : activeTab === "logs"
+              ? totalLogEvents
+              : totalExtensions
+        }
+        enabledCount={
+          activeTab === "extensions"
+            ? filteredEnabledCount
+            : activeTab === "logs"
+              ? totalLogEvents
+              : totalExtensionsEnabled
+        }
       />
     </div>
   )
