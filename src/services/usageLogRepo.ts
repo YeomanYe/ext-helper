@@ -144,6 +144,10 @@ export const usageLogRepo = {
     await writeEvents([])
   },
 
+  async replaceAll(events: UsageLogEvent[]): Promise<void> {
+    await writeEvents(events)
+  },
+
   async getStats(): Promise<UsageLogStats> {
     return buildUsageLogStats(await readEvents())
   },

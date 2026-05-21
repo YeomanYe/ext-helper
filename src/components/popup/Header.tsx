@@ -1,5 +1,5 @@
 import * as React from "react"
-import { X, LayoutGrid, List, ChevronDown, FileText, type LucideIcon } from "lucide-react"
+import { X, LayoutGrid, List, ChevronDown, FileText, FileJson, type LucideIcon } from "lucide-react"
 import { cn } from "@/utils"
 import { isDevMode } from "@/services/mockData"
 import { browserAdapter } from "@/services/browser/adapter"
@@ -242,9 +242,14 @@ function ViewModeToggle({
 interface HeaderProps {
   viewMode?: ViewMode
   onViewModeChange?: (mode: ViewMode) => void
+  onOpenImportExport?: () => void
 }
 
-export function Header({ viewMode = "compact", onViewModeChange }: HeaderProps) {
+export function Header({
+  viewMode = "compact",
+  onViewModeChange,
+  onOpenImportExport,
+}: HeaderProps) {
   const version = useExtensionVersion()
   return (
     <header className="relative flex items-center justify-between border-b-2 border-punk-primary bg-punk-bg px-4 py-3 hud-corner">
@@ -305,6 +310,18 @@ export function Header({ viewMode = "compact", onViewModeChange }: HeaderProps) 
 
       <div className="flex items-center gap-1 relative z-10">
         <ViewModeToggle viewMode={viewMode} onViewModeChange={onViewModeChange} />
+        <button
+          type="button"
+          onClick={onOpenImportExport}
+          aria-label="Import or export data"
+          title="Import or export data"
+          className={cn(
+            "flex h-8 w-8 items-center justify-center border border-punk-border/30 bg-punk-bg/50",
+            "text-punk-text-muted transition-all duration-200 hover:border-punk-accent hover:text-punk-accent"
+          )}
+        >
+          <FileJson className="h-4 w-4" />
+        </button>
       </div>
     </header>
   )
