@@ -136,4 +136,22 @@ describe("usageLogRepo", () => {
     expect(events).toHaveLength(1)
     expect(events[0].id).toBe("popup")
   })
+
+  it("normal: createUsageLogEvent preserves extension iconUrl", async () => {
+    const { createUsageLogEvent } = await import("@/services/usageLogRepo")
+
+    const event = createUsageLogEvent(
+      { id: "ext-with-icon", name: "Extension With Icon", iconUrl: "chrome://icon.png" },
+      "enabled",
+      "popup"
+    )
+
+    expect(event).toMatchObject({
+      extensionId: "ext-with-icon",
+      extensionName: "Extension With Icon",
+      iconUrl: "chrome://icon.png",
+      action: "enabled",
+      source: "popup",
+    })
+  })
 })

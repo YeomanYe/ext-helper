@@ -92,7 +92,7 @@ export const buildUsageLogStats = (events: UsageLogEvent[]): UsageLogStats => {
 }
 
 export const createUsageLogEvent = (
-  extension: Pick<Extension, "id" | "name">,
+  extension: Pick<Extension, "id" | "name"> & Partial<Pick<Extension, "iconUrl">>,
   action: UsageLogAction,
   source: UsageLogEvent["source"] = "browser"
 ): UsageLogEvent => {
@@ -106,6 +106,7 @@ export const createUsageLogEvent = (
     id: randomId,
     extensionId: extension.id,
     extensionName: extension.name || extension.id,
+    iconUrl: extension.iconUrl ?? null,
     action,
     timestamp,
     source,

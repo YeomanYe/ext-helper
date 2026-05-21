@@ -55,6 +55,7 @@ export interface UsageLogEvent {
   id: string
   extensionId: string
   extensionName: string
+  iconUrl?: string | null
   action: UsageLogAction
   timestamp: number
   source: UsageLogSource

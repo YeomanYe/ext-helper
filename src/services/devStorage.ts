@@ -52,13 +52,17 @@ class DevStorage {
 
   private buildMockUsageLog(): UsageLogEvent[] {
     const now = Date.now()
+    const actions: UsageLogEvent["action"][] = ["enabled", "disabled", "installed", "uninstalled"]
+    const sources: UsageLogEvent["source"][] = ["browser", "popup", "background"]
+
     return this.extensions.slice(0, 8).map((extension, index) => ({
       id: `dev-log-${index}`,
       extensionId: extension.id,
       extensionName: extension.name,
-      action: index % 3 === 0 ? "disabled" : "enabled",
+      iconUrl: extension.iconUrl,
+      action: actions[index % actions.length],
       timestamp: now - index * 1000 * 60 * 17,
-      source: "browser",
+      source: sources[index % sources.length],
     }))
   }
 

@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Activity, Download, Power, PowerOff, Trash2, Upload } from "lucide-react"
+import { Activity, Download, Power, PowerOff, Puzzle, Trash2 } from "lucide-react"
 import { Button } from "@/components/common/Button"
 import { useUsageLogStore } from "@/stores"
 import type { UsageLogAction, UsageLogEvent } from "@/types"
@@ -16,16 +16,20 @@ const ACTION_ICONS = {
   enabled: Power,
   disabled: PowerOff,
   installed: Download,
-  uninstalled: Upload,
+  uninstalled: Trash2,
 }
 
-const formatTime = (timestamp: number): string =>
-  new Intl.DateTimeFormat(undefined, {
-    month: "short",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date(timestamp))
+const formatTime = (timestamp: number): string => {
+  const date = new Date(timestamp)
+  const pad = (value: number) => value.toString().padStart(2, "0")
+
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(
+    date.getHours()
+  )}:${pad(date.getMinutes())}`
+}
+
+const getExtensionInitial = (event: UsageLogEvent): string =>
+  (event.extensionName || event.extensionId || "?").trim().charAt(0).toUpperCase()
 
 function StatTile({ action, count }: { action: UsageLogAction; count: number }) {
   const Icon = ACTION_ICONS[action]
@@ -43,22 +47,54 @@ function StatTile({ action, count }: { action: UsageLogAction; count: number }) 
   )
 }
 
-function EventRow({ event }: { event: UsageLogEvent }) {
+function EventIcon({ event }: { event: UsageLogEvent }) {
+  const [imageFailed, setImageFailed] = React.useState(false)
   const Icon = ACTION_ICONS[event.action]
+  const showImage = Boolean(event.iconUrl) && !imageFailed
+  const isPositive = event.action === "enabled" || event.action === "installed"
 
+  React.useEffect(() => {
+    setImageFailed(false)
+  }, [event.iconUrl])
+
+  return (
+    <div className="relative mt-0.5 h-10 w-10 flex-shrink-0">
+      <div className="flex h-10 w-10 items-center justify-center overflow-hidden border border-punk-border/50 bg-punk-bg font-punk-heading text-sm text-punk-text-primary">
+        {showImage ? (
+          <img
+            src={event.iconUrl ?? undefined}
+            alt=""
+            loading="lazy"
+            className="h-full w-full object-cover"
+            onError={() => setImageFailed(true)}
+          />
+        ) : getExtensionInitial(event) ? (
+          <span>{getExtensionInitial(event)}</span>
+        ) : (
+          <Puzzle className="h-4 w-4 text-punk-text-muted" />
+        )}
+      </div>
+      <div
+        className={cn(
+          "absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center border-2 border-punk-bg-alt",
+          isPositive
+            ? "border-punk-bg-alt bg-punk-success text-punk-bg"
+            : "border-punk-bg-alt bg-punk-cta text-punk-bg"
+        )}
+        title={ACTION_LABELS[event.action]}
+        aria-label={ACTION_LABELS[event.action]}
+      >
+        <Icon className="h-3 w-3" />
+      </div>
+    </div>
+  )
+}
+
+function EventRow({ event }: { event: UsageLogEvent }) {
   return (
     <li className="border border-punk-border/30 bg-punk-bg-alt/50 px-3 py-2">
       <div className="flex items-start gap-3">
-        <div
-          className={cn(
-            "mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center border",
-            event.action === "enabled" || event.action === "installed"
-              ? "border-punk-success/50 text-punk-success"
-              : "border-punk-cta/50 text-punk-cta"
-          )}
-        >
-          <Icon className="h-4 w-4" />
-        </div>
+        <EventIcon event={event} />
         <div className="min-w-0 flex-1">
           <div className="flex items-center justify-between gap-3">
             <span className="truncate font-punk-heading text-[13px] text-punk-text-primary">
@@ -70,7 +106,6 @@ function EventRow({ event }: { event: UsageLogEvent }) {
           </div>
           <div className="mt-1 flex flex-wrap items-center gap-2 font-punk-body text-[11px]">
             <span className="text-punk-accent">{ACTION_LABELS[event.action]}</span>
-            <span className="text-punk-text-muted">SRC:{event.source.toUpperCase()}</span>
             <span className="max-w-full truncate text-punk-text-muted">ID:{event.extensionId}</span>
           </div>
         </div>

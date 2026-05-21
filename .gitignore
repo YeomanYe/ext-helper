@@ -77,3 +77,4 @@ release/
 .playwright-mcp
 .review-artifacts/
 .worktrees/
+artifacts/
