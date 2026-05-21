@@ -1,0 +1,21 @@
+
+> ext-helper@1.0.0 dev:web /Users/ym/Documents/projects/ext-helper/.worktrees/config-log-import-export
+> vite --config vite.config.ts --force
+
+Forced re-optimization of dependencies
+
+  VITE v5.4.21  ready in 414 ms
+
+  ➜  Local:   http://localhost:4173/
+  ➜  Network: http://192.168.1.11:4173/
+  ➜  Network: http://198.18.0.1:4173/
+12:26:12 AM [vite] hmr update /src/styles/globals.css, /src/components/popup/ImportExportDialog.tsx
+12:26:13 AM [vite] hmr update /src/components/popup/ImportExportDialog.tsx, /src/styles/globals.css
+12:26:13 AM [vite] hmr update /src/components/popup/Header.tsx, /src/styles/globals.css
+12:26:42 AM [vite] page reload .plasmo/popup.html
+12:26:42 AM [vite] page reload .plasmo/newtab.html
+12:26:42 AM [vite] page reload .plasmo/devtools.html
+12:26:42 AM [vite] page reload .plasmo/sidepanel.html
+12:26:42 AM [vite] page reload .plasmo/options.html
+12:26:42 AM [vite] page reload build/chrome-mv3-prod/popup.html
+12:26:52 AM [vite] page reload build/chrome-mv3-prod/popup.html
