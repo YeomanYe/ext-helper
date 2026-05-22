@@ -3,7 +3,7 @@ node_modules/
 vendor/
 bower_components/
 jspm_packages/
-
+.zread/
 # Build outputs
 dist/
 dist-web/
