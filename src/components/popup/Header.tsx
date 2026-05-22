@@ -1,5 +1,15 @@
 import * as React from "react"
-import { X, LayoutGrid, List, ChevronDown, FileText, FileJson, type LucideIcon } from "lucide-react"
+import {
+  X,
+  LayoutGrid,
+  List,
+  ChevronDown,
+  FileText,
+  Settings,
+  Upload,
+  Download,
+  type LucideIcon,
+} from "lucide-react"
 import { cn } from "@/utils"
 import { isDevMode } from "@/services/mockData"
 import { browserAdapter } from "@/services/browser/adapter"
@@ -242,7 +252,7 @@ function ViewModeToggle({
 interface HeaderProps {
   viewMode?: ViewMode
   onViewModeChange?: (mode: ViewMode) => void
-  onOpenImportExport?: () => void
+  onOpenImportExport?: (mode: "import" | "export") => void
 }
 
 export function Header({
@@ -251,6 +261,7 @@ export function Header({
   onOpenImportExport,
 }: HeaderProps) {
   const version = useExtensionVersion()
+  const [showSettingsMenu, setShowSettingsMenu] = React.useState(false)
   return (
     <header className="relative flex items-center justify-between border-b-2 border-punk-primary bg-punk-bg px-4 py-3 hud-corner">
       {/* Decorative scanline */}
@@ -310,18 +321,52 @@ export function Header({
 
       <div className="flex items-center gap-1 relative z-10">
         <ViewModeToggle viewMode={viewMode} onViewModeChange={onViewModeChange} />
-        <button
-          type="button"
-          onClick={onOpenImportExport}
-          aria-label="Import or export data"
-          title="Import or export data"
-          className={cn(
-            "flex h-8 w-8 items-center justify-center border border-punk-border/30 bg-punk-bg/50",
-            "text-punk-text-muted transition-all duration-200 hover:border-punk-accent hover:text-punk-accent"
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => setShowSettingsMenu((open) => !open)}
+            aria-label="Open settings menu"
+            aria-expanded={showSettingsMenu}
+            title="Settings"
+            className={cn(
+              "flex h-8 w-8 items-center justify-center border border-punk-border/30 bg-punk-bg/50",
+              "text-punk-text-muted transition-all duration-200 hover:border-punk-accent hover:text-punk-accent",
+              showSettingsMenu && "border-punk-accent text-punk-accent"
+            )}
+          >
+            <Settings className="h-4 w-4" />
+          </button>
+
+          {showSettingsMenu && (
+            <>
+              <div className="fixed inset-0 z-40" onClick={() => setShowSettingsMenu(false)} />
+              <div className="absolute right-0 top-full z-50 mt-1 w-40 border border-punk-border bg-punk-bg-alt shadow-[0_0_20px_rgba(124,58,237,0.3)]">
+                <button
+                  type="button"
+                  onClick={() => {
+                    onOpenImportExport?.("import")
+                    setShowSettingsMenu(false)
+                  }}
+                  className="flex w-full items-center gap-2 px-3 py-2 text-left font-punk-heading text-[13px] uppercase tracking-wider text-punk-text-secondary transition-all duration-150 hover:bg-punk-bg hover:text-punk-text-primary"
+                >
+                  <Upload className="h-3.5 w-3.5" />
+                  IMPORT
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    onOpenImportExport?.("export")
+                    setShowSettingsMenu(false)
+                  }}
+                  className="flex w-full items-center gap-2 px-3 py-2 text-left font-punk-heading text-[13px] uppercase tracking-wider text-punk-text-secondary transition-all duration-150 hover:bg-punk-bg hover:text-punk-text-primary"
+                >
+                  <Download className="h-3.5 w-3.5" />
+                  EXPORT
+                </button>
+              </div>
+            </>
           )}
-        >
-          <FileJson className="h-4 w-4" />
-        </button>
+        </div>
       </div>
     </header>
   )

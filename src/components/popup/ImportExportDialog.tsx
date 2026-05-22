@@ -1,5 +1,5 @@
 import * as React from "react"
-import { AlertTriangle, CheckCircle2, Download, FileJson, Upload, X } from "lucide-react"
+import { AlertTriangle, CheckCircle2, Download, Upload, X } from "lucide-react"
 import { Button } from "@/components/common"
 import {
   createExportPayload,
@@ -17,6 +17,7 @@ import { cn } from "@/utils"
 
 interface ImportExportDialogProps {
   open: boolean
+  mode: "import" | "export"
   onClose: () => void
   onImported: () => Promise<void>
 }
@@ -36,7 +37,7 @@ const selectedDomainsFrom = (selection: Record<ImportExportDomain, boolean>) =>
 const payloadFileName = (payload: ImportExportPayload) =>
   `ext-helper-backup-${payload.exportedAt.slice(0, 10)}.json`
 
-export function ImportExportDialog({ open, onClose, onImported }: ImportExportDialogProps) {
+export function ImportExportDialog({ open, mode, onClose, onImported }: ImportExportDialogProps) {
   const fileInputRef = React.useRef<HTMLInputElement>(null)
   const [exportSelection, setExportSelection] = React.useState(defaultDomainSelection)
   const [importSelection, setImportSelection] = React.useState(defaultDomainSelection)
@@ -49,7 +50,10 @@ export function ImportExportDialog({ open, onClose, onImported }: ImportExportDi
     if (!open) return
     setError(null)
     setStatus(null)
-  }, [open])
+    if (mode === "import") {
+      setParsed(null)
+    }
+  }, [open, mode])
 
   if (!open) return null
 
@@ -145,15 +149,19 @@ export function ImportExportDialog({ open, onClose, onImported }: ImportExportDi
       <div className="w-full max-w-[560px] border-2 border-punk-primary bg-punk-bg shadow-[0_0_30px_rgba(34,211,238,0.35)]">
         <div className="flex items-center justify-between border-b border-punk-border/50 px-4 py-3">
           <div className="flex items-center gap-2">
-            <FileJson className="h-4 w-4 text-punk-accent" />
+            {mode === "import" ? (
+              <Upload className="h-4 w-4 text-punk-accent" />
+            ) : (
+              <Download className="h-4 w-4 text-punk-accent" />
+            )}
             <h2 className="font-punk-heading text-sm uppercase text-punk-neon-cyan">
-              IMPORT_EXPORT
+              {mode === "import" ? "IMPORT_DATA" : "EXPORT_DATA"}
             </h2>
           </div>
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close import export"
+            aria-label={mode === "import" ? "Close import data" : "Close export data"}
             className="text-punk-text-muted transition-colors hover:text-punk-accent"
           >
             <X className="h-5 w-5" />
@@ -161,58 +169,74 @@ export function ImportExportDialog({ open, onClose, onImported }: ImportExportDi
         </div>
 
         <div className="grid max-h-[480px] gap-4 overflow-y-auto p-4">
-          <section className="space-y-3">
-            <div className="flex items-center justify-between gap-3">
-              <h3 className="font-punk-heading text-xs uppercase text-punk-text-primary">EXPORT</h3>
-              <Button
-                type="button"
-                size="sm"
-                onClick={() => void handleExport()}
-                disabled={busy || selectedDomainsFrom(exportSelection).length === 0}
-                className="gap-2"
-              >
-                <Download className="h-3.5 w-3.5" />
-                JSON
-              </Button>
-            </div>
-            <DomainChecklist selection={exportSelection} onToggle={toggleExportDomain} />
-          </section>
-
-          <section className="space-y-3 border-t border-punk-border/30 pt-4">
-            <div className="flex items-center justify-between gap-3">
-              <h3 className="font-punk-heading text-xs uppercase text-punk-text-primary">IMPORT</h3>
-              <Button
-                type="button"
-                size="sm"
-                variant="secondary"
-                onClick={() => fileInputRef.current?.click()}
-                disabled={busy}
-                className="gap-2"
-              >
-                <Upload className="h-3.5 w-3.5" />
-                FILE
-              </Button>
-            </div>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="application/json,.json"
-              className="hidden"
-              onChange={(event) => void handleImportFile(event)}
-            />
-
-            {parsed ? (
-              <ImportPreview
-                preview={parsed.preview}
-                selection={importSelection}
-                onToggle={toggleImportDomain}
-              />
-            ) : (
-              <div className="border border-dashed border-punk-border/50 px-3 py-5 text-center font-punk-body text-sm text-punk-text-muted">
-                NO_FILE_SELECTED
+          {mode === "export" ? (
+            <section className="space-y-3">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <h3 className="font-punk-heading text-xs uppercase text-punk-text-primary">
+                    EXPORT
+                  </h3>
+                  <p className="mt-1 font-punk-body text-xs text-punk-text-muted">
+                    Choose data domains and download a local JSON backup.
+                  </p>
+                </div>
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={() => void handleExport()}
+                  disabled={busy || selectedDomainsFrom(exportSelection).length === 0}
+                  className="gap-2"
+                >
+                  <Download className="h-3.5 w-3.5" />
+                  EXPORT_JSON
+                </Button>
               </div>
-            )}
-          </section>
+              <DomainChecklist selection={exportSelection} onToggle={toggleExportDomain} />
+            </section>
+          ) : (
+            <section className="space-y-3">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <h3 className="font-punk-heading text-xs uppercase text-punk-text-primary">
+                    IMPORT
+                  </h3>
+                  <p className="mt-1 font-punk-body text-xs text-punk-text-muted">
+                    Pick a backup file, preview domains, then confirm import.
+                  </p>
+                </div>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={busy}
+                  className="gap-2"
+                >
+                  <Upload className="h-3.5 w-3.5" />
+                  SELECT_FILE
+                </Button>
+              </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="application/json,.json"
+                className="hidden"
+                onChange={(event) => void handleImportFile(event)}
+              />
+
+              {parsed ? (
+                <ImportPreview
+                  preview={parsed.preview}
+                  selection={importSelection}
+                  onToggle={toggleImportDomain}
+                />
+              ) : (
+                <div className="border border-dashed border-punk-border/50 px-3 py-5 text-center font-punk-body text-sm text-punk-text-muted">
+                  NO_FILE_SELECTED
+                </div>
+              )}
+            </section>
+          )}
 
           {error && (
             <div className="flex items-start gap-2 border border-punk-cta/60 bg-punk-cta/10 px-3 py-2 font-punk-body text-sm text-punk-cta">
@@ -232,14 +256,16 @@ export function ImportExportDialog({ open, onClose, onImported }: ImportExportDi
           <Button type="button" variant="ghost" size="sm" onClick={onClose} disabled={busy}>
             CANCEL
           </Button>
-          <Button
-            type="button"
-            size="sm"
-            onClick={() => void handleConfirmImport()}
-            disabled={!parsed || busy || selectedImportCount === 0}
-          >
-            CONFIRM_IMPORT
-          </Button>
+          {mode === "import" && (
+            <Button
+              type="button"
+              size="sm"
+              onClick={() => void handleConfirmImport()}
+              disabled={!parsed || busy || selectedImportCount === 0}
+            >
+              CONFIRM_IMPORT
+            </Button>
+          )}
         </div>
       </div>
     </div>

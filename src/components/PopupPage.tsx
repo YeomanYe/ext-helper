@@ -16,6 +16,7 @@ import {
 import { cn } from "@/utils"
 
 type TabType = "extensions" | "rules" | "logs"
+type ImportExportMode = "import" | "export"
 
 export function PopupPage() {
   const viewMode = useUIStore((s) => s.viewMode)
@@ -49,7 +50,7 @@ export function PopupPage() {
   const filteredEnabledCount = filteredExtensions.filter((e) => e.enabled).length
 
   const [activeTab, setActiveTab] = React.useState<TabType>("extensions")
-  const [importExportOpen, setImportExportOpen] = React.useState(false)
+  const [importExportMode, setImportExportMode] = React.useState<ImportExportMode | null>(null)
 
   React.useEffect(() => {
     initializeUIStore()
@@ -63,6 +64,10 @@ export function PopupPage() {
     await Promise.all([fetchGroups(), fetchRules(), fetchUsageLog(), initializeUIStore()])
   }, [fetchGroups, fetchRules, fetchUsageLog])
 
+  const openImportExport = React.useCallback((mode: ImportExportMode) => {
+    setImportExportMode(mode)
+  }, [])
+
   const isBisectActive = bisectSession.active
   const isBisectResolved = bisectSession.phase === "resolved"
 
@@ -71,11 +76,12 @@ export function PopupPage() {
       <Header
         viewMode={viewMode}
         onViewModeChange={setViewMode}
-        onOpenImportExport={() => setImportExportOpen(true)}
+        onOpenImportExport={openImportExport}
       />
       <ImportExportDialog
-        open={importExportOpen}
-        onClose={() => setImportExportOpen(false)}
+        open={importExportMode !== null}
+        mode={importExportMode ?? "import"}
+        onClose={() => setImportExportMode(null)}
         onImported={handleImportExportImported}
       />
 
