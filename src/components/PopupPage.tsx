@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Header, Footer, ExtensionsActionsMenu } from "@/components/popup"
+import { Header, Footer, ExtensionsActionsMenu, ImportExportDialog } from "@/components/popup"
 import { ExtensionsTab } from "@/components/popup/ExtensionsTab"
 import { UsageLogTab } from "@/components/popup/UsageLogTab"
 import { RuleManager } from "@/components/rules"
@@ -8,6 +8,7 @@ import {
   useExtensionStore,
   useFilteredExtensions,
   useGroupStore,
+  useRuleStore,
   useUsageLogStore,
   useUIStore,
   initializeUIStore,
@@ -15,12 +16,14 @@ import {
 import { cn } from "@/utils"
 
 type TabType = "extensions" | "rules" | "logs"
+type ImportExportMode = "import" | "export"
 
 export function PopupPage() {
   const viewMode = useUIStore((s) => s.viewMode)
   const setViewMode = useUIStore((s) => s.setViewMode)
   const fetchExtensions = useExtensionStore((s) => s.fetchExtensions)
   const fetchGroups = useGroupStore((s) => s.fetchGroups)
+  const fetchRules = useRuleStore((s) => s.fetchRules)
   const fetchUsageLog = useUsageLogStore((s) => s.fetchUsageLog)
 
   const totalExtensionsEnabled = useExtensionStore(
@@ -47,20 +50,40 @@ export function PopupPage() {
   const filteredEnabledCount = filteredExtensions.filter((e) => e.enabled).length
 
   const [activeTab, setActiveTab] = React.useState<TabType>("extensions")
+  const [importExportMode, setImportExportMode] = React.useState<ImportExportMode | null>(null)
 
   React.useEffect(() => {
     initializeUIStore()
     fetchExtensions()
     fetchGroups()
+    fetchRules()
     fetchUsageLog()
-  }, [fetchExtensions, fetchGroups, fetchUsageLog])
+  }, [fetchExtensions, fetchGroups, fetchRules, fetchUsageLog])
+
+  const handleImportExportImported = React.useCallback(async () => {
+    await Promise.all([fetchGroups(), fetchRules(), fetchUsageLog(), initializeUIStore()])
+  }, [fetchGroups, fetchRules, fetchUsageLog])
+
+  const openImportExport = React.useCallback((mode: ImportExportMode) => {
+    setImportExportMode(mode)
+  }, [])
 
   const isBisectActive = bisectSession.active
   const isBisectResolved = bisectSession.phase === "resolved"
 
   return (
     <div className="flex h-[600px] flex-col bg-punk-bg">
-      <Header viewMode={viewMode} onViewModeChange={setViewMode} />
+      <Header
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
+        onOpenImportExport={openImportExport}
+      />
+      <ImportExportDialog
+        open={importExportMode !== null}
+        mode={importExportMode ?? "import"}
+        onClose={() => setImportExportMode(null)}
+        onImported={handleImportExportImported}
+      />
 
       {/* Tab Bar */}
       <div className="flex-shrink-0 px-3 pt-2 border-b border-punk-border/30">

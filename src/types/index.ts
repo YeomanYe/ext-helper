@@ -1,3 +1,5 @@
+import type { Rule } from "@/rules/types"
+
 export type BrowserType = "chrome" | "firefox" | "safari" | "edge" | "unknown"
 
 export interface Extension {
@@ -105,6 +107,42 @@ export interface Preferences {
   showDisabled: boolean
   sortBy: SortType
   viewMode: ViewMode
+}
+
+export type ImportExportDomain = "groups" | "rules" | "preferences" | "usageLog"
+
+export type ImportExportPreferences = Partial<
+  Pick<Preferences, "theme" | "compactMode" | "showDisabled" | "viewMode">
+>
+
+export interface ImportExportPayload {
+  schemaVersion: 1
+  exportedAt: string
+  data: Partial<{
+    groups: Group[]
+    rules: Rule[]
+    preferences: ImportExportPreferences
+    usageLog: UsageLogEvent[]
+  }>
+}
+
+export interface ImportExportPreviewDomain {
+  domain: ImportExportDomain
+  label: string
+  count: number
+  selected: boolean
+}
+
+export interface ImportExportPreview {
+  schemaVersion: number
+  exportedAt: string
+  compatible: boolean
+  domains: ImportExportPreviewDomain[]
+}
+
+export interface ParsedImportExportPayload {
+  payload: ImportExportPayload
+  preview: ImportExportPreview
 }
 
 export interface ExtensionStore {

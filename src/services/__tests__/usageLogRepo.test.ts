@@ -154,4 +154,23 @@ describe("usageLogRepo", () => {
       source: "popup",
     })
   })
+
+  it("normal: replaceAll imports logs using the existing sort and max-event rules", async () => {
+    const { usageLogRepo } = await import("@/services/usageLogRepo")
+
+    const events = Array.from({ length: 505 }, (_, index) =>
+      buildEvent({
+        id: `imported-${index}`,
+        extensionId: `ext-${index}`,
+        timestamp: index,
+      })
+    )
+
+    await usageLogRepo.replaceAll(events)
+
+    const imported = await usageLogRepo.fetchAll()
+    expect(imported).toHaveLength(500)
+    expect(imported[0].id).toBe("imported-504")
+    expect(imported.at(-1)?.id).toBe("imported-5")
+  })
 })

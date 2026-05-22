@@ -1,7 +1,7 @@
 ---
 id: config-log-import-export
 title: 配置与日志导入导出
-status: approved
+status: ready-for-review
 created: 2026-05-21
 updated: 2026-05-21
 project_root: /Users/ym/Documents/projects/ext-helper
@@ -60,18 +60,18 @@ needs_visual_check: true
 
 ## 验收标准
 
-- [ ] 点击 Header 右上角显示模式切换控件右侧的导入导出图标，会打开导入导出弹窗。
-- [ ] 导出操作会下载一个 JSON 文件，文件包含版本号、导出时间、Groups、Rules、Preferences，并在 usage log 已可用时包含 UsageLogEvents。
-- [ ] 导出的 JSON 不包含扩展管理权限之外的敏感浏览器数据，不包含用户未选择导出的数据域。
-- [ ] 选择导入文件后，系统先展示预览摘要，至少包含数据域、条目数量、导出时间和版本兼容性；确认前不写入任何 repo 或 store。
-- [ ] 无效 JSON、缺少必需字段、版本不兼容或数据结构不合法时，弹窗显示可理解错误，并且本地数据保持不变。
-- [ ] 用户取消导入或关闭弹窗时，不写入 Groups、Rules、Preferences 或 UsageLogEvents。
-- [ ] 用户确认导入后，只写入预览中勾选的数据域，并刷新 popup 中对应的 groups、rules、preferences 和 logs 视图。
-- [ ] 导入 usage log 时复用现有日志上限和规范化规则，导入后统计与列表同步更新。
-- [ ] web preview 模式可导出和导入 mock/devStorage 数据，不调用真实 browser extension API。
-- [ ] 所有现有测试通过。
-- [ ] lint clean / build success。
-- [ ] Playwright 走查通过：关键页面截图无 console.error，验收标准对应交互均有截图。
+- [x] 点击 Header 右上角显示模式切换控件右侧的导入导出图标，会打开导入导出弹窗。
+- [x] 导出操作会下载一个 JSON 文件，文件包含版本号、导出时间、Groups、Rules、Preferences，并在 usage log 已可用时包含 UsageLogEvents。
+- [x] 导出的 JSON 不包含扩展管理权限之外的敏感浏览器数据，不包含用户未选择导出的数据域。
+- [x] 选择导入文件后，系统先展示预览摘要，至少包含数据域、条目数量、导出时间和版本兼容性；确认前不写入任何 repo 或 store。
+- [x] 无效 JSON、缺少必需字段、版本不兼容或数据结构不合法时，弹窗显示可理解错误，并且本地数据保持不变。
+- [x] 用户取消导入或关闭弹窗时，不写入 Groups、Rules、Preferences 或 UsageLogEvents。
+- [x] 用户确认导入后，只写入预览中勾选的数据域，并刷新 popup 中对应的 groups、rules、preferences 和 logs 视图。
+- [x] 导入 usage log 时复用现有日志上限和规范化规则，导入后统计与列表同步更新。
+- [x] web preview 模式可导出和导入 mock/devStorage 数据，不调用真实 browser extension API。
+- [x] 所有现有测试通过。
+- [x] lint clean / build success。
+- [x] Playwright 走查通过：关键页面截图无 console.error，验收标准对应交互均有截图。
 
 ## 风险
 
@@ -87,3 +87,11 @@ needs_visual_check: true
 
 - **2026-05-21**: 初版 spec，决定采用版本化 import/export service + Header 图标入口 + 预览确认弹窗，优先防止无预览覆盖本地配置。
 - **2026-05-21**: 高风险信号：用户配置导入/覆盖（已记入“风险”区段，但仍 approved）
+- **2026-05-21**: 实现完成，导入确认按已勾选数据域顺序写入 repo，并通过 popup store refresh 同步 UI。
+
+## Visual review (2026-05-21)
+
+- Screenshots: 4（见 .review-artifacts/config-log-import-export/）
+- Console errors: 0（详见 console.log）
+- 验收标准覆盖: 12 / 12
+- 备注: 走查覆盖 Header 入口、弹窗、导入预览和确认导入后的 groups 刷新。
