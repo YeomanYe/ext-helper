@@ -57,13 +57,13 @@ export function ExtensionsActionsMenu({
         onClick={() => setOpen((value) => !value)}
         aria-label="Extension actions menu"
         aria-expanded={open}
-        className="flex h-8 items-center gap-1 border border-punk-border/30 bg-punk-bg-alt px-2 text-[11px] font-punk-heading uppercase tracking-wider text-punk-text-muted transition-all hover:border-punk-accent/50 hover:text-punk-accent"
+        className="flex h-8 items-center gap-1 border border-punk-border/30 bg-punk-surface-raised px-2 text-[11px] font-punk-heading uppercase tracking-wider text-punk-text-muted transition-all hover:border-punk-accent/50 hover:text-punk-accent hover:shadow-punk-hard"
       >
         ACTIONS
         <ChevronDown className={cn("h-3 w-3 transition-transform", open && "rotate-180")} />
       </button>
       {open && (
-        <div className="absolute right-0 top-full z-50 mt-1 w-40 border border-punk-border bg-punk-bg-alt shadow-[0_0_20px_rgba(124,58,237,0.3)]">
+        <div className="absolute right-0 top-full z-50 mt-1 w-40 border border-punk-border bg-punk-surface-raised shadow-punk-panel">
           {!isBisectActive && (
             <button
               onClick={() => {
@@ -71,7 +71,7 @@ export function ExtensionsActionsMenu({
                 setOpen(false)
               }}
               disabled={enabledExtensionCount < 2}
-              className="w-full px-3 py-2 text-left font-punk-heading text-[11px] uppercase tracking-wider text-punk-text-secondary transition-colors hover:bg-punk-bg hover:text-punk-text-primary disabled:cursor-not-allowed disabled:opacity-40"
+              className="w-full px-3 py-2 text-left font-punk-heading text-[11px] uppercase tracking-wider text-punk-text-secondary transition-colors hover:bg-punk-surface-soft hover:text-punk-text-primary disabled:cursor-not-allowed disabled:opacity-50"
             >
               Start Bisect
             </button>
@@ -83,7 +83,7 @@ export function ExtensionsActionsMenu({
                   onBisectGood()
                   setOpen(false)
                 }}
-                className="w-full px-3 py-2 text-left font-punk-heading text-[11px] uppercase tracking-wider text-punk-success transition-colors hover:bg-punk-bg"
+                className="w-full px-3 py-2 text-left font-punk-heading text-[11px] uppercase tracking-wider text-punk-success transition-colors hover:bg-punk-surface-soft"
               >
                 Bisect Good
               </button>
@@ -92,7 +92,7 @@ export function ExtensionsActionsMenu({
                   onBisectBad()
                   setOpen(false)
                 }}
-                className="w-full px-3 py-2 text-left font-punk-heading text-[11px] uppercase tracking-wider text-punk-cta transition-colors hover:bg-punk-bg"
+                className="w-full px-3 py-2 text-left font-punk-heading text-[11px] uppercase tracking-wider text-punk-cta transition-colors hover:bg-punk-surface-soft"
               >
                 Bisect Bad
               </button>
@@ -101,7 +101,7 @@ export function ExtensionsActionsMenu({
                   onCancelBisect()
                   setOpen(false)
                 }}
-                className="w-full px-3 py-2 text-left font-punk-heading text-[11px] uppercase tracking-wider text-punk-text-secondary transition-colors hover:bg-punk-bg hover:text-punk-text-primary"
+                className="w-full px-3 py-2 text-left font-punk-heading text-[11px] uppercase tracking-wider text-punk-text-secondary transition-colors hover:bg-punk-surface-soft hover:text-punk-text-primary"
               >
                 Cancel Bisect
               </button>
@@ -113,7 +113,7 @@ export function ExtensionsActionsMenu({
               setOpen(false)
             }}
             disabled={isBisectActive}
-            className="w-full px-3 py-2 text-left font-punk-heading text-[11px] uppercase tracking-wider text-punk-text-secondary transition-colors hover:bg-punk-bg hover:text-punk-text-primary disabled:cursor-not-allowed disabled:opacity-40"
+            className="w-full px-3 py-2 text-left font-punk-heading text-[11px] uppercase tracking-wider text-punk-text-secondary transition-colors hover:bg-punk-surface-soft hover:text-punk-text-primary disabled:cursor-not-allowed disabled:opacity-50"
           >
             Enable All
           </button>
@@ -123,7 +123,7 @@ export function ExtensionsActionsMenu({
               setOpen(false)
             }}
             disabled={isBisectActive}
-            className="w-full px-3 py-2 text-left font-punk-heading text-[11px] uppercase tracking-wider text-punk-text-secondary transition-colors hover:bg-punk-bg hover:text-punk-text-primary disabled:cursor-not-allowed disabled:opacity-40"
+            className="w-full px-3 py-2 text-left font-punk-heading text-[11px] uppercase tracking-wider text-punk-text-secondary transition-colors hover:bg-punk-surface-soft hover:text-punk-text-primary disabled:cursor-not-allowed disabled:opacity-50"
           >
             Disable All
           </button>
@@ -133,7 +133,7 @@ export function ExtensionsActionsMenu({
               setOpen(false)
             }}
             disabled={!canUndo || isBisectActive}
-            className="w-full px-3 py-2 text-left font-punk-heading text-[11px] uppercase tracking-wider text-punk-text-secondary transition-colors hover:bg-punk-bg hover:text-punk-text-primary disabled:cursor-not-allowed disabled:opacity-40"
+            className="w-full px-3 py-2 text-left font-punk-heading text-[11px] uppercase tracking-wider text-punk-text-secondary transition-colors hover:bg-punk-surface-soft hover:text-punk-text-primary disabled:cursor-not-allowed disabled:opacity-50"
           >
             Undo [{undoCount}]
           </button>
@@ -143,7 +143,7 @@ export function ExtensionsActionsMenu({
               setOpen(false)
             }}
             disabled={!canRedo || isBisectActive}
-            className="w-full px-3 py-2 text-left font-punk-heading text-[11px] uppercase tracking-wider text-punk-text-secondary transition-colors hover:bg-punk-bg hover:text-punk-text-primary disabled:cursor-not-allowed disabled:opacity-40"
+            className="w-full px-3 py-2 text-left font-punk-heading text-[11px] uppercase tracking-wider text-punk-text-secondary transition-colors hover:bg-punk-surface-soft hover:text-punk-text-primary disabled:cursor-not-allowed disabled:opacity-50"
           >
             Redo [{redoCount}]
           </button>

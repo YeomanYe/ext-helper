@@ -145,8 +145,8 @@ export function ImportExportDialog({ open, mode, onClose, onImported }: ImportEx
   ).length
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 px-4">
-      <div className="w-full max-w-[560px] border-2 border-punk-primary bg-punk-bg shadow-[0_0_30px_rgba(34,211,238,0.35)]">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-punk-bg/70 px-4 backdrop-blur-sm">
+      <div className="w-full max-w-[560px] border-2 border-punk-primary bg-punk-surface-raised shadow-punk-panel">
         <div className="flex items-center justify-between border-b border-punk-border/50 px-4 py-3">
           <div className="flex items-center gap-2">
             {mode === "import" ? (
@@ -316,7 +316,7 @@ function ImportPreview({
   const availableDomains = new Set(preview.domains.map((item) => item.domain))
 
   return (
-    <div className="space-y-3 border border-punk-border/40 bg-punk-bg-alt/50 p-3">
+    <div className="space-y-3 border border-punk-border/40 bg-punk-surface-soft/70 p-3">
       <div className="grid grid-cols-2 gap-2 font-punk-body text-xs text-punk-text-secondary">
         <span>VERSION: {preview.schemaVersion}</span>
         <span>COMPATIBLE: {preview.compatible ? "YES" : "NO"}</span>

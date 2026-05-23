@@ -72,11 +72,11 @@ export function RuleEditor({ rule, onSave, onClose }: RuleEditorProps) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-punk-bg/80 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-punk-bg/70 backdrop-blur-sm"
       onClick={onClose}
     >
       <div
-        className="w-[480px] max-h-[580px] border border-punk-border bg-punk-bg-alt shadow-[0_0_30px_rgba(124,58,237,0.4)] overflow-hidden flex flex-col"
+        className="w-[480px] max-h-[580px] border border-punk-border bg-punk-surface-raised shadow-punk-panel overflow-hidden flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -98,11 +98,11 @@ export function RuleEditor({ rule, onSave, onClose }: RuleEditorProps) {
           <div className="flex gap-4">
             {/* Icon Upload - centered with right side content */}
             <div className="flex-shrink-0 flex items-center">
-              <div className="relative w-[96px] h-[96px] border border-punk-border/50 bg-punk-bg rounded overflow-hidden group">
+              <div className="relative w-[96px] h-[96px] border border-punk-border/50 bg-punk-surface-soft rounded overflow-hidden group">
                 {iconUrl ? (
                   <>
                     <img src={iconUrl} alt="Rule icon" className="w-full h-full object-cover" />
-                    <div className="absolute inset-0 bg-punk-bg/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <div className="absolute inset-0 bg-punk-surface-raised/75 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                       <label className="cursor-pointer p-2 text-punk-text-muted hover:text-punk-accent transition-colors">
                         <Upload className="h-5 w-5" />
                         <input
@@ -115,7 +115,7 @@ export function RuleEditor({ rule, onSave, onClose }: RuleEditorProps) {
                     </div>
                   </>
                 ) : (
-                  <label className="flex flex-col items-center justify-center w-full h-full cursor-pointer hover:bg-punk-bg-alt transition-colors">
+                  <label className="flex flex-col items-center justify-center w-full h-full cursor-pointer hover:bg-punk-surface-raised transition-colors">
                     <Image className="h-6 w-6 text-punk-text-muted mb-1" />
                     <span className="text-[10px] text-punk-text-muted uppercase">UPLOAD</span>
                     <input

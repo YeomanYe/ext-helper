@@ -41,7 +41,7 @@ export function ExtensionContextMenu({
       ref={menuRef as React.RefObject<HTMLDivElement>}
       role="menu"
       aria-label="Extension actions"
-      className="fixed z-[90] border border-punk-border bg-punk-bg-alt py-1 shadow-[0_0_20px_rgba(124,58,237,0.3)]"
+      className="fixed z-[90] border border-punk-border bg-punk-surface-raised py-1 shadow-punk-panel"
       style={{ top: menuPosition.top, left: menuPosition.left, width: menuWidth }}
       onClick={(e) => e.stopPropagation()}
     >
@@ -56,7 +56,7 @@ export function ExtensionContextMenu({
         }}
         disabled={disableEnableControls || (!extension.enabled && !extension.mayEnable)}
         title={!extension.enabled && !extension.mayEnable ? "Blocked by browser policy" : undefined}
-        className="flex w-full items-center gap-2 px-3 py-2.5 text-left font-punk-body text-sm text-punk-text-secondary hover:text-punk-accent hover:bg-punk-bg transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+        className="flex w-full items-center gap-2 px-3 py-2.5 text-left font-punk-body text-sm text-punk-text-secondary hover:text-punk-accent hover:bg-punk-surface-soft transition-colors disabled:cursor-not-allowed disabled:opacity-50"
       >
         {extension.enabled ? (
           <>
@@ -78,7 +78,7 @@ export function ExtensionContextMenu({
             onOpenOptions?.()
             onClose()
           }}
-          className="flex w-full items-center gap-2 px-3 py-2.5 text-left font-punk-body text-sm text-punk-text-secondary hover:text-punk-accent hover:bg-punk-bg transition-colors"
+          className="flex w-full items-center gap-2 px-3 py-2.5 text-left font-punk-body text-sm text-punk-text-secondary hover:text-punk-accent hover:bg-punk-surface-soft transition-colors"
         >
           <Settings className="h-4 w-4" />
           OPTIONS
@@ -90,7 +90,7 @@ export function ExtensionContextMenu({
           e.stopPropagation()
           onShowDetails()
         }}
-        className="flex w-full items-center gap-2 px-3 py-2.5 text-left font-punk-body text-sm text-punk-text-secondary hover:text-punk-accent hover:bg-punk-bg transition-colors"
+        className="flex w-full items-center gap-2 px-3 py-2.5 text-left font-punk-body text-sm text-punk-text-secondary hover:text-punk-accent hover:bg-punk-surface-soft transition-colors"
       >
         <Info className="h-4 w-4" />
         DETAILS
@@ -103,7 +103,7 @@ export function ExtensionContextMenu({
           onRemove()
         }}
         disabled={disableRemove}
-        className="flex w-full items-center gap-2 px-3 py-2.5 text-left font-punk-body text-sm text-punk-cta hover:bg-punk-cta/10 transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+        className="flex w-full items-center gap-2 px-3 py-2.5 text-left font-punk-body text-sm text-punk-cta hover:bg-punk-cta/10 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
       >
         <Trash2 className="h-4 w-4" />
         REMOVE

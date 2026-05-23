@@ -107,20 +107,20 @@ export function GroupManager({
       {/* Search Bar */}
       <div className="flex items-center gap-1 px-2 py-1.5">
         <div className="relative flex-1">
-          <Search className="absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gray-400" />
+          <Search className="absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-punk-accent" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search groups..."
-            className="h-7 w-full rounded-md border border-gray-200 bg-gray-50 pl-7 pr-7 text-xs dark:border-gray-700 dark:bg-gray-800"
+            className="punk-input h-7 w-full border border-punk-border/50 bg-punk-surface-raised pl-7 pr-7 text-xs"
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery("")}
-              className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded p-0.5 hover:bg-gray-200 dark:hover:bg-gray-700"
+              className="absolute right-1.5 top-1/2 -translate-y-1/2 p-0.5 hover:bg-punk-surface-soft"
             >
-              <X className="h-3 w-3 text-gray-400" />
+              <X className="h-3 w-3 text-punk-text-muted" />
             </button>
           )}
         </div>
@@ -128,7 +128,7 @@ export function GroupManager({
         <select
           value={activeFilter}
           onChange={(e) => setActiveFilter(e.target.value as GroupFilterType)}
-          className="h-7 rounded-md border border-gray-200 bg-gray-50 px-1.5 text-xs dark:border-gray-700 dark:bg-gray-800"
+          className="h-7 border border-punk-border/50 bg-punk-surface-raised px-1.5 text-xs text-punk-text-secondary"
         >
           {FILTERS.map((filter) => (
             <option key={filter.value} value={filter.value}>
@@ -141,7 +141,7 @@ export function GroupManager({
       {/* Results Count */}
       {(searchQuery || activeFilter !== "all") && (
         <div className="px-3 py-1">
-          <span className="text-xs text-gray-500 dark:text-gray-400">
+          <span className="text-xs text-punk-text-muted">
             {filteredGroups.length} / {groups.length} groups
           </span>
         </div>
@@ -151,14 +151,14 @@ export function GroupManager({
       <button
         onClick={() => onSelectGroup(null)}
         className={cn(
-          "flex w-full items-center gap-2 px-3 py-2 rounded-lg text-sm",
-          "hover:bg-gray-50 dark:hover:bg-gray-800",
-          activeGroupId === null && "bg-primary-light dark:bg-primary/20"
+          "flex w-full items-center gap-2 px-3 py-2 text-sm",
+          "hover:bg-punk-surface-soft",
+          activeGroupId === null && "border border-punk-primary/50 bg-punk-primary/10"
         )}
       >
-        <Folder className="h-4 w-4 text-gray-500" />
-        <span className="flex-1 text-left text-gray-900 dark:text-gray-100">All Extensions</span>
-        <span className="text-xs text-gray-500 dark:text-gray-400">({extensions.length})</span>
+        <Folder className="h-4 w-4 text-punk-accent" />
+        <span className="flex-1 text-left text-punk-text-primary">All Extensions</span>
+        <span className="text-xs text-punk-text-muted">({extensions.length})</span>
       </button>
 
       {/* Groups */}
@@ -179,7 +179,7 @@ export function GroupManager({
                     setEditingName("")
                   }
                 }}
-                className="flex-1 rounded border border-gray-300 px-2 py-1 text-sm dark:border-gray-600 dark:bg-gray-800"
+                className="punk-input flex-1 border border-punk-border/50 px-2 py-1 text-sm"
                 autoFocus
               />
             </div>
@@ -206,9 +206,9 @@ export function GroupManager({
 
       {/* Create Group Modal */}
       {showCreateModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="w-72 rounded-lg border border-gray-200 bg-white p-4 shadow-xl dark:border-gray-700 dark:bg-gray-800">
-            <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-punk-bg/70 backdrop-blur-sm">
+          <div className="w-72 border border-punk-border bg-punk-surface-raised p-4 shadow-punk-panel">
+            <h3 className="font-punk-heading text-sm uppercase text-punk-text-primary">
               Create New Group
             </h3>
 
@@ -218,7 +218,7 @@ export function GroupManager({
                 value={newGroupName}
                 onChange={(e) => setNewGroupName(e.target.value)}
                 placeholder="Group name"
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-700"
+                className="punk-input w-full border border-punk-border/50 px-3 py-2 text-sm"
                 autoFocus
               />
 
@@ -228,8 +228,9 @@ export function GroupManager({
                     key={color}
                     onClick={() => setSelectedColor(color)}
                     className={cn(
-                      "h-6 w-6 rounded-full transition-transform",
-                      selectedColor === color && "ring-2 ring-offset-2 ring-gray-400 scale-110"
+                      "h-6 w-6 transition-transform",
+                      selectedColor === color &&
+                        "ring-2 ring-punk-primary ring-offset-2 ring-offset-punk-bg scale-110"
                     )}
                     style={{ backgroundColor: color }}
                   />
@@ -240,14 +241,14 @@ export function GroupManager({
             <div className="mt-4 flex justify-end gap-2">
               <button
                 onClick={() => setShowCreateModal(false)}
-                className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
+                className="px-3 py-1.5 text-sm text-punk-text-muted hover:text-punk-text-primary"
               >
                 Cancel
               </button>
               <button
                 onClick={handleCreateGroup}
                 disabled={!newGroupName.trim()}
-                className="rounded-md bg-primary px-3 py-1.5 text-sm text-white hover:bg-primary-hover disabled:opacity-50"
+                className="bg-punk-primary px-3 py-1.5 text-sm text-white hover:bg-punk-secondary disabled:opacity-50"
               >
                 Create
               </button>

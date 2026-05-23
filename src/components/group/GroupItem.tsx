@@ -77,7 +77,7 @@ export function GroupItem({
       <div
         className={cn(
           "flex items-center gap-2 px-3 py-2 cursor-pointer transition-colors",
-          "hover:bg-punk-bg-alt",
+          "hover:bg-punk-surface-soft",
           isActive && "bg-punk-primary/20"
         )}
         onClick={onSelect}
@@ -122,14 +122,14 @@ export function GroupItem({
           </button>
 
           {showMenu && (
-            <div className="absolute right-0 top-full z-50 mt-1 w-40 border border-punk-border bg-punk-bg-alt py-1 shadow-[0_0_20px_rgba(124,58,237,0.3)]">
+            <div className="absolute right-0 top-full z-50 mt-1 w-40 border border-punk-border bg-punk-surface-raised py-1 shadow-punk-panel">
               <button
                 onClick={(e) => {
                   e.stopPropagation()
                   setShowMenu(false)
                   setShowExtensionList(true)
                 }}
-                className="flex w-full items-center gap-2 px-3 py-2 text-left font-punk-body text-sm text-punk-text-secondary hover:text-punk-accent hover:bg-punk-bg transition-colors"
+                className="flex w-full items-center gap-2 px-3 py-2 text-left font-punk-body text-sm text-punk-text-secondary hover:text-punk-accent hover:bg-punk-surface-soft transition-colors"
               >
                 <Plus className="h-4 w-4" />
                 ADD EXTENSION
@@ -140,7 +140,7 @@ export function GroupItem({
                   onRename()
                   setShowMenu(false)
                 }}
-                className="flex w-full items-center gap-2 px-3 py-2 text-left font-punk-body text-sm text-punk-text-secondary hover:text-punk-accent hover:bg-punk-bg transition-colors"
+                className="flex w-full items-center gap-2 px-3 py-2 text-left font-punk-body text-sm text-punk-text-secondary hover:text-punk-accent hover:bg-punk-surface-soft transition-colors"
               >
                 <Pencil className="h-4 w-4" />
                 RENAME
@@ -163,7 +163,7 @@ export function GroupItem({
           {showExtensionList && (
             <div
               ref={listRef}
-              className="absolute left-full top-0 z-50 ml-1 w-56 border border-punk-border bg-punk-bg-alt py-2 shadow-[0_0_20px_rgba(124,58,237,0.3)] max-h-64 overflow-y-auto"
+              className="absolute left-full top-0 z-50 ml-1 w-56 border border-punk-border bg-punk-surface-raised py-2 shadow-punk-panel max-h-64 overflow-y-auto"
             >
               {availableExtensions.length === 0 ? (
                 <div className="px-3 py-2 text-xs text-punk-text-muted">
@@ -178,7 +178,7 @@ export function GroupItem({
                       setShowExtensionList(false)
                       setShowMenu(false)
                     }}
-                    className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-punk-text-secondary hover:bg-punk-bg transition-colors"
+                    className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-punk-text-secondary hover:bg-punk-surface-soft transition-colors"
                   >
                     <div
                       className="h-4 w-4 rounded flex-shrink-0"
@@ -202,7 +202,7 @@ export function GroupItem({
                         setShowExtensionList(false)
                         setShowMenu(false)
                       }}
-                      className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-punk-text-secondary hover:bg-punk-bg transition-colors"
+                      className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-punk-text-secondary hover:bg-punk-surface-soft transition-colors"
                     >
                       <div
                         className="h-4 w-4 rounded flex-shrink-0"

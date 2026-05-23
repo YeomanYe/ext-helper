@@ -7,21 +7,144 @@
 :root {
   /* Punk Color System */
   --punk-primary: #7c3aed;
+  --punk-primary-rgb: 124 58 237;
   --punk-secondary: #a78bfa;
+  --punk-secondary-rgb: 167 139 250;
   --punk-cta: #f43f5e;
+  --punk-cta-rgb: 244 63 94;
   --punk-accent: #22d3ee;
+  --punk-accent-rgb: 34 211 238;
   --punk-success: #10b981;
+  --punk-success-rgb: 16 185 129;
   --punk-warning: #fbbf24;
+  --punk-warning-rgb: 251 191 36;
   --punk-error: #f43f5e;
+  --punk-error-rgb: 244 63 94;
   --punk-bg: #0f0f23;
+  --punk-bg-rgb: 15 15 35;
   --punk-bg-alt: #1a1a2e;
+  --punk-bg-alt-rgb: 26 26 46;
   --punk-border: #7c3aed;
+  --punk-border-rgb: 124 58 237;
   --punk-text-primary: #e2e8f0;
+  --punk-text-primary-rgb: 226 232 240;
   --punk-text-secondary: #94a3b8;
+  --punk-text-secondary-rgb: 148 163 184;
   --punk-text-muted: #78859b;
+  --punk-text-muted-rgb: 120 133 155;
   --punk-neon-pink: #ff00ff;
+  --punk-neon-pink-rgb: 255 0 255;
   --punk-neon-cyan: #00ffff;
+  --punk-neon-cyan-rgb: 0 255 255;
   --punk-neon-yellow: #ffff00;
+  --punk-neon-yellow-rgb: 255 255 0;
+  --punk-surface-soft: #11162b;
+  --punk-surface-soft-rgb: 17 22 43;
+  --punk-surface-raised: #1a1a2e;
+  --punk-surface-raised-rgb: 26 26 46;
+  --punk-surface-inset: #0b1020;
+  --punk-surface-inset-rgb: 11 16 32;
+  --punk-hard-shadow: 8px 8px 0 rgb(0 0 0 / 0.45);
+  --punk-panel-shadow:
+    0 0 calc(18px * var(--punk-glow-strength)) rgb(var(--punk-primary-rgb) / 0.28),
+    0 12px 32px rgb(0 0 0 / 0.45);
+  --punk-scanline-color: rgba(0, 0, 0, 0.15);
+  --punk-flicker-color: rgba(124, 58, 237, 0.03);
+  --punk-glow-strength: 1;
+}
+
+html[data-theme="light"] {
+  --punk-primary: #111111;
+  --punk-primary-rgb: 17 17 17;
+  --punk-secondary: #2d2d2d;
+  --punk-secondary-rgb: 45 45 45;
+  --punk-cta: #ff2a6d;
+  --punk-cta-rgb: 255 42 109;
+  --punk-accent: #00a86b;
+  --punk-accent-rgb: 0 168 107;
+  --punk-success: #008f5a;
+  --punk-success-rgb: 0 143 90;
+  --punk-warning: #d97706;
+  --punk-warning-rgb: 217 119 6;
+  --punk-error: #e11d48;
+  --punk-error-rgb: 225 29 72;
+  --punk-bg: #f8f4e8;
+  --punk-bg-rgb: 248 244 232;
+  --punk-bg-alt: #fffdf5;
+  --punk-bg-alt-rgb: 255 253 245;
+  --punk-border: #111111;
+  --punk-border-rgb: 17 17 17;
+  --punk-text-primary: #16120f;
+  --punk-text-primary-rgb: 22 18 15;
+  --punk-text-secondary: #403a33;
+  --punk-text-secondary-rgb: 64 58 51;
+  --punk-text-muted: #71675c;
+  --punk-text-muted-rgb: 113 103 92;
+  --punk-neon-pink: #ff2a6d;
+  --punk-neon-pink-rgb: 255 42 109;
+  --punk-neon-cyan: #00a86b;
+  --punk-neon-cyan-rgb: 0 168 107;
+  --punk-neon-yellow: #d97706;
+  --punk-neon-yellow-rgb: 217 119 6;
+  --punk-surface-soft: #eee7d3;
+  --punk-surface-soft-rgb: 238 231 211;
+  --punk-surface-raised: #fffdf5;
+  --punk-surface-raised-rgb: 255 253 245;
+  --punk-surface-inset: #e4dcc7;
+  --punk-surface-inset-rgb: 228 220 199;
+  --punk-hard-shadow: 5px 5px 0 rgb(17 17 17 / 0.18);
+  --punk-panel-shadow:
+    5px 5px 0 rgb(17 17 17 / 0.2), 0 0 0 1px rgb(17 17 17 / 0.08), 0 10px 20px rgb(17 17 17 / 0.08);
+  --punk-scanline-color: rgba(17, 17, 17, 0.025);
+  --punk-flicker-color: rgba(0, 168, 107, 0.006);
+  --punk-glow-strength: 0.08;
+}
+
+html[data-theme="system"]:not(.dark) {
+  --punk-primary: #111111;
+  --punk-primary-rgb: 17 17 17;
+  --punk-secondary: #2d2d2d;
+  --punk-secondary-rgb: 45 45 45;
+  --punk-cta: #ff2a6d;
+  --punk-cta-rgb: 255 42 109;
+  --punk-accent: #00a86b;
+  --punk-accent-rgb: 0 168 107;
+  --punk-success: #008f5a;
+  --punk-success-rgb: 0 143 90;
+  --punk-warning: #d97706;
+  --punk-warning-rgb: 217 119 6;
+  --punk-error: #e11d48;
+  --punk-error-rgb: 225 29 72;
+  --punk-bg: #f8f4e8;
+  --punk-bg-rgb: 248 244 232;
+  --punk-bg-alt: #fffdf5;
+  --punk-bg-alt-rgb: 255 253 245;
+  --punk-border: #111111;
+  --punk-border-rgb: 17 17 17;
+  --punk-text-primary: #16120f;
+  --punk-text-primary-rgb: 22 18 15;
+  --punk-text-secondary: #403a33;
+  --punk-text-secondary-rgb: 64 58 51;
+  --punk-text-muted: #71675c;
+  --punk-text-muted-rgb: 113 103 92;
+  --punk-neon-pink: #ff2a6d;
+  --punk-neon-pink-rgb: 255 42 109;
+  --punk-neon-cyan: #00a86b;
+  --punk-neon-cyan-rgb: 0 168 107;
+  --punk-neon-yellow: #d97706;
+  --punk-neon-yellow-rgb: 217 119 6;
+  --punk-surface-soft: #eee7d3;
+  --punk-surface-soft-rgb: 238 231 211;
+  --punk-surface-raised: #fffdf5;
+  --punk-surface-raised-rgb: 255 253 245;
+  --punk-surface-inset: #e4dcc7;
+  --punk-surface-inset-rgb: 228 220 199;
+  --punk-hard-shadow: 5px 5px 0 rgb(17 17 17 / 0.18);
+  --punk-panel-shadow:
+    5px 5px 0 rgb(17 17 17 / 0.2), 0 0 0 1px rgb(17 17 17 / 0.08), 0 10px 20px rgb(17 17 17 / 0.08);
+  --punk-scanline-color: rgba(17, 17, 17, 0.025);
+  --punk-flicker-color: rgba(0, 168, 107, 0.006);
+  --punk-glow-strength: 0.08;
 }
 
 /* Base Punk Theme */
@@ -44,6 +167,26 @@ body {
   overflow: hidden;
 }
 
+:is(html[data-theme="light"], html[data-theme="system"]:not(.dark)) body {
+  background:
+    repeating-linear-gradient(
+        112deg,
+        rgb(17 17 17 / 0.035) 0,
+        rgb(17 17 17 / 0.035) 1px,
+        transparent 1px,
+        transparent 14px
+      )
+      0 0 / 38px 38px,
+    radial-gradient(circle at 14px 18px, rgb(17 17 17 / 0.045) 0 1px, transparent 1.5px) 0 0 / 28px
+      28px,
+    linear-gradient(
+      180deg,
+      var(--punk-bg-alt) 0%,
+      var(--punk-bg) 48%,
+      var(--punk-surface-soft) 100%
+    );
+}
+
 /* Scanline Effect Overlay */
 body::before {
   content: "";
@@ -54,8 +197,8 @@ body::before {
   height: 100%;
   background: repeating-linear-gradient(
     0deg,
-    rgba(0, 0, 0, 0.15),
-    rgba(0, 0, 0, 0.15) 1px,
+    var(--punk-scanline-color),
+    var(--punk-scanline-color) 1px,
     transparent 1px,
     transparent 2px
   );
@@ -71,7 +214,7 @@ body::after {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(124, 58, 237, 0.03);
+  background: var(--punk-flicker-color);
   pointer-events: none;
   z-index: 9998;
   animation: flicker 0.15s infinite;
@@ -83,12 +226,12 @@ body::after {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--punk-bg);
+  background: var(--punk-surface-inset);
 }
 
 ::-webkit-scrollbar-thumb {
   background: var(--punk-primary);
-  box-shadow: 0 0 10px var(--punk-primary);
+  box-shadow: 0 0 calc(10px * var(--punk-glow-strength)) var(--punk-primary);
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -99,25 +242,25 @@ body::after {
 /* Neon Glow Text */
 .neon-text {
   text-shadow:
-    0 0 5px var(--punk-primary),
-    0 0 10px var(--punk-primary),
-    0 0 20px var(--punk-primary);
+    0 0 calc(5px * var(--punk-glow-strength)) var(--punk-primary),
+    0 0 calc(10px * var(--punk-glow-strength)) var(--punk-primary),
+    0 0 calc(20px * var(--punk-glow-strength)) var(--punk-primary);
   letter-spacing: 0.05em;
 }
 
 .neon-text-cyan {
   text-shadow:
-    0 0 5px var(--punk-neon-cyan),
-    0 0 10px var(--punk-neon-cyan),
-    0 0 20px var(--punk-neon-cyan);
+    0 0 calc(5px * var(--punk-glow-strength)) var(--punk-neon-cyan),
+    0 0 calc(10px * var(--punk-glow-strength)) var(--punk-neon-cyan),
+    0 0 calc(20px * var(--punk-glow-strength)) var(--punk-neon-cyan);
   letter-spacing: 0.05em;
 }
 
 .neon-text-pink {
   text-shadow:
-    0 0 5px var(--punk-neon-pink),
-    0 0 10px var(--punk-neon-pink),
-    0 0 20px var(--punk-neon-pink);
+    0 0 calc(5px * var(--punk-glow-strength)) var(--punk-neon-pink),
+    0 0 calc(10px * var(--punk-glow-strength)) var(--punk-neon-pink),
+    0 0 calc(20px * var(--punk-glow-strength)) var(--punk-neon-pink);
   letter-spacing: 0.05em;
 }
 
@@ -160,15 +303,15 @@ body::after {
 .punk-border {
   border: 1px solid var(--punk-primary);
   box-shadow:
-    0 0 5px var(--punk-primary),
-    inset 0 0 5px rgba(124, 58, 237, 0.1);
+    0 0 calc(5px * var(--punk-glow-strength)) var(--punk-primary),
+    inset 0 0 5px rgb(var(--punk-primary-rgb) / 0.1);
 }
 
 .punk-border-cyan {
   border: 1px solid var(--punk-neon-cyan);
   box-shadow:
-    0 0 5px var(--punk-neon-cyan),
-    inset 0 0 5px rgba(0, 255, 255, 0.1);
+    0 0 calc(5px * var(--punk-glow-strength)) var(--punk-neon-cyan),
+    inset 0 0 5px rgb(var(--punk-neon-cyan-rgb) / 0.1);
 }
 
 /* Glitch Effect */
@@ -248,19 +391,50 @@ body::after {
 
 /* Punk Input Styling */
 input.punk-input {
-  background: var(--punk-bg);
-  border: 1px solid var(--punk-primary);
+  background: var(--punk-bg-alt);
+  border: 1px solid var(--punk-border);
   color: var(--punk-text-primary);
   font-family: "Noto Sans SC", "JetBrains Mono", monospace;
   transition: all 0.3s ease;
+  box-shadow: inset 0 1px 0 rgb(var(--punk-text-primary-rgb) / 0.03);
+}
+
+:is(html[data-theme="light"], html[data-theme="system"]:not(.dark)) .punk-border {
+  border-color: var(--punk-border);
+  box-shadow:
+    var(--punk-hard-shadow),
+    inset 0 0 0 1px rgb(255 253 245 / 0.85);
+}
+
+:is(html[data-theme="light"], html[data-theme="system"]:not(.dark)) .punk-border-cyan {
+  border-color: var(--punk-border);
+  box-shadow:
+    var(--punk-hard-shadow),
+    inset 4px 0 0 rgb(var(--punk-accent-rgb) / 0.75);
+}
+
+:is(html[data-theme="light"], html[data-theme="system"]:not(.dark)) input.punk-input {
+  background: var(--punk-surface-raised);
+  border-color: rgb(var(--punk-border-rgb) / 0.9);
+  box-shadow:
+    inset 4px 4px 0 rgb(var(--punk-surface-inset-rgb) / 0.75),
+    2px 2px 0 rgb(17 17 17 / 0.08);
 }
 
 input.punk-input:focus {
   outline: none;
-  border-color: var(--punk-neon-cyan);
+  border-color: var(--punk-primary);
   box-shadow:
-    0 0 10px var(--punk-neon-cyan),
-    inset 0 0 10px rgba(0, 255, 255, 0.05);
+    0 0 calc(10px * var(--punk-glow-strength)) rgb(var(--punk-primary-rgb) / 0.55),
+    inset 0 0 10px rgb(var(--punk-primary-rgb) / 0.05);
+}
+
+:is(html[data-theme="light"], html[data-theme="system"]:not(.dark)) input.punk-input:focus {
+  border-color: var(--punk-primary);
+  box-shadow:
+    inset 4px 4px 0 rgb(var(--punk-surface-inset-rgb) / 0.65),
+    0 0 0 2px rgb(var(--punk-accent-rgb) / 0.32),
+    4px 4px 0 rgb(17 17 17 / 0.16);
 }
 
 input.punk-input::placeholder {
@@ -282,24 +456,57 @@ button.punk-btn-primary {
   color: white;
   border: 2px solid var(--punk-primary);
   box-shadow:
-    0 0 10px var(--punk-primary),
-    0 4px 0 0 #5b21b6;
+    0 0 calc(10px * var(--punk-glow-strength)) var(--punk-primary),
+    0 4px 0 0 rgb(var(--punk-primary-rgb) / 0.75);
 }
 
 button.punk-btn-primary:hover {
   background: var(--punk-secondary);
   border-color: var(--punk-secondary);
   box-shadow:
-    0 0 20px var(--punk-secondary),
-    0 4px 0 0 #7c3aed;
+    0 0 calc(20px * var(--punk-glow-strength)) var(--punk-secondary),
+    0 4px 0 0 rgb(var(--punk-primary-rgb) / 0.75);
   transform: translateY(-2px);
 }
 
 button.punk-btn-primary:active {
   transform: translateY(2px);
   box-shadow:
-    0 0 5px var(--punk-primary),
-    0 2px 0 0 #5b21b6;
+    0 0 calc(5px * var(--punk-glow-strength)) var(--punk-primary),
+    0 2px 0 0 rgb(var(--punk-primary-rgb) / 0.75);
+}
+
+:is(html[data-theme="light"], html[data-theme="system"]:not(.dark)) button.punk-btn-primary {
+  background: var(--punk-primary);
+  border-color: var(--punk-primary);
+  color: white;
+  box-shadow:
+    var(--punk-hard-shadow),
+    inset -3px -3px 0 rgb(255 255 255 / 0.12);
+}
+
+:is(html[data-theme="light"], html[data-theme="system"]:not(.dark)) button.punk-btn-primary:hover {
+  background: var(--punk-accent);
+  border-color: var(--punk-primary);
+  color: var(--punk-primary);
+  box-shadow:
+    7px 7px 0 rgb(17 17 17 / 0.2),
+    inset -3px -3px 0 rgb(255 253 245 / 0.3);
+}
+
+:is(html[data-theme="light"], html[data-theme="system"]:not(.dark)) .neon-text,
+:is(html[data-theme="light"], html[data-theme="system"]:not(.dark)) .neon-text-cyan,
+:is(html[data-theme="light"], html[data-theme="system"]:not(.dark)) .neon-text-pink {
+  text-shadow:
+    2px 0 0 rgb(var(--punk-accent-rgb) / 0.5),
+    -1px 1px 0 rgb(var(--punk-neon-pink-rgb) / 0.35);
+}
+
+:is(html[data-theme="light"], html[data-theme="system"]:not(.dark)) .hud-corner::before,
+:is(html[data-theme="light"], html[data-theme="system"]:not(.dark)) .hud-corner::after {
+  width: 13px;
+  height: 13px;
+  border-color: var(--punk-primary);
 }
 
 /* Terminal-style text */
@@ -347,9 +554,15 @@ button.punk-btn-primary:active {
 
 /* Focus visible styling */
 *:focus-visible {
-  outline: 2px solid var(--punk-neon-cyan);
+  outline: 2px solid var(--punk-primary);
   outline-offset: 2px;
-  box-shadow: 0 0 10px var(--punk-neon-cyan);
+  box-shadow: 0 0 calc(10px * var(--punk-glow-strength)) var(--punk-primary);
+}
+
+:is(html[data-theme="light"], html[data-theme="system"]:not(.dark)) *:focus-visible {
+  box-shadow:
+    0 0 0 3px rgb(var(--punk-accent-rgb) / 0.28),
+    4px 4px 0 rgb(17 17 17 / 0.12);
 }
 
 /* Reduced Motion */

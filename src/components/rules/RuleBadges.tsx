@@ -35,7 +35,7 @@ export function ConditionGroupDetail({ group }: { group: ConditionGroup }) {
       : ""
 
   return (
-    <div className="flex items-center gap-2 px-2 py-1 border border-punk-border/20 bg-punk-bg rounded">
+    <div className="flex items-center gap-2 px-2 py-1 border border-punk-border/20 bg-punk-surface-soft/70 rounded">
       <Globe className="h-3 w-3 text-punk-accent shrink-0" />
       <div className="flex-1 min-w-0">
         <span className="font-punk-code text-[13px] text-punk-text-primary uppercase">
@@ -81,7 +81,7 @@ export function ActionBlock({
     icon = ext?.iconUrl ? (
       <img src={ext.iconUrl} className="w-6 h-6 object-cover" alt="" />
     ) : (
-      <div className="w-6 h-6 bg-punk-bg-alt flex items-center justify-center">
+      <div className="w-6 h-6 bg-punk-surface-soft flex items-center justify-center">
         <Package className="w-4 h-4 text-punk-text-muted" />
       </div>
     )
@@ -99,7 +99,7 @@ export function ActionBlock({
   }
 
   return (
-    <div className="flex flex-col items-center gap-0.5 p-1 border border-punk-border/30 bg-punk-bg-alt rounded min-w-[60px]">
+    <div className="flex flex-col items-center gap-0.5 p-1 border border-punk-border/30 bg-punk-surface-raised rounded min-w-[60px]">
       {icon}
       <span className="font-punk-heading text-[10px] text-punk-text-primary uppercase text-center truncate w-full px-0.5">
         {displayName.substring(0, 8)}
@@ -149,7 +149,7 @@ export function ActionBadge({
       <div
         className={cn(
           detailed ? "h-5 w-5" : "h-4 w-4",
-          "bg-punk-bg-alt flex items-center justify-center"
+          "bg-punk-surface-soft flex items-center justify-center"
         )}
       >
         <span

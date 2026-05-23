@@ -22,8 +22,8 @@ export function BisectBanner({
   if (!bisectSession.active) return null
 
   return (
-    <div className="flex-shrink-0 border-b border-punk-border/30 bg-punk-bg px-3 py-3">
-      <div className="border border-punk-warning/40 bg-punk-bg-alt px-3 py-2.5">
+    <div className="flex-shrink-0 border-b border-punk-border/30 bg-punk-surface-soft/70 px-3 py-3">
+      <div className="border border-punk-warning/40 bg-punk-surface-raised px-3 py-2.5">
         <div className="flex items-start justify-between gap-3">
           <div className="space-y-1">
             <p className="font-punk-heading text-[12px] uppercase tracking-wider text-punk-warning">

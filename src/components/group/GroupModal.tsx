@@ -179,11 +179,11 @@ export function GroupModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-punk-bg/80 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-punk-bg/70 backdrop-blur-sm"
       onClick={onClose}
     >
       <div
-        className="w-[480px] h-[575px] border border-punk-border bg-punk-bg-alt shadow-[0_0_30px_rgba(124,58,237,0.4)] overflow-hidden flex flex-col"
+        className="w-[480px] h-[575px] border border-punk-border bg-punk-surface-raised shadow-punk-panel overflow-hidden flex flex-col"
         onClick={(event) => event.stopPropagation()}
       >
         <GroupEditorPanel

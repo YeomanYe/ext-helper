@@ -32,7 +32,7 @@ export function GroupExtensionPicker({
   return (
     <>
       {showEnableActions && (
-        <div className="flex items-center gap-2 px-4 py-2 border-b border-punk-border/30 bg-punk-bg shrink-0">
+        <div className="flex items-center gap-2 px-4 py-2 border-b border-punk-border/30 bg-punk-surface-soft/70 shrink-0">
           <span className="font-punk-heading text-[12px] text-punk-text-muted uppercase">
             ACTIONS
           </span>
@@ -63,12 +63,12 @@ export function GroupExtensionPicker({
         </div>
       )}
 
-      <div className="flex gap-2 px-4 py-2 border-b border-punk-border/30 bg-punk-bg shrink-0 overflow-x-auto">
+      <div className="flex gap-2 px-4 py-2 border-b border-punk-border/30 bg-punk-surface-soft/70 shrink-0 overflow-x-auto">
         {members.map((extension) => (
           <div
             key={extension.id}
             className={cn(
-              "w-8 h-8 flex-shrink-0 border bg-punk-bg-alt flex items-center justify-center overflow-hidden",
+              "w-8 h-8 flex-shrink-0 border bg-punk-surface-raised flex items-center justify-center overflow-hidden",
               extension.enabled ? "border-punk-success" : "border-punk-border/30"
             )}
             onClick={() => onToggleMembership(extension)}
@@ -100,7 +100,7 @@ export function GroupExtensionPicker({
                   "relative flex flex-col items-center justify-center p-2 cursor-pointer transition-all border",
                   extension.isInGroup
                     ? "border-punk-success/50 bg-punk-success/5 hover:border-punk-success"
-                    : "border-punk-border/20 bg-punk-bg-alt hover:border-punk-primary/50"
+                    : "border-punk-border/20 bg-punk-surface-raised hover:border-punk-primary/50"
                 )}
                 style={{ height: "72px" }}
               >
@@ -113,7 +113,7 @@ export function GroupExtensionPicker({
                 {extension.iconUrl ? (
                   <img src={extension.iconUrl} className="w-8 h-8 object-cover" alt="" />
                 ) : (
-                  <div className="w-8 h-8 bg-punk-bg flex items-center justify-center">
+                  <div className="w-8 h-8 bg-punk-surface-soft flex items-center justify-center">
                     <Package className="w-4 h-4 text-punk-text-muted" />
                   </div>
                 )}

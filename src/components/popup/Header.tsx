@@ -8,12 +8,16 @@ import {
   Settings,
   Upload,
   Download,
+  Moon,
+  Sun,
+  Monitor,
   type LucideIcon,
 } from "lucide-react"
 import { cn } from "@/utils"
 import { isDevMode } from "@/services/mockData"
 import { browserAdapter } from "@/services/browser/adapter"
-import type { FilterType, ViewMode } from "@/types"
+import { useUIStore } from "@/stores/uiStore"
+import type { FilterType, Preferences, ViewMode } from "@/types"
 
 function useExtensionVersion(): string {
   const [version, setVersion] = React.useState("1.0.0")
@@ -91,10 +95,10 @@ export function SearchBar({
             onClick={handleToggle}
             className={cn(
               "flex items-center gap-2 px-3 h-11",
-              "border border-punk-border/50 bg-punk-bg-alt",
+              "border border-punk-border/50 bg-punk-surface-raised",
               "font-punk-heading text-[13px] uppercase tracking-wider",
               "text-punk-text-primary",
-              "hover:border-punk-primary hover:shadow-[0_0_10px_rgba(124,58,237,0.3)]",
+              "hover:border-punk-primary hover:shadow-punk-hard",
               "transition-all duration-200"
             )}
           >
@@ -123,7 +127,7 @@ export function SearchBar({
               <div className="fixed inset-0 z-40" onClick={() => setShowDropdown(false)} />
               <div
                 className={cn(
-                  "absolute left-0 z-50 min-w-full border border-punk-border bg-punk-bg-alt shadow-[0_0_20px_rgba(124,58,237,0.3)]",
+                  "absolute left-0 z-50 min-w-full border border-punk-border bg-punk-surface-raised shadow-punk-panel",
                   dropUp ? "bottom-full mb-1" : "top-full mt-1"
                 )}
               >
@@ -138,8 +142,8 @@ export function SearchBar({
                       "w-full px-3 py-2 text-left font-punk-heading text-[13px] uppercase tracking-wider",
                       "transition-all duration-150",
                       activeFilter === filter.value
-                        ? "bg-punk-primary text-white"
-                        : "text-punk-text-secondary hover:bg-punk-bg hover:text-punk-text-primary"
+                        ? "bg-punk-primary/12 text-punk-primary"
+                        : "text-punk-text-secondary hover:bg-punk-surface-soft hover:text-punk-text-primary"
                     )}
                   >
                     {filter.label}
@@ -198,7 +202,7 @@ export function QuickFilters({ activeFilter, onFilterChange }: QuickFiltersProps
             "punk-btn px-3 py-1.5 transition-all duration-200",
             activeFilter === filter.value
               ? "punk-btn-primary"
-              : "bg-punk-bg-alt text-punk-text-secondary hover:text-punk-primary border border-punk-primary/30 hover:border-punk-primary"
+              : "bg-punk-surface-raised text-punk-text-secondary hover:text-punk-primary border border-punk-primary/30 hover:border-punk-primary"
           )}
         >
           {filter.label}
@@ -214,6 +218,17 @@ const VIEW_MODES: { mode: ViewMode; icon: LucideIcon; label: string }[] = [
   { mode: "detail", icon: FileText, label: "DETAIL" },
 ]
 
+const THEME_OPTIONS: {
+  theme: Preferences["theme"]
+  icon: LucideIcon
+  label: string
+  ariaLabel: string
+}[] = [
+  { theme: "dark", icon: Moon, label: "DARK", ariaLabel: "Use dark theme" },
+  { theme: "light", icon: Sun, label: "LIGHT", ariaLabel: "Use light theme" },
+  { theme: "system", icon: Monitor, label: "SYS", ariaLabel: "Follow system theme" },
+]
+
 function ViewModeToggle({
   viewMode,
   onViewModeChange,
@@ -223,7 +238,7 @@ function ViewModeToggle({
 }) {
   return (
     <div
-      className="flex border border-punk-border/30 bg-punk-bg/50"
+      className="flex border border-punk-border/30 bg-punk-surface-inset/70"
       role="group"
       aria-label="View mode"
     >
@@ -237,7 +252,7 @@ function ViewModeToggle({
           className={cn(
             "flex items-center gap-1 px-2.5 py-1.5 transition-all duration-200",
             viewMode === mode
-              ? "bg-punk-primary/30 text-punk-accent border border-punk-primary/50"
+              ? "bg-punk-primary/10 text-punk-accent border border-punk-primary/60"
               : "text-punk-text-muted hover:text-punk-text-secondary border border-transparent"
           )}
         >
@@ -262,10 +277,12 @@ export function Header({
 }: HeaderProps) {
   const version = useExtensionVersion()
   const [showSettingsMenu, setShowSettingsMenu] = React.useState(false)
+  const theme = useUIStore((state) => state.theme)
+  const setTheme = useUIStore((state) => state.setTheme)
   return (
-    <header className="relative flex items-center justify-between border-b-2 border-punk-primary bg-punk-bg px-4 py-3 hud-corner">
+    <header className="relative flex items-center justify-between border-b-2 border-punk-primary bg-punk-surface-raised px-4 py-3 shadow-punk-hard hud-corner">
       {/* Decorative scanline */}
-      <div className="absolute inset-0 overflow-hidden opacity-20 pointer-events-none">
+      <div className="absolute inset-0 overflow-hidden opacity-10 pointer-events-none">
         <div className="w-full h-1 bg-punk-accent animate-scanline" />
       </div>
 
@@ -281,14 +298,14 @@ export function Header({
             xmlns="http://www.w3.org/2000/svg"
           >
             {/* Background */}
-            <rect width="40" height="40" fill="#0D1B2A" />
+            <rect width="40" height="40" fill="var(--punk-bg-alt)" />
             {/* Border */}
             <rect
               x="1.5"
               y="1.5"
               width="37"
               height="37"
-              stroke="#00FFFF"
+              stroke="var(--punk-neon-cyan)"
               strokeWidth="2"
               fill="none"
             />
@@ -298,7 +315,7 @@ export function Header({
               y="20"
               textAnchor="middle"
               dominantBaseline="central"
-              fill="#00FFFF"
+              fill="var(--punk-neon-cyan)"
               fontSize="22"
               fontWeight="bold"
               fontFamily="monospace"
@@ -329,7 +346,7 @@ export function Header({
             aria-expanded={showSettingsMenu}
             title="Settings"
             className={cn(
-              "flex h-8 w-8 items-center justify-center border border-punk-border/30 bg-punk-bg/50",
+              "flex h-8 w-8 items-center justify-center border border-punk-border/30 bg-punk-surface-inset/70",
               "text-punk-text-muted transition-all duration-200 hover:border-punk-accent hover:text-punk-accent",
               showSettingsMenu && "border-punk-accent text-punk-accent"
             )}
@@ -340,14 +357,41 @@ export function Header({
           {showSettingsMenu && (
             <>
               <div className="fixed inset-0 z-40" onClick={() => setShowSettingsMenu(false)} />
-              <div className="absolute right-0 top-full z-50 mt-1 w-40 border border-punk-border bg-punk-bg-alt shadow-[0_0_20px_rgba(124,58,237,0.3)]">
+              <div className="absolute right-0 top-full z-50 mt-1 w-60 border border-punk-border bg-punk-surface-raised shadow-punk-panel">
+                <div className="border-b border-punk-border/40 px-3 py-2">
+                  <div className="mb-2 font-punk-heading text-[11px] uppercase tracking-wider text-punk-text-muted">
+                    THEME
+                  </div>
+                  <div className="grid grid-cols-3 border border-punk-border/60 bg-punk-surface-inset/70">
+                    {THEME_OPTIONS.map(({ theme: optionTheme, icon: Icon, label, ariaLabel }) => (
+                      <button
+                        key={optionTheme}
+                        type="button"
+                        onClick={() => setTheme(optionTheme)}
+                        aria-label={ariaLabel}
+                        aria-pressed={theme === optionTheme}
+                        title={ariaLabel}
+                        className={cn(
+                          "flex h-9 min-w-0 items-center justify-center gap-1 px-2 transition-all duration-200",
+                          "border border-transparent font-punk-heading text-[10px] uppercase tracking-wider",
+                          theme === optionTheme
+                            ? "border-punk-primary/50 bg-punk-primary/10 text-punk-primary"
+                            : "text-punk-text-muted hover:border-punk-accent/50 hover:text-punk-text-primary"
+                        )}
+                      >
+                        <Icon className="h-3.5 w-3.5 shrink-0" />
+                        <span>{label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
                 <button
                   type="button"
                   onClick={() => {
                     onOpenImportExport?.("import")
                     setShowSettingsMenu(false)
                   }}
-                  className="flex w-full items-center gap-2 px-3 py-2 text-left font-punk-heading text-[13px] uppercase tracking-wider text-punk-text-secondary transition-all duration-150 hover:bg-punk-bg hover:text-punk-text-primary"
+                  className="flex w-full items-center gap-2 px-3 py-2 text-left font-punk-heading text-[13px] uppercase tracking-wider text-punk-text-secondary transition-all duration-150 hover:bg-punk-surface-soft hover:text-punk-text-primary"
                 >
                   <Upload className="h-3.5 w-3.5" />
                   IMPORT
@@ -358,7 +402,7 @@ export function Header({
                     onOpenImportExport?.("export")
                     setShowSettingsMenu(false)
                   }}
-                  className="flex w-full items-center gap-2 px-3 py-2 text-left font-punk-heading text-[13px] uppercase tracking-wider text-punk-text-secondary transition-all duration-150 hover:bg-punk-bg hover:text-punk-text-primary"
+                  className="flex w-full items-center gap-2 px-3 py-2 text-left font-punk-heading text-[13px] uppercase tracking-wider text-punk-text-secondary transition-all duration-150 hover:bg-punk-surface-soft hover:text-punk-text-primary"
                 >
                   <Download className="h-3.5 w-3.5" />
                   EXPORT
@@ -381,9 +425,9 @@ export function Footer({ totalCount, enabledCount }: FooterProps) {
   const percentage = totalCount > 0 ? Math.round((enabledCount / totalCount) * 100) : 0
 
   return (
-    <footer className="relative flex items-center justify-between border-t-2 border-punk-primary bg-punk-bg-alt px-4 py-2 overflow-hidden">
+    <footer className="relative flex items-center justify-between border-t-2 border-punk-primary bg-punk-surface-raised px-4 py-2 overflow-hidden shadow-punk-hard">
       {/* Progress bar background */}
-      <div className="absolute bottom-0 left-0 h-0.5 bg-punk-bg w-full">
+      <div className="absolute bottom-0 left-0 h-0.5 bg-punk-surface-inset w-full">
         <div
           className="h-full bg-punk-success transition-all duration-500"
           style={{ width: `${percentage}%` }}

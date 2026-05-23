@@ -134,7 +134,7 @@ function ConditionGroupRow({
   }
 
   return (
-    <div className="border border-punk-border/30 bg-punk-bg p-2.5 space-y-2">
+    <div className="border border-punk-border/30 bg-punk-surface-soft/70 p-2.5 space-y-2">
       {/* Header: Domains label + All Sites toggle + Match mode + Remove */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -147,7 +147,7 @@ function ConditionGroupRow({
               "h-6 px-2 text-[11px] font-punk-heading uppercase tracking-wider transition-all border",
               isAllSites
                 ? "border-punk-success/50 bg-punk-success/10 text-punk-success"
-                : "border-punk-border/30 bg-punk-bg text-punk-text-muted hover:border-punk-success/30 hover:text-punk-success/70"
+                : "border-punk-border/30 bg-punk-surface-raised text-punk-text-muted hover:border-punk-success/30 hover:text-punk-success/70"
             )}
           >
             ALL SITES
@@ -226,7 +226,7 @@ function ConditionGroupRow({
               "px-2 py-0.5 text-[12px] font-punk-heading uppercase transition-all",
               group.schedule
                 ? "bg-punk-success/10 text-punk-success border border-punk-success/30"
-                : "bg-punk-bg text-punk-text-muted border border-punk-border/30 hover:border-punk-success/30"
+                : "bg-punk-surface-raised text-punk-text-muted border border-punk-border/30 hover:border-punk-success/30"
             )}
           >
             {group.schedule ? "ENABLED" : "DISABLED"}
@@ -245,7 +245,7 @@ function ConditionGroupRow({
                     "w-7 h-6 text-[12px] font-punk-heading transition-all",
                     group.schedule!.days.includes(day.value)
                       ? "border border-punk-success/50 bg-punk-success/10 text-punk-success"
-                      : "border border-punk-border/30 bg-punk-bg text-punk-text-muted hover:border-punk-success/30"
+                      : "border border-punk-border/30 bg-punk-surface-raised text-punk-text-muted hover:border-punk-success/30"
                   )}
                 >
                   {day.label}
@@ -297,7 +297,7 @@ function MatchModeDropdown({
         onClick={() => setShowDropdown(!showDropdown)}
         className={cn(
           "h-6 px-2 text-[12px] flex items-center gap-1",
-          "border border-punk-border/50 bg-punk-bg-alt",
+          "border border-punk-border/50 bg-punk-surface-raised",
           "hover:border-punk-primary transition-colors"
         )}
       >
@@ -310,7 +310,7 @@ function MatchModeDropdown({
       </button>
 
       {showDropdown && (
-        <div className="absolute top-full left-0 mt-1 z-50 w-44 border border-punk-border bg-punk-bg-alt shadow-[0_0_15px_rgba(124,58,237,0.3)]">
+        <div className="absolute top-full left-0 mt-1 z-50 w-44 border border-punk-border bg-punk-surface-raised shadow-punk-panel">
           {MATCH_MODES.map((mode) => (
             <button
               key={mode.value}
@@ -321,8 +321,8 @@ function MatchModeDropdown({
               className={cn(
                 "w-full px-2 py-1.5 text-left font-punk-heading text-[13px] uppercase tracking-wider transition-all",
                 value === mode.value
-                  ? "bg-punk-primary text-white"
-                  : "text-punk-text-secondary hover:bg-punk-bg hover:text-punk-text-primary"
+                  ? "bg-punk-primary/12 text-punk-primary"
+                  : "text-punk-text-secondary hover:bg-punk-surface-soft hover:text-punk-text-primary"
               )}
             >
               {mode.label}

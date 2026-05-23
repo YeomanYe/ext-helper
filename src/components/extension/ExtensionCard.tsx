@@ -135,9 +135,9 @@ export const ExtensionCard = React.memo(function ExtensionCard({
         ref={cardRef as React.RefObject<HTMLDivElement>}
         className={cn(
           "group relative flex flex-col border transition-all",
-          "bg-punk-bg-alt",
-          "hover:border-punk-primary hover:shadow-[0_0_15px_rgba(124,58,237,0.3)]",
-          isDimmed && "opacity-60",
+          "bg-punk-surface-raised",
+          "hover:border-punk-primary hover:shadow-punk-panel",
+          isDimmed && "opacity-70",
           "w-full",
           "punk-border",
           className
@@ -155,7 +155,7 @@ export const ExtensionCard = React.memo(function ExtensionCard({
                   loading="lazy"
                 />
               ) : (
-                <div className="w-14 h-14 flex items-center justify-center bg-punk-bg">
+                <div className="w-14 h-14 flex items-center justify-center bg-punk-surface-soft">
                   <Package className="w-7 h-7 text-punk-text-muted" />
                 </div>
               )}
@@ -235,7 +235,7 @@ export const ExtensionCard = React.memo(function ExtensionCard({
             </div>
           </div>
 
-          <div className="border border-punk-border/30 rounded bg-punk-bg/50 mb-2">
+          <div className="border border-punk-border/30 rounded bg-punk-surface-soft/70 mb-2">
             <div className="flex items-center gap-2 px-2 py-1.5 border-b border-punk-border/20">
               <Shield className="w-3 h-3 text-punk-accent" />
               <span className="font-punk-heading text-[11px] text-punk-text-muted uppercase">
@@ -247,7 +247,7 @@ export const ExtensionCard = React.memo(function ExtensionCard({
                 {extension.permissions.slice(0, 6).map((perm, idx) => (
                   <span
                     key={idx}
-                    className="px-1.5 py-0.5 text-[10px] font-punk-code text-punk-text-secondary bg-punk-bg border border-punk-border/20"
+                    className="px-1.5 py-0.5 text-[10px] font-punk-code text-punk-text-secondary bg-punk-surface-raised border border-punk-border/20"
                   >
                     {perm.substring(0, 15)}
                   </span>
@@ -262,7 +262,7 @@ export const ExtensionCard = React.memo(function ExtensionCard({
           </div>
 
           {extension.hostPermissions.length > 0 && (
-            <div className="border border-punk-border/30 rounded bg-punk-bg/50 mb-2">
+            <div className="border border-punk-border/30 rounded bg-punk-surface-soft/70 mb-2">
               <div className="flex items-center gap-2 px-2 py-1.5 border-b border-punk-border/20">
                 <Shield className="w-3 h-3 text-punk-warning" />
                 <span className="font-punk-heading text-[11px] text-punk-text-muted uppercase">
@@ -278,7 +278,7 @@ export const ExtensionCard = React.memo(function ExtensionCard({
                         "px-1.5 py-0.5 text-[10px] font-punk-code",
                         host === "<all_urls>"
                           ? "text-punk-warning bg-punk-warning/5 border border-punk-warning/30"
-                          : "text-punk-text-secondary bg-punk-bg border border-punk-border/20"
+                          : "text-punk-text-secondary bg-punk-surface-raised border border-punk-border/20"
                       )}
                     >
                       {host}
@@ -330,9 +330,9 @@ export const ExtensionCard = React.memo(function ExtensionCard({
         ref={cardRef as React.RefObject<HTMLDivElement>}
         className={cn(
           "group relative flex items-center gap-3 p-2.5 border",
-          "bg-punk-bg-alt",
-          "hover:border-punk-primary hover:shadow-[0_0_15px_rgba(124,58,237,0.3)]",
-          isDimmed && "opacity-50",
+          "bg-punk-surface-raised",
+          "hover:border-punk-primary hover:shadow-punk-panel",
+          isDimmed && "opacity-70",
           "min-w-[280px] flex-1 min-h-[60px]",
           "punk-border",
           className
@@ -348,7 +348,7 @@ export const ExtensionCard = React.memo(function ExtensionCard({
               loading="lazy"
             />
           ) : (
-            <div className="w-10 h-10 flex items-center justify-center bg-punk-bg">
+            <div className="w-10 h-10 flex items-center justify-center bg-punk-surface-soft">
               <Package className="w-5 h-5 text-punk-text-muted" />
             </div>
           )}
@@ -411,9 +411,9 @@ export const ExtensionCard = React.memo(function ExtensionCard({
       ref={cardRef as React.RefObject<HTMLDivElement>}
       className={cn(
         "group relative flex flex-col items-center justify-center p-3 border",
-        "bg-punk-bg-alt",
-        "hover:border-punk-primary hover:shadow-[0_0_15px_rgba(124,58,237,0.3)]",
-        isDimmed && "opacity-50",
+        "bg-punk-surface-raised",
+        "hover:border-punk-primary hover:shadow-punk-panel",
+        isDimmed && "opacity-70",
         "aspect-square cursor-pointer",
         "punk-border",
         className
@@ -433,7 +433,7 @@ export const ExtensionCard = React.memo(function ExtensionCard({
             loading="lazy"
           />
         ) : (
-          <div className="w-10 h-10 flex items-center justify-center bg-punk-bg">
+          <div className="w-10 h-10 flex items-center justify-center bg-punk-surface-soft">
             <Package className="w-5 h-5 text-punk-text-muted" />
           </div>
         )}

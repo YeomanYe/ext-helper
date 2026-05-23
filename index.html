@@ -1,10 +1,37 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ExtHelper - Dev Preview</title>
-    <link rel="icon" href="data:,">
+    <link rel="icon" href="data:," />
+    <script>
+      ;(() => {
+        const apply = (theme) => {
+          const resolved =
+            theme === "system"
+              ? window.matchMedia("(prefers-color-scheme: dark)").matches
+                ? "dark"
+                : "light"
+              : theme
+          document.documentElement.setAttribute("data-theme", theme)
+          document.documentElement.classList.toggle("dark", resolved === "dark")
+        }
+
+        try {
+          const preferences = JSON.parse(localStorage.getItem("dev-preferences") || "{}")
+          apply(
+            preferences.theme === "light" ||
+              preferences.theme === "dark" ||
+              preferences.theme === "system"
+              ? preferences.theme
+              : "system"
+          )
+        } catch {
+          apply("system")
+        }
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>

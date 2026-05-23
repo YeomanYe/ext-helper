@@ -1,13 +1,40 @@
 ---
 id: theme-toggle
 title: 主题切换
-status: approved
+status: verified
+verified_at: 2026-05-23T00:24:50Z
 created: 2026-05-22
 updated: 2026-05-22
 project_root: /Users/ym/Documents/projects/ext-helper
 needs_visual_check: true
 needs_video_check: false
 ---
+
+## Stage 3 report (2026-05-23)
+- VERDICT: verified
+- 工程: /Users/ym/Documents/projects/ext-helper
+- worktree: /Users/ym/Documents/projects/ext-helper/.worktrees/theme-toggle
+- hard gates: lint=0 test=0 build=0
+- 视觉走查: 4 张截图 / 0 段录屏 / console.error=0
+- 视口: 1440x900
+- artifacts 目录: /Users/ym/Documents/projects/ext-helper/.worktrees/theme-toggle/.review-artifacts/theme-toggle
+- 失败原因: none
+- 截图路径:
+  - /Users/ym/Documents/projects/ext-helper/.worktrees/theme-toggle/.review-artifacts/theme-toggle/screenshots/main.png
+  - /Users/ym/Documents/projects/ext-helper/.worktrees/theme-toggle/.review-artifacts/theme-toggle/screenshots/settings-menu.png
+  - /Users/ym/Documents/projects/ext-helper/.worktrees/theme-toggle/.review-artifacts/theme-toggle/screenshots/light-theme.png
+  - /Users/ym/Documents/projects/ext-helper/.worktrees/theme-toggle/.review-artifacts/theme-toggle/screenshots/dark-theme.png
+- 录屏路径:
+  - none
+
+## Stage 2 report (2026-05-22)
+- 实现自:stage2 cron prompt
+- worktree: /Users/ym/Documents/projects/ext-helper/.worktrees/theme-toggle
+- branch: todo/theme-toggle
+- commits: 1
+- 改动文件: 8(index.html, src/components/popup/Header.tsx, src/dev/main.tsx, src/popup.tsx, src/stores/__tests__/uiStore.test.ts, src/stores/uiStore.ts, src/styles/globals.css, src/utils/theme.ts)
+- 关键决定: 抽出 `src/utils/theme.ts` 统一维护 `data-theme` 与 `dark` class，Header 只通过 `uiStore.theme` / `setTheme()` 派发三态切换。
+- needs-rework 兜底: 本次不是 needs-rework。
 
 ## Stage 1 report (2026-05-22)
 - 起草自:stage1 cron prompt

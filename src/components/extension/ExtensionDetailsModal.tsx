@@ -84,13 +84,13 @@ export function ExtensionDetailsModal({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-punk-bg/80 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-punk-bg/70 p-4 backdrop-blur-sm"
       onClick={onClose}
     >
       <div
         className={cn(
-          "relative w-full max-w-lg border border-punk-neon-cyan/30 bg-punk-bg",
-          "shadow-[0_0_25px_rgba(0,255,255,0.1),0_4px_24px_rgba(0,0,0,0.6)]",
+          "relative w-full max-w-lg border border-punk-neon-cyan/40 bg-punk-surface-raised",
+          "shadow-punk-panel",
           "max-h-[560px] overflow-hidden flex flex-col"
         )}
         onClick={(e) => e.stopPropagation()}
@@ -111,7 +111,7 @@ export function ExtensionDetailsModal({
                 className="h-10 w-10 object-cover"
               />
             ) : (
-              <div className="flex h-10 w-10 items-center justify-center bg-punk-bg-alt">
+              <div className="flex h-10 w-10 items-center justify-center bg-punk-surface-soft">
                 <Package className="h-5 w-5 text-punk-text-muted" />
               </div>
             )}
@@ -174,7 +174,7 @@ export function ExtensionDetailsModal({
 
           {/* Description */}
           {extension.description && (
-            <div className="border border-punk-border/20 bg-punk-bg-alt/50 p-2.5">
+            <div className="border border-punk-border/20 bg-punk-surface-soft/70 p-2.5">
               <p className="font-punk-body text-[13px] leading-relaxed text-punk-text-secondary">
                 {extension.description}
               </p>
@@ -182,7 +182,7 @@ export function ExtensionDetailsModal({
           )}
 
           {/* System info — HUD data readout */}
-          <div className="border border-punk-border/20 bg-punk-bg-alt/50 p-2.5">
+          <div className="border border-punk-border/20 bg-punk-surface-soft/70 p-2.5">
             <SectionHeader icon={<Package className="h-3 w-3" />} label="SYSTEM INFO" />
             <div className="space-y-0">
               <DataRow label="TYPE" value={extension.type} />
@@ -217,7 +217,7 @@ export function ExtensionDetailsModal({
           </div>
 
           {/* Permissions */}
-          <div className="border border-punk-border/20 bg-punk-bg-alt/50 p-2.5">
+          <div className="border border-punk-border/20 bg-punk-surface-soft/70 p-2.5">
             <SectionHeader
               icon={<Shield className="h-3 w-3" />}
               label="PERMISSIONS"
@@ -228,7 +228,7 @@ export function ExtensionDetailsModal({
                 extension.permissions.map((perm) => (
                   <span
                     key={perm}
-                    className="border border-punk-border/20 bg-punk-bg px-1.5 py-0.5 font-punk-code text-[10px] text-punk-text-secondary"
+                    className="border border-punk-border/20 bg-punk-surface-raised px-1.5 py-0.5 font-punk-code text-[10px] text-punk-text-secondary"
                   >
                     {perm}
                   </span>
@@ -242,7 +242,7 @@ export function ExtensionDetailsModal({
           </div>
 
           {/* Host Permissions */}
-          <div className="border border-punk-border/20 bg-punk-bg-alt/50 p-2.5">
+          <div className="border border-punk-border/20 bg-punk-surface-soft/70 p-2.5">
             <SectionHeader
               icon={<Globe className="h-3 w-3" />}
               label="HOST PERMISSIONS"
@@ -257,7 +257,7 @@ export function ExtensionDetailsModal({
                       "border px-1.5 py-0.5 font-punk-code text-[10px]",
                       host === "<all_urls>"
                         ? "border-punk-warning/30 bg-punk-warning/5 text-punk-warning"
-                        : "border-punk-border/20 bg-punk-bg text-punk-text-secondary"
+                        : "border-punk-border/20 bg-punk-surface-raised text-punk-text-secondary"
                     )}
                   >
                     {host}

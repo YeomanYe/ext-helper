@@ -139,8 +139,8 @@ export function GroupsBar({
                 "border transition-all duration-200",
                 "font-punk-code text-[12px] uppercase tracking-wider",
                 showMore
-                  ? "border-punk-neon-cyan/60 bg-punk-bg text-punk-neon-cyan shadow-[0_0_12px_rgba(0,255,255,0.15),inset_0_0_12px_rgba(0,255,255,0.05)]"
-                  : "border-punk-border/50 bg-punk-bg-alt text-punk-text-muted hover:border-punk-neon-cyan/40 hover:text-punk-accent"
+                  ? "border-punk-neon-cyan/60 bg-punk-surface-soft text-punk-neon-cyan shadow-punk-hard"
+                  : "border-punk-border/50 bg-punk-surface-raised text-punk-text-muted hover:border-punk-neon-cyan/40 hover:text-punk-accent"
               )}
             >
               <MoreHorizontal className="h-3.5 w-3.5" />
@@ -152,8 +152,8 @@ export function GroupsBar({
               <div
                 className={cn(
                   "absolute right-0 top-full mt-1.5 z-50",
-                  "border border-punk-neon-cyan/30 bg-punk-bg",
-                  "shadow-[0_0_20px_rgba(0,255,255,0.1),0_4px_24px_rgba(0,0,0,0.6)]"
+                  "border border-punk-neon-cyan/40 bg-punk-surface-raised",
+                  "shadow-punk-panel"
                 )}
               >
                 {/* HUD corner accents */}
@@ -183,7 +183,7 @@ export function GroupsBar({
                       onChange={(e) => setOverflowSearch(e.target.value)}
                       placeholder="FILTER_SECTORS..."
                       className={cn(
-                        "w-full h-7 pl-7 pr-7 bg-punk-bg-alt",
+                        "w-full h-7 pl-7 pr-7 bg-punk-surface-raised",
                         "border border-punk-neon-cyan/20 focus:border-punk-neon-cyan/50",
                         "font-punk-code text-[11px] text-punk-text-primary",
                         "placeholder:text-punk-text-muted/50",

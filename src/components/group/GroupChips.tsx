@@ -30,9 +30,9 @@ export function GroupChip({
     <div
       className={cn(
         "flex items-center gap-2 px-3 py-2 transition-all duration-200 cursor-pointer",
-        "border border-punk-border/50 bg-punk-bg-alt",
-        "hover:border-punk-primary hover:shadow-[0_0_10px_rgba(124,58,237,0.3)]",
-        "active:shadow-[0_0_15px_rgba(124,58,237,0.5)]"
+        "border border-punk-border/50 bg-punk-surface-raised",
+        "hover:border-punk-primary hover:shadow-punk-hard",
+        "active:shadow-punk-panel"
       )}
       onClick={onClick}
     >

@@ -50,9 +50,9 @@ export const RuleCard = React.memo(function RuleCard({
       <div
         className={cn(
           "group relative flex flex-col items-center justify-center p-3 border",
-          "bg-punk-bg-alt",
-          "hover:border-punk-primary hover:shadow-[0_0_15px_rgba(124,58,237,0.3)]",
-          isDimmed && "opacity-50",
+          "bg-punk-surface-raised",
+          "hover:border-punk-primary hover:shadow-punk-panel",
+          isDimmed && "opacity-70",
           "aspect-square",
           "punk-border",
           className
@@ -94,7 +94,7 @@ export const RuleCard = React.memo(function RuleCard({
         </div>
 
         {/* Rule Icon */}
-        <div className="w-8 h-8 flex items-center justify-center bg-punk-bg rounded mb-1.5 overflow-hidden mt-3">
+        <div className="w-8 h-8 flex items-center justify-center bg-punk-surface-soft rounded mb-1.5 overflow-hidden mt-3">
           {rule.iconUrl ? (
             <img src={rule.iconUrl} alt="" className="w-full h-full object-cover" />
           ) : (
@@ -127,9 +127,9 @@ export const RuleCard = React.memo(function RuleCard({
       <div
         className={cn(
           "group relative flex flex-col border transition-all",
-          "bg-punk-bg-alt",
-          "hover:border-punk-primary hover:shadow-[0_0_15px_rgba(124,58,237,0.3)]",
-          isDimmed && "opacity-60",
+          "bg-punk-surface-raised",
+          "hover:border-punk-primary hover:shadow-punk-panel",
+          isDimmed && "opacity-70",
           "min-w-[280px] flex-1",
           "punk-border",
           className
@@ -140,7 +140,7 @@ export const RuleCard = React.memo(function RuleCard({
           {/* Header */}
           <div className="flex items-start gap-3 mb-2">
             {/* Rule Icon */}
-            <div className="w-10 h-10 flex items-center justify-center bg-punk-bg rounded flex-shrink-0 overflow-hidden">
+            <div className="w-10 h-10 flex items-center justify-center bg-punk-surface-soft rounded flex-shrink-0 overflow-hidden">
               {rule.iconUrl ? (
                 <img src={rule.iconUrl} alt="" className="w-full h-full object-cover" />
               ) : (
@@ -245,9 +245,9 @@ export const RuleCard = React.memo(function RuleCard({
     <div
       className={cn(
         "group relative flex flex-col border transition-all",
-        "bg-punk-bg-alt",
-        "hover:border-punk-primary hover:shadow-[0_0_15px_rgba(124,58,237,0.3)]",
-        isDimmed && "opacity-60",
+        "bg-punk-surface-raised",
+        "hover:border-punk-primary hover:shadow-punk-panel",
+        isDimmed && "opacity-70",
         "w-full",
         "punk-border",
         className
@@ -258,7 +258,7 @@ export const RuleCard = React.memo(function RuleCard({
         {/* Header */}
         <div className="flex items-start gap-3 mb-3">
           {/* Rule Icon */}
-          <div className="w-12 h-12 flex items-center justify-center bg-punk-bg rounded flex-shrink-0 overflow-hidden">
+          <div className="w-12 h-12 flex items-center justify-center bg-punk-surface-soft rounded flex-shrink-0 overflow-hidden">
             {rule.iconUrl ? (
               <img src={rule.iconUrl} alt="" className="w-full h-full object-cover" />
             ) : (
@@ -319,7 +319,7 @@ export const RuleCard = React.memo(function RuleCard({
         </div>
 
         {/* Conditions Section - always expanded */}
-        <div className="border border-punk-border/30 rounded bg-punk-bg/50">
+        <div className="border border-punk-border/30 rounded bg-punk-surface-soft/70">
           <div className="flex items-center gap-2 px-2 py-1.5">
             <Globe className="w-3 h-3 text-punk-accent" />
             <span className="font-punk-heading text-[11px] text-punk-text-muted uppercase">
@@ -344,7 +344,7 @@ export const RuleCard = React.memo(function RuleCard({
         </div>
 
         {/* Actions Section - display as grid of blocks */}
-        <div className="border border-punk-border/30 rounded bg-punk-bg/50">
+        <div className="border border-punk-border/30 rounded bg-punk-surface-soft/70">
           <div className="flex items-center gap-2 px-2 py-1.5">
             <Zap className="w-3 h-3 text-punk-cta" />
             <span className="font-punk-heading text-[11px] text-punk-text-muted uppercase">

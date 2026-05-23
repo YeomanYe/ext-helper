@@ -175,14 +175,14 @@ export function ActionBuilder({ actions, onChange }: ActionBuilderProps) {
                     ? "border-punk-success/50 bg-punk-success/5"
                     : disabledExtensions.includes(ext.id)
                       ? "border-punk-cta/50 bg-punk-cta/5"
-                      : "border-punk-border/20 bg-punk-bg hover:border-punk-border/50"
+                      : "border-punk-border/20 bg-punk-surface-raised hover:border-punk-border/50"
                 )}
               >
                 {/* Icon */}
                 {ext.iconUrl ? (
                   <img src={ext.iconUrl} className="h-5 w-5 object-cover flex-shrink-0" alt="" />
                 ) : (
-                  <div className="h-5 w-5 bg-punk-bg-alt flex items-center justify-center flex-shrink-0">
+                  <div className="h-5 w-5 bg-punk-surface-soft flex items-center justify-center flex-shrink-0">
                     <span className="font-punk-heading text-[10px] text-punk-text-muted">
                       {ext.name[0]}
                     </span>
@@ -244,7 +244,7 @@ export function ActionBuilder({ actions, onChange }: ActionBuilderProps) {
                       ? "border-punk-success/50 bg-punk-success/5"
                       : disabledGroups.includes(group.id)
                         ? "border-punk-cta/50 bg-punk-cta/5"
-                        : "border-punk-border/20 bg-punk-bg hover:border-punk-border/50"
+                        : "border-punk-border/20 bg-punk-surface-raised hover:border-punk-border/50"
                   )}
                 >
                   {/* Icon */}

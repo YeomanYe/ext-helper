@@ -1,7 +1,10 @@
 import * as React from "react"
 import { createRoot } from "react-dom/client"
 import { PopupPage } from "~src/components/PopupPage"
+import { applyStoredThemeDom } from "~src/utils/theme"
 import "~src/styles/globals.css"
+
+applyStoredThemeDom()
 
 function App() {
   return (

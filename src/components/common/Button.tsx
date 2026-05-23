@@ -9,8 +9,8 @@ const buttonVariants = cva(
       variant: {
         default: "punk-btn-primary",
         secondary:
-          "bg-punk-bg-alt text-punk-text-secondary border border-punk-border/30 hover:text-punk-primary hover:border-punk-primary hover:shadow-[0_0_10px_rgba(124,58,237,0.5)]",
-        ghost: "text-punk-text-secondary hover:text-punk-accent hover:bg-punk-bg-alt",
+          "bg-punk-surface-raised text-punk-text-secondary border border-punk-border/30 hover:text-punk-primary hover:border-punk-primary hover:shadow-punk-hard",
+        ghost: "text-punk-text-secondary hover:text-punk-accent hover:bg-punk-surface-soft",
         destructive:
           "bg-punk-cta text-white border-2 border-punk-cta shadow-[0_0_10px_rgba(244,63,94,0.5)] hover:bg-punk-cta/80 hover:shadow-[0_0_20px_rgba(244,63,94,0.8)]",
         accent:

@@ -42,10 +42,10 @@ function RuleFilterDropdown({
         onClick={handleToggle}
         className={cn(
           "flex items-center gap-2 px-3 h-9",
-          "border border-punk-border/50 bg-punk-bg-alt",
+          "border border-punk-border/50 bg-punk-surface-raised",
           "font-punk-heading text-[13px] uppercase tracking-wider",
           "text-punk-text-primary",
-          "hover:border-punk-primary hover:shadow-[0_0_10px_rgba(124,58,237,0.3)]",
+          "hover:border-punk-primary hover:shadow-punk-hard",
           "transition-all duration-200"
         )}
       >
@@ -71,7 +71,7 @@ function RuleFilterDropdown({
           <div className="fixed inset-0 z-40" onClick={() => setShowDropdown(false)} />
           <div
             className={cn(
-              "absolute left-0 z-50 min-w-full border border-punk-border bg-punk-bg-alt shadow-[0_0_20px_rgba(124,58,237,0.3)]",
+              "absolute left-0 z-50 min-w-full border border-punk-border bg-punk-surface-raised shadow-punk-panel",
               dropUp ? "bottom-full mb-1" : "top-full mt-1"
             )}
           >
@@ -86,8 +86,8 @@ function RuleFilterDropdown({
                   "w-full px-3 py-2 text-left font-punk-heading text-[13px] uppercase tracking-wider",
                   "transition-all duration-150",
                   value === filter.value
-                    ? "bg-punk-primary text-white"
-                    : "text-punk-text-secondary hover:bg-punk-bg hover:text-punk-text-primary"
+                    ? "bg-punk-primary/12 text-punk-primary"
+                    : "text-punk-text-secondary hover:bg-punk-surface-soft hover:text-punk-text-primary"
                 )}
               >
                 {filter.label}
@@ -231,7 +231,7 @@ export function RuleManager() {
 
       {/* Results count */}
       {(searchQuery || filter !== "all") && (
-        <div className="px-3 py-1 bg-punk-bg/50">
+        <div className="px-3 py-1 bg-punk-surface-soft/70">
           <span className="text-xs text-punk-text-muted">
             {filteredRules.length} / {rules.length} rules
           </span>

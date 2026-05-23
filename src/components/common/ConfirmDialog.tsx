@@ -56,12 +56,12 @@ export function ConfirmDialog({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-punk-bg/80 backdrop-blur-sm"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-punk-bg/70 backdrop-blur-sm"
       onClick={onCancel}
     >
       <div
         className={cn(
-          "w-80 border bg-punk-bg-alt shadow-[0_0_30px_rgba(124,58,237,0.4)] overflow-hidden",
+          "w-80 border bg-punk-surface-raised shadow-punk-panel overflow-hidden",
           borderColor
         )}
         onClick={(e) => e.stopPropagation()}

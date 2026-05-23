@@ -13,6 +13,7 @@ describe("uiStore", () => {
   let addFn: ReturnType<typeof vi.fn>
   let removeFn: ReturnType<typeof vi.fn>
   let toggleFn: ReturnType<typeof vi.fn>
+  let setAttributeFn: ReturnType<typeof vi.fn>
 
   beforeEach(async () => {
     vi.resetModules()
@@ -28,10 +29,12 @@ describe("uiStore", () => {
     addFn = vi.fn()
     removeFn = vi.fn()
     toggleFn = vi.fn()
+    setAttributeFn = vi.fn()
 
     Object.defineProperty(globalThis, "document", {
       value: {
         documentElement: {
+          setAttribute: setAttributeFn,
           classList: {
             add: addFn,
             remove: removeFn,
@@ -71,6 +74,7 @@ describe("uiStore", () => {
 
       expect(useUIStore.getState().theme).toBe("dark")
       expect(addFn).toHaveBeenCalledWith("dark")
+      expect(setAttributeFn).toHaveBeenCalledWith("data-theme", "dark")
       expect(repo.save).toHaveBeenCalledWith({ theme: "dark" })
     })
 
@@ -80,6 +84,7 @@ describe("uiStore", () => {
 
       expect(useUIStore.getState().theme).toBe("light")
       expect(removeFn).toHaveBeenCalledWith("dark")
+      expect(setAttributeFn).toHaveBeenCalledWith("data-theme", "light")
       expect(repo.save).toHaveBeenCalledWith({ theme: "light" })
     })
 
@@ -90,6 +95,7 @@ describe("uiStore", () => {
       expect(useUIStore.getState().theme).toBe("system")
       expect(window.matchMedia).toHaveBeenCalledWith("(prefers-color-scheme: dark)")
       expect(toggleFn).toHaveBeenCalledWith("dark", true)
+      expect(setAttributeFn).toHaveBeenCalledWith("data-theme", "system")
       expect(repo.save).toHaveBeenCalledWith({ theme: "system" })
     })
 
@@ -245,6 +251,7 @@ describe("uiStore", () => {
       expect(state.showDisabled).toBe(false)
       expect(state.viewMode).toBe("detail")
       expect(addFn).toHaveBeenCalledWith("dark")
+      expect(setAttributeFn).toHaveBeenCalledWith("data-theme", "dark")
     })
 
     it("normal: should apply light theme from preferences", async () => {
@@ -261,6 +268,7 @@ describe("uiStore", () => {
       const state = useUIStore.getState()
       expect(state.theme).toBe("light")
       expect(removeFn).toHaveBeenCalledWith("dark")
+      expect(setAttributeFn).toHaveBeenCalledWith("data-theme", "light")
     })
 
     it("normal: should apply system theme from preferences", async () => {
@@ -276,6 +284,7 @@ describe("uiStore", () => {
 
       expect(window.matchMedia).toHaveBeenCalledWith("(prefers-color-scheme: dark)")
       expect(toggleFn).toHaveBeenCalledWith("dark", true)
+      expect(setAttributeFn).toHaveBeenCalledWith("data-theme", "system")
     })
 
     it("edge: should handle missing/empty preferences", async () => {

@@ -64,8 +64,8 @@ export function Tooltip({ content, children, className }: TooltipProps) {
             ref={tooltipRef}
             className={cn(
               "fixed z-[200] px-2.5 py-1.5 pointer-events-none",
-              "border border-punk-neon-cyan/30 bg-punk-bg",
-              "shadow-[0_0_12px_rgba(0,255,255,0.15),0_2px_8px_rgba(0,0,0,0.6)]",
+              "border border-punk-neon-cyan/40 bg-punk-surface-raised",
+              "shadow-punk-panel",
               "font-punk-code text-[11px] text-punk-text-primary leading-relaxed",
               "max-w-[260px]",
               className

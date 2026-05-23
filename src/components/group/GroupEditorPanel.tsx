@@ -37,17 +37,17 @@ export function GroupEditorPanel({
     : GROUP_ICON_MAP[group?.icon || "folder"] || <Folder className="w-4 h-4" />
 
   return (
-    <div className="flex gap-3 px-4 py-2 border-b border-punk-border/30 bg-punk-bg shrink-0">
+    <div className="flex gap-3 px-4 py-2 border-b border-punk-border/30 bg-punk-surface-soft/70 shrink-0">
       <div className="flex-shrink-0 flex items-center">
         {isCreateMode ? (
           <div
-            className="relative w-[72px] h-[72px] border border-punk-border/50 bg-punk-bg rounded overflow-hidden group cursor-pointer"
+            className="relative w-[72px] h-[72px] border border-punk-border/50 bg-punk-surface-raised rounded overflow-hidden group cursor-pointer"
             onClick={() => fileInputRef.current?.click()}
           >
             {editIconUrl ? (
               <>
                 <img src={editIconUrl} alt="" className="w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-punk-bg/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <div className="absolute inset-0 bg-punk-surface-raised/75 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                   <label className="cursor-pointer p-2 text-punk-text-muted hover:text-punk-accent transition-colors">
                     <Upload className="h-5 w-5" />
                   </label>
@@ -68,11 +68,11 @@ export function GroupEditorPanel({
             />
           </div>
         ) : (
-          <div className="relative w-[72px] h-[72px] border border-punk-border/50 bg-punk-bg rounded overflow-hidden group">
+          <div className="relative w-[72px] h-[72px] border border-punk-border/50 bg-punk-surface-raised rounded overflow-hidden group">
             {group?.iconUrl ? (
               <>
                 <img src={group.iconUrl} alt="" className="w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-punk-bg/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <div className="absolute inset-0 bg-punk-surface-raised/75 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                   <label className="cursor-pointer p-2 text-punk-text-muted hover:text-punk-accent transition-colors">
                     <Upload className="h-5 w-5" />
                     <input
@@ -87,7 +87,7 @@ export function GroupEditorPanel({
             ) : (
               <>
                 <div
-                  className="flex flex-col items-center justify-center w-full h-full cursor-pointer hover:bg-punk-bg-alt transition-colors"
+                  className="flex flex-col items-center justify-center w-full h-full cursor-pointer hover:bg-punk-surface-soft transition-colors"
                   style={{ color: group?.color }}
                   onClick={() => fileInputRef.current?.click()}
                 >

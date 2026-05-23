@@ -72,7 +72,7 @@ export function PopupPage() {
   const isBisectResolved = bisectSession.phase === "resolved"
 
   return (
-    <div className="flex h-[600px] flex-col bg-punk-bg">
+    <div className="flex h-[600px] flex-col bg-punk-bg text-punk-text-primary">
       <Header
         viewMode={viewMode}
         onViewModeChange={setViewMode}
@@ -86,7 +86,7 @@ export function PopupPage() {
       />
 
       {/* Tab Bar */}
-      <div className="flex-shrink-0 px-3 pt-2 border-b border-punk-border/30">
+      <div className="flex-shrink-0 border-b border-punk-border/30 bg-punk-surface-soft/45 px-3 pt-2">
         <div className="flex items-center gap-1">
           <button
             onClick={() => setActiveTab("extensions")}

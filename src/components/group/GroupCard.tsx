@@ -52,12 +52,12 @@ export function GroupCard({
   }, [])
 
   return (
-    <div className="border transition-all punk-border bg-punk-bg-alt hover:border-punk-primary hover:shadow-[0_0_15px_rgba(124,58,237,0.3)]">
+    <div className="border transition-all punk-border bg-punk-surface-raised hover:border-punk-primary hover:shadow-punk-panel">
       {/* Group Header */}
       <div
         className={cn(
           "flex items-center gap-2 px-3 py-2 cursor-pointer",
-          "hover:bg-punk-bg/50",
+          "hover:bg-punk-surface-soft",
           "transition-colors duration-150"
         )}
         onClick={onToggleExpand}
@@ -93,14 +93,14 @@ export function GroupCard({
           </button>
 
           {showMenu && (
-            <div className="absolute right-0 top-full z-50 mt-1 w-32 border border-punk-border bg-punk-bg-alt py-1 shadow-[0_0_20px_rgba(124,58,237,0.3)]">
+            <div className="absolute right-0 top-full z-50 mt-1 w-32 border border-punk-border bg-punk-surface-raised py-1 shadow-punk-panel">
               <button
                 onClick={(e) => {
                   e.stopPropagation()
                   onRename()
                   setShowMenu(false)
                 }}
-                className="flex w-full items-center gap-2 px-3 py-1.5 text-left font-punk-body text-[13px] text-punk-text-secondary hover:text-punk-accent hover:bg-punk-bg transition-colors"
+                className="flex w-full items-center gap-2 px-3 py-1.5 text-left font-punk-body text-[13px] text-punk-text-secondary hover:text-punk-accent hover:bg-punk-surface-soft transition-colors"
               >
                 <Edit2 className="h-3 w-3" />
                 RENAME
@@ -171,7 +171,7 @@ export function CreateGroupCard({ onClick }: CreateGroupCardProps) {
       className={cn(
         "flex items-center justify-center gap-2 border border-dashed border-punk-border/50",
         "px-3 py-2 font-punk-heading text-[13px] uppercase text-punk-text-muted",
-        "hover:border-punk-primary hover:text-punk-accent hover:shadow-[0_0_10px_rgba(124,58,237,0.3)]",
+        "hover:border-punk-primary hover:text-punk-accent hover:shadow-punk-hard",
         "transition-all duration-200"
       )}
     >

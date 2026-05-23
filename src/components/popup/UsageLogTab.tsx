@@ -35,7 +35,7 @@ function StatTile({ action, count }: { action: UsageLogAction; count: number }) 
   const Icon = ACTION_ICONS[action]
 
   return (
-    <div className="border border-punk-border/40 bg-punk-bg-alt/70 px-3 py-2">
+    <div className="border border-punk-border/40 bg-punk-surface-raised px-3 py-2 shadow-punk-hard">
       <div className="flex items-center justify-between gap-2">
         <span className="font-punk-body text-[11px] text-punk-text-muted">
           {ACTION_LABELS[action]}
@@ -59,7 +59,7 @@ function EventIcon({ event }: { event: UsageLogEvent }) {
 
   return (
     <div className="relative mt-0.5 h-10 w-10 flex-shrink-0">
-      <div className="flex h-10 w-10 items-center justify-center overflow-hidden border border-punk-border/50 bg-punk-bg font-punk-heading text-sm text-punk-text-primary">
+      <div className="flex h-10 w-10 items-center justify-center overflow-hidden border border-punk-border/50 bg-punk-surface-soft font-punk-heading text-sm text-punk-text-primary">
         {showImage ? (
           <img
             src={event.iconUrl ?? undefined}
@@ -92,7 +92,7 @@ function EventIcon({ event }: { event: UsageLogEvent }) {
 
 function EventRow({ event }: { event: UsageLogEvent }) {
   return (
-    <li className="border border-punk-border/30 bg-punk-bg-alt/50 px-3 py-2">
+    <li className="border border-punk-border/30 bg-punk-surface-raised px-3 py-2">
       <div className="flex items-start gap-3">
         <EventIcon event={event} />
         <div className="min-w-0 flex-1">
@@ -168,7 +168,7 @@ export function UsageLogTab() {
 
       <div className="flex-1 overflow-y-auto px-3 py-3">
         {events.length === 0 ? (
-          <div className="flex h-full min-h-[220px] items-center justify-center border border-dashed border-punk-border/50 bg-punk-bg-alt/30">
+          <div className="flex h-full min-h-[220px] items-center justify-center border border-dashed border-punk-border/50 bg-punk-surface-soft/70">
             <div className="text-center">
               <Activity className="mx-auto h-8 w-8 text-punk-text-muted" />
               <div className="mt-3 font-punk-heading text-sm text-punk-text-primary">

@@ -8,22 +8,25 @@ export default {
     extend: {
       colors: {
         punk: {
-          primary: '#7C3AED',      // Neon Purple
-          secondary: '#A78BFA',    // Light Purple
-          cta: '#F43F5E',         // Rose Red
-          accent: '#22D3EE',       // Cyan
-          success: '#10B981',       // Neon Green
-          warning: '#FBBF24',      // Amber
-          error: '#F43F5E',        // Rose
-          bg: '#0F0F23',           // Deep Dark Blue
-          'bg-alt': '#1A1A2E',     // Slightly lighter dark
-          border: '#7C3AED',       // Purple border (glowing)
-          'text-primary': '#E2E8F0', // Light text
-          'text-secondary': '#94A3B8', // Muted text
-          'text-muted': '#78859B', // Muted (WCAG AA compliant)
-          'neon-pink': '#FF00FF',  // Magenta
-          'neon-cyan': '#00FFFF',   // Cyan
-          'neon-yellow': '#FFFF00', // Yellow
+          primary: 'rgb(var(--punk-primary-rgb) / <alpha-value>)',
+          secondary: 'rgb(var(--punk-secondary-rgb) / <alpha-value>)',
+          cta: 'rgb(var(--punk-cta-rgb) / <alpha-value>)',
+          accent: 'rgb(var(--punk-accent-rgb) / <alpha-value>)',
+          success: 'rgb(var(--punk-success-rgb) / <alpha-value>)',
+          warning: 'rgb(var(--punk-warning-rgb) / <alpha-value>)',
+          error: 'rgb(var(--punk-error-rgb) / <alpha-value>)',
+          bg: 'rgb(var(--punk-bg-rgb) / <alpha-value>)',
+          'bg-alt': 'rgb(var(--punk-bg-alt-rgb) / <alpha-value>)',
+          'surface-soft': 'rgb(var(--punk-surface-soft-rgb) / <alpha-value>)',
+          'surface-raised': 'rgb(var(--punk-surface-raised-rgb) / <alpha-value>)',
+          'surface-inset': 'rgb(var(--punk-surface-inset-rgb) / <alpha-value>)',
+          border: 'rgb(var(--punk-border-rgb) / <alpha-value>)',
+          'text-primary': 'rgb(var(--punk-text-primary-rgb) / <alpha-value>)',
+          'text-secondary': 'rgb(var(--punk-text-secondary-rgb) / <alpha-value>)',
+          'text-muted': 'rgb(var(--punk-text-muted-rgb) / <alpha-value>)',
+          'neon-pink': 'rgb(var(--punk-neon-pink-rgb) / <alpha-value>)',
+          'neon-cyan': 'rgb(var(--punk-neon-cyan-rgb) / <alpha-value>)',
+          'neon-yellow': 'rgb(var(--punk-neon-yellow-rgb) / <alpha-value>)',
         }
       },
       fontFamily: {
@@ -33,11 +36,18 @@ export default {
         sans: ['"Noto Sans SC"', '"JetBrains Mono"', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif']
       },
       boxShadow: {
-        'neon-purple': '0 0 5px #7C3AED, 0 0 20px #7C3AED, 0 0 40px #7C3AED',
-        'neon-pink': '0 0 5px #FF00FF, 0 0 20px #FF00FF, 0 0 40px #FF00FF',
-        'neon-cyan': '0 0 5px #00FFFF, 0 0 20px #00FFFF, 0 0 40px #00FFFF',
-        'neon-cta': '0 0 5px #F43F5E, 0 0 20px #F43F5E, 0 0 40px #F43F5E',
-        'neon-success': '0 0 5px #10B981, 0 0 20px #10B981, 0 0 40px #10B981',
+        'neon-purple':
+          '0 0 5px rgb(var(--punk-primary-rgb) / 0.55), 0 0 20px rgb(var(--punk-primary-rgb) / 0.35), 0 0 40px rgb(var(--punk-primary-rgb) / 0.25)',
+        'neon-pink':
+          '0 0 5px rgb(var(--punk-neon-pink-rgb) / 0.55), 0 0 20px rgb(var(--punk-neon-pink-rgb) / 0.35), 0 0 40px rgb(var(--punk-neon-pink-rgb) / 0.25)',
+        'neon-cyan':
+          '0 0 5px rgb(var(--punk-neon-cyan-rgb) / 0.55), 0 0 20px rgb(var(--punk-neon-cyan-rgb) / 0.35), 0 0 40px rgb(var(--punk-neon-cyan-rgb) / 0.25)',
+        'neon-cta':
+          '0 0 5px rgb(var(--punk-cta-rgb) / 0.55), 0 0 20px rgb(var(--punk-cta-rgb) / 0.35), 0 0 40px rgb(var(--punk-cta-rgb) / 0.25)',
+        'neon-success':
+          '0 0 5px rgb(var(--punk-success-rgb) / 0.55), 0 0 20px rgb(var(--punk-success-rgb) / 0.35), 0 0 40px rgb(var(--punk-success-rgb) / 0.25)',
+        'punk-hard': 'var(--punk-hard-shadow)',
+        'punk-panel': 'var(--punk-panel-shadow)',
       },
       animation: {
         'glitch': 'glitch 0.5s infinite',

@@ -1,21 +1,11 @@
 import { create } from "zustand"
 import type { Preferences, UIStore, ViewMode } from "@/types"
 import { preferencesRepo } from "@/services/preferencesRepo"
+import { applyThemeDom } from "@/utils/theme"
 
 type PreferenceUpdates = Partial<
   Pick<Preferences, "theme" | "compactMode" | "showDisabled" | "viewMode">
 >
-
-function applyTheme(theme: Preferences["theme"]) {
-  if (theme === "dark") {
-    document.documentElement.classList.add("dark")
-  } else if (theme === "light") {
-    document.documentElement.classList.remove("dark")
-  } else {
-    const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches
-    document.documentElement.classList.toggle("dark", isDark)
-  }
-}
 
 export const useUIStore = create<UIStore>((set, get) => ({
   theme: "system",
@@ -26,7 +16,7 @@ export const useUIStore = create<UIStore>((set, get) => ({
 
   setTheme: async (theme: Preferences["theme"]) => {
     set({ theme, lastUpdate: Date.now() })
-    applyTheme(theme)
+    applyThemeDom(theme)
     try {
       await preferencesRepo.save({ theme })
     } catch (error) {
@@ -90,7 +80,9 @@ export async function initializeUIStore() {
       }
 
       useUIStore.setState(nextState)
-      applyTheme(nextState.theme ?? useUIStore.getState().theme)
+      applyThemeDom(nextState.theme ?? useUIStore.getState().theme)
+    } else {
+      applyThemeDom(useUIStore.getState().theme)
     }
   } catch (error) {
     console.error("Failed to initialize UI store:", error)
