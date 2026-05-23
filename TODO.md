@@ -4,7 +4,7 @@
 
 - [x] `extension-usage-log` 扩展使用日志 — 记录扩展启用/禁用/安装/卸载历史，统计使用情况
 - [x] `config-log-import-export` 配置与日志导入导出 — 支持导出和导入 Groups、Rules、偏好设置等本地配置，以及扩展使用日志 (交互入口放在右上角显示模式切换控件右侧的图标；使用弹窗展示导入导出设置；导入前必须有预览和确认；日志部分依赖 extension-usage-log 的日志数据结构)
-- [ ] `theme-toggle` 主题切换 — 支持深色 / 浅色 / 跟随系统三态 (由 uiStore 管理；popup 与 dev:web preview 共用主题逻辑；FOUC 防抖参考 tab-shelf 的 inline head script 方案)
+- [x] `theme-toggle` 主题切换 — 支持深色 / 浅色 / 跟随系统三态 (由 uiStore 管理；popup 与 dev:web preview 共用主题逻辑；FOUC 防抖参考 tab-shelf 的 inline head script 方案)
 - [ ] `ai-group-suggestions` 大模型快速分组 — 在创建与更新分组面板中用大模型快速选择合适的扩展 (在创建/更新分组面板增加机器人图标按钮；点击后根据扩展名称、描述、权限和当前分组目标推荐候选扩展；设置中支持本地模型和远程模型；大模型接入逻辑借鉴 /Users/ym/Documents/projects/ai-bookmark)
 - [ ] `site-applicable-extensions` 当前网站可用扩展识别 — 在当前网站上下文中，标记已安装扩展里哪些适用于此站点 (基于权限、host matches、用户使用记录)
 - [ ] `cloud-extension-recommendation` 云端推荐可用扩展 — 查询云端目录，推荐可以用在当前网站上的扩展 (按域名匹配、社区评分、用户已安装情况过滤)
