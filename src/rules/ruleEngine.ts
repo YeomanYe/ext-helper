@@ -14,6 +14,7 @@ import { domainMatcher } from "./domainMatcher"
 import { browserAdapter } from "@/services/browser/adapter"
 import { groupsRepo } from "@/services/groupsRepo"
 import { rulesRepo } from "@/services/rulesRepo"
+import { logger } from "@/utils/logger"
 
 export class RuleEngine {
   /**
@@ -158,7 +159,7 @@ export class RuleEngine {
           }
         }
       } catch (error) {
-        console.error(`Failed to execute action ${action.type}:`, error)
+        logger.error(`Failed to execute action ${action.type}:`, error)
       }
     }
   }
@@ -172,7 +173,7 @@ export class RuleEngine {
         try {
           await browserAdapter.setExtensionEnabled(extId, enabled)
         } catch (error) {
-          console.error(`Failed to ${enabled ? "enable" : "disable"} extension ${extId}:`, error)
+          logger.error(`Failed to ${enabled ? "enable" : "disable"} extension ${extId}:`, error)
         }
       }
     }

@@ -1,6 +1,6 @@
 import * as React from "react"
 import { Trash2, Plus, X, Calendar, ChevronDown, Clock } from "lucide-react"
-import { cn } from "@/utils"
+import { cn, generateId } from "@/utils"
 import { useClickOutside } from "@/hooks/useClickOutside"
 import type { ConditionGroup, MatchMode } from "@/rules/types"
 import { DAYS_OF_WEEK, MATCH_MODES } from "@/rules/types"
@@ -8,10 +8,6 @@ import { DAYS_OF_WEEK, MATCH_MODES } from "@/rules/types"
 interface ConditionBuilderProps {
   conditions: ConditionGroup[]
   onChange: (conditions: ConditionGroup[]) => void
-}
-
-function generateId() {
-  return Math.random().toString(36).substring(2, 9)
 }
 
 export function ConditionBuilder({ conditions, onChange }: ConditionBuilderProps) {

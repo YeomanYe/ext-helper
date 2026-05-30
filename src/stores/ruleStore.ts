@@ -6,6 +6,7 @@ import { create } from "zustand"
 import type { Rule, RuleStore } from "@/rules/types"
 import { rulesRepo } from "@/services/rulesRepo"
 import { runOptimisticMutation } from "@/stores/optimistic"
+import { logger } from "@/utils/logger"
 
 export const useRuleStore = create<RuleStore>((set, get) => ({
   rules: [],
@@ -41,7 +42,7 @@ export const useRuleStore = create<RuleStore>((set, get) => ({
       persist: () => rulesRepo.saveAll(newRules),
       rollback: (snapshot) => ({ rules: snapshot }),
       onError: (error) => {
-        console.error("Failed to save rule:", error)
+        logger.error("Failed to save rule:", error)
         return { error: "Failed to save rule" }
       },
     })
@@ -58,7 +59,7 @@ export const useRuleStore = create<RuleStore>((set, get) => ({
       persist: () => rulesRepo.saveAll(newRules),
       rollback: (snapshot) => ({ rules: snapshot }),
       onError: (error) => {
-        console.error("Failed to update rule:", error)
+        logger.error("Failed to update rule:", error)
         return { error: "Failed to update rule" }
       },
     })
@@ -73,7 +74,7 @@ export const useRuleStore = create<RuleStore>((set, get) => ({
       persist: () => rulesRepo.saveAll(newRules),
       rollback: (snapshot) => ({ rules: snapshot }),
       onError: (error) => {
-        console.error("Failed to delete rule:", error)
+        logger.error("Failed to delete rule:", error)
         return { error: "Failed to delete rule" }
       },
     })
@@ -93,7 +94,7 @@ export const useRuleStore = create<RuleStore>((set, get) => ({
       persist: () => rulesRepo.saveAll(newRules),
       rollback: (snapshot) => ({ rules: snapshot }),
       onError: (error) => {
-        console.error("Failed to toggle rule:", error)
+        logger.error("Failed to toggle rule:", error)
         return { error: "Failed to toggle rule" }
       },
     })
@@ -121,7 +122,7 @@ export const useRuleStore = create<RuleStore>((set, get) => ({
       persist: () => rulesRepo.saveAll(newRules),
       rollback: (snapshot) => ({ rules: snapshot }),
       onError: (error) => {
-        console.error("Failed to duplicate rule:", error)
+        logger.error("Failed to duplicate rule:", error)
         return { error: "Failed to duplicate rule" }
       },
     })

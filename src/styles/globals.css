@@ -416,9 +416,7 @@ input.punk-input {
 :is(html[data-theme="light"], html[data-theme="system"]:not(.dark)) input.punk-input {
   background: var(--punk-surface-raised);
   border-color: rgb(var(--punk-border-rgb) / 0.9);
-  box-shadow:
-    inset 4px 4px 0 rgb(var(--punk-surface-inset-rgb) / 0.75),
-    2px 2px 0 rgb(17 17 17 / 0.08);
+  box-shadow: 2px 2px 0 rgb(17 17 17 / 0.08);
 }
 
 input.punk-input:focus {
@@ -432,7 +430,6 @@ input.punk-input:focus {
 :is(html[data-theme="light"], html[data-theme="system"]:not(.dark)) input.punk-input:focus {
   border-color: var(--punk-primary);
   box-shadow:
-    inset 4px 4px 0 rgb(var(--punk-surface-inset-rgb) / 0.65),
     0 0 0 2px rgb(var(--punk-accent-rgb) / 0.32),
     4px 4px 0 rgb(17 17 17 / 0.16);
 }

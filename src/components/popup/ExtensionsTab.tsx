@@ -6,6 +6,7 @@ import { useExtensionStore, useFilteredExtensions, useGroupStore, useUIStore } f
 import { browserAdapter } from "@/services/browser/adapter"
 import { isDevMode } from "@/services/mockData"
 import type { Group } from "@/types"
+import { logger } from "@/utils/logger"
 
 export function ExtensionsTab() {
   // Stable actions (never change — defined at store creation)
@@ -76,7 +77,7 @@ export function ExtensionsTab() {
       try {
         await browserAdapter.openOptionsPage(ext.optionsUrl)
       } catch (err) {
-        console.error("Failed to open options page:", err)
+        logger.error("Failed to open options page:", err)
       }
     },
     [devMode]
@@ -92,7 +93,7 @@ export function ExtensionsTab() {
         await browserAdapter.uninstallExtension(id)
         fetchExtensions()
       } catch (err) {
-        console.error("Failed to uninstall extension:", err)
+        logger.error("Failed to uninstall extension:", err)
       }
     },
     [devMode, fetchExtensions, removeExtension]

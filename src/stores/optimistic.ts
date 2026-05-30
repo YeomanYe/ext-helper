@@ -1,13 +1,17 @@
-import type { StateCreator, StoreApi, UseBoundStore } from "zustand"
-
-type AsyncFn<TArgs extends unknown[]> = (...args: TArgs) => Promise<void>
+import type { StoreApi } from "zustand"
 
 interface OptimisticMutationOptions<TState, TSnapshot> {
   snapshot: (state: TState) => TSnapshot
   apply: (state: TState) => Partial<TState>
-  persist: () => Promise<void>
+  persist: (snapshot: TSnapshot, nextState: TState) => Promise<void>
   rollback: (snapshot: TSnapshot, state: TState) => Partial<TState>
   onError: (error: unknown) => Partial<TState>
+  /**
+   * Optional patch applied AFTER persist() succeeds (e.g. write to history).
+   * Receives the original snapshot AND current state (post-apply, post-persist)
+   * so it can both reference the pre-mutation values and read fresh state.
+   */
+  commit?: (snapshot: TSnapshot, state: TState) => Partial<TState>
 }
 
 export async function runOptimisticMutation<TState, TSnapshot>(
@@ -23,7 +27,13 @@ export async function runOptimisticMutation<TState, TSnapshot>(
   } as Partial<TState>)
 
   try {
-    await options.persist()
+    const afterApply = get()
+    await options.persist(snapshot, afterApply)
+    if (options.commit) {
+      set({
+        ...options.commit(snapshot, get()),
+      } as Partial<TState>)
+    }
   } catch (error) {
     const current = get()
     set({

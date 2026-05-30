@@ -2,6 +2,7 @@ import { create } from "zustand"
 import type { Preferences, UIStore, ViewMode } from "@/types"
 import { preferencesRepo } from "@/services/preferencesRepo"
 import { applyThemeDom } from "@/utils/theme"
+import { logger } from "@/utils/logger"
 
 type PreferenceUpdates = Partial<
   Pick<Preferences, "theme" | "compactMode" | "showDisabled" | "viewMode">
@@ -20,7 +21,7 @@ export const useUIStore = create<UIStore>((set, get) => ({
     try {
       await preferencesRepo.save({ theme })
     } catch (error) {
-      console.error("Failed to save theme preference:", error)
+      logger.error("Failed to save theme preference:", error)
     }
   },
 
@@ -31,7 +32,7 @@ export const useUIStore = create<UIStore>((set, get) => ({
     try {
       await preferencesRepo.save({ compactMode: !compactMode })
     } catch (error) {
-      console.error("Failed to save compact mode preference:", error)
+      logger.error("Failed to save compact mode preference:", error)
     }
   },
 
@@ -42,7 +43,7 @@ export const useUIStore = create<UIStore>((set, get) => ({
     try {
       await preferencesRepo.save({ showDisabled: !showDisabled })
     } catch (error) {
-      console.error("Failed to save show disabled preference:", error)
+      logger.error("Failed to save show disabled preference:", error)
     }
   },
 
@@ -52,7 +53,7 @@ export const useUIStore = create<UIStore>((set, get) => ({
     try {
       await preferencesRepo.save({ viewMode })
     } catch (error) {
-      console.error("Failed to save view mode preference:", error)
+      logger.error("Failed to save view mode preference:", error)
     }
   },
 }))
@@ -85,6 +86,6 @@ export async function initializeUIStore() {
       applyThemeDom(useUIStore.getState().theme)
     }
   } catch (error) {
-    console.error("Failed to initialize UI store:", error)
+    logger.error("Failed to initialize UI store:", error)
   }
 }

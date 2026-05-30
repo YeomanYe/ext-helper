@@ -6,6 +6,12 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function generateId(): string {
+  // Prefer crypto.randomUUID (122 bits of entropy, zero collision risk) when
+  // available. Falls back to timestamp + Math.random for non-secure contexts
+  // (e.g. older test environments without window.crypto).
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID()
+  }
   return `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`
 }
 

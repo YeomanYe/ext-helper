@@ -2,6 +2,7 @@ import { create } from "zustand"
 import type { Group, GroupStore } from "@/types"
 import { groupsRepo } from "@/services/groupsRepo"
 import { runOptimisticMutation } from "@/stores/optimistic"
+import { logger } from "@/utils/logger"
 
 export const useGroupStore = create<GroupStore>((set, get) => ({
   groups: [],
@@ -13,7 +14,7 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
     try {
       set({ groups: await groupsRepo.fetchAll() })
     } catch (error) {
-      console.error("Failed to fetch groups:", error)
+      logger.error("Failed to fetch groups:", error)
       set({ groups: [] })
     }
   },
@@ -39,7 +40,7 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
       persist: () => groupsRepo.saveAll(newGroups),
       rollback: (snapshot) => ({ groups: snapshot }),
       onError: (error) => {
-        console.error("Failed to save group:", error)
+        logger.error("Failed to save group:", error)
         return {}
       },
     })
@@ -63,7 +64,7 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
         activeGroupId: snapshot.activeGroupId,
       }),
       onError: (error) => {
-        console.error("Failed to delete group:", error)
+        logger.error("Failed to delete group:", error)
         return {}
       },
     })
@@ -78,7 +79,7 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
       persist: () => groupsRepo.saveAll(newGroups),
       rollback: (snapshot) => ({ groups: snapshot }),
       onError: (error) => {
-        console.error("Failed to rename group:", error)
+        logger.error("Failed to rename group:", error)
         return {}
       },
     })
@@ -98,7 +99,7 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
       persist: () => groupsRepo.saveAll(newGroups),
       rollback: (snapshot) => ({ groups: snapshot }),
       onError: (error) => {
-        console.error("Failed to update group:", error)
+        logger.error("Failed to update group:", error)
         return {}
       },
     })
@@ -140,7 +141,7 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
       persist: () => groupsRepo.saveAll(newGroups),
       rollback: (snapshot) => ({ groups: snapshot }),
       onError: (error) => {
-        console.error("Failed to add extension to group:", error)
+        logger.error("Failed to add extension to group:", error)
         return {}
       },
     })
@@ -163,7 +164,7 @@ export const useGroupStore = create<GroupStore>((set, get) => ({
       persist: () => groupsRepo.saveAll(newGroups),
       rollback: (snapshot) => ({ groups: snapshot }),
       onError: (error) => {
-        console.error("Failed to remove extension from group:", error)
+        logger.error("Failed to remove extension from group:", error)
         return {}
       },
     })

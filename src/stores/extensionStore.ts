@@ -17,6 +17,7 @@ import {
   withHistoryCleared,
   setPendingHistoryMeta,
 } from "@/stores/extensionStoreUtils"
+import { runOptimisticMutation } from "@/stores/optimistic"
 
 interface ExtensionStoreState extends ExtensionStore {
   history: ExtensionSnapshot[]
@@ -49,6 +50,23 @@ const recordEnabledChanges = async (
     await usageLogRepo.appendMany(events)
   }
 }
+
+// ─── Snapshot shape used by extension-mutation helpers ──────────────────────
+interface ExtensionMutationSnapshot {
+  extensions: Extension[]
+  history: ExtensionSnapshot[]
+  future: ExtensionSnapshot[]
+}
+
+const snapshotExtensions = (state: ExtensionStoreState): ExtensionMutationSnapshot => ({
+  extensions: cloneExtensions(state.extensions),
+  history: state.history,
+  future: state.future,
+})
+
+const errorPatch = (fallback: string) => (error: unknown) => ({
+  error: error instanceof Error ? error.message : fallback,
+})
 
 export const useExtensionStore = create<ExtensionStoreState>((set, get) => ({
   ...initialState,
@@ -88,31 +106,26 @@ export const useExtensionStore = create<ExtensionStoreState>((set, get) => ({
     const currentExtension = state.extensions.find((extension) => extension.id === id)
     if (!currentExtension) return
 
-    const previousExtensions = cloneExtensions(state.extensions)
-    const nextExtensions = state.extensions.map((extension) =>
-      extension.id === id ? { ...extension, enabled: !extension.enabled } : extension
-    )
-
-    set({
-      extensions: nextExtensions,
-      error: null,
-      ...setPendingHistoryMeta(state.history),
+    await runOptimisticMutation<ExtensionStoreState, ExtensionMutationSnapshot>(set, get, {
+      snapshot: snapshotExtensions,
+      apply: (s) => ({
+        extensions: s.extensions.map((extension) =>
+          extension.id === id ? { ...extension, enabled: !extension.enabled } : extension
+        ),
+        error: null,
+        ...setPendingHistoryMeta(s.history),
+      }),
+      persist: async (snap, next) => {
+        await extensionsRepo.setEnabled(id, !currentExtension.enabled)
+        await recordEnabledChanges(snap.extensions, next.extensions)
+      },
+      commit: (snap, s) => buildHistoryMeta([...s.history, snap.extensions], []),
+      rollback: (snap) => ({
+        extensions: snap.extensions,
+        ...buildHistoryMeta(snap.history, snap.future),
+      }),
+      onError: errorPatch("Failed to toggle extension"),
     })
-
-    try {
-      await extensionsRepo.setEnabled(id, !currentExtension.enabled)
-      await recordEnabledChanges(previousExtensions, nextExtensions)
-      set((currentState) => ({
-        ...buildHistoryMeta([...currentState.history, previousExtensions], []),
-        extensions: currentState.extensions,
-      }))
-    } catch (error) {
-      set({
-        extensions: previousExtensions,
-        error: error instanceof Error ? error.message : "Failed to toggle extension",
-        ...buildHistoryMeta(state.history, state.future),
-      })
-    }
   },
 
   removeExtension: async (id: string) => {
@@ -120,28 +133,21 @@ export const useExtensionStore = create<ExtensionStoreState>((set, get) => ({
     if (state.bisectSession.active) return
     if (!state.extensions.some((extension) => extension.id === id)) return
 
-    const previousExtensions = cloneExtensions(state.extensions)
-    const nextExtensions = state.extensions.filter((extension) => extension.id !== id)
-
-    set({
-      extensions: nextExtensions,
-      error: null,
-      ...setPendingHistoryMeta(state.history),
+    await runOptimisticMutation<ExtensionStoreState, ExtensionMutationSnapshot>(set, get, {
+      snapshot: snapshotExtensions,
+      apply: (s) => ({
+        extensions: s.extensions.filter((extension) => extension.id !== id),
+        error: null,
+        ...setPendingHistoryMeta(s.history),
+      }),
+      persist: () => extensionsRepo.remove(id),
+      commit: (snap, s) => buildHistoryMeta([...s.history, snap.extensions], []),
+      rollback: (snap) => ({
+        extensions: snap.extensions,
+        ...buildHistoryMeta(snap.history, snap.future),
+      }),
+      onError: errorPatch("Failed to remove extension"),
     })
-
-    try {
-      await extensionsRepo.remove(id)
-      set((currentState) => ({
-        ...buildHistoryMeta([...currentState.history, previousExtensions], []),
-        extensions: currentState.extensions,
-      }))
-    } catch (error) {
-      set({
-        extensions: previousExtensions,
-        error: error instanceof Error ? error.message : "Failed to remove extension",
-        ...buildHistoryMeta(state.history, state.future),
-      })
-    }
   },
 
   setExtensionsEnabled: async (ids: string[], enabled: boolean) => {
@@ -156,31 +162,26 @@ export const useExtensionStore = create<ExtensionStoreState>((set, get) => ({
     )
     if (!hasChanges) return
 
-    const previousExtensions = cloneExtensions(state.extensions)
-    const nextExtensions = state.extensions.map((extension) =>
-      targetIds.has(extension.id) ? { ...extension, enabled } : extension
-    )
-
-    set({
-      extensions: nextExtensions,
-      error: null,
-      ...setPendingHistoryMeta(state.history),
+    await runOptimisticMutation<ExtensionStoreState, ExtensionMutationSnapshot>(set, get, {
+      snapshot: snapshotExtensions,
+      apply: (s) => ({
+        extensions: s.extensions.map((extension) =>
+          targetIds.has(extension.id) ? { ...extension, enabled } : extension
+        ),
+        error: null,
+        ...setPendingHistoryMeta(s.history),
+      }),
+      persist: async (snap, next) => {
+        await extensionsRepo.applySnapshot(snap.extensions, next.extensions)
+        await recordEnabledChanges(snap.extensions, next.extensions)
+      },
+      commit: (snap, s) => buildHistoryMeta([...s.history, snap.extensions], []),
+      rollback: (snap) => ({
+        extensions: snap.extensions,
+        ...buildHistoryMeta(snap.history, snap.future),
+      }),
+      onError: errorPatch("Failed to update extensions"),
     })
-
-    try {
-      await extensionsRepo.applySnapshot(previousExtensions, nextExtensions)
-      await recordEnabledChanges(previousExtensions, nextExtensions)
-      set((currentState) => ({
-        ...buildHistoryMeta([...currentState.history, previousExtensions], []),
-        extensions: currentState.extensions,
-      }))
-    } catch (error) {
-      set({
-        extensions: previousExtensions,
-        error: error instanceof Error ? error.message : "Failed to update extensions",
-        ...buildHistoryMeta(state.history, state.future),
-      })
-    }
   },
 
   undoExtensions: async () => {
@@ -188,26 +189,25 @@ export const useExtensionStore = create<ExtensionStoreState>((set, get) => ({
     if (state.bisectSession.active || state.history.length === 0) return
 
     const previousExtensions = state.history[state.history.length - 1]
-    const currentExtensions = cloneExtensions(state.extensions)
     const nextHistory = state.history.slice(0, -1)
-    const nextFuture = [...state.future, currentExtensions]
 
-    set({
-      extensions: previousExtensions,
-      error: null,
-      ...buildHistoryMeta(nextHistory, nextFuture),
+    await runOptimisticMutation<ExtensionStoreState, ExtensionMutationSnapshot>(set, get, {
+      snapshot: snapshotExtensions,
+      apply: (s) => ({
+        extensions: previousExtensions,
+        error: null,
+        ...buildHistoryMeta(nextHistory, [...s.future, cloneExtensions(s.extensions)]),
+      }),
+      persist: async (snap) => {
+        await extensionsRepo.applySnapshot(snap.extensions, previousExtensions)
+        await recordEnabledChanges(snap.extensions, previousExtensions)
+      },
+      rollback: (snap) => ({
+        extensions: snap.extensions,
+        ...buildHistoryMeta(snap.history, snap.future),
+      }),
+      onError: errorPatch("Failed to undo extension changes"),
     })
-
-    try {
-      await extensionsRepo.applySnapshot(currentExtensions, previousExtensions)
-      await recordEnabledChanges(currentExtensions, previousExtensions)
-    } catch (error) {
-      set({
-        extensions: currentExtensions,
-        error: error instanceof Error ? error.message : "Failed to undo extension changes",
-        ...buildHistoryMeta(state.history, state.future),
-      })
-    }
   },
 
   redoExtensions: async () => {
@@ -215,26 +215,25 @@ export const useExtensionStore = create<ExtensionStoreState>((set, get) => ({
     if (state.bisectSession.active || state.future.length === 0) return
 
     const nextExtensions = state.future[state.future.length - 1]
-    const currentExtensions = cloneExtensions(state.extensions)
-    const nextHistory = [...state.history, currentExtensions]
     const nextFuture = state.future.slice(0, -1)
 
-    set({
-      extensions: nextExtensions,
-      error: null,
-      ...buildHistoryMeta(nextHistory, nextFuture),
+    await runOptimisticMutation<ExtensionStoreState, ExtensionMutationSnapshot>(set, get, {
+      snapshot: snapshotExtensions,
+      apply: (s) => ({
+        extensions: nextExtensions,
+        error: null,
+        ...buildHistoryMeta([...s.history, cloneExtensions(s.extensions)], nextFuture),
+      }),
+      persist: async (snap) => {
+        await extensionsRepo.applySnapshot(snap.extensions, nextExtensions)
+        await recordEnabledChanges(snap.extensions, nextExtensions)
+      },
+      rollback: (snap) => ({
+        extensions: snap.extensions,
+        ...buildHistoryMeta(snap.history, snap.future),
+      }),
+      onError: errorPatch("Failed to redo extension changes"),
     })
-
-    try {
-      await extensionsRepo.applySnapshot(currentExtensions, nextExtensions)
-      await recordEnabledChanges(currentExtensions, nextExtensions)
-    } catch (error) {
-      set({
-        extensions: currentExtensions,
-        error: error instanceof Error ? error.message : "Failed to redo extension changes",
-        ...buildHistoryMeta(state.history, state.future),
-      })
-    }
   },
 
   startBisect: async () => {
@@ -268,23 +267,28 @@ export const useExtensionStore = create<ExtensionStoreState>((set, get) => ({
       bisectSession.currentTestIds
     )
 
-    set({
-      extensions: nextExtensions,
-      bisectSession,
-      error: null,
-    })
-
-    try {
-      await extensionsRepo.applySnapshot(state.extensions, nextExtensions)
-      await extensionsRepo.saveBisectSession(bisectSession)
-    } catch (error) {
-      set({
-        extensions: state.extensions,
-        bisectSession: state.bisectSession,
-        error: error instanceof Error ? error.message : "Failed to start bisect",
-      })
-      await extensionsRepo.clearBisectSession()
+    interface BisectStartSnapshot {
+      extensions: Extension[]
+      bisectSession: BisectSession
     }
+
+    await runOptimisticMutation<ExtensionStoreState, BisectStartSnapshot>(set, get, {
+      snapshot: (s) => ({ extensions: s.extensions, bisectSession: s.bisectSession }),
+      apply: () => ({ extensions: nextExtensions, bisectSession, error: null }),
+      persist: async (snap) => {
+        await extensionsRepo.applySnapshot(snap.extensions, nextExtensions)
+        await extensionsRepo.saveBisectSession(bisectSession)
+      },
+      rollback: (snap) => ({
+        extensions: snap.extensions,
+        bisectSession: snap.bisectSession,
+      }),
+      onError: (error) => {
+        // Best-effort clear of any partial persisted session
+        void extensionsRepo.clearBisectSession()
+        return { error: error instanceof Error ? error.message : "Failed to start bisect" }
+      },
+    })
   },
 
   markBisectGood: async () => {
@@ -298,39 +302,7 @@ export const useExtensionStore = create<ExtensionStoreState>((set, get) => ({
       return
     }
 
-    const { currentTestIds, parkedIds } = splitCandidateIds(candidateIds)
-    const nextSession: BisectSession = {
-      ...session,
-      phase: candidateIds.length === 1 ? "resolved" : "running",
-      candidateIds,
-      currentTestIds,
-      parkedIds,
-      step: session.step + 1,
-      resultId: candidateIds.length === 1 ? candidateIds[0] : undefined,
-      resultIds: candidateIds.length > 1 ? candidateIds : undefined,
-    }
-    const nextExtensions = buildBisectExtensions(
-      session.baselineExtensions,
-      session.allCandidateIds,
-      nextSession.currentTestIds
-    )
-
-    set({
-      extensions: nextExtensions,
-      bisectSession: nextSession,
-      error: null,
-    })
-
-    try {
-      await extensionsRepo.applySnapshot(state.extensions, nextExtensions)
-      await extensionsRepo.saveBisectSession(nextSession)
-    } catch (error) {
-      set({
-        extensions: state.extensions,
-        bisectSession: session,
-        error: error instanceof Error ? error.message : "Failed to apply bisect result",
-      })
-    }
+    await applyBisectStep(set, get, session, candidateIds, "Failed to apply bisect result")
   },
 
   markBisectBad: async () => {
@@ -344,85 +316,108 @@ export const useExtensionStore = create<ExtensionStoreState>((set, get) => ({
       return
     }
 
-    const { currentTestIds, parkedIds } = splitCandidateIds(candidateIds)
-    const nextSession: BisectSession = {
-      ...session,
-      phase: candidateIds.length === 1 ? "resolved" : "running",
-      candidateIds,
-      currentTestIds,
-      parkedIds,
-      step: session.step + 1,
-      resultId: candidateIds.length === 1 ? candidateIds[0] : undefined,
-      resultIds: candidateIds.length > 1 ? candidateIds : undefined,
-    }
-    const nextExtensions = buildBisectExtensions(
-      session.baselineExtensions,
-      session.allCandidateIds,
-      nextSession.currentTestIds
-    )
-
-    set({
-      extensions: nextExtensions,
-      bisectSession: nextSession,
-      error: null,
-    })
-
-    try {
-      await extensionsRepo.applySnapshot(state.extensions, nextExtensions)
-      await extensionsRepo.saveBisectSession(nextSession)
-    } catch (error) {
-      set({
-        extensions: state.extensions,
-        bisectSession: session,
-        error: error instanceof Error ? error.message : "Failed to apply bisect result",
-      })
-    }
+    await applyBisectStep(set, get, session, candidateIds, "Failed to apply bisect result")
   },
 
   cancelBisect: async () => {
-    const state = get()
-    const session = state.bisectSession
-    if (!session.active) return
-
-    const restoredExtensions = cloneExtensions(session.baselineExtensions)
-    set({ extensions: restoredExtensions, bisectSession: createIdleBisectSession(), error: null })
-
-    try {
-      await extensionsRepo.applySnapshot(state.extensions, restoredExtensions)
-      await extensionsRepo.clearBisectSession()
-    } catch (error) {
-      set({
-        extensions: state.extensions,
-        bisectSession: session,
-        error: error instanceof Error ? error.message : "Failed to cancel bisect",
-      })
-    }
+    await restoreBisectBaseline(set, get, "Failed to cancel bisect")
   },
 
   finishBisectRestore: async () => {
-    const state = get()
-    const session = state.bisectSession
-    if (!session.active) return
-
-    const restoredExtensions = cloneExtensions(session.baselineExtensions)
-    set({ extensions: restoredExtensions, bisectSession: createIdleBisectSession(), error: null })
-
-    try {
-      await extensionsRepo.applySnapshot(state.extensions, restoredExtensions)
-      await extensionsRepo.clearBisectSession()
-    } catch (error) {
-      set({
-        extensions: state.extensions,
-        bisectSession: session,
-        error: error instanceof Error ? error.message : "Failed to restore bisect baseline",
-      })
-    }
+    await restoreBisectBaseline(set, get, "Failed to restore bisect baseline")
   },
 
   setFilter: (filter: FilterType) => set({ filter }),
   setSearchQuery: (searchQuery: string) => set({ searchQuery }),
   setSortBy: (sortBy: SortType) => set({ sortBy }),
 }))
+
+// ─── Bisect step helper (shared by markGood / markBad) ──────────────────────
+interface BisectStepSnapshot {
+  extensions: Extension[]
+  bisectSession: BisectSession
+}
+
+async function applyBisectStep(
+  set: (patch: Partial<ExtensionStoreState>) => void,
+  get: () => ExtensionStoreState,
+  session: BisectSession,
+  candidateIds: string[],
+  errorFallback: string
+): Promise<void> {
+  const { currentTestIds, parkedIds } = splitCandidateIds(candidateIds)
+  const nextSession: BisectSession = {
+    ...session,
+    phase: candidateIds.length === 1 ? "resolved" : "running",
+    candidateIds,
+    currentTestIds,
+    parkedIds,
+    step: session.step + 1,
+    resultId: candidateIds.length === 1 ? candidateIds[0] : undefined,
+    resultIds: candidateIds.length > 1 ? candidateIds : undefined,
+  }
+  const nextExtensions = buildBisectExtensions(
+    session.baselineExtensions,
+    session.allCandidateIds,
+    nextSession.currentTestIds
+  )
+
+  await runOptimisticMutation<ExtensionStoreState, BisectStepSnapshot>(
+    set as never,
+    get as never,
+    {
+      snapshot: (s) => ({ extensions: s.extensions, bisectSession: s.bisectSession }),
+      apply: () => ({
+        extensions: nextExtensions,
+        bisectSession: nextSession,
+        error: null,
+      }),
+      persist: async (snap) => {
+        await extensionsRepo.applySnapshot(snap.extensions, nextExtensions)
+        await extensionsRepo.saveBisectSession(nextSession)
+      },
+      rollback: (snap) => ({
+        extensions: snap.extensions,
+        bisectSession: snap.bisectSession,
+      }),
+      onError: errorPatch(errorFallback),
+    }
+  )
+}
+
+async function restoreBisectBaseline(
+  set: (patch: Partial<ExtensionStoreState>) => void,
+  get: () => ExtensionStoreState,
+  errorFallback: string
+): Promise<void> {
+  const state = get()
+  const session = state.bisectSession
+  if (!session.active) return
+
+  const restoredExtensions = cloneExtensions(session.baselineExtensions)
+
+  await runOptimisticMutation<ExtensionStoreState, BisectStepSnapshot>(
+    set as never,
+    get as never,
+    {
+      snapshot: (s) => ({ extensions: s.extensions, bisectSession: s.bisectSession }),
+      apply: () => ({
+        extensions: restoredExtensions,
+        bisectSession: createIdleBisectSession(),
+        error: null,
+      }),
+      persist: async (snap) => {
+        await extensionsRepo.applySnapshot(snap.extensions, restoredExtensions)
+        await extensionsRepo.clearBisectSession()
+      },
+      rollback: (snap) => ({
+        extensions: snap.extensions,
+        bisectSession: snap.bisectSession,
+      }),
+      onError: errorPatch(errorFallback),
+    }
+  )
+}
 
 export const useFilteredExtensions = () => {
   const extensions = useExtensionStore((s) => s.extensions)

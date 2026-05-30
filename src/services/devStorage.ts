@@ -1,6 +1,7 @@
 // Development mode storage - simulates browser storage in memory
 import type { BisectSession, Extension, Group, UsageLogEvent } from "@/types"
 import type { Rule } from "@/rules/types"
+import { generateId } from "@/utils"
 import { MOCK_EXTENSIONS, MOCK_GROUPS, MOCK_RULES } from "./mockData"
 
 class DevStorage {
@@ -147,9 +148,9 @@ class DevStorage {
     this.notify("rules")
   }
 
-  // Generate ID
+  // Generate ID — delegates to shared utility (which prefers crypto.randomUUID).
   generateId(): string {
-    return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+    return generateId()
   }
 
   // Preferences

@@ -8,14 +8,17 @@ import { ruleEngine } from "@/rules/ruleEngine"
 import { rulesRepo, SYNC_RULES_INDEX, SYNC_RULE_PREFIX } from "@/services/rulesRepo"
 import { createUsageLogEvent, usageLogRepo } from "@/services/usageLogRepo"
 import type { Rule, RuleSettings } from "@/rules/types"
+import { logger } from "@/utils/logger"
 
 class RuleBackgroundService {
   /**
    * 获取设置（每次从 storage 读取，避免 Service Worker 挂起后内存丢失）
    */
   private async getSettings(): Promise<RuleSettings> {
-    const storedSettings = await browserAdapter.getStorage(RULE_SETTINGS_KEY)
-    return { ...DEFAULT_RULE_SETTINGS, ...storedSettings }
+    const storedSettings = await browserAdapter.getStorage<Partial<RuleSettings>>(
+      RULE_SETTINGS_KEY
+    )
+    return { ...DEFAULT_RULE_SETTINGS, ...(storedSettings ?? {}) }
   }
 
   /**
@@ -36,9 +39,9 @@ class RuleBackgroundService {
       this.setupMessageHandler()
       this.setupSyncListener()
 
-      console.log("[RuleBackground] Initialized successfully")
+      logger.log("[RuleBackground] Initialized successfully")
     } catch (error) {
-      console.error("[RuleBackground] Initialization failed:", error)
+      logger.error("[RuleBackground] Initialization failed:", error)
     }
   }
 
@@ -80,11 +83,12 @@ class RuleBackgroundService {
    */
   private setupMessageHandler(): void {
     browserAdapter.onMessage((message, _sender, sendResponse) => {
-      if (message.type === "TRIGGER_RULES_NOW") {
+      const msg = message as { type?: string } | null | undefined
+      if (msg?.type === "TRIGGER_RULES_NOW") {
         this.triggerAllRules()
         sendResponse({ success: true })
       }
-      if (message.type === "GET_RULE_STATUS") {
+      if (msg?.type === "GET_RULE_STATUS") {
         this.getSettings().then((settings) => {
           sendResponse({
             schedulerEnabled: settings.enableScheduler,
@@ -105,7 +109,7 @@ class RuleBackgroundService {
       delayInMinutes: s.schedulerInterval / 60000,
       periodInMinutes: s.schedulerInterval / 60000,
     })
-    console.log(`[RuleBackground] Scheduler started with interval: ${s.schedulerInterval}ms`)
+    logger.log(`[RuleBackground] Scheduler started with interval: ${s.schedulerInterval}ms`)
   }
 
   /**
@@ -113,7 +117,7 @@ class RuleBackgroundService {
    */
   private async stopScheduler(): Promise<void> {
     await browserAdapter.clearAlarm(RULE_ALARM_NAME)
-    console.log("[RuleBackground] Scheduler stopped")
+    logger.log("[RuleBackground] Scheduler stopped")
   }
 
   /**
@@ -143,7 +147,7 @@ class RuleBackgroundService {
       })
 
       if (shouldTrigger) {
-        console.log(`[RuleBackground] Triggering time rule: ${rule.name}`)
+        logger.log(`[RuleBackground] Triggering time rule: ${rule.name}`)
         await ruleEngine.executeActions(rule.actions)
         await ruleEngine.recordTrigger(rule.id)
       }
@@ -171,7 +175,7 @@ class RuleBackgroundService {
       )
 
       if (shouldTrigger) {
-        console.log(`[RuleBackground] Triggering domain rule: ${rule.name} for ${url}`)
+        logger.log(`[RuleBackground] Triggering domain rule: ${rule.name} for ${url}`)
         await ruleEngine.executeActions(rule.actions)
         await ruleEngine.recordTrigger(rule.id)
       }
@@ -199,7 +203,7 @@ class RuleBackgroundService {
         (key) => key === SYNC_RULES_INDEX || key.startsWith(SYNC_RULE_PREFIX)
       )
       if (ruleChanged) {
-        console.log("[RuleBackground] Sync rules changed, re-evaluating")
+        logger.log("[RuleBackground] Sync rules changed, re-evaluating")
         this.checkTimeRules()
       }
     })
@@ -249,9 +253,9 @@ class UsageLogBackgroundService {
         )
       })
 
-      console.log("[UsageLogBackground] Initialized successfully")
+      logger.log("[UsageLogBackground] Initialized successfully")
     } catch (error) {
-      console.error("[UsageLogBackground] Initialization failed:", error)
+      logger.error("[UsageLogBackground] Initialization failed:", error)
     }
   }
 
