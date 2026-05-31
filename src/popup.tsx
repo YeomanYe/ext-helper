@@ -1,17 +1,17 @@
 import * as React from "react"
 import { createRoot } from "react-dom/client"
-import { PopupPage } from "@/components/PopupPage"
-import { applyStoredThemeDom } from "@/utils/theme"
-import "@/styles/globals.css"
+import { PopupPage } from "~src/components/PopupPage"
+import { applyStoredThemeDom } from "~src/utils/theme"
+import "~src/styles/globals.css"
 
 applyStoredThemeDom()
 
-function App() {
+export default function App() {
   return <PopupPage />
 }
 
-// Support both "__plasmo" (Plasmo) and "root" (Vite preview) container IDs
-const container = document.getElementById("__plasmo") || document.getElementById("root")
+// Vite preview mounts here. Plasmo mounts the default export into "__plasmo".
+const container = document.getElementById("root")
 if (container) {
   const root = createRoot(container)
   root.render(

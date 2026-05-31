@@ -107,6 +107,46 @@ export interface Preferences {
   showDisabled: boolean
   sortBy: SortType
   viewMode: ViewMode
+  aiSettings?: AiSettings
+}
+
+export type AiProviderType = "chrome-local" | "openai-compatible" | "manual"
+export type CustomModelProvider = "openai-compatible" | "anthropic-compatible"
+export type AiStatus = "available" | "downloading" | "downloadable" | "unavailable"
+
+export interface AiSettings {
+  enabled: boolean
+  provider: AiProviderType
+  aiStatus?: AiStatus
+  downloadProgress?: number
+  hasCloudKey?: boolean
+  customModelProvider?: CustomModelProvider
+  customModelProviderId?: string
+  customModelBaseUrl?: string
+  customModelName?: string
+  customModelApiKey?: string
+  /** @deprecated use customModelBaseUrl */
+  baseUrl?: string
+  /** @deprecated use customModelName */
+  model: string
+  /** @deprecated use customModelApiKey */
+  apiKey?: string
+  lastTestStatus?: "idle" | "success" | "error"
+  lastTestMessage?: string
+}
+
+export interface ChromeLocalAiStatus {
+  available: boolean
+  message: string
+}
+
+export interface GroupSuggestion {
+  extensionId: string
+  reason: string
+}
+
+export interface GroupSuggestionResult {
+  suggestions: GroupSuggestion[]
 }
 
 export type ImportExportDomain = "groups" | "rules" | "preferences" | "usageLog"

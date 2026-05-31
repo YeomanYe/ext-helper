@@ -135,19 +135,13 @@ async function setExtensionEnabled(id: string, enabled: boolean): Promise<void> 
 }
 
 async function uninstallExtension(id: string): Promise<void> {
-  return withBrowserError(
-    () => browser.management.uninstall(id),
-    "Failed to uninstall extension"
-  )
+  return withBrowserError(() => browser.management.uninstall(id), "Failed to uninstall extension")
 }
 
 async function openOptionsPage(optionsUrl: string): Promise<void> {
-  return withBrowserError(
-    async () => {
-      await browser.tabs.create({ url: optionsUrl })
-    },
-    "Failed to open options page"
-  )
+  return withBrowserError(async () => {
+    await browser.tabs.create({ url: optionsUrl })
+  }, "Failed to open options page")
 }
 
 function onExtensionInstalled(callback: (info: Extension) => void): () => void {
@@ -165,13 +159,34 @@ function onExtensionUninstalled(callback: (id: string) => void): () => void {
 }
 
 function onExtensionEnabledChanged(callback: (info: Extension) => void): () => void {
-  const handler = (info: ExtensionInfo) => callback(formatExtension(info))
-  // @types/chrome (as of 0.0.270) doesn't list onEnabledChanged — it exists in real Chrome.
+  const handleEnabled = (info: ExtensionInfo) =>
+    callback({ ...formatExtension(info), enabled: true })
+  const handleDisabled = (info: ExtensionInfo) =>
+    callback({ ...formatExtension(info), enabled: false })
+  const handleChanged = (info: ExtensionInfo) => callback(formatExtension(info))
+
+  // Chrome/Edge expose separate events. Some polyfills may expose a combined event instead.
   const mgmt = browser.management as typeof browser.management & {
-    onEnabledChanged: chrome.events.Event<(info: ExtensionInfo) => void>
+    onEnabled?: chrome.events.Event<(info: ExtensionInfo) => void>
+    onDisabled?: chrome.events.Event<(info: ExtensionInfo) => void>
+    onEnabledChanged?: chrome.events.Event<(info: ExtensionInfo) => void>
   }
-  mgmt.onEnabledChanged.addListener(handler)
-  return () => mgmt.onEnabledChanged.removeListener(handler)
+
+  if (mgmt.onEnabled || mgmt.onDisabled) {
+    mgmt.onEnabled?.addListener(handleEnabled)
+    mgmt.onDisabled?.addListener(handleDisabled)
+    return () => {
+      mgmt.onEnabled?.removeListener(handleEnabled)
+      mgmt.onDisabled?.removeListener(handleDisabled)
+    }
+  }
+
+  if (mgmt.onEnabledChanged) {
+    mgmt.onEnabledChanged.addListener(handleChanged)
+    return () => mgmt.onEnabledChanged?.removeListener(handleChanged)
+  }
+
+  return () => undefined
 }
 
 // ---------- Storage API ----------
@@ -206,10 +221,7 @@ async function setSyncStorage(key: string, value: unknown): Promise<void> {
 
 async function removeSyncStorage(keys: string[]): Promise<void> {
   if (keys.length === 0) return
-  return withBrowserError(
-    () => browser.storage.sync.remove(keys),
-    "Failed to remove sync storage"
-  )
+  return withBrowserError(() => browser.storage.sync.remove(keys), "Failed to remove sync storage")
 }
 
 type SyncChangeCallback = (changes: Record<string, StorageChange>) => void
@@ -252,11 +264,7 @@ async function getTab(tabId: number): Promise<{ url?: string } | null> {
   }
 }
 
-type TabUpdatedCallback = (
-  tabId: number,
-  changeInfo: chrome.tabs.TabChangeInfo,
-  tab: Tab
-) => void
+type TabUpdatedCallback = (tabId: number, changeInfo: chrome.tabs.TabChangeInfo, tab: Tab) => void
 type TabActivatedCallback = (activeInfo: chrome.tabs.TabActiveInfo) => void
 
 function onTabUpdated(callback: TabUpdatedCallback): () => void {

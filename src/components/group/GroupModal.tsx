@@ -2,9 +2,19 @@ import * as React from "react"
 import { ConfirmDialog } from "@/components/common"
 import { GroupEditorPanel } from "@/components/group/GroupEditorPanel"
 import { GroupExtensionPicker } from "@/components/group/GroupExtensionPicker"
+import { GroupSuggestionDialog } from "@/components/group/GroupSuggestionDialog"
 import type { Group, Extension, FilterType } from "@/types"
 import { cn } from "@/utils"
 import { useGroupStore } from "@/stores/groupStore"
+import { showToast } from "@/stores/toastStore"
+import { preferencesRepo } from "@/services/preferencesRepo"
+import { suggestExtensionsForGroup } from "@/services/groupSuggestionService"
+import type { AiSettings, GroupSuggestion } from "@/types"
+import {
+  defaultAiSettings,
+  getEffectiveAiProvider,
+  normalizeAiSettings,
+} from "@/services/aiSettings"
 
 interface GroupModalProps {
   group?: Group
@@ -27,6 +37,14 @@ interface GroupModalProps {
 
 interface ExtensionWithStatus extends Extension {
   isInGroup: boolean
+}
+
+const getAiSuggestionErrorMessage = (error: unknown) => {
+  if (!(error instanceof Error)) return "AI suggestions failed"
+  if (error instanceof SyntaxError || /JSON|array element/i.test(error.message)) {
+    return "AI returned an unreadable response"
+  }
+  return error.message
 }
 
 export function GroupModal({
@@ -53,6 +71,13 @@ export function GroupModal({
   const [editName, setEditName] = React.useState(group?.name || "New Group")
   const [editIconUrl, setEditIconUrl] = React.useState(group?.iconUrl || "")
   const [selectedExtensions, setSelectedExtensions] = React.useState<Set<string>>(new Set())
+  const [aiSettings, setAiSettings] = React.useState<AiSettings>(defaultAiSettings)
+  const [aiSuggestions, setAiSuggestions] = React.useState<GroupSuggestion[]>([])
+  const [selectedAiSuggestionIds, setSelectedAiSuggestionIds] = React.useState<Set<string>>(
+    new Set()
+  )
+  const [showAiSuggestionDialog, setShowAiSuggestionDialog] = React.useState(false)
+  const [aiLoading, setAiLoading] = React.useState(false)
 
   const groupExtensionIds = React.useMemo(
     () => new Set(group?.extensionIds || []),
@@ -93,13 +118,36 @@ export function GroupModal({
   React.useEffect(() => {
     const handleEsc = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
+        if (showAiSuggestionDialog) {
+          setShowAiSuggestionDialog(false)
+          return
+        }
         onClose()
       }
     }
 
     document.addEventListener("keydown", handleEsc)
     return () => document.removeEventListener("keydown", handleEsc)
-  }, [onClose])
+  }, [onClose, showAiSuggestionDialog])
+
+  React.useEffect(() => {
+    let cancelled = false
+    preferencesRepo
+      .fetch()
+      .then((preferences) => {
+        if (!cancelled) {
+          setAiSettings(normalizeAiSettings(preferences.aiSettings))
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          showToast({ variant: "error", message: "AI settings unavailable" })
+        }
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -156,6 +204,94 @@ export function GroupModal({
     }
   }
 
+  const suggestedExtensionIds = React.useMemo(
+    () => new Set(aiSuggestions.map((suggestion) => suggestion.extensionId)),
+    [aiSuggestions]
+  )
+
+  const suggestionReasons = React.useMemo(
+    () =>
+      new Map(
+        aiSuggestions.map((suggestion) => [suggestion.extensionId, suggestion.reason] as const)
+      ),
+    [aiSuggestions]
+  )
+
+  const effectiveAiProvider = getEffectiveAiProvider(aiSettings)
+
+  const handleRequestAiSuggestions = async () => {
+    if (!editName.trim()) {
+      showToast({ variant: "warning", message: "Name the group before requesting AI suggestions" })
+      return
+    }
+    setAiLoading(true)
+    try {
+      const result = await suggestExtensionsForGroup({
+        settings: aiSettings,
+        groupName: editName.trim(),
+        extensions: allExtensions,
+        currentMemberIds: Array.from(isCreateMode ? selectedExtensions : groupExtensionIds),
+      })
+      if (result.suggestions.length === 0) {
+        setAiSuggestions([])
+        setSelectedAiSuggestionIds(new Set())
+        setShowAiSuggestionDialog(false)
+        showToast({ variant: "warning", message: "AI returned no matching extensions" })
+        return
+      }
+
+      setAiSuggestions(result.suggestions)
+      const currentMemberIds = isCreateMode ? selectedExtensions : groupExtensionIds
+      setSelectedAiSuggestionIds(
+        new Set(
+          result.suggestions
+            .map((suggestion) => suggestion.extensionId)
+            .filter((extensionId) => !currentMemberIds.has(extensionId))
+        )
+      )
+      setShowAiSuggestionDialog(true)
+    } catch (error) {
+      setShowAiSuggestionDialog(false)
+      showToast({
+        variant: "error",
+        message: getAiSuggestionErrorMessage(error),
+      })
+    } finally {
+      setAiLoading(false)
+    }
+  }
+
+  const handleToggleAiSuggestion = (extensionId: string) => {
+    setSelectedAiSuggestionIds((previous) => {
+      const next = new Set(previous)
+      if (next.has(extensionId)) {
+        next.delete(extensionId)
+      } else {
+        next.add(extensionId)
+      }
+      return next
+    })
+  }
+
+  const handleApplySuggestions = (suggestedIds: string[]) => {
+    if (suggestedIds.length === 0) return
+    if (isCreateMode) {
+      setSelectedExtensions((previous) => new Set([...previous, ...suggestedIds]))
+      setShowAiSuggestionDialog(false)
+      setAiSuggestions([])
+      setSelectedAiSuggestionIds(new Set())
+      return
+    }
+
+    if (!group || !onAddExtension) return
+    suggestedIds
+      .filter((extensionId) => !groupExtensionIds.has(extensionId))
+      .forEach((extensionId) => onAddExtension(group.id, extensionId))
+    setShowAiSuggestionDialog(false)
+    setAiSuggestions([])
+    setSelectedAiSuggestionIds(new Set())
+  }
+
   const handleToggleAll = (enabled: boolean) => {
     if (disableEnableControls || !onToggleExtension) return
 
@@ -183,7 +319,7 @@ export function GroupModal({
       onClick={onClose}
     >
       <div
-        className="w-[480px] h-[575px] border border-punk-border bg-punk-surface-raised shadow-punk-panel overflow-hidden flex flex-col"
+        className="relative w-[480px] h-[575px] border border-punk-border bg-punk-surface-raised shadow-punk-panel overflow-hidden flex flex-col"
         onClick={(event) => event.stopPropagation()}
       >
         <GroupEditorPanel
@@ -198,6 +334,9 @@ export function GroupModal({
           onSearchQueryChange={setSearchQuery}
           onFilterChange={setFilter}
           onImageUpload={handleImageUpload}
+          onRequestAiSuggestions={handleRequestAiSuggestions}
+          aiLoading={aiLoading}
+          aiDisabled={effectiveAiProvider === "manual" || allExtensions.length === 0}
         />
 
         {!isCreateMode && (
@@ -208,6 +347,9 @@ export function GroupModal({
             disableEnableControls={disableEnableControls}
             onToggleAll={handleToggleAll}
             onToggleMembership={handleToggleMembership}
+            suggestedExtensionIds={suggestedExtensionIds}
+            suggestionReasons={suggestionReasons}
+            onReviewSuggestions={() => setShowAiSuggestionDialog(true)}
           />
         )}
 
@@ -220,6 +362,9 @@ export function GroupModal({
               showEnableActions={false}
               onToggleAll={() => {}}
               onToggleMembership={handleToggleMembership}
+              suggestedExtensionIds={suggestedExtensionIds}
+              suggestionReasons={suggestionReasons}
+              onReviewSuggestions={() => setShowAiSuggestionDialog(true)}
             />
           </div>
         )}
@@ -268,6 +413,17 @@ export function GroupModal({
             }
           }}
           onCancel={() => setShowDeleteConfirm(false)}
+        />
+        <GroupSuggestionDialog
+          isOpen={showAiSuggestionDialog}
+          groupName={editName.trim() || "New Group"}
+          suggestions={aiSuggestions}
+          extensions={allExtensions}
+          currentMemberIds={isCreateMode ? selectedExtensions : groupExtensionIds}
+          selectedIds={selectedAiSuggestionIds}
+          onToggleSelection={handleToggleAiSuggestion}
+          onConfirm={handleApplySuggestions}
+          onCancel={() => setShowAiSuggestionDialog(false)}
         />
       </div>
     </div>

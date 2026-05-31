@@ -106,6 +106,31 @@ describe("importExportService", () => {
     expect(payload.data).not.toHaveProperty("usageLog")
   })
 
+  it("normal: excludes AI provider settings and API keys from exported preferences", async () => {
+    const { preferencesRepo } = await import("@/services/preferencesRepo")
+    const { createExportPayload } = await import("@/services/importExportService")
+
+    await preferencesRepo.save({
+      theme: "dark",
+      aiSettings: {
+        enabled: true,
+        provider: "openai-compatible",
+        baseUrl: "https://api.example.test/v1",
+        model: "secret-model",
+        apiKey: "secret-key",
+      },
+    })
+
+    const payload = await createExportPayload({
+      domains: ["preferences"],
+      now: () => new Date("2026-05-21T12:00:00.000Z"),
+    })
+
+    expect(payload.data.preferences).toEqual({ theme: "dark" })
+    expect(JSON.stringify(payload)).not.toContain("secret-key")
+    expect(JSON.stringify(payload)).not.toContain("secret-model")
+  })
+
   it("normal: previews valid payloads without writing to repositories", async () => {
     const { groupsRepo } = await import("@/services/groupsRepo")
     const { parseImportPayload } = await import("@/services/importExportService")

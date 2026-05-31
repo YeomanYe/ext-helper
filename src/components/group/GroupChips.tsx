@@ -1,4 +1,4 @@
-import { Folder, Power, PowerOff } from "lucide-react"
+import { Bot, Folder, Power, PowerOff } from "lucide-react"
 import { cn } from "@/utils"
 import type { Group } from "@/types"
 import { GROUP_ICON_MAP } from "./groupVisuals"
@@ -84,13 +84,14 @@ export function CreateGroupChip({ onClick }: CreateGroupChipProps) {
   return (
     <button
       onClick={onClick}
+      title="Create a group and use AI suggestions"
       className={cn(
         "flex items-center gap-2 px-3 py-2 transition-all duration-200",
         "border border-dashed border-punk-accent text-punk-accent bg-punk-accent/5"
       )}
     >
-      <Folder className="h-3.5 w-3.5" />
-      <span className="font-punk-heading text-[12px] uppercase tracking-wider">NEW GROUP</span>
+      <Bot className="h-3.5 w-3.5" />
+      <span className="font-punk-heading text-[12px] uppercase tracking-wider">NEW / AI GROUP</span>
     </button>
   )
 }

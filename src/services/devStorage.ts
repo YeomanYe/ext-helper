@@ -1,5 +1,5 @@
 // Development mode storage - simulates browser storage in memory
-import type { BisectSession, Extension, Group, UsageLogEvent } from "@/types"
+import type { AiSettings, BisectSession, Extension, Group, UsageLogEvent } from "@/types"
 import type { Rule } from "@/rules/types"
 import { generateId } from "@/utils"
 import { MOCK_EXTENSIONS, MOCK_GROUPS, MOCK_RULES } from "./mockData"
@@ -14,6 +14,7 @@ class DevStorage {
     compactMode?: boolean
     showDisabled?: boolean
     viewMode?: string
+    aiSettings?: AiSettings
   } = {}
   private bisectSession: BisectSession | null = null
   private listeners: Map<string, Set<() => void>> = new Map()
@@ -159,6 +160,7 @@ class DevStorage {
     compactMode?: boolean
     showDisabled?: boolean
     viewMode?: string
+    aiSettings?: AiSettings
   } {
     return { ...this.preferences }
   }
@@ -169,6 +171,7 @@ class DevStorage {
       compactMode?: boolean
       showDisabled?: boolean
       viewMode?: string
+      aiSettings?: AiSettings
     }>
   ) {
     this.preferences = { ...this.preferences, ...prefs }

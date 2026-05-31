@@ -362,27 +362,23 @@ async function applyBisectStep(
     nextSession.currentTestIds
   )
 
-  await runOptimisticMutation<ExtensionStoreState, BisectStepSnapshot>(
-    set as never,
-    get as never,
-    {
-      snapshot: (s) => ({ extensions: s.extensions, bisectSession: s.bisectSession }),
-      apply: () => ({
-        extensions: nextExtensions,
-        bisectSession: nextSession,
-        error: null,
-      }),
-      persist: async (snap) => {
-        await extensionsRepo.applySnapshot(snap.extensions, nextExtensions)
-        await extensionsRepo.saveBisectSession(nextSession)
-      },
-      rollback: (snap) => ({
-        extensions: snap.extensions,
-        bisectSession: snap.bisectSession,
-      }),
-      onError: errorPatch(errorFallback),
-    }
-  )
+  await runOptimisticMutation<ExtensionStoreState, BisectStepSnapshot>(set as never, get as never, {
+    snapshot: (s) => ({ extensions: s.extensions, bisectSession: s.bisectSession }),
+    apply: () => ({
+      extensions: nextExtensions,
+      bisectSession: nextSession,
+      error: null,
+    }),
+    persist: async (snap) => {
+      await extensionsRepo.applySnapshot(snap.extensions, nextExtensions)
+      await extensionsRepo.saveBisectSession(nextSession)
+    },
+    rollback: (snap) => ({
+      extensions: snap.extensions,
+      bisectSession: snap.bisectSession,
+    }),
+    onError: errorPatch(errorFallback),
+  })
 }
 
 async function restoreBisectBaseline(
@@ -396,27 +392,23 @@ async function restoreBisectBaseline(
 
   const restoredExtensions = cloneExtensions(session.baselineExtensions)
 
-  await runOptimisticMutation<ExtensionStoreState, BisectStepSnapshot>(
-    set as never,
-    get as never,
-    {
-      snapshot: (s) => ({ extensions: s.extensions, bisectSession: s.bisectSession }),
-      apply: () => ({
-        extensions: restoredExtensions,
-        bisectSession: createIdleBisectSession(),
-        error: null,
-      }),
-      persist: async (snap) => {
-        await extensionsRepo.applySnapshot(snap.extensions, restoredExtensions)
-        await extensionsRepo.clearBisectSession()
-      },
-      rollback: (snap) => ({
-        extensions: snap.extensions,
-        bisectSession: snap.bisectSession,
-      }),
-      onError: errorPatch(errorFallback),
-    }
-  )
+  await runOptimisticMutation<ExtensionStoreState, BisectStepSnapshot>(set as never, get as never, {
+    snapshot: (s) => ({ extensions: s.extensions, bisectSession: s.bisectSession }),
+    apply: () => ({
+      extensions: restoredExtensions,
+      bisectSession: createIdleBisectSession(),
+      error: null,
+    }),
+    persist: async (snap) => {
+      await extensionsRepo.applySnapshot(snap.extensions, restoredExtensions)
+      await extensionsRepo.clearBisectSession()
+    },
+    rollback: (snap) => ({
+      extensions: snap.extensions,
+      bisectSession: snap.bisectSession,
+    }),
+    onError: errorPatch(errorFallback),
+  })
 }
 
 export const useFilteredExtensions = () => {

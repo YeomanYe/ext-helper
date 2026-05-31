@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Folder, Image, Upload } from "lucide-react"
+import { Bot, Folder, Image, Loader2, Upload } from "lucide-react"
 import { SearchBar, GROUP_PANEL_FILTERS } from "@/components/popup"
 import type { FilterType, Group } from "@/types"
 import { GROUP_ICON_MAP } from "./groupVisuals"
@@ -16,6 +16,9 @@ interface GroupEditorPanelProps {
   onSearchQueryChange: (value: string) => void
   onFilterChange: (filter: FilterType) => void
   onImageUpload: (event: React.ChangeEvent<HTMLInputElement>) => void
+  onRequestAiSuggestions: () => void
+  aiLoading: boolean
+  aiDisabled: boolean
 }
 
 export function GroupEditorPanel({
@@ -30,6 +33,9 @@ export function GroupEditorPanel({
   onSearchQueryChange,
   onFilterChange,
   onImageUpload,
+  onRequestAiSuggestions,
+  aiLoading,
+  aiDisabled,
 }: GroupEditorPanelProps) {
   const fileInputRef = React.useRef<HTMLInputElement>(null)
   const groupIcon = group?.iconUrl
@@ -127,6 +133,24 @@ export function GroupEditorPanel({
               className="punk-input w-full h-10 px-3 text-sm"
             />
           </div>
+          <button
+            type="button"
+            onClick={onRequestAiSuggestions}
+            disabled={aiDisabled || aiLoading}
+            aria-label="Suggest extensions with AI"
+            title="Suggest extensions with AI"
+            className={[
+              "mt-6 flex h-10 min-w-[116px] shrink-0 items-center justify-center gap-2 border px-3 transition-all",
+              aiDisabled || aiLoading
+                ? "cursor-not-allowed border-punk-border/30 bg-punk-surface-inset/70 text-punk-text-muted"
+                : "border-punk-accent/50 bg-punk-accent/10 text-punk-accent hover:bg-punk-accent/20 hover:shadow-[0_0_10px_rgba(0,255,255,0.25)]",
+            ].join(" ")}
+          >
+            {aiLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Bot className="h-4 w-4" />}
+            <span className="font-punk-heading text-[11px] uppercase">
+              {aiLoading ? "ASKING" : "AI SUGGEST"}
+            </span>
+          </button>
         </div>
 
         <label className="block font-punk-heading text-[13px] text-punk-text-muted uppercase">

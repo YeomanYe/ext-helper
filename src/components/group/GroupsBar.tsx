@@ -245,7 +245,7 @@ export function GroupsBar({
                     )}
                   >
                     <Plus className="h-3 w-3" />
-                    NEW GROUP
+                    NEW / AI GROUP
                   </button>
                 </div>
               </div>

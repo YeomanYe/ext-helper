@@ -12,6 +12,9 @@ interface GroupExtensionPickerProps {
   filteredExtensions: ExtensionWithStatus[]
   disableEnableControls: boolean
   showEnableActions?: boolean
+  suggestedExtensionIds?: Set<string>
+  suggestionReasons?: Map<string, string>
+  onReviewSuggestions?: () => void
   onToggleAll: (enabled: boolean) => void
   onToggleMembership: (extension: ExtensionWithStatus) => void
 }
@@ -22,6 +25,9 @@ export function GroupExtensionPicker({
   filteredExtensions,
   disableEnableControls,
   showEnableActions = true,
+  suggestedExtensionIds = new Set(),
+  suggestionReasons = new Map(),
+  onReviewSuggestions,
   onToggleAll,
   onToggleMembership,
 }: GroupExtensionPickerProps) {
@@ -64,14 +70,28 @@ export function GroupExtensionPicker({
       )}
 
       <div className="flex gap-2 px-4 py-2 border-b border-punk-border/30 bg-punk-surface-soft/70 shrink-0 overflow-x-auto">
+        {suggestedExtensionIds.size > 0 && (
+          <button
+            type="button"
+            onClick={onReviewSuggestions}
+            className="h-8 shrink-0 border border-punk-accent/60 bg-punk-accent/10 px-2 font-punk-heading text-[11px] uppercase text-punk-accent hover:bg-punk-accent/20"
+          >
+            REVIEW AI ({suggestedExtensionIds.size})
+          </button>
+        )}
         {members.map((extension) => (
           <div
             key={extension.id}
             className={cn(
               "w-8 h-8 flex-shrink-0 border bg-punk-surface-raised flex items-center justify-center overflow-hidden",
-              extension.enabled ? "border-punk-success" : "border-punk-border/30"
+              suggestedExtensionIds.has(extension.id)
+                ? "border-transparent shadow-[0_0_8px_rgba(0,255,255,0.35)]"
+                : extension.enabled
+                  ? "border-punk-success"
+                  : "border-punk-border/30"
             )}
             onClick={() => onToggleMembership(extension)}
+            title={suggestionReasons.get(extension.id)}
           >
             {extension.iconUrl ? (
               <img src={extension.iconUrl} className="w-full h-full object-cover" alt="" />
@@ -98,11 +118,14 @@ export function GroupExtensionPicker({
                 onClick={() => onToggleMembership(extension)}
                 className={cn(
                   "relative flex flex-col items-center justify-center p-2 cursor-pointer transition-all border",
-                  extension.isInGroup
-                    ? "border-punk-success/50 bg-punk-success/5 hover:border-punk-success"
-                    : "border-punk-border/20 bg-punk-surface-raised hover:border-punk-primary/50"
+                  suggestedExtensionIds.has(extension.id)
+                    ? "border-punk-accent bg-punk-accent/10 shadow-[0_0_10px_rgba(0,255,255,0.25)]"
+                    : extension.isInGroup
+                      ? "border-punk-success/50 bg-punk-success/5 hover:border-punk-success"
+                      : "border-punk-border/20 bg-punk-surface-raised hover:border-punk-primary/50"
                 )}
                 style={{ height: "72px" }}
+                title={suggestionReasons.get(extension.id)}
               >
                 <div
                   className={cn(
@@ -120,11 +143,20 @@ export function GroupExtensionPicker({
                 <span
                   className={cn(
                     "font-punk-heading text-[10px] uppercase text-center truncate w-full mt-1",
-                    extension.isInGroup ? "text-punk-text-primary" : "text-punk-text-muted"
+                    suggestedExtensionIds.has(extension.id)
+                      ? "text-punk-accent"
+                      : extension.isInGroup
+                        ? "text-punk-text-primary"
+                        : "text-punk-text-muted"
                   )}
                 >
                   {extension.name.substring(0, 8)}
                 </span>
+                {suggestedExtensionIds.has(extension.id) && (
+                  <span className="absolute bottom-1 left-1 right-1 truncate text-center font-punk-body text-[8px] uppercase text-punk-accent/80">
+                    AI
+                  </span>
+                )}
               </div>
             ))}
           </div>

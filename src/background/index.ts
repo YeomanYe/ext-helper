@@ -15,9 +15,7 @@ class RuleBackgroundService {
    * 获取设置（每次从 storage 读取，避免 Service Worker 挂起后内存丢失）
    */
   private async getSettings(): Promise<RuleSettings> {
-    const storedSettings = await browserAdapter.getStorage<Partial<RuleSettings>>(
-      RULE_SETTINGS_KEY
-    )
+    const storedSettings = await browserAdapter.getStorage<Partial<RuleSettings>>(RULE_SETTINGS_KEY)
     return { ...DEFAULT_RULE_SETTINGS, ...(storedSettings ?? {}) }
   }
 

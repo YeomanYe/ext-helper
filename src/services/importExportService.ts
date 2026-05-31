@@ -77,7 +77,7 @@ const validateGroup = (value: unknown, index: number): Group => {
   if (value.iconUrl !== undefined && !isString(value.iconUrl)) {
     throw new ImportExportError(`groups[${index}].iconUrl must be a string`)
   }
-  return clone(value as Group)
+  return clone(value as unknown as Group)
 }
 
 const validateRule = (value: unknown, index: number): Rule => {
@@ -98,7 +98,7 @@ const validateRule = (value: unknown, index: number): Rule => {
   assertNumber(value.createdAt, `rules[${index}].createdAt`)
   assertNumber(value.updatedAt, `rules[${index}].updatedAt`)
   assertNumber(value.triggerCount, `rules[${index}].triggerCount`)
-  return clone(value as Rule)
+  return clone(value as unknown as Rule)
 }
 
 const validatePreferences = (value: unknown): ImportExportPreferences => {
@@ -112,11 +112,11 @@ const validatePreferences = (value: unknown): ImportExportPreferences => {
   }
   if (value.compactMode !== undefined) {
     assertBoolean(value.compactMode, "preferences.compactMode")
-    preferences.compactMode = value.compactMode
+    if (isBoolean(value.compactMode)) preferences.compactMode = value.compactMode
   }
   if (value.showDisabled !== undefined) {
     assertBoolean(value.showDisabled, "preferences.showDisabled")
-    preferences.showDisabled = value.showDisabled
+    if (isBoolean(value.showDisabled)) preferences.showDisabled = value.showDisabled
   }
   if (value.viewMode !== undefined) {
     if (value.viewMode !== "compact" && value.viewMode !== "card" && value.viewMode !== "detail") {
@@ -147,7 +147,7 @@ const validateUsageLogEvent = (value: unknown, index: number): UsageLogEvent => 
   if (value.iconUrl !== undefined && value.iconUrl !== null && !isString(value.iconUrl)) {
     throw new ImportExportError(`usageLog[${index}].iconUrl must be a string or null`)
   }
-  return clone(value as UsageLogEvent)
+  return clone(value as unknown as UsageLogEvent)
 }
 
 const validatePayload = (value: unknown): ImportExportPayload => {
@@ -156,7 +156,7 @@ const validatePayload = (value: unknown): ImportExportPayload => {
     throw new ImportExportError("Backup version is not compatible with this Ext Helper version")
   }
   assertString(value.exportedAt, "exportedAt")
-  if (Number.isNaN(Date.parse(value.exportedAt))) {
+  if (!isString(value.exportedAt) || Number.isNaN(Date.parse(value.exportedAt))) {
     throw new ImportExportError("exportedAt must be an ISO date")
   }
   if (!isRecord(value.data)) throw new ImportExportError("data must be an object")
@@ -200,7 +200,15 @@ export async function createExportPayload({
 
   if (selected.has("groups")) data.groups = await groupsRepo.fetchAll()
   if (selected.has("rules")) data.rules = await rulesRepo.fetchAll()
-  if (selected.has("preferences")) data.preferences = await preferencesRepo.fetch()
+  if (selected.has("preferences")) {
+    const preferences = await preferencesRepo.fetch()
+    data.preferences = {
+      ...(preferences.theme !== undefined ? { theme: preferences.theme } : {}),
+      ...(preferences.compactMode !== undefined ? { compactMode: preferences.compactMode } : {}),
+      ...(preferences.showDisabled !== undefined ? { showDisabled: preferences.showDisabled } : {}),
+      ...(preferences.viewMode !== undefined ? { viewMode: preferences.viewMode } : {}),
+    }
+  }
   if (selected.has("usageLog")) data.usageLog = await usageLogRepo.fetchAll()
 
   return {

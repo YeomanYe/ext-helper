@@ -3,7 +3,7 @@ import { Header, Footer, ExtensionsActionsMenu, ImportExportDialog } from "@/com
 import { ExtensionsTab } from "@/components/popup/ExtensionsTab"
 import { UsageLogTab } from "@/components/popup/UsageLogTab"
 import { RuleManager } from "@/components/rules"
-import { ErrorBoundary } from "@/components/common/ErrorBoundary"
+import { ErrorBoundary, ToastViewport } from "@/components/common"
 import {
   useExtensionStore,
   useFilteredExtensions,
@@ -178,6 +178,7 @@ export function PopupPage() {
               : totalExtensionsEnabled
         }
       />
+      <ToastViewport />
     </div>
   )
 }

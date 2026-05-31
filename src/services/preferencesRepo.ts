@@ -1,4 +1,4 @@
-import type { Preferences, ViewMode } from "@/types"
+import type { AiSettings, Preferences, ViewMode } from "@/types"
 import { browserAdapter } from "@/services/browser/adapter"
 import { devStorage } from "@/services/devStorage"
 import { isDevMode } from "@/services/mockData"
@@ -10,6 +10,7 @@ type StoredPreferences = Partial<{
   compactMode: boolean
   showDisabled: boolean
   viewMode: ViewMode
+  aiSettings: AiSettings
 }>
 
 export const preferencesRepo = {
