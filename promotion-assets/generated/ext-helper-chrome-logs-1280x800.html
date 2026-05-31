@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ext Helper Logs Promo</title>
+    <style>
+      :root {
+        --paper: #f5f1e7;
+        --paper-strong: #fffdf5;
+        --ink: #27231d;
+        --muted: #6f675c;
+        --green: #00a870;
+        --green-dark: #16845f;
+        --line: rgba(0, 168, 112, 0.34);
+        --line-soft: rgba(39, 35, 29, 0.1);
+        --shadow: rgba(66, 54, 36, 0.22);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
+        background:
+          linear-gradient(rgba(0, 168, 112, 0.035) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(0, 168, 112, 0.028) 1px, transparent 1px),
+          linear-gradient(155deg, #fffdf7 0%, var(--paper) 55%, #e7dfcf 100%);
+        background-size: 32px 32px, 32px 32px, auto;
+        color: var(--ink);
+        font-family: "SF Pro Display", "Segoe UI", Arial, sans-serif;
+      }
+
+      body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: repeating-linear-gradient(
+          0deg,
+          rgba(55, 48, 38, 0.035),
+          rgba(55, 48, 38, 0.035) 1px,
+          transparent 1px,
+          transparent 3px
+        );
+        pointer-events: none;
+      }
+
+      .canvas {
+        width: 1280px;
+        height: 800px;
+        padding: 28px;
+      }
+
+      .frame {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 28px;
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.24)),
+          var(--paper-strong);
+        box-shadow: 0 28px 76px var(--shadow), inset 0 0 0 1px rgba(255, 255, 255, 0.78);
+      }
+
+      .frame::before,
+      .frame::after {
+        content: "";
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        border-color: var(--green);
+        border-style: solid;
+        opacity: 0.9;
+      }
+
+      .frame::before {
+        top: 18px;
+        left: 18px;
+        border-width: 3px 0 0 3px;
+      }
+
+      .frame::after {
+        right: 18px;
+        bottom: 18px;
+        border-width: 0 3px 3px 0;
+      }
+
+      .content {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        grid-template-columns: 0.84fr 1.16fr;
+        gap: 28px;
+        height: 100%;
+        padding: 42px 40px;
+      }
+
+      .copy {
+        display: flex;
+        min-width: 0;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 2px 0 8px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      .app-icon {
+        width: 60px;
+        height: 60px;
+        display: grid;
+        place-items: center;
+        border: 3px solid var(--green-dark);
+        background: #fffdf5;
+        color: var(--green-dark);
+        font-family: "Courier New", monospace;
+        font-size: 36px;
+        font-weight: 900;
+        line-height: 1;
+        box-shadow: 0 14px 34px rgba(0, 168, 112, 0.18);
+      }
+
+      .eyebrow {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--green-dark);
+        font-size: 14px;
+        font-weight: 800;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+      }
+
+      .eyebrow::before {
+        content: "";
+        width: 38px;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--green));
+      }
+
+      .name {
+        margin-top: 5px;
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 800;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        max-width: 520px;
+        margin: 34px 0 0;
+        font-family: "Courier New", monospace;
+        font-size: 64px;
+        font-weight: 900;
+        letter-spacing: 0;
+        line-height: 0.95;
+        text-transform: uppercase;
+      }
+
+      .accent {
+        color: transparent;
+        background: linear-gradient(90deg, #7c3aed 0%, #008f7a 72%);
+        -webkit-background-clip: text;
+        background-clip: text;
+      }
+
+      .lede {
+        max-width: 470px;
+        margin: 24px 0 0;
+        color: var(--muted);
+        font-size: 18px;
+        font-weight: 600;
+        line-height: 1.55;
+      }
+
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 24px;
+      }
+
+      .chip {
+        padding: 9px 14px;
+        border: 1px solid rgba(0, 168, 112, 0.22);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.62);
+        color: #332d25;
+        font-size: 13px;
+        font-weight: 900;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .stat {
+        min-height: 118px;
+        padding: 16px;
+        border: 1px solid rgba(0, 168, 112, 0.14);
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.58);
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.45);
+      }
+
+      .stat strong {
+        display: block;
+        margin-bottom: 10px;
+        font-family: "Courier New", monospace;
+        font-size: 29px;
+        line-height: 1;
+      }
+
+      .stat span {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 900;
+        letter-spacing: 0.08em;
+        line-height: 1.35;
+        text-transform: uppercase;
+      }
+
+      .proof {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 14px;
+        color: var(--muted);
+        font-size: 14px;
+        font-weight: 650;
+      }
+
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        background: var(--green);
+        box-shadow: 0 0 16px rgba(0, 168, 112, 0.45);
+      }
+
+      .stage {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 0;
+      }
+
+      .stage::before {
+        content: "";
+        position: absolute;
+        inset: 7% 3% 9% 11%;
+        border-radius: 40px;
+        background: linear-gradient(135deg, rgba(0, 168, 112, 0.16), rgba(124, 58, 237, 0.08));
+        filter: blur(12px);
+      }
+
+      .screenshot {
+        position: relative;
+        width: 100%;
+        max-width: 700px;
+        height: 652px;
+        overflow: hidden;
+        border: 1px solid rgba(39, 35, 29, 0.14);
+        border-radius: 24px;
+        background: #fffaf0;
+        box-shadow: 0 28px 70px rgba(66, 54, 36, 0.24);
+      }
+
+      .window-bar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        height: 38px;
+        padding: 0 18px;
+        border-bottom: 1px solid rgba(39, 35, 29, 0.12);
+        background: rgba(39, 35, 29, 0.08);
+      }
+
+      .window-bar span {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+      }
+
+      .window-bar span:nth-child(1) {
+        background: #fb7185;
+      }
+
+      .window-bar span:nth-child(2) {
+        background: #fbbf24;
+      }
+
+      .window-bar span:nth-child(3) {
+        background: #34d399;
+      }
+
+      .shot-crop {
+        height: calc(100% - 38px);
+        overflow: hidden;
+      }
+
+      .shot-crop img {
+        width: 100%;
+        height: 100%;
+        display: block;
+        object-fit: cover;
+        object-position: top left;
+      }
+
+      .caption {
+        position: absolute;
+        right: 34px;
+        bottom: 2px;
+        padding: 11px 16px;
+        border-radius: 999px;
+        background: rgba(39, 35, 29, 0.82);
+        color: rgba(255, 255, 255, 0.86);
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .caption strong {
+        color: #fff;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="canvas">
+      <section class="frame">
+        <div class="content">
+          <section class="copy">
+            <div>
+              <div class="brand">
+                <div class="app-icon" aria-hidden="true">E</div>
+                <div>
+                  <div class="eyebrow">Chrome Logs</div>
+                  <div class="name">Ext Helper</div>
+                </div>
+              </div>
+              <h1>Audit every <span class="accent">extension event</span></h1>
+              <p class="lede">
+                See installs, removals, enables, and disables in one clear local usage log.
+              </p>
+              <div class="chips">
+                <span class="chip">Usage Log</span>
+                <span class="chip">Install History</span>
+                <span class="chip">Local Records</span>
+              </div>
+            </div>
+
+            <div>
+              <div class="stats">
+                <div class="stat">
+                  <strong>48</strong>
+                  <span>Captured events</span>
+                </div>
+                <div class="stat">
+                  <strong>100%</strong>
+                  <span>Active extension set</span>
+                </div>
+                <div class="stat">
+                  <strong>4</strong>
+                  <span>Event categories</span>
+                </div>
+              </div>
+              <div class="proof">
+                <span class="dot"></span>
+                <span>Built from the provided light-mode Chrome screenshot</span>
+              </div>
+            </div>
+          </section>
+
+          <section class="stage">
+            <div class="screenshot">
+              <div class="window-bar" aria-hidden="true"><span></span><span></span><span></span></div>
+              <div class="shot-crop">
+                <img src="../../website/public/screenshots/screenshot-light-log.jpg" alt="" />
+              </div>
+              <div class="caption">Feature focus: <strong>Usage Logs</strong></div>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

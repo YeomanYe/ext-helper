@@ -6,12 +6,14 @@ These store assets are rendered from project-owned sources only:
 - `../../website/public/screenshots/screenshot-card.png`
 - `../../website/public/screenshots/screenshot-bisect.png`
 - `../../website/public/screenshots/screenshot-rules.png`
+- `../../website/public/screenshots/screenshot-light-log.jpg`
 - `../../README.md`
 
 Render command:
 
 ```bash
 node promotion-assets/generated/render-store-assets.mjs
+node promotion-assets/generated/render-logs-promo.mjs
 ```
 
 Generated outputs:
@@ -25,7 +27,10 @@ Generated outputs:
 - `ext-helper-automation-1280x800.png`
   - Use: Chrome Web Store / Firefox AMO screenshot
   - Sources: `../../website/public/screenshots/screenshot-rules.png`, `../../assets/icon.png`
-- `ext-helper-chrome-small-promo-440x280.png`
+- `ext-helper-chrome-logs-1280x800.png`
+  - Use: Chrome Web Store / Firefox AMO screenshot
+  - Sources: `../../website/public/screenshots/screenshot-light-log.jpg`, `../../assets/icon.png`
+- `ext-helper-chrome-small-promo-440x280-v2.png`
   - Use: Chrome Web Store small promo tile
   - Sources: `../../assets/icon.png`
 - `ext-helper-chrome-marquee-1400x560.png`
