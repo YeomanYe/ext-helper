@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/).
 
+## [2.0.0] - 2026-05-31
+
+### Added
+
+- 大模型快速分组(`ai-group-suggestions`): 在创建与更新分组面板中加入 AI 建议流程，可根据扩展元数据推荐候选扩展并一键加入分组。
+
 ## [1.3.0] - 2026-05-23
 
 ### Added

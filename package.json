@@ -1,6 +1,6 @@
 {
   "name": "ext-helper",
-  "version": "1.3.0",
+  "version": "2.0.0",
   "description": "Browser extension manager with enable/disable and grouping",
   "author": "Tony Ye (https://github.com/YeomanYe)",
   "type": "module",
@@ -69,7 +69,7 @@
   },
   "manifest": {
     "name": "Ext Helper",
-    "version": "1.3.0",
+    "version": "2.0.0",
     "description": "Browser extension manager with enable/disable and grouping",
     "action": {
       "default_popup": "popup.html"
