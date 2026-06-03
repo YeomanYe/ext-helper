@@ -83,6 +83,18 @@
     "host_permissions": [
       "<all_urls>"
     ],
+    "web_accessible_resources": [
+      {
+        "resources": [
+          "resources/icon-bridge.html",
+          "resources/icon-bridge.js"
+        ],
+        "matches": [
+          "http://*/*",
+          "https://*/*"
+        ]
+      }
+    ],
     "browser_specific_settings": {
       "gecko": {
         "id": "ext-helper@yeomanye.github.io",

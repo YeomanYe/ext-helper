@@ -7,6 +7,8 @@ import { RULE_SETTINGS_KEY, DEFAULT_RULE_SETTINGS, RULE_ALARM_NAME } from "@/rul
 import { ruleEngine } from "@/rules/ruleEngine"
 import { rulesRepo, SYNC_RULES_INDEX, SYNC_RULE_PREFIX } from "@/services/rulesRepo"
 import { createUsageLogEvent, usageLogRepo } from "@/services/usageLogRepo"
+import { extensionsRepo } from "@/services/extensionsRepo"
+import { discoverInstalledExtensionsForSite } from "@/services/siteDiscoveryService"
 import type { Rule, RuleSettings } from "@/rules/types"
 import { logger } from "@/utils/logger"
 
@@ -81,7 +83,10 @@ class RuleBackgroundService {
    */
   private setupMessageHandler(): void {
     browserAdapter.onMessage((message, _sender, sendResponse) => {
-      const msg = message as { type?: string } | null | undefined
+      const msg = message as
+        | { type?: string; url?: string; pageTitle?: string; pageDescription?: string }
+        | null
+        | undefined
       if (msg?.type === "TRIGGER_RULES_NOW") {
         this.triggerAllRules()
         sendResponse({ success: true })
@@ -93,6 +98,32 @@ class RuleBackgroundService {
             domainDetectionEnabled: settings.enableDomainDetection,
           })
         })
+      }
+      if (msg?.type === "DISCOVER_INSTALLED_EXTENSIONS_FOR_SITE") {
+        if (!msg.url) {
+          sendResponse({ success: false, error: "Current URL is required." })
+          return true
+        }
+
+        extensionsRepo
+          .fetchAll()
+          .then((extensions) => {
+            sendResponse({
+              success: true,
+              result: discoverInstalledExtensionsForSite({
+                url: msg.url!,
+                pageTitle: msg.pageTitle,
+                pageDescription: msg.pageDescription,
+                extensions,
+              }),
+            })
+          })
+          .catch((error) => {
+            sendResponse({
+              success: false,
+              error: error instanceof Error ? error.message : "Failed to discover extensions.",
+            })
+          })
       }
       return true
     })
