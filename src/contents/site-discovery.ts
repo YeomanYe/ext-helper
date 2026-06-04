@@ -13,8 +13,31 @@ const EXTENSION_PREFERENCES_KEY = "ext-helper-preferences"
 const THEME_QUERY = "(prefers-color-scheme: dark)"
 const ICON_BRIDGE_REQUEST = "EXT_HELPER_ICON_TO_DATA_URL"
 const ICON_BRIDGE_RESPONSE = "EXT_HELPER_ICON_DATA_URL"
+const EDGE_SNAP_DISTANCE = 28
+const EDGE_GAP = 12
+const COLLAPSED_VISIBLE_WIDTH = 6
+const DRAG_THRESHOLD = 5
+const DOCK_SLIDE_MS = 190
+const COLLAPSE_LOCK_MS = 360
 
 type ExtensionTheme = "light" | "dark" | "system"
+type DockEdge = "left" | "right" | null
+
+interface TriggerPosition {
+  x: number
+  y: number
+  edge: DockEdge
+  collapsed: boolean
+}
+
+interface DragState {
+  pointerId: number
+  startX: number
+  startY: number
+  offsetX: number
+  offsetY: number
+  moved: boolean
+}
 
 interface IconBridgeResponse {
   type?: string
@@ -140,8 +163,8 @@ function createStyles(): HTMLStyleElement {
 
     .eh-trigger {
       position: fixed;
-      right: 20px;
-      bottom: 22px;
+      left: var(--eh-trigger-x, calc(100vw - 154px));
+      top: var(--eh-trigger-y, calc(100vh - 64px));
       z-index: 2147483647;
       display: inline-flex;
       align-items: center;
@@ -158,12 +181,16 @@ function createStyles(): HTMLStyleElement {
       font: 800 11px/1 "Noto Sans SC", "JetBrains Mono", monospace;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      cursor: pointer;
+      cursor: grab;
+      touch-action: none;
+      user-select: none;
       transition:
-        transform 140ms ease,
+        clip-path 160ms ease,
+        left 160ms ease,
         box-shadow 140ms ease,
         background 140ms ease,
-        border-color 140ms ease;
+        border-color 140ms ease,
+        transform 160ms ease;
     }
 
     .eh-trigger::before {
@@ -173,38 +200,213 @@ function createStyles(): HTMLStyleElement {
       width: 20px;
       height: 20px;
       border: 1px solid rgb(255 255 255 / 0.45);
-      color: var(--eh-accent);
+      color: currentColor;
       font: 900 13px/1 "JetBrains Mono", monospace;
     }
 
-    .eh-trigger:hover {
-      border-color: var(--eh-accent);
-      background: var(--eh-secondary);
-      box-shadow:
-        10px 10px 0 rgb(0 0 0 / 0.42),
-        0 0 20px rgb(var(--eh-accent-rgb) / 0.35);
-      transform: translate(-1px, -1px);
+    .eh-trigger::after {
+      content: "";
+      position: absolute;
+      inset: -8px;
     }
 
-    :host([data-theme="light"]) .eh-trigger {
+    .eh-trigger:hover {
+      border-color: var(--eh-border);
       background: var(--eh-primary);
       box-shadow:
         var(--eh-shadow-hard),
-        inset -3px -3px 0 rgb(255 255 255 / 0.12);
+        0 0 14px rgb(var(--eh-primary-rgb) / 0.45);
+      transform: translate(-1px, -1px);
+    }
+
+    .eh-trigger:active,
+    .eh-trigger.is-dragging {
+      cursor: grabbing;
+    }
+
+    .eh-trigger.is-dragging {
+      transition: none;
+      border-color: var(--eh-border);
+      background: var(--eh-primary);
+      color: #ffffff;
+      box-shadow:
+        var(--eh-shadow-hard),
+        0 0 14px rgb(var(--eh-primary-rgb) / 0.45);
+      transform: scale(1.02);
+    }
+
+    .eh-trigger.is-collapsing:not(.is-collapsed),
+    .eh-trigger.is-collapsing:not(.is-collapsed):hover {
+      border-color: var(--eh-border);
+      background: var(--eh-primary);
+      color: #ffffff;
+      box-shadow:
+        var(--eh-shadow-hard),
+        0 0 14px rgb(var(--eh-primary-rgb) / 0.45);
+      transform: translateX(0);
+    }
+
+    .eh-trigger.is-collapsed {
+      min-width: 112px;
+      color: transparent;
+      overflow: hidden;
+      text-shadow: none;
+    }
+
+    .eh-trigger.is-collapsed[data-edge="left"] {
+      background: var(--eh-primary);
+      clip-path: inset(0 calc(100% - ${COLLAPSED_VISIBLE_WIDTH}px) 0 0);
+      transform: translateX(${COLLAPSED_VISIBLE_WIDTH - 1}px);
+      box-shadow:
+        3px 0 0 rgb(0 0 0 / 0.32),
+        0 0 14px rgb(var(--eh-primary-rgb) / 0.36);
+      animation: eh-collapse-left 220ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .eh-trigger.is-collapsed[data-edge="right"] {
+      background: var(--eh-primary);
+      clip-path: inset(0 0 0 calc(100% - ${COLLAPSED_VISIBLE_WIDTH}px));
+      transform: translateX(-${COLLAPSED_VISIBLE_WIDTH - 1}px);
+      box-shadow:
+        -3px 0 0 rgb(0 0 0 / 0.32),
+        0 0 14px rgb(var(--eh-primary-rgb) / 0.36);
+      animation: eh-collapse-right 220ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .eh-trigger.is-collapsed::before {
+      opacity: 0;
+    }
+
+    .eh-trigger.is-collapsed:hover,
+    .eh-trigger.is-collapsed:focus-visible,
+    .eh-trigger.is-open {
+      background: var(--eh-primary);
+      border-color: var(--eh-border);
+      clip-path: inset(0);
+      transform: translateX(0);
+      color: #ffffff;
+    }
+
+    .eh-trigger.is-collapsed:hover::before,
+    .eh-trigger.is-collapsed:focus-visible::before,
+    .eh-trigger.is-open::before {
+      opacity: 1;
+    }
+
+    .eh-trigger.is-collapsing.is-collapsed[data-edge="left"]:hover,
+    .eh-trigger.is-collapsing.is-collapsed[data-edge="left"]:focus-visible {
+      background: var(--eh-primary);
+      clip-path: inset(0 calc(100% - ${COLLAPSED_VISIBLE_WIDTH}px) 0 0);
+      transform: translateX(${COLLAPSED_VISIBLE_WIDTH - 1}px);
+      color: transparent;
+    }
+
+    .eh-trigger.is-collapsing.is-collapsed[data-edge="right"]:hover,
+    .eh-trigger.is-collapsing.is-collapsed[data-edge="right"]:focus-visible {
+      background: var(--eh-primary);
+      clip-path: inset(0 0 0 calc(100% - ${COLLAPSED_VISIBLE_WIDTH}px));
+      transform: translateX(-${COLLAPSED_VISIBLE_WIDTH - 1}px);
+      color: transparent;
+    }
+
+    .eh-trigger.is-collapsing.is-collapsed:hover::before,
+    .eh-trigger.is-collapsing.is-collapsed:focus-visible::before {
+      opacity: 0;
+    }
+
+    :host([data-theme="light"]) .eh-trigger {
+      background: var(--eh-surface-raised);
+      color: var(--eh-text-primary);
+      border-color: var(--eh-primary);
+      box-shadow:
+        var(--eh-shadow-hard),
+        inset -3px -3px 0 rgb(17 17 17 / 0.05);
+    }
+
+    :host([data-theme="light"]) .eh-trigger::before {
+      border-color: rgb(17 17 17 / 0.34);
     }
 
     :host([data-theme="light"]) .eh-trigger:hover {
-      background: var(--eh-accent);
-      color: var(--eh-primary);
+      background: var(--eh-surface-raised);
+      color: var(--eh-text-primary);
       box-shadow:
-        7px 7px 0 rgb(17 17 17 / 0.22),
-        inset -3px -3px 0 rgb(255 253 245 / 0.3);
+        var(--eh-shadow-hard),
+        inset -3px -3px 0 rgb(17 17 17 / 0.05);
+    }
+
+    :host([data-theme="light"]) .eh-trigger.is-dragging,
+    :host([data-theme="light"]) .eh-trigger.is-dragging:hover,
+    :host([data-theme="light"]) .eh-trigger.is-collapsing:not(.is-collapsed),
+    :host([data-theme="light"]) .eh-trigger.is-collapsing:not(.is-collapsed):hover {
+      border-color: var(--eh-primary);
+      background: var(--eh-surface-raised);
+      color: var(--eh-text-primary);
+      box-shadow:
+        var(--eh-shadow-hard),
+        inset -3px -3px 0 rgb(17 17 17 / 0.05);
+    }
+
+    :host([data-theme="light"]) .eh-trigger.is-collapsed {
+      color: transparent;
+      box-shadow:
+        3px 0 0 rgb(17 17 17 / 0.22),
+        0 0 0 1px rgb(17 17 17 / 0.08);
+    }
+
+    :host([data-theme="light"]) .eh-trigger.is-collapsed[data-edge="left"] {
+      background: var(--eh-surface-raised);
+    }
+
+    :host([data-theme="light"]) .eh-trigger.is-collapsed[data-edge="right"] {
+      background: var(--eh-surface-raised);
+    }
+
+    :host([data-theme="light"]) .eh-trigger.is-collapsed:hover,
+    :host([data-theme="light"]) .eh-trigger.is-collapsed:focus-visible,
+    :host([data-theme="light"]) .eh-trigger.is-open {
+      background: var(--eh-surface-raised);
+      border-color: var(--eh-primary);
+      color: var(--eh-text-primary);
+    }
+
+    :host([data-theme="light"]) .eh-trigger.is-collapsing.is-collapsed:hover,
+    :host([data-theme="light"]) .eh-trigger.is-collapsing.is-collapsed:focus-visible {
+      background: var(--eh-surface-raised);
+      color: transparent;
+    }
+
+    :host([data-theme="light"]) .eh-trigger.is-collapsing.is-collapsed[data-edge="right"]:hover,
+    :host([data-theme="light"]) .eh-trigger.is-collapsing.is-collapsed[data-edge="right"]:focus-visible {
+      background: var(--eh-surface-raised);
+    }
+
+    @keyframes eh-collapse-left {
+      from {
+        clip-path: inset(0);
+        transform: translateX(0);
+      }
+      to {
+        clip-path: inset(0 calc(100% - ${COLLAPSED_VISIBLE_WIDTH}px) 0 0);
+        transform: translateX(${COLLAPSED_VISIBLE_WIDTH - 1}px);
+      }
+    }
+
+    @keyframes eh-collapse-right {
+      from {
+        clip-path: inset(0);
+        transform: translateX(0);
+      }
+      to {
+        clip-path: inset(0 0 0 calc(100% - ${COLLAPSED_VISIBLE_WIDTH}px));
+        transform: translateX(-${COLLAPSED_VISIBLE_WIDTH - 1}px);
+      }
     }
 
     .eh-panel {
       position: fixed;
-      right: 20px;
-      bottom: 72px;
+      left: var(--eh-panel-x, calc(100vw - 440px));
+      top: var(--eh-panel-y, calc(100vh - 560px));
       z-index: 2147483647;
       width: min(420px, calc(100vw - 32px));
       max-height: min(640px, calc(100vh - 96px));
@@ -248,6 +450,23 @@ function createStyles(): HTMLStyleElement {
       border-bottom: 2px solid var(--eh-accent);
     }
 
+    :host([data-theme="light"]) .eh-panel {
+      border: 2px solid var(--eh-primary);
+      box-shadow:
+        var(--eh-shadow-panel),
+        inset 4px 0 0 rgb(var(--eh-accent-rgb) / 0.75);
+    }
+
+    :host([data-theme="light"]) .eh-panel::before {
+      border-top-color: var(--eh-primary);
+      border-left-color: var(--eh-primary);
+    }
+
+    :host([data-theme="light"]) .eh-panel::after {
+      border-right-color: var(--eh-primary);
+      border-bottom-color: var(--eh-primary);
+    }
+
     .eh-hidden {
       display: none;
     }
@@ -260,6 +479,13 @@ function createStyles(): HTMLStyleElement {
       border-bottom: 1px solid rgb(var(--eh-accent-rgb) / 0.18);
       background:
         linear-gradient(90deg, rgb(var(--eh-accent-rgb) / 0.08), transparent 58%),
+        var(--eh-surface-raised);
+    }
+
+    :host([data-theme="light"]) .eh-header {
+      border-bottom-color: rgb(var(--eh-border-rgb) / 0.4);
+      background:
+        linear-gradient(90deg, rgb(var(--eh-accent-rgb) / 0.1), transparent 58%),
         var(--eh-surface-raised);
     }
 
@@ -516,6 +742,11 @@ function createStyles(): HTMLStyleElement {
       background: rgb(var(--eh-bg-rgb) / 0.34);
     }
 
+    :host([data-theme="light"]) .eh-footer {
+      border-top-color: rgb(var(--eh-border-rgb) / 0.28);
+      background: rgb(var(--eh-bg-rgb) / 0.58);
+    }
+
     .eh-query {
       margin: 0 0 8px;
       color: var(--eh-text-muted);
@@ -553,6 +784,10 @@ function createStyles(): HTMLStyleElement {
       .eh-card,
       .eh-close {
         transition: none;
+      }
+
+      .eh-trigger.is-collapsed {
+        animation: none;
       }
     }
   `
@@ -771,6 +1006,115 @@ function getMetaDescription(): string {
   return ""
 }
 
+function getDefaultTriggerPosition(trigger: HTMLElement): TriggerPosition {
+  const width = trigger.offsetWidth || 136
+  const height = trigger.offsetHeight || 42
+  return {
+    x: Math.max(EDGE_GAP, window.innerWidth - width - 20),
+    y: Math.max(EDGE_GAP, window.innerHeight - height - 22),
+    edge: null,
+    collapsed: false,
+  }
+}
+
+function clampTriggerPosition(
+  position: Pick<TriggerPosition, "x" | "y">,
+  trigger: HTMLElement
+): Pick<TriggerPosition, "x" | "y"> {
+  const width = trigger.offsetWidth || 136
+  const height = trigger.offsetHeight || 42
+  return {
+    x: Math.min(
+      Math.max(EDGE_GAP, position.x),
+      Math.max(EDGE_GAP, window.innerWidth - width - EDGE_GAP)
+    ),
+    y: Math.min(
+      Math.max(EDGE_GAP, position.y),
+      Math.max(EDGE_GAP, window.innerHeight - height - EDGE_GAP)
+    ),
+  }
+}
+
+function getDockedPosition(
+  position: Pick<TriggerPosition, "x" | "y">,
+  trigger: HTMLElement
+): TriggerPosition {
+  const width = trigger.offsetWidth || 136
+  const rightDistance = window.innerWidth - (position.x + width)
+
+  if (position.x <= EDGE_SNAP_DISTANCE) {
+    return {
+      x: 0,
+      y: position.y,
+      edge: "left",
+      collapsed: true,
+    }
+  }
+
+  if (rightDistance <= EDGE_SNAP_DISTANCE) {
+    return {
+      x: window.innerWidth - width,
+      y: position.y,
+      edge: "right",
+      collapsed: true,
+    }
+  }
+
+  const clamped = clampTriggerPosition(position, trigger)
+  return {
+    x: clamped.x,
+    y: clamped.y,
+    edge: null,
+    collapsed: false,
+  }
+}
+
+function applyTriggerPosition(trigger: HTMLElement, position: TriggerPosition): void {
+  trigger.style.setProperty("--eh-trigger-x", `${Math.round(position.x)}px`)
+  trigger.style.setProperty("--eh-trigger-y", `${Math.round(position.y)}px`)
+  trigger.dataset.edge = position.edge ?? ""
+  trigger.classList.toggle("is-collapsed", position.collapsed)
+}
+
+function expandDockedPosition(trigger: HTMLElement, position: TriggerPosition): TriggerPosition {
+  if (position.edge === "left") {
+    return { ...position, x: EDGE_GAP, collapsed: false }
+  }
+
+  if (position.edge === "right") {
+    const width = trigger.offsetWidth || 136
+    return { ...position, x: window.innerWidth - width - EDGE_GAP, collapsed: false }
+  }
+
+  return { ...position, collapsed: false }
+}
+
+function updatePanelPosition(panel: HTMLElement, trigger: HTMLElement): void {
+  if (panel.classList.contains("eh-hidden")) return
+
+  const triggerRect = trigger.getBoundingClientRect()
+  const panelRect = panel.getBoundingClientRect()
+  const margin = 16
+  const gap = 12
+  const panelWidth = panelRect.width || Math.min(420, window.innerWidth - 32)
+  const panelHeight = panelRect.height || Math.min(640, window.innerHeight - 96)
+  const x = Math.min(
+    Math.max(margin, triggerRect.left),
+    Math.max(margin, window.innerWidth - panelWidth - margin)
+  )
+  const preferredY = triggerRect.top - panelHeight - gap
+  const y =
+    preferredY >= margin
+      ? preferredY
+      : Math.min(
+          triggerRect.bottom + gap,
+          Math.max(margin, window.innerHeight - panelHeight - margin)
+        )
+
+  panel.style.setProperty("--eh-panel-x", `${Math.round(x)}px`)
+  panel.style.setProperty("--eh-panel-y", `${Math.round(y)}px`)
+}
+
 async function requestDiscovery(): Promise<DiscoveryResponse> {
   return await chrome.runtime.sendMessage({
     type: "DISCOVER_INSTALLED_EXTENSIONS_FOR_SITE",
@@ -808,6 +1152,8 @@ function mount(): void {
   trigger.className = "eh-trigger"
   trigger.type = "button"
   trigger.textContent = "Ext Helper"
+  trigger.title = "Drag to move. Drop on the screen edge to tuck it into the side."
+  trigger.setAttribute("aria-label", "Open Ext Helper site discovery. Drag to move.")
 
   const panel = document.createElement("section")
   panel.className = "eh-panel eh-hidden"
@@ -827,10 +1173,65 @@ function mount(): void {
   const body = panel.querySelector<HTMLElement>(".eh-body")!
   const footer = panel.querySelector<HTMLElement>(".eh-footer")!
   const close = panel.querySelector<HTMLButtonElement>(".eh-close")!
+  let triggerPosition: TriggerPosition | null = null
+  let dragState: DragState | null = null
+  let suppressNextClick = false
+  let collapseTimer: number | null = null
+  let collapseUnlockTimer: number | null = null
 
-  trigger.addEventListener("click", async () => {
-    panel.classList.toggle("eh-hidden")
-    if (panel.classList.contains("eh-hidden")) return
+  const clearCollapseAnimation = () => {
+    if (collapseTimer !== null) {
+      window.clearTimeout(collapseTimer)
+      collapseTimer = null
+    }
+    if (collapseUnlockTimer !== null) {
+      window.clearTimeout(collapseUnlockTimer)
+      collapseUnlockTimer = null
+    }
+    trigger.classList.remove("is-collapsing")
+  }
+
+  const setTriggerPosition = (nextPosition: TriggerPosition) => {
+    triggerPosition = nextPosition
+    applyTriggerPosition(trigger, triggerPosition)
+    window.requestAnimationFrame(() => updatePanelPosition(panel, trigger))
+  }
+
+  const settleTriggerPosition = (nextPosition: TriggerPosition) => {
+    clearCollapseAnimation()
+
+    if (!nextPosition.collapsed) {
+      setTriggerPosition(nextPosition)
+      return
+    }
+
+    trigger.classList.add("is-collapsing")
+    setTriggerPosition({ ...nextPosition, collapsed: false })
+    collapseTimer = window.setTimeout(() => {
+      setTriggerPosition(nextPosition)
+      collapseTimer = null
+      collapseUnlockTimer = window.setTimeout(() => {
+        trigger.classList.remove("is-collapsing")
+        collapseUnlockTimer = null
+      }, COLLAPSE_LOCK_MS)
+    }, DOCK_SLIDE_MS)
+  }
+
+  const ensureTriggerPosition = (): TriggerPosition => {
+    if (!triggerPosition) {
+      triggerPosition = getDefaultTriggerPosition(trigger)
+      applyTriggerPosition(trigger, triggerPosition)
+    }
+
+    return triggerPosition
+  }
+
+  const openPanel = async () => {
+    clearCollapseAnimation()
+    ensureTriggerPosition()
+    trigger.classList.add("is-open")
+    panel.classList.remove("eh-hidden")
+    updatePanelPosition(panel, trigger)
     renderState(body, "Scanning installed extensions for this site...")
     footer.replaceChildren()
     const response = await requestDiscovery().catch((error) => ({
@@ -842,12 +1243,101 @@ function mount(): void {
     } else {
       renderState(body, response.error)
     }
+    updatePanelPosition(panel, trigger)
+  }
+
+  const closePanel = () => {
+    trigger.classList.remove("is-open")
+    panel.classList.add("eh-hidden")
+  }
+
+  trigger.addEventListener("click", async () => {
+    if (suppressNextClick) {
+      suppressNextClick = false
+      return
+    }
+
+    if (!panel.classList.contains("eh-hidden")) {
+      closePanel()
+      return
+    }
+
+    await openPanel()
   })
 
-  close.addEventListener("click", () => panel.classList.add("eh-hidden"))
+  trigger.addEventListener("pointerdown", (event) => {
+    if (event.button !== 0) return
+
+    clearCollapseAnimation()
+    ensureTriggerPosition()
+
+    const rect = trigger.getBoundingClientRect()
+    dragState = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      offsetX: event.clientX - rect.left,
+      offsetY: event.clientY - rect.top,
+      moved: false,
+    }
+    trigger.setPointerCapture(event.pointerId)
+    trigger.classList.add("is-dragging")
+  })
+
+  trigger.addEventListener("pointermove", (event) => {
+    if (!dragState || dragState.pointerId !== event.pointerId) return
+
+    const deltaX = event.clientX - dragState.startX
+    const deltaY = event.clientY - dragState.startY
+    if (!dragState.moved && Math.hypot(deltaX, deltaY) < DRAG_THRESHOLD) return
+
+    dragState.moved = true
+    const clamped = clampTriggerPosition(
+      {
+        x: event.clientX - dragState.offsetX,
+        y: event.clientY - dragState.offsetY,
+      },
+      trigger
+    )
+    setTriggerPosition({ x: clamped.x, y: clamped.y, edge: null, collapsed: false })
+  })
+
+  trigger.addEventListener("pointerup", (event) => {
+    if (!dragState || dragState.pointerId !== event.pointerId) return
+
+    trigger.releasePointerCapture(event.pointerId)
+    trigger.classList.remove("is-dragging")
+    if (dragState.moved && triggerPosition) {
+      suppressNextClick = true
+      window.setTimeout(() => {
+        suppressNextClick = false
+      }, 0)
+      settleTriggerPosition(getDockedPosition(triggerPosition, trigger))
+    }
+    dragState = null
+  })
+
+  trigger.addEventListener("pointercancel", (event) => {
+    if (!dragState || dragState.pointerId !== event.pointerId) return
+
+    trigger.releasePointerCapture(event.pointerId)
+    trigger.classList.remove("is-dragging")
+    dragState = null
+  })
+
+  close.addEventListener("click", closePanel)
+
+  window.addEventListener("resize", () => {
+    const currentPosition = ensureTriggerPosition()
+    const expanded = currentPosition.collapsed
+      ? expandDockedPosition(trigger, currentPosition)
+      : currentPosition
+    setTriggerPosition(getDockedPosition(expanded, trigger))
+  })
 
   shadow.append(createStyles(), iconBridge.iframe, trigger, panel)
   document.documentElement.append(host)
+  setTriggerPosition(getDefaultTriggerPosition(trigger))
 }
 
 mount()
