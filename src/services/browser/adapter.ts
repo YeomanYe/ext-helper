@@ -205,6 +205,10 @@ async function setStorage(key: string, value: unknown): Promise<void> {
   )
 }
 
+async function removeStorage(key: string | string[]): Promise<void> {
+  return withBrowserError(() => browser.storage.local.remove(key), "Failed to remove storage")
+}
+
 async function getSyncStorage<T = unknown>(key: string): Promise<T | undefined> {
   return withBrowserError(async () => {
     const result = await browser.storage.sync.get(key)
@@ -329,6 +333,25 @@ function sendMessage(message: unknown, callback?: (response: unknown) => void): 
   }
 }
 
+// ---------- Identity API ----------
+
+function getRedirectUrl(path?: string): string {
+  return browser.identity.getRedirectURL(path)
+}
+
+async function launchWebAuthFlow({
+  url,
+  interactive,
+}: {
+  url: string
+  interactive: boolean
+}): Promise<string> {
+  return withBrowserError(
+    () => browser.identity.launchWebAuthFlow({ url, interactive }),
+    "Failed to complete login"
+  )
+}
+
 export const browserAdapter = {
   detectBrowser,
   isManifestV3,
@@ -342,6 +365,7 @@ export const browserAdapter = {
   onExtensionEnabledChanged,
   getStorage,
   setStorage,
+  removeStorage,
   getSyncStorage,
   setSyncStorage,
   removeSyncStorage,
@@ -356,4 +380,6 @@ export const browserAdapter = {
   onAlarm,
   onMessage,
   sendMessage,
+  getRedirectUrl,
+  launchWebAuthFlow,
 }

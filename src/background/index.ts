@@ -9,8 +9,18 @@ import { rulesRepo, SYNC_RULES_INDEX, SYNC_RULE_PREFIX } from "@/services/rulesR
 import { createUsageLogEvent, usageLogRepo } from "@/services/usageLogRepo"
 import { extensionsRepo } from "@/services/extensionsRepo"
 import { discoverInstalledExtensionsForSite } from "@/services/siteDiscoveryService"
+import fallbackRecommendationRecords from "@/data/site-recommendations.compact.json"
+import { fetchSiteRecommendations } from "@/services/siteRecommendationService"
+import {
+  buildLoginUrl,
+  parseAuthSessionFromRedirectUrl,
+  siteAuthSessionRepo,
+  type SiteAuthProvider,
+} from "@/services/siteAuthService"
 import type { Rule, RuleSettings } from "@/rules/types"
 import { logger } from "@/utils/logger"
+
+const EXT_HELPER_API_BASE_URL = (process.env.PLASMO_PUBLIC_EXT_HELPER_API_BASE_URL ?? "").trim()
 
 class RuleBackgroundService {
   /**
@@ -84,7 +94,13 @@ class RuleBackgroundService {
   private setupMessageHandler(): void {
     browserAdapter.onMessage((message, _sender, sendResponse) => {
       const msg = message as
-        | { type?: string; url?: string; pageTitle?: string; pageDescription?: string }
+        | {
+            type?: string
+            url?: string
+            pageTitle?: string
+            pageDescription?: string
+            provider?: SiteAuthProvider
+          }
         | null
         | undefined
       if (msg?.type === "TRIGGER_RULES_NOW") {
@@ -105,9 +121,15 @@ class RuleBackgroundService {
           return true
         }
 
-        extensionsRepo
-          .fetchAll()
-          .then((extensions) => {
+        Promise.all([extensionsRepo.fetchAll(), siteAuthSessionRepo.fetch()])
+          .then(async ([extensions, authSession]) => {
+            const recommendations = await fetchSiteRecommendations({
+              url: msg.url!,
+              apiBaseUrl: EXT_HELPER_API_BASE_URL,
+              authToken: authSession?.accessToken ?? null,
+              fallbackRecords: fallbackRecommendationRecords,
+            })
+
             sendResponse({
               success: true,
               result: discoverInstalledExtensionsForSite({
@@ -116,12 +138,102 @@ class RuleBackgroundService {
                 pageDescription: msg.pageDescription,
                 extensions,
               }),
+              recommendations,
+              auth: {
+                apiConfigured: Boolean(EXT_HELPER_API_BASE_URL),
+                authenticated: Boolean(authSession),
+                user: authSession?.user ?? null,
+                provider: authSession?.provider ?? null,
+              },
             })
           })
           .catch((error) => {
             sendResponse({
               success: false,
               error: error instanceof Error ? error.message : "Failed to discover extensions.",
+            })
+          })
+      }
+      if (msg?.type === "GET_SITE_AUTH_STATUS") {
+        siteAuthSessionRepo
+          .fetch()
+          .then((authSession) => {
+            sendResponse({
+              success: true,
+              auth: {
+                apiConfigured: Boolean(EXT_HELPER_API_BASE_URL),
+                authenticated: Boolean(authSession),
+                user: authSession?.user ?? null,
+                provider: authSession?.provider ?? null,
+              },
+            })
+          })
+          .catch((error) => {
+            sendResponse({
+              success: false,
+              error: error instanceof Error ? error.message : "Failed to read login status.",
+            })
+          })
+      }
+      if (msg?.type === "START_SITE_AUTH_LOGIN") {
+        if (!EXT_HELPER_API_BASE_URL) {
+          sendResponse({ success: false, error: "Ext Helper API base URL is not configured." })
+          return true
+        }
+        if (msg.provider !== "github" && msg.provider !== "google") {
+          sendResponse({ success: false, error: "Unsupported login provider." })
+          return true
+        }
+
+        const redirectUri = browserAdapter.getRedirectUrl("auth")
+        const loginUrl = buildLoginUrl({
+          apiBaseUrl: EXT_HELPER_API_BASE_URL,
+          provider: msg.provider,
+          redirectUri,
+        })
+        browserAdapter
+          .launchWebAuthFlow({ url: loginUrl, interactive: true })
+          .then((redirectUrl) => {
+            const session = parseAuthSessionFromRedirectUrl(redirectUrl)
+            if (!session) throw new Error("Login callback did not include a valid session.")
+            return siteAuthSessionRepo.save(session).then(() => session)
+          })
+          .then((session) => {
+            sendResponse({
+              success: true,
+              auth: {
+                apiConfigured: true,
+                authenticated: true,
+                user: session.user,
+                provider: session.provider,
+              },
+            })
+          })
+          .catch((error) => {
+            sendResponse({
+              success: false,
+              error: error instanceof Error ? error.message : "Login failed.",
+            })
+          })
+      }
+      if (msg?.type === "SIGN_OUT_SITE_AUTH") {
+        siteAuthSessionRepo
+          .clear()
+          .then(() => {
+            sendResponse({
+              success: true,
+              auth: {
+                apiConfigured: Boolean(EXT_HELPER_API_BASE_URL),
+                authenticated: false,
+                user: null,
+                provider: null,
+              },
+            })
+          })
+          .catch((error) => {
+            sendResponse({
+              success: false,
+              error: error instanceof Error ? error.message : "Sign out failed.",
             })
           })
       }

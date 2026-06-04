@@ -1,12 +1,28 @@
 import type { SiteDiscoveryResult } from "@/services/siteDiscoveryService"
+import type { SiteRecommendationResult } from "@/services/siteRecommendationService"
+import type { SiteAuthProvider, SiteAuthUser } from "@/services/siteAuthService"
 
 export const config = {
   matches: ["http://*/*", "https://*/*"],
 }
 
 type DiscoveryResponse =
-  | { success: true; result: SiteDiscoveryResult }
+  | {
+      success: true
+      result: SiteDiscoveryResult
+      recommendations?: SiteRecommendationResult
+      auth?: SiteAuthStatus
+    }
   | { success: false; error: string }
+
+type AuthResponse = { success: true; auth: SiteAuthStatus } | { success: false; error: string }
+
+interface SiteAuthStatus {
+  apiConfigured: boolean
+  authenticated: boolean
+  user: SiteAuthUser | null
+  provider: SiteAuthProvider | null
+}
 
 const ROOT_ID = "ext-helper-site-discovery-root"
 const EXTENSION_PREFERENCES_KEY = "ext-helper-preferences"
@@ -597,6 +613,29 @@ function createStyles(): HTMLStyleElement {
       gap: 10px;
     }
 
+    .eh-section {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .eh-section:first-child {
+      margin-top: 0;
+    }
+
+    .eh-section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin: 0;
+      color: var(--eh-text-primary);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
     .eh-card {
       display: grid;
       grid-template-columns: 42px minmax(0, 1fr);
@@ -604,7 +643,9 @@ function createStyles(): HTMLStyleElement {
       border: 1px solid rgb(var(--eh-border-rgb) / 0.28);
       border-radius: 0;
       background: var(--eh-surface-raised);
+      color: inherit;
       padding: 11px;
+      text-decoration: none;
       transition:
         border-color 140ms ease,
         box-shadow 140ms ease,
@@ -762,6 +803,47 @@ function createStyles(): HTMLStyleElement {
       gap: 6px;
     }
 
+    .eh-footer-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .eh-auth-copy {
+      min-width: 0;
+      color: var(--eh-text-muted);
+      font-size: 10px;
+      font-weight: 750;
+      letter-spacing: 0.06em;
+      line-height: 1.35;
+      text-transform: uppercase;
+    }
+
+    .eh-actions {
+      display: inline-flex;
+      flex: 0 0 auto;
+      gap: 6px;
+    }
+
+    .eh-action {
+      border: 1px solid rgb(var(--eh-border-rgb) / 0.42);
+      border-radius: 0;
+      background: var(--eh-surface-raised);
+      color: var(--eh-text-primary);
+      cursor: pointer;
+      font: 900 10px/1 "Noto Sans SC", "JetBrains Mono", monospace;
+      letter-spacing: 0.08em;
+      padding: 7px 9px;
+      text-transform: uppercase;
+    }
+
+    .eh-action:hover {
+      border-color: var(--eh-primary);
+      background: var(--eh-surface-soft);
+    }
+
     .eh-icon-bridge {
       display: none;
     }
@@ -906,11 +988,109 @@ function createIcon(name: string, url: string | null, iconBridge: IconBridge): H
   return icon
 }
 
+function createSectionTitle(title: string, chipText?: string): HTMLElement {
+  const heading = document.createElement("h3")
+  heading.className = "eh-section-title"
+  const label = document.createElement("span")
+  label.textContent = title
+  heading.append(label)
+
+  if (chipText) {
+    const chip = document.createElement("span")
+    chip.className = "eh-chip"
+    chip.textContent = chipText
+    heading.append(chip)
+  }
+
+  return heading
+}
+
+function createInstalledMatchCard(
+  match: SiteDiscoveryResult["matches"][number],
+  iconBridge: IconBridge
+): HTMLElement {
+  const card = document.createElement("article")
+  card.className = "eh-card"
+
+  const content = document.createElement("div")
+  const permissionText =
+    match.permissionSignals.length > 0
+      ? match.permissionSignals.slice(0, 2).join(" / ")
+      : "metadata"
+  content.innerHTML = `
+    <h3 class="eh-card-title">
+      <span class="eh-name"></span>
+      <span class="eh-pill ${match.confidence}">${match.confidence}</span>
+    </h3>
+    <p class="eh-description"></p>
+    <p class="eh-reason"></p>
+    <div class="eh-meta">
+      <span class="eh-chip">${match.extension.enabled ? "Enabled" : "Disabled"}</span>
+      <span class="eh-chip">v${match.extension.version}</span>
+      <span class="eh-chip"></span>
+    </div>
+  `
+  content.querySelector(".eh-name")!.textContent = match.extension.name
+  content.querySelector(".eh-description")!.textContent =
+    match.extension.description || "No description provided by this extension."
+  content.querySelector(".eh-reason")!.textContent =
+    match.reasons[0] ?? "Looks useful for this page."
+  content.querySelector(".eh-meta .eh-chip:last-child")!.textContent = permissionText
+
+  card.append(createIcon(match.extension.name, match.extension.iconUrl, iconBridge), content)
+  return card
+}
+
+function createRecommendedCard(
+  recommendation: SiteRecommendationResult["recommendations"][number],
+  iconBridge: IconBridge
+): HTMLElement {
+  const card = document.createElement("a")
+  card.className = "eh-card"
+  card.href = recommendation.url
+  card.target = "_blank"
+  card.rel = "noreferrer"
+
+  const content = document.createElement("div")
+  content.innerHTML = `
+    <h3 class="eh-card-title">
+      <span class="eh-name"></span>
+      <span class="eh-pill">rec</span>
+    </h3>
+    <p class="eh-description"></p>
+    <p class="eh-reason"></p>
+    <div class="eh-meta">
+      <span class="eh-chip"></span>
+      <span class="eh-chip"></span>
+      <span class="eh-chip"></span>
+    </div>
+  `
+  content.querySelector(".eh-name")!.textContent = recommendation.name
+  content.querySelector(".eh-description")!.textContent =
+    recommendation.description || "No description provided by Chrome Web Store."
+  content.querySelector(".eh-reason")!.textContent = recommendation.reason
+  const chips = content.querySelectorAll<HTMLElement>(".eh-meta .eh-chip")
+  chips[0]!.textContent = recommendation.rating
+    ? `${recommendation.rating.toFixed(1)} stars`
+    : "rating n/a"
+  chips[1]!.textContent = recommendation.usersText ?? "users n/a"
+  chips[2]!.textContent = recommendation.sourceQuery || `rank ${recommendation.rank}`
+
+  card.append(createIcon(recommendation.name, recommendation.iconUrl, iconBridge), content)
+  return card
+}
+
 function renderResult(
   body: HTMLElement,
   footer: HTMLElement,
   result: SiteDiscoveryResult,
-  iconBridge: IconBridge
+  iconBridge: IconBridge,
+  recommendations: SiteRecommendationResult | undefined,
+  auth: SiteAuthStatus | undefined,
+  actions: {
+    onLogin: (provider: SiteAuthProvider) => void
+    onSignOut: () => void
+  }
 ): void {
   body.replaceChildren()
   footer.replaceChildren()
@@ -920,53 +1100,51 @@ function renderResult(
   summary.innerHTML = `
     <div class="eh-stat"><strong>${result.domain}</strong><span>site</span></div>
     <div class="eh-stat"><strong>${result.matches.length}</strong><span>matches</span></div>
-    <div class="eh-stat"><strong>${result.totalExtensions}</strong><span>installed</span></div>
+    <div class="eh-stat"><strong>${recommendations?.recommendations.length ?? 0}</strong><span>recommended</span></div>
   `
   body.append(summary)
+
+  const installedSection = document.createElement("section")
+  installedSection.className = "eh-section"
+  installedSection.append(
+    createSectionTitle("Installed matches", `${result.totalExtensions} installed`)
+  )
 
   if (result.matches.length === 0) {
     const empty = document.createElement("div")
     empty.className = "eh-state"
     empty.textContent =
-      "No installed extensions look specific to this site yet. Try Explore More below."
-    body.append(empty)
+      "No installed extensions look specific to this site yet. Check recommendations below."
+    installedSection.append(empty)
   } else {
     const list = document.createElement("div")
     list.className = "eh-list"
     for (const match of result.matches) {
-      const card = document.createElement("article")
-      card.className = "eh-card"
-
-      const content = document.createElement("div")
-      const permissionText =
-        match.permissionSignals.length > 0
-          ? match.permissionSignals.slice(0, 2).join(" / ")
-          : "metadata"
-      content.innerHTML = `
-        <h3 class="eh-card-title">
-          <span class="eh-name"></span>
-          <span class="eh-pill ${match.confidence}">${match.confidence}</span>
-        </h3>
-        <p class="eh-description"></p>
-        <p class="eh-reason"></p>
-        <div class="eh-meta">
-          <span class="eh-chip">${match.extension.enabled ? "Enabled" : "Disabled"}</span>
-          <span class="eh-chip">v${match.extension.version}</span>
-          <span class="eh-chip"></span>
-        </div>
-      `
-      content.querySelector(".eh-name")!.textContent = match.extension.name
-      content.querySelector(".eh-description")!.textContent =
-        match.extension.description || "No description provided by this extension."
-      content.querySelector(".eh-reason")!.textContent =
-        match.reasons[0] ?? "Looks useful for this page."
-      content.querySelector(".eh-meta .eh-chip:last-child")!.textContent = permissionText
-
-      card.append(createIcon(match.extension.name, match.extension.iconUrl, iconBridge), content)
-      list.append(card)
+      list.append(createInstalledMatchCard(match, iconBridge))
     }
-    body.append(list)
+    installedSection.append(list)
   }
+  body.append(installedSection)
+
+  const recommendationSection = document.createElement("section")
+  recommendationSection.className = "eh-section"
+  recommendationSection.append(
+    createSectionTitle("Recommended extensions", recommendations?.source ?? "fallback")
+  )
+  if (!recommendations || recommendations.recommendations.length === 0) {
+    const empty = document.createElement("div")
+    empty.className = "eh-state"
+    empty.textContent = "No crawler recommendations are available for this site yet."
+    recommendationSection.append(empty)
+  } else {
+    const list = document.createElement("div")
+    list.className = "eh-list"
+    recommendations.recommendations.forEach((recommendation) => {
+      list.append(createRecommendedCard(recommendation, iconBridge))
+    })
+    recommendationSection.append(list)
+  }
+  body.append(recommendationSection)
 
   const queryTitle = document.createElement("p")
   queryTitle.className = "eh-query"
@@ -980,7 +1158,40 @@ function renderResult(
     queryList.append(chip)
   })
 
-  footer.append(queryTitle, queryList)
+  const footerRow = document.createElement("div")
+  footerRow.className = "eh-footer-row"
+  const authCopy = document.createElement("p")
+  authCopy.className = "eh-auth-copy"
+  if (auth?.authenticated) {
+    authCopy.textContent = `Signed in${auth.user?.email ? ` as ${auth.user.email}` : ""}`
+  } else if (auth?.apiConfigured) {
+    authCopy.textContent = "Sign in to unlock server recommendations"
+  } else {
+    authCopy.textContent = "Using local crawler fallback"
+  }
+
+  const actionGroup = document.createElement("div")
+  actionGroup.className = "eh-actions"
+  if (auth?.authenticated) {
+    const signOut = document.createElement("button")
+    signOut.className = "eh-action"
+    signOut.type = "button"
+    signOut.textContent = "Sign out"
+    signOut.addEventListener("click", actions.onSignOut)
+    actionGroup.append(signOut)
+  } else if (auth?.apiConfigured) {
+    ;(["github", "google"] as const).forEach((provider) => {
+      const button = document.createElement("button")
+      button.className = "eh-action"
+      button.type = "button"
+      button.textContent = provider
+      button.addEventListener("click", () => actions.onLogin(provider))
+      actionGroup.append(button)
+    })
+  }
+
+  footerRow.append(authCopy, actionGroup)
+  footer.append(queryTitle, queryList, footerRow)
 }
 
 function renderState(body: HTMLElement, message: string): void {
@@ -1124,6 +1335,19 @@ async function requestDiscovery(): Promise<DiscoveryResponse> {
   })
 }
 
+async function requestLogin(provider: SiteAuthProvider): Promise<AuthResponse> {
+  return await chrome.runtime.sendMessage({
+    type: "START_SITE_AUTH_LOGIN",
+    provider,
+  })
+}
+
+async function requestSignOut(): Promise<AuthResponse> {
+  return await chrome.runtime.sendMessage({
+    type: "SIGN_OUT_SITE_AUTH",
+  })
+}
+
 function mount(): void {
   if (document.getElementById(ROOT_ID)) return
 
@@ -1226,24 +1450,71 @@ function mount(): void {
     return triggerPosition
   }
 
-  const openPanel = async () => {
-    clearCollapseAnimation()
-    ensureTriggerPosition()
-    trigger.classList.add("is-open")
-    panel.classList.remove("eh-hidden")
-    updatePanelPosition(panel, trigger)
-    renderState(body, "Scanning installed extensions for this site...")
+  const loadPanel = async () => {
+    renderState(body, "Scanning installed extensions and recommendations for this site...")
     footer.replaceChildren()
     const response = await requestDiscovery().catch((error) => ({
       success: false as const,
       error: error instanceof Error ? error.message : "Discovery failed.",
     }))
     if (response.success) {
-      renderResult(body, footer, response.result, iconBridge)
+      renderResult(
+        body,
+        footer,
+        response.result,
+        iconBridge,
+        response.recommendations,
+        response.auth,
+        {
+          onLogin: (provider) => {
+            void handleLogin(provider)
+          },
+          onSignOut: () => {
+            void handleSignOut()
+          },
+        }
+      )
     } else {
       renderState(body, response.error)
     }
     updatePanelPosition(panel, trigger)
+  }
+
+  const handleLogin = async (provider: SiteAuthProvider) => {
+    renderState(body, `Opening ${provider} login...`)
+    footer.replaceChildren()
+    const response = await requestLogin(provider).catch((error) => ({
+      success: false as const,
+      error: error instanceof Error ? error.message : "Login failed.",
+    }))
+    if (!response.success) {
+      renderState(body, response.error)
+      return
+    }
+    await loadPanel()
+  }
+
+  const handleSignOut = async () => {
+    renderState(body, "Signing out...")
+    footer.replaceChildren()
+    const response = await requestSignOut().catch((error) => ({
+      success: false as const,
+      error: error instanceof Error ? error.message : "Sign out failed.",
+    }))
+    if (!response.success) {
+      renderState(body, response.error)
+      return
+    }
+    await loadPanel()
+  }
+
+  const openPanel = async () => {
+    clearCollapseAnimation()
+    ensureTriggerPosition()
+    trigger.classList.add("is-open")
+    panel.classList.remove("eh-hidden")
+    updatePanelPosition(panel, trigger)
+    await loadPanel()
   }
 
   const closePanel = () => {
