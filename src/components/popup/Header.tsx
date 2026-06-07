@@ -916,7 +916,7 @@ function CloudRecommendationDialog({ onClose }: { onClose: () => void }) {
               <input
                 value={apiBaseUrl}
                 onChange={(event) => setApiBaseUrl(event.target.value)}
-                placeholder={DEFAULT_RECOMMENDATION_API_BASE_URL}
+                placeholder="Default service"
                 disabled={!enabled || loading}
                 className="punk-input h-10 w-full px-3 text-sm disabled:cursor-not-allowed disabled:opacity-50"
               />
