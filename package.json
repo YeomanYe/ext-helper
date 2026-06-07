@@ -18,6 +18,7 @@
     "format": "prettier --write src",
     "format:check": "prettier --check src",
     "prepare": "husky",
+    "deploy:recommendation-api": "pnpm dlx wrangler@latest deploy --config workers/recommendation-api/wrangler.toml",
     "dev:website": "vite --config vite.website.config.ts",
     "build:website": "vite build --config vite.website.config.ts"
   },
