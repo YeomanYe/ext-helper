@@ -108,6 +108,14 @@ export interface Preferences {
   sortBy: SortType
   viewMode: ViewMode
   aiSettings?: AiSettings
+  recommendationApiBaseUrl?: string
+  cloudRecommendationEnabled?: boolean
+}
+
+export interface RecommendationQuota {
+  limit: number
+  remaining: number
+  resetsAt: string
 }
 
 export type AiProviderType = "chrome-local" | "openai-compatible" | "manual"
@@ -152,7 +160,15 @@ export interface GroupSuggestionResult {
 export type ImportExportDomain = "groups" | "rules" | "preferences" | "usageLog"
 
 export type ImportExportPreferences = Partial<
-  Pick<Preferences, "theme" | "compactMode" | "showDisabled" | "viewMode">
+  Pick<
+    Preferences,
+    | "theme"
+    | "compactMode"
+    | "showDisabled"
+    | "viewMode"
+    | "recommendationApiBaseUrl"
+    | "cloudRecommendationEnabled"
+  >
 >
 
 export interface ImportExportPayload {

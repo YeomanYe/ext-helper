@@ -8,9 +8,16 @@ import { ruleEngine } from "@/rules/ruleEngine"
 import { rulesRepo, SYNC_RULES_INDEX, SYNC_RULE_PREFIX } from "@/services/rulesRepo"
 import { createUsageLogEvent, usageLogRepo } from "@/services/usageLogRepo"
 import { extensionsRepo } from "@/services/extensionsRepo"
-import { discoverInstalledExtensionsForSite } from "@/services/siteDiscoveryService"
-import fallbackRecommendationRecords from "@/data/site-recommendations.compact.json"
-import { fetchSiteRecommendations } from "@/services/siteRecommendationService"
+import { getEffectiveAiProvider, normalizeAiSettings } from "@/services/aiSettings"
+import { preferencesRepo } from "@/services/preferencesRepo"
+import { siteInstallRepo } from "@/services/siteInstallRepo"
+import {
+  buildInstalledSiteDiscoveryPayload,
+  buildSiteAuthStatus,
+  buildSiteRecommendationPayload,
+  type InstalledExtensionRecommendationContext,
+} from "@/services/siteDiscoveryPanelService"
+import { resolveRecommendationApiBaseUrl } from "@/services/siteRecommendationService"
 import {
   buildLoginUrl,
   parseAuthSessionFromRedirectUrl,
@@ -20,7 +27,21 @@ import {
 import type { Rule, RuleSettings } from "@/rules/types"
 import { logger } from "@/utils/logger"
 
-const EXT_HELPER_API_BASE_URL = (process.env.PLASMO_PUBLIC_EXT_HELPER_API_BASE_URL ?? "").trim()
+const EXT_HELPER_AUTH_API_BASE_URL = (
+  process.env.PLASMO_PUBLIC_EXT_HELPER_AUTH_API_BASE_URL ?? ""
+).trim()
+
+function getConfiguredAiSettings(preferences: Awaited<ReturnType<typeof preferencesRepo.fetch>>) {
+  if (!preferences.aiSettings) return undefined
+  const aiSettings = normalizeAiSettings(preferences.aiSettings)
+  return getEffectiveAiProvider(aiSettings) !== "manual" ? aiSettings : undefined
+}
+
+function getRecommendationApiBaseUrl(
+  preferences: Awaited<ReturnType<typeof preferencesRepo.fetch>>
+) {
+  return resolveRecommendationApiBaseUrl(preferences.recommendationApiBaseUrl)
+}
 
 class RuleBackgroundService {
   /**
@@ -32,23 +53,25 @@ class RuleBackgroundService {
   }
 
   /**
-   * 初始化后台服务
+   * 同步注册所有事件监听器。
+   * MV3 service worker 唤醒时，listener 必须在顶层同步注册，否则唤醒期间的消息会被丢弃。
+   */
+  registerListeners(): void {
+    this.setupAlarmListener()
+    this.setupTabListener()
+    this.setupMessageHandler()
+    this.setupSyncListener()
+  }
+
+  /**
+   * 异步初始化（调度器等需要先读 storage 的工作）
    */
   async initialize(): Promise<void> {
     try {
       const settings = await this.getSettings()
-
-      // 设置定时器
       if (settings.enableScheduler) {
         await this.startScheduler(settings)
       }
-
-      // 设置监听器
-      this.setupAlarmListener()
-      this.setupTabListener()
-      this.setupMessageHandler()
-      this.setupSyncListener()
-
       logger.log("[RuleBackground] Initialized successfully")
     } catch (error) {
       logger.error("[RuleBackground] Initialization failed:", error)
@@ -100,6 +123,7 @@ class RuleBackgroundService {
             pageTitle?: string
             pageDescription?: string
             provider?: SiteAuthProvider
+            installedExtensions?: InstalledExtensionRecommendationContext[]
           }
         | null
         | undefined
@@ -121,31 +145,26 @@ class RuleBackgroundService {
           return true
         }
 
-        Promise.all([extensionsRepo.fetchAll(), siteAuthSessionRepo.fetch()])
-          .then(async ([extensions, authSession]) => {
-            const recommendations = await fetchSiteRecommendations({
-              url: msg.url!,
-              apiBaseUrl: EXT_HELPER_API_BASE_URL,
-              authToken: authSession?.accessToken ?? null,
-              fallbackRecords: fallbackRecommendationRecords,
-            })
-
-            sendResponse({
-              success: true,
-              result: discoverInstalledExtensionsForSite({
+        Promise.all([
+          extensionsRepo.fetchAll(),
+          siteAuthSessionRepo.fetch(),
+          preferencesRepo.fetch(),
+        ])
+          .then(([extensions, authSession, preferences]) => {
+            const aiSettings = getConfiguredAiSettings(preferences)
+            const recommendationApiBaseUrl = getRecommendationApiBaseUrl(preferences)
+            sendResponse(
+              buildInstalledSiteDiscoveryPayload({
                 url: msg.url!,
                 pageTitle: msg.pageTitle,
                 pageDescription: msg.pageDescription,
                 extensions,
-              }),
-              recommendations,
-              auth: {
-                apiConfigured: Boolean(EXT_HELPER_API_BASE_URL),
-                authenticated: Boolean(authSession),
-                user: authSession?.user ?? null,
-                provider: authSession?.provider ?? null,
-              },
-            })
+                authSession,
+                recommendationApiBaseUrl,
+                authApiConfigured: Boolean(EXT_HELPER_AUTH_API_BASE_URL),
+                aiConfigured: Boolean(aiSettings),
+              })
+            )
           })
           .catch((error) => {
             sendResponse({
@@ -154,18 +173,63 @@ class RuleBackgroundService {
             })
           })
       }
+      if (msg?.type === "FETCH_SITE_RECOMMENDATIONS_FOR_SITE") {
+        if (!msg.url) {
+          sendResponse({ success: false, error: "Current URL is required." })
+          return true
+        }
+
+        Promise.all([
+          siteAuthSessionRepo.fetch(),
+          preferencesRepo.fetch(),
+          siteInstallRepo.fetchOrCreate(),
+        ])
+          .then(async ([authSession, preferences, installId]) => {
+            const aiSettings = getConfiguredAiSettings(preferences)
+            const cloudEnabled = preferences.cloudRecommendationEnabled !== false
+            const payload = await buildSiteRecommendationPayload({
+              url: msg.url!,
+              pageTitle: msg.pageTitle,
+              pageDescription: msg.pageDescription,
+              apiBaseUrl: cloudEnabled ? getRecommendationApiBaseUrl(preferences) : "",
+              authSession,
+              installId,
+              aiSettings: aiSettings ?? undefined,
+              installedExtensions: msg.installedExtensions,
+            })
+            // eslint-disable-next-line no-console
+            console.log("[RecommendationBackground] Site recommendations result", {
+              url: msg.url,
+              cloudEnabled,
+              aiConfigured: Boolean(aiSettings),
+              source: payload.recommendations.source,
+              domain: payload.recommendations.domain,
+              totalCandidates: payload.recommendations.totalCandidates,
+              count: payload.recommendations.recommendations.length,
+              quota: payload.recommendations.quota,
+              error: payload.recommendations.error,
+              recommendations: payload.recommendations.recommendations,
+            })
+            sendResponse(payload)
+          })
+          .catch((error) => {
+            sendResponse({
+              success: false,
+              error: error instanceof Error ? error.message : "Failed to fetch recommendations.",
+            })
+          })
+      }
       if (msg?.type === "GET_SITE_AUTH_STATUS") {
-        siteAuthSessionRepo
-          .fetch()
-          .then((authSession) => {
+        Promise.all([siteAuthSessionRepo.fetch(), preferencesRepo.fetch()])
+          .then(([authSession, preferences]) => {
             sendResponse({
               success: true,
-              auth: {
-                apiConfigured: Boolean(EXT_HELPER_API_BASE_URL),
-                authenticated: Boolean(authSession),
-                user: authSession?.user ?? null,
-                provider: authSession?.provider ?? null,
-              },
+              auth: buildSiteAuthStatus({
+                authSession,
+                recommendationApiBaseUrl: getRecommendationApiBaseUrl(preferences),
+                authApiConfigured: Boolean(EXT_HELPER_AUTH_API_BASE_URL),
+                aiConfigured: Boolean(getConfiguredAiSettings(preferences)),
+              }),
             })
           })
           .catch((error) => {
@@ -176,7 +240,7 @@ class RuleBackgroundService {
           })
       }
       if (msg?.type === "START_SITE_AUTH_LOGIN") {
-        if (!EXT_HELPER_API_BASE_URL) {
+        if (!EXT_HELPER_AUTH_API_BASE_URL) {
           sendResponse({ success: false, error: "Ext Helper API base URL is not configured." })
           return true
         }
@@ -187,7 +251,7 @@ class RuleBackgroundService {
 
         const redirectUri = browserAdapter.getRedirectUrl("auth")
         const loginUrl = buildLoginUrl({
-          apiBaseUrl: EXT_HELPER_API_BASE_URL,
+          apiBaseUrl: EXT_HELPER_AUTH_API_BASE_URL,
           provider: msg.provider,
           redirectUri,
         })
@@ -198,15 +262,16 @@ class RuleBackgroundService {
             if (!session) throw new Error("Login callback did not include a valid session.")
             return siteAuthSessionRepo.save(session).then(() => session)
           })
-          .then((session) => {
+          .then(async (session) => {
+            const preferences = await preferencesRepo.fetch()
             sendResponse({
               success: true,
-              auth: {
-                apiConfigured: true,
-                authenticated: true,
-                user: session.user,
-                provider: session.provider,
-              },
+              auth: buildSiteAuthStatus({
+                authSession: session,
+                recommendationApiBaseUrl: getRecommendationApiBaseUrl(preferences),
+                authApiConfigured: true,
+                aiConfigured: Boolean(getConfiguredAiSettings(preferences)),
+              }),
             })
           })
           .catch((error) => {
@@ -219,15 +284,16 @@ class RuleBackgroundService {
       if (msg?.type === "SIGN_OUT_SITE_AUTH") {
         siteAuthSessionRepo
           .clear()
-          .then(() => {
+          .then(async () => {
+            const preferences = await preferencesRepo.fetch()
             sendResponse({
               success: true,
-              auth: {
-                apiConfigured: Boolean(EXT_HELPER_API_BASE_URL),
-                authenticated: false,
-                user: null,
-                provider: null,
-              },
+              auth: buildSiteAuthStatus({
+                authSession: null,
+                recommendationApiBaseUrl: getRecommendationApiBaseUrl(preferences),
+                authApiConfigured: Boolean(EXT_HELPER_AUTH_API_BASE_URL),
+                aiConfigured: Boolean(getConfiguredAiSettings(preferences)),
+              }),
             })
           })
           .catch((error) => {
@@ -412,6 +478,9 @@ class UsageLogBackgroundService {
 export const ruleBackgroundService = new RuleBackgroundService()
 export const usageLogBackgroundService = new UsageLogBackgroundService()
 
-// 初始化服务（当 background script 加载时）
+// 同步注册监听器（必须在任何 await 之前，确保 MV3 唤醒消息不丢失）
+ruleBackgroundService.registerListeners()
+
+// 异步初始化（调度器等）
 ruleBackgroundService.initialize()
 usageLogBackgroundService.initialize()

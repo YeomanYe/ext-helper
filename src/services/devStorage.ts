@@ -15,6 +15,8 @@ class DevStorage {
     showDisabled?: boolean
     viewMode?: string
     aiSettings?: AiSettings
+    recommendationApiBaseUrl?: string
+    cloudRecommendationEnabled?: boolean
   } = {}
   private bisectSession: BisectSession | null = null
   private listeners: Map<string, Set<() => void>> = new Map()
@@ -161,6 +163,8 @@ class DevStorage {
     showDisabled?: boolean
     viewMode?: string
     aiSettings?: AiSettings
+    recommendationApiBaseUrl?: string
+    cloudRecommendationEnabled?: boolean
   } {
     return { ...this.preferences }
   }
@@ -172,6 +176,8 @@ class DevStorage {
       showDisabled?: boolean
       viewMode?: string
       aiSettings?: AiSettings
+      recommendationApiBaseUrl?: string
+      cloudRecommendationEnabled?: boolean
     }>
   ) {
     this.preferences = { ...this.preferences, ...prefs }

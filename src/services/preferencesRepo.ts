@@ -11,6 +11,8 @@ type StoredPreferences = Partial<{
   showDisabled: boolean
   viewMode: ViewMode
   aiSettings: AiSettings
+  recommendationApiBaseUrl: string
+  cloudRecommendationEnabled: boolean
 }>
 
 export const preferencesRepo = {

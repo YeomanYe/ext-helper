@@ -26,12 +26,14 @@ import {
   type LucideIcon,
 } from "lucide-react"
 import { cn } from "@/utils"
+import { Switch } from "@/components/common/Switch"
 import { isDevMode } from "@/services/mockData"
 import { browserAdapter } from "@/services/browser/adapter"
 import { preferencesRepo } from "@/services/preferencesRepo"
 import { detectChromeLocalAiStatus, testAiProvider } from "@/services/aiProvider"
 import { useUIStore } from "@/stores/uiStore"
 import { defaultAiSettings, normalizeAiSettings } from "@/services/aiSettings"
+import { DEFAULT_RECOMMENDATION_API_BASE_URL } from "@/services/siteRecommendationService"
 import {
   getModelProviderPresetForSettings,
   modelProviderPresets,
@@ -585,7 +587,9 @@ function AiSettingsDialog({ onClose }: { onClose: () => void }) {
   }
 
   const handleSave = async () => {
-    await preferencesRepo.save({ aiSettings: normalizeAiSettings(settings) })
+    await preferencesRepo.save({
+      aiSettings: normalizeAiSettings(settings),
+    })
     onClose()
   }
 
@@ -833,6 +837,119 @@ function AiSettingsDialog({ onClose }: { onClose: () => void }) {
   )
 }
 
+function CloudRecommendationDialog({ onClose }: { onClose: () => void }) {
+  const [enabled, setEnabled] = React.useState(true)
+  const [apiBaseUrl, setApiBaseUrl] = React.useState("")
+  const [loading, setLoading] = React.useState(true)
+
+  React.useEffect(() => {
+    let cancelled = false
+    preferencesRepo
+      .fetch()
+      .then((preferences) => {
+        if (cancelled) return
+        setEnabled(preferences.cloudRecommendationEnabled !== false)
+        setApiBaseUrl(preferences.recommendationApiBaseUrl ?? "")
+        setLoading(false)
+      })
+      .catch(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const handleSave = async () => {
+    await preferencesRepo.save({
+      cloudRecommendationEnabled: enabled,
+      recommendationApiBaseUrl: apiBaseUrl.trim(),
+    })
+    onClose()
+  }
+
+  return (
+    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-punk-bg/80 backdrop-blur-sm">
+      <div className="w-[480px] border border-punk-border bg-punk-bg-alt shadow-punk-hard">
+        <div className="flex items-center justify-between border-b border-punk-border/40 px-4 py-3">
+          <div className="flex items-center gap-2 font-punk-heading text-[13px] uppercase text-punk-accent">
+            <Cloud className="h-4 w-4" />
+            CLOUD RECOMMENDATION
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close cloud recommendation settings"
+            className="text-punk-text-muted hover:text-punk-text-primary"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className="space-y-3 px-4 py-3">
+          <div className="rounded border border-punk-border/40 bg-punk-surface-soft/50 p-3">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <div className="font-punk-heading text-[12px] uppercase text-punk-text-primary">
+                  ENABLE CLOUD RECOMMENDATION
+                </div>
+                <p className="mt-1 font-punk-body text-[11px] text-punk-text-muted">
+                  When off, recommendations come from your AI provider only (or stay empty if AI is
+                  not configured).
+                </p>
+              </div>
+              <Switch checked={enabled} onCheckedChange={setEnabled} disabled={loading} />
+            </div>
+          </div>
+
+          <div
+            className={cn(
+              "rounded border border-punk-border/40 bg-punk-surface-soft/50 p-3",
+              !enabled && "opacity-60"
+            )}
+          >
+            <label className="block">
+              <span className="mb-1 flex items-center gap-1 font-punk-heading text-[12px] uppercase text-punk-text-muted">
+                <Server className="h-3.5 w-3.5" />
+                API BASE URL
+              </span>
+              <input
+                value={apiBaseUrl}
+                onChange={(event) => setApiBaseUrl(event.target.value)}
+                placeholder={DEFAULT_RECOMMENDATION_API_BASE_URL}
+                disabled={!enabled || loading}
+                className="punk-input h-10 w-full px-3 text-sm disabled:cursor-not-allowed disabled:opacity-50"
+              />
+            </label>
+            <p className="mt-1 font-punk-body text-[11px] text-punk-text-muted">
+              Optional. Leave empty to use the default cloud service. Failures or quota limits
+              automatically fall back to your AI provider.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex justify-end gap-2 border-t border-punk-border/40 px-4 py-3">
+          <button
+            type="button"
+            onClick={onClose}
+            className="border border-punk-border/60 px-3 py-2 font-punk-heading text-[12px] uppercase text-punk-text-secondary hover:border-punk-accent hover:text-punk-accent"
+          >
+            CANCEL
+          </button>
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={loading}
+            className="bg-punk-primary px-3 py-2 font-punk-heading text-[12px] uppercase text-white hover:bg-punk-primary/80 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            SAVE
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 const THEME_OPTIONS: {
   theme: Preferences["theme"]
   icon: LucideIcon
@@ -893,6 +1010,7 @@ export function Header({
   const version = useExtensionVersion()
   const [showSettingsMenu, setShowSettingsMenu] = React.useState(false)
   const [showAiSettings, setShowAiSettings] = React.useState(false)
+  const [showCloudRecommendation, setShowCloudRecommendation] = React.useState(false)
   const theme = useUIStore((state) => state.theme)
   const setTheme = useUIStore((state) => state.setTheme)
   return (
@@ -1034,6 +1152,17 @@ export function Header({
                   <Bot className="h-3.5 w-3.5" />
                   AI SETTINGS
                 </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowCloudRecommendation(true)
+                    setShowSettingsMenu(false)
+                  }}
+                  className="flex w-full items-center gap-2 px-3 py-2 text-left font-punk-heading text-[13px] uppercase tracking-wider text-punk-text-secondary transition-all duration-150 hover:bg-punk-bg hover:text-punk-text-primary"
+                >
+                  <Cloud className="h-3.5 w-3.5" />
+                  CLOUD RECOMMENDATION
+                </button>
               </div>
             </>
           )}
@@ -1041,6 +1170,9 @@ export function Header({
       </div>
 
       {showAiSettings && <AiSettingsDialog onClose={() => setShowAiSettings(false)} />}
+      {showCloudRecommendation && (
+        <CloudRecommendationDialog onClose={() => setShowCloudRecommendation(false)} />
+      )}
     </header>
   )
 }

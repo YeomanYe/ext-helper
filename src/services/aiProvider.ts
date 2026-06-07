@@ -10,6 +10,7 @@ export interface PromptAiProviderOptions {
   debugLabel?: string
   jsonResponse?: boolean
   returnRawOnParseError?: boolean
+  maxTokens?: number
   structuredOutput?: {
     name: string
     description: string
@@ -213,6 +214,25 @@ function extractTextFromProviderResponse(response: unknown): string {
   return JSON.stringify(response)
 }
 
+function parseMiniMaxToolCallText(text: string): unknown | null {
+  if (!text.includes("<invoke") && !text.includes("<minimax:tool_call")) return null
+  const result: Record<string, unknown> = {}
+  let found = false
+  const paramRegex = /<parameter name="([^"]+)">([\s\S]*?)<\/parameter>/g
+  let match: RegExpExecArray | null
+  while ((match = paramRegex.exec(text)) !== null) {
+    const name = match[1]
+    const raw = match[2].trim()
+    try {
+      result[name] = JSON.parse(raw)
+    } catch {
+      result[name] = raw
+    }
+    found = true
+  }
+  return found ? result : null
+}
+
 export function parseAiJson(text: string): unknown {
   const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/i)
   const candidate = fenced?.[1] ?? text
@@ -231,6 +251,8 @@ function parseAiProviderOutput(text: string, options?: PromptAiProviderOptions):
   if (options?.debugLabel) {
     logger.log(`[AI][${options.debugLabel}] raw output:`, text)
   }
+  const miniMax = parseMiniMaxToolCallText(text)
+  if (miniMax !== null) return miniMax
   try {
     return parseAiJson(text)
   } catch (error) {
@@ -325,7 +347,7 @@ async function promptAnthropicCompatible(
     },
     body: JSON.stringify({
       model,
-      max_tokens: 1000,
+      max_tokens: options?.maxTokens ?? 4096,
       temperature: 0.2,
       system: options?.structuredOutput
         ? "Use the required tool to return structured data. Do not write free-form text."
@@ -347,16 +369,22 @@ async function promptAnthropicCompatible(
   })
   if (!response.ok) throw await createProviderHttpError(response)
   const responsePayload = await response.json()
+  // eslint-disable-next-line no-console
+  console.log("[AI][anthropic-compatible] raw response payload", responsePayload)
   const structuredOutput = extractStructuredOutputFromProviderResponse(
     responsePayload,
     options?.structuredOutput
   )
   if (structuredOutput !== null) {
+    // eslint-disable-next-line no-console
+    console.log("[AI][anthropic-compatible] structured output extracted", structuredOutput)
     logStructuredOutput(structuredOutput, options)
     return structuredOutput
   }
-
-  return parseAiProviderOutput(extractTextFromProviderResponse(responsePayload), options)
+  const extractedText = extractTextFromProviderResponse(responsePayload)
+  // eslint-disable-next-line no-console
+  console.log("[AI][anthropic-compatible] fallback text extraction", extractedText)
+  return parseAiProviderOutput(extractedText, options)
 }
 
 async function testOpenAiCompatible(settings: AiSettings): Promise<void> {

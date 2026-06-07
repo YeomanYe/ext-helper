@@ -124,6 +124,18 @@ const validatePreferences = (value: unknown): ImportExportPreferences => {
     }
     preferences.viewMode = value.viewMode
   }
+  if (value.recommendationApiBaseUrl !== undefined) {
+    assertString(value.recommendationApiBaseUrl, "preferences.recommendationApiBaseUrl")
+    if (isString(value.recommendationApiBaseUrl)) {
+      preferences.recommendationApiBaseUrl = value.recommendationApiBaseUrl
+    }
+  }
+  if (value.cloudRecommendationEnabled !== undefined) {
+    assertBoolean(value.cloudRecommendationEnabled, "preferences.cloudRecommendationEnabled")
+    if (isBoolean(value.cloudRecommendationEnabled)) {
+      preferences.cloudRecommendationEnabled = value.cloudRecommendationEnabled
+    }
+  }
   return preferences
 }
 
@@ -207,6 +219,12 @@ export async function createExportPayload({
       ...(preferences.compactMode !== undefined ? { compactMode: preferences.compactMode } : {}),
       ...(preferences.showDisabled !== undefined ? { showDisabled: preferences.showDisabled } : {}),
       ...(preferences.viewMode !== undefined ? { viewMode: preferences.viewMode } : {}),
+      ...(preferences.recommendationApiBaseUrl !== undefined
+        ? { recommendationApiBaseUrl: preferences.recommendationApiBaseUrl }
+        : {}),
+      ...(preferences.cloudRecommendationEnabled !== undefined
+        ? { cloudRecommendationEnabled: preferences.cloudRecommendationEnabled }
+        : {}),
     }
   }
   if (selected.has("usageLog")) data.usageLog = await usageLogRepo.fetchAll()

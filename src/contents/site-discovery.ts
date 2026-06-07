@@ -1,6 +1,11 @@
 import type { SiteDiscoveryResult } from "@/services/siteDiscoveryService"
 import type { SiteRecommendationResult } from "@/services/siteRecommendationService"
-import type { SiteAuthProvider, SiteAuthUser } from "@/services/siteAuthService"
+import { getRecommendationQuotaPointsText } from "@/services/siteRecommendationQuota"
+import type { SiteAuthProvider } from "@/services/siteAuthService"
+import type {
+  InstalledExtensionRecommendationContext,
+  SiteAuthStatus,
+} from "@/services/siteDiscoveryPanelService"
 
 export const config = {
   matches: ["http://*/*", "https://*/*"],
@@ -10,19 +15,18 @@ type DiscoveryResponse =
   | {
       success: true
       result: SiteDiscoveryResult
-      recommendations?: SiteRecommendationResult
       auth?: SiteAuthStatus
     }
   | { success: false; error: string }
 
-type AuthResponse = { success: true; auth: SiteAuthStatus } | { success: false; error: string }
+type RecommendationResponse =
+  | {
+      success: true
+      recommendations: SiteRecommendationResult
+    }
+  | { success: false; error: string }
 
-interface SiteAuthStatus {
-  apiConfigured: boolean
-  authenticated: boolean
-  user: SiteAuthUser | null
-  provider: SiteAuthProvider | null
-}
+type AuthResponse = { success: true; auth: SiteAuthStatus } | { success: false; error: string }
 
 const ROOT_ID = "ext-helper-site-discovery-root"
 const EXTENSION_PREFERENCES_KEY = "ext-helper-preferences"
@@ -126,6 +130,7 @@ function createStyles(): HTMLStyleElement {
       --eh-bg-rgb: 15 15 35;
       --eh-bg-alt: #1a1a2e;
       --eh-surface-soft: #11162b;
+      --eh-surface-soft-rgb: 17 22 43;
       --eh-surface-raised: #1a1a2e;
       --eh-surface-inset: #0b1020;
       --eh-border: #7c3aed;
@@ -158,6 +163,7 @@ function createStyles(): HTMLStyleElement {
       --eh-bg-rgb: 248 244 232;
       --eh-bg-alt: #fffdf5;
       --eh-surface-soft: #eee7d3;
+      --eh-surface-soft-rgb: 238 231 211;
       --eh-surface-raised: #fffdf5;
       --eh-surface-inset: #e4dcc7;
       --eh-border: #111111;
@@ -197,6 +203,7 @@ function createStyles(): HTMLStyleElement {
       font: 800 11px/1 "Noto Sans SC", "JetBrains Mono", monospace;
       letter-spacing: 0.08em;
       text-transform: uppercase;
+      white-space: nowrap;
       cursor: grab;
       touch-action: none;
       user-select: none;
@@ -271,8 +278,8 @@ function createStyles(): HTMLStyleElement {
 
     .eh-trigger.is-collapsed[data-edge="left"] {
       background: var(--eh-primary);
-      clip-path: inset(0 calc(100% - ${COLLAPSED_VISIBLE_WIDTH}px) 0 0);
-      transform: translateX(${COLLAPSED_VISIBLE_WIDTH - 1}px);
+      clip-path: inset(0 0 0 calc(100% - ${COLLAPSED_VISIBLE_WIDTH}px));
+      transform: translateX(calc(-100% + ${COLLAPSED_VISIBLE_WIDTH}px));
       box-shadow:
         3px 0 0 rgb(0 0 0 / 0.32),
         0 0 14px rgb(var(--eh-primary-rgb) / 0.36);
@@ -281,8 +288,8 @@ function createStyles(): HTMLStyleElement {
 
     .eh-trigger.is-collapsed[data-edge="right"] {
       background: var(--eh-primary);
-      clip-path: inset(0 0 0 calc(100% - ${COLLAPSED_VISIBLE_WIDTH}px));
-      transform: translateX(-${COLLAPSED_VISIBLE_WIDTH - 1}px);
+      clip-path: inset(0 calc(100% - ${COLLAPSED_VISIBLE_WIDTH}px) 0 0);
+      transform: translateX(calc(100% - ${COLLAPSED_VISIBLE_WIDTH}px));
       box-shadow:
         -3px 0 0 rgb(0 0 0 / 0.32),
         0 0 14px rgb(var(--eh-primary-rgb) / 0.36);
@@ -312,16 +319,16 @@ function createStyles(): HTMLStyleElement {
     .eh-trigger.is-collapsing.is-collapsed[data-edge="left"]:hover,
     .eh-trigger.is-collapsing.is-collapsed[data-edge="left"]:focus-visible {
       background: var(--eh-primary);
-      clip-path: inset(0 calc(100% - ${COLLAPSED_VISIBLE_WIDTH}px) 0 0);
-      transform: translateX(${COLLAPSED_VISIBLE_WIDTH - 1}px);
+      clip-path: inset(0 0 0 calc(100% - ${COLLAPSED_VISIBLE_WIDTH}px));
+      transform: translateX(calc(-100% + ${COLLAPSED_VISIBLE_WIDTH}px));
       color: transparent;
     }
 
     .eh-trigger.is-collapsing.is-collapsed[data-edge="right"]:hover,
     .eh-trigger.is-collapsing.is-collapsed[data-edge="right"]:focus-visible {
       background: var(--eh-primary);
-      clip-path: inset(0 0 0 calc(100% - ${COLLAPSED_VISIBLE_WIDTH}px));
-      transform: translateX(-${COLLAPSED_VISIBLE_WIDTH - 1}px);
+      clip-path: inset(0 calc(100% - ${COLLAPSED_VISIBLE_WIDTH}px) 0 0);
+      transform: translateX(calc(100% - ${COLLAPSED_VISIBLE_WIDTH}px));
       color: transparent;
     }
 
@@ -403,8 +410,8 @@ function createStyles(): HTMLStyleElement {
         transform: translateX(0);
       }
       to {
-        clip-path: inset(0 calc(100% - ${COLLAPSED_VISIBLE_WIDTH}px) 0 0);
-        transform: translateX(${COLLAPSED_VISIBLE_WIDTH - 1}px);
+        clip-path: inset(0 0 0 calc(100% - ${COLLAPSED_VISIBLE_WIDTH}px));
+        transform: translateX(calc(-100% + ${COLLAPSED_VISIBLE_WIDTH}px));
       }
     }
 
@@ -414,8 +421,8 @@ function createStyles(): HTMLStyleElement {
         transform: translateX(0);
       }
       to {
-        clip-path: inset(0 0 0 calc(100% - ${COLLAPSED_VISIBLE_WIDTH}px));
-        transform: translateX(-${COLLAPSED_VISIBLE_WIDTH - 1}px);
+        clip-path: inset(0 calc(100% - ${COLLAPSED_VISIBLE_WIDTH}px) 0 0);
+        transform: translateX(calc(100% - ${COLLAPSED_VISIBLE_WIDTH}px));
       }
     }
 
@@ -424,8 +431,10 @@ function createStyles(): HTMLStyleElement {
       left: var(--eh-panel-x, calc(100vw - 440px));
       top: var(--eh-panel-y, calc(100vh - 560px));
       z-index: 2147483647;
+      display: flex;
+      flex-direction: column;
       width: min(420px, calc(100vw - 32px));
-      max-height: min(640px, calc(100vh - 96px));
+      height: min(660px, calc(100vh - 32px));
       overflow: hidden;
       border: 1px solid rgb(var(--eh-accent-rgb) / 0.46);
       border-radius: 0;
@@ -556,7 +565,8 @@ function createStyles(): HTMLStyleElement {
     }
 
     .eh-body {
-      max-height: 478px;
+      flex: 1 1 auto;
+      min-height: 0;
       overflow: auto;
       padding: 14px 14px 16px;
     }
@@ -572,9 +582,30 @@ function createStyles(): HTMLStyleElement {
       line-height: 1.45;
     }
 
+    .eh-loading {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .eh-loading::before {
+      content: "";
+      width: 13px;
+      height: 13px;
+      border: 2px solid rgb(var(--eh-accent-rgb) / 0.24);
+      border-top-color: var(--eh-accent);
+      animation: eh-spin 720ms linear infinite;
+    }
+
+    @keyframes eh-spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
     .eh-summary {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 8px;
       margin-bottom: 12px;
     }
@@ -610,7 +641,63 @@ function createStyles(): HTMLStyleElement {
 
     .eh-list {
       display: grid;
-      gap: 10px;
+      gap: 8px;
+    }
+
+    .eh-tabs {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      border-bottom: 1px solid rgb(var(--eh-border-rgb) / 0.3);
+      background: transparent;
+      margin-top: 14px;
+      padding: 8px 10px 0;
+    }
+
+    .eh-tab {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-width: 0;
+      border: 0;
+      border-bottom: 2px solid transparent;
+      border-radius: 0;
+      background: transparent;
+      color: var(--eh-text-muted);
+      cursor: pointer;
+      font: 900 13px/1 "Noto Sans SC", "JetBrains Mono", monospace;
+      letter-spacing: 0.08em;
+      padding: 0 10px 9px;
+      text-align: left;
+      text-transform: uppercase;
+      transition:
+        border-color 140ms ease,
+        color 140ms ease;
+    }
+
+    .eh-tab:hover {
+      color: var(--eh-text-primary);
+    }
+
+    .eh-tab[aria-selected="true"] {
+      border-bottom-color: var(--eh-accent);
+      color: var(--eh-accent);
+    }
+
+    .eh-tab-count {
+      display: inline-grid;
+      min-width: 18px;
+      height: 18px;
+      place-items: center;
+      border: 1px solid rgb(var(--eh-border-rgb) / 0.28);
+      background: rgb(var(--eh-surface-soft-rgb) / 0.72);
+      color: inherit;
+      font: 900 10px/1 "JetBrains Mono", monospace;
+      padding: 0 4px;
+    }
+
+    .eh-tab-panel[hidden] {
+      display: none;
     }
 
     .eh-section {
@@ -638,13 +725,14 @@ function createStyles(): HTMLStyleElement {
 
     .eh-card {
       display: grid;
-      grid-template-columns: 42px minmax(0, 1fr);
-      gap: 11px;
+      grid-template-columns: 38px minmax(0, 1fr);
+      gap: 10px;
       border: 1px solid rgb(var(--eh-border-rgb) / 0.28);
       border-radius: 0;
       background: var(--eh-surface-raised);
       color: inherit;
-      padding: 11px;
+      min-height: 86px;
+      padding: 8px;
       text-decoration: none;
       transition:
         border-color 140ms ease,
@@ -661,9 +749,8 @@ function createStyles(): HTMLStyleElement {
     .eh-icon {
       display: inline-grid;
       place-items: center;
-      width: 42px;
-      height: 42px;
-      border: 1px solid rgb(var(--eh-border-rgb) / 0.28);
+      width: 38px;
+      height: 38px;
       border-radius: 0;
       background: var(--eh-surface-soft);
       color: var(--eh-accent);
@@ -737,7 +824,7 @@ function createStyles(): HTMLStyleElement {
     }
 
     .eh-description {
-      margin: 6px 0 0;
+      margin: 5px 0 0;
       color: var(--eh-text-secondary);
       font-size: 12px;
       font-weight: 600;
@@ -745,24 +832,27 @@ function createStyles(): HTMLStyleElement {
       display: -webkit-box;
       overflow: hidden;
       -webkit-box-orient: vertical;
-      -webkit-line-clamp: 2;
+      -webkit-line-clamp: 1;
     }
 
     .eh-reason {
-      margin: 7px 0 0;
+      margin: 5px 0 0;
       color: var(--eh-text-muted);
       font-size: 10px;
       font-weight: 750;
       letter-spacing: 0.06em;
       line-height: 1.35;
+      overflow: hidden;
+      text-overflow: ellipsis;
       text-transform: uppercase;
+      white-space: nowrap;
     }
 
     .eh-meta {
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
-      margin-top: 8px;
+      margin-top: 6px;
     }
 
     .eh-chip {
@@ -778,6 +868,7 @@ function createStyles(): HTMLStyleElement {
     }
 
     .eh-footer {
+      flex: 0 0 auto;
       border-top: 1px solid rgb(var(--eh-accent-rgb) / 0.16);
       padding: 12px 14px;
       background: rgb(var(--eh-bg-rgb) / 0.34);
@@ -799,8 +890,14 @@ function createStyles(): HTMLStyleElement {
 
     .eh-query-list {
       display: flex;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
       gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+
+    .eh-query-list .eh-chip {
+      flex: 0 0 auto;
     }
 
     .eh-footer-row {
@@ -1005,6 +1102,65 @@ function createSectionTitle(title: string, chipText?: string): HTMLElement {
   return heading
 }
 
+function createTabButton({
+  id,
+  panelId,
+  label,
+  selected,
+}: {
+  id: string
+  panelId: string
+  label: string
+  selected: boolean
+}): HTMLButtonElement {
+  const button = document.createElement("button")
+  button.id = id
+  button.className = "eh-tab"
+  button.type = "button"
+  button.role = "tab"
+  button.setAttribute("aria-controls", panelId)
+  button.setAttribute("aria-selected", String(selected))
+  button.innerHTML = `
+    <span></span>
+    <span class="eh-tab-count"></span>
+  `
+  button.querySelector("span")!.textContent = label
+  return button
+}
+
+function createTabPanel({
+  id,
+  labelledBy,
+  selected,
+}: {
+  id: string
+  labelledBy: string
+  selected: boolean
+}): HTMLElement {
+  const panel = document.createElement("section")
+  panel.id = id
+  panel.className = "eh-section eh-tab-panel"
+  panel.role = "tabpanel"
+  panel.setAttribute("aria-labelledby", labelledBy)
+  panel.hidden = !selected
+  return panel
+}
+
+function wireTabs(tabs: HTMLButtonElement[], panels: HTMLElement[]): void {
+  const selectTab = (activeIndex: number) => {
+    tabs.forEach((tab, index) => {
+      tab.setAttribute("aria-selected", String(index === activeIndex))
+    })
+    panels.forEach((panel, index) => {
+      panel.hidden = index !== activeIndex
+    })
+  }
+
+  tabs.forEach((tab, index) => {
+    tab.addEventListener("click", () => selectTab(index))
+  })
+}
+
 function createInstalledMatchCard(
   match: SiteDiscoveryResult["matches"][number],
   iconBridge: IconBridge
@@ -1090,22 +1246,90 @@ function renderResult(
   actions: {
     onLogin: (provider: SiteAuthProvider) => void
     onSignOut: () => void
-  }
+  },
+  options: {
+    recommendationsLoading?: boolean
+    activePanelId?: string
+  } = {}
 ): void {
   body.replaceChildren()
   footer.replaceChildren()
+  const selectedPanelId = options.activePanelId ?? "eh-panel-installed"
+  const recommendedCount = options.recommendationsLoading
+    ? "..."
+    : String(recommendations?.recommendations.length ?? 0)
+  const pointsText = getRecommendationQuotaPointsText(
+    recommendations,
+    options.recommendationsLoading
+  )
 
   const summary = document.createElement("div")
   summary.className = "eh-summary"
   summary.innerHTML = `
-    <div class="eh-stat"><strong>${result.domain}</strong><span>site</span></div>
     <div class="eh-stat"><strong>${result.matches.length}</strong><span>matches</span></div>
-    <div class="eh-stat"><strong>${recommendations?.recommendations.length ?? 0}</strong><span>recommended</span></div>
+    <div class="eh-stat"><strong>${recommendedCount}</strong><span>recommended</span></div>
+    <div class="eh-stat"><strong>${pointsText}</strong><span>points</span></div>
   `
   body.append(summary)
 
-  const installedSection = document.createElement("section")
-  installedSection.className = "eh-section"
+  const tabs = document.createElement("div")
+  tabs.className = "eh-tabs"
+  tabs.role = "tablist"
+
+  const recommendedTab = createTabButton({
+    id: "eh-tab-recommended",
+    panelId: "eh-panel-recommended",
+    label: "Recommended",
+    selected: selectedPanelId === "eh-panel-recommended",
+  })
+  const installedTab = createTabButton({
+    id: "eh-tab-installed",
+    panelId: "eh-panel-installed",
+    label: "Installed",
+    selected: selectedPanelId !== "eh-panel-recommended",
+  })
+  installedTab.querySelector(".eh-tab-count")!.textContent = String(result.matches.length)
+  recommendedTab.querySelector(".eh-tab-count")!.textContent = recommendedCount
+  tabs.append(installedTab, recommendedTab)
+
+  const recommendationSection = createTabPanel({
+    id: "eh-panel-recommended",
+    labelledBy: "eh-tab-recommended",
+    selected: selectedPanelId === "eh-panel-recommended",
+  })
+  recommendationSection.append(
+    createSectionTitle(
+      "Recommended extensions",
+      recommendations?.recommendations.length ? recommendations.source : undefined
+    )
+  )
+  if (options.recommendationsLoading) {
+    recommendationSection.append(createLoadingState("Searching recommendations for this site..."))
+  } else if (!recommendations || recommendations.recommendations.length === 0) {
+    const empty = document.createElement("div")
+    empty.className = "eh-state"
+    if (!auth?.apiConfigured && !auth?.aiConfigured) {
+      empty.textContent = "Recommendation service or AI provider is not configured yet."
+    } else if (recommendations?.error) {
+      empty.textContent = "Recommendation service is unavailable. Try again later."
+    } else {
+      empty.textContent = "No recommendations are available for this site yet."
+    }
+    recommendationSection.append(empty)
+  } else {
+    const list = document.createElement("div")
+    list.className = "eh-list"
+    recommendations.recommendations.forEach((recommendation) => {
+      list.append(createRecommendedCard(recommendation, iconBridge))
+    })
+    recommendationSection.append(list)
+  }
+
+  const installedSection = createTabPanel({
+    id: "eh-panel-installed",
+    labelledBy: "eh-tab-installed",
+    selected: selectedPanelId !== "eh-panel-recommended",
+  })
   installedSection.append(
     createSectionTitle("Installed matches", `${result.totalExtensions} installed`)
   )
@@ -1124,27 +1348,9 @@ function renderResult(
     }
     installedSection.append(list)
   }
-  body.append(installedSection)
 
-  const recommendationSection = document.createElement("section")
-  recommendationSection.className = "eh-section"
-  recommendationSection.append(
-    createSectionTitle("Recommended extensions", recommendations?.source ?? "fallback")
-  )
-  if (!recommendations || recommendations.recommendations.length === 0) {
-    const empty = document.createElement("div")
-    empty.className = "eh-state"
-    empty.textContent = "No crawler recommendations are available for this site yet."
-    recommendationSection.append(empty)
-  } else {
-    const list = document.createElement("div")
-    list.className = "eh-list"
-    recommendations.recommendations.forEach((recommendation) => {
-      list.append(createRecommendedCard(recommendation, iconBridge))
-    })
-    recommendationSection.append(list)
-  }
-  body.append(recommendationSection)
+  wireTabs([installedTab, recommendedTab], [installedSection, recommendationSection])
+  body.append(tabs, installedSection, recommendationSection)
 
   const queryTitle = document.createElement("p")
   queryTitle.className = "eh-query"
@@ -1164,10 +1370,14 @@ function renderResult(
   authCopy.className = "eh-auth-copy"
   if (auth?.authenticated) {
     authCopy.textContent = `Signed in${auth.user?.email ? ` as ${auth.user.email}` : ""}`
-  } else if (auth?.apiConfigured) {
+  } else if (auth?.authConfigured) {
     authCopy.textContent = "Sign in to unlock server recommendations"
+  } else if (auth?.apiConfigured) {
+    authCopy.textContent = "Using server recommendations"
+  } else if (auth?.aiConfigured) {
+    authCopy.textContent = "Using AI recommendations"
   } else {
-    authCopy.textContent = "Using local crawler fallback"
+    authCopy.textContent = "Recommendation service or AI provider is not configured"
   }
 
   const actionGroup = document.createElement("div")
@@ -1179,7 +1389,7 @@ function renderResult(
     signOut.textContent = "Sign out"
     signOut.addEventListener("click", actions.onSignOut)
     actionGroup.append(signOut)
-  } else if (auth?.apiConfigured) {
+  } else if (auth?.authConfigured) {
     ;(["github", "google"] as const).forEach((provider) => {
       const button = document.createElement("button")
       button.className = "eh-action"
@@ -1200,6 +1410,35 @@ function renderState(body: HTMLElement, message: string): void {
   state.className = "eh-state"
   state.textContent = message
   body.append(state)
+}
+
+function renderLoadingState(body: HTMLElement, message: string): void {
+  body.replaceChildren(createLoadingState(message))
+}
+
+function createLoadingState(message: string): HTMLElement {
+  const state = document.createElement("div")
+  state.className = "eh-state eh-loading"
+  state.setAttribute("role", "status")
+  state.textContent = message
+  return state
+}
+
+function getActivePanelId(body: HTMLElement): string | undefined {
+  return (
+    body
+      .querySelector<HTMLButtonElement>('.eh-tab[aria-selected="true"]')
+      ?.getAttribute("aria-controls") ?? undefined
+  )
+}
+
+function getInstalledExtensionsForRecommendations(
+  result: SiteDiscoveryResult
+): InstalledExtensionRecommendationContext[] {
+  return result.matches.map((match) => ({
+    name: match.extension.name,
+    description: match.extension.description || undefined,
+  }))
 }
 
 function getMetaDescription(): string {
@@ -1335,6 +1574,18 @@ async function requestDiscovery(): Promise<DiscoveryResponse> {
   })
 }
 
+async function requestRecommendations(
+  installedExtensions: InstalledExtensionRecommendationContext[]
+): Promise<RecommendationResponse> {
+  return await chrome.runtime.sendMessage({
+    type: "FETCH_SITE_RECOMMENDATIONS_FOR_SITE",
+    url: location.href,
+    pageTitle: document.title,
+    pageDescription: getMetaDescription(),
+    installedExtensions,
+  })
+}
+
 async function requestLogin(provider: SiteAuthProvider): Promise<AuthResponse> {
   return await chrome.runtime.sendMessage({
     type: "START_SITE_AUTH_LOGIN",
@@ -1451,7 +1702,7 @@ function mount(): void {
   }
 
   const loadPanel = async () => {
-    renderState(body, "Scanning installed extensions and recommendations for this site...")
+    renderLoadingState(body, "Scanning installed extensions for this site...")
     footer.replaceChildren()
     const response = await requestDiscovery().catch((error) => ({
       success: false as const,
@@ -1463,7 +1714,7 @@ function mount(): void {
         footer,
         response.result,
         iconBridge,
-        response.recommendations,
+        undefined,
         response.auth,
         {
           onLogin: (provider) => {
@@ -1472,7 +1723,42 @@ function mount(): void {
           onSignOut: () => {
             void handleSignOut()
           },
-        }
+        },
+        { recommendationsLoading: true }
+      )
+      updatePanelPosition(panel, trigger)
+
+      const recommendationResponse = await requestRecommendations(
+        getInstalledExtensionsForRecommendations(response.result)
+      ).catch((error) => ({
+        success: false as const,
+        error: error instanceof Error ? error.message : "Recommendation lookup failed.",
+      }))
+      const recommendations: SiteRecommendationResult = recommendationResponse.success
+        ? recommendationResponse.recommendations
+        : {
+            domain: response.result.domain,
+            source: "remote",
+            totalCandidates: 0,
+            recommendations: [],
+            error: recommendationResponse.error,
+          }
+      renderResult(
+        body,
+        footer,
+        response.result,
+        iconBridge,
+        recommendations,
+        response.auth,
+        {
+          onLogin: (provider) => {
+            void handleLogin(provider)
+          },
+          onSignOut: () => {
+            void handleSignOut()
+          },
+        },
+        { activePanelId: getActivePanelId(body) }
       )
     } else {
       renderState(body, response.error)
