@@ -162,7 +162,7 @@ export const ExtensionCard = React.memo(function ExtensionCard({
               <div
                 className={cn(
                   "absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 border-2 border-punk-bg-alt rounded-full",
-                  extension.enabled ? "bg-punk-success animate-pulse-neon" : "bg-punk-text-muted"
+                  extension.enabled ? "bg-punk-success shadow-neon-success" : "bg-punk-text-muted"
                 )}
               />
             </div>
@@ -355,7 +355,7 @@ export const ExtensionCard = React.memo(function ExtensionCard({
           <div
             className={cn(
               "absolute -bottom-0.5 -right-0.5 w-3 h-3 border border-punk-bg",
-              extension.enabled ? "bg-punk-success animate-pulse-neon" : "bg-punk-text-muted"
+              extension.enabled ? "bg-punk-success shadow-neon-success" : "bg-punk-text-muted"
             )}
           />
         </div>
@@ -440,7 +440,7 @@ export const ExtensionCard = React.memo(function ExtensionCard({
         <div
           className={cn(
             "absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 border border-punk-bg-alt",
-            extension.enabled ? "bg-punk-success animate-pulse-neon" : "bg-punk-text-muted"
+            extension.enabled ? "bg-punk-success shadow-neon-success" : "bg-punk-text-muted"
           )}
         />
       </div>

@@ -23,7 +23,7 @@ export function ExtensionList({
         {[1, 2, 3].map((i) => (
           <div
             key={i}
-            className="animate-pulse flex items-start gap-3 border border-punk-border/30 bg-punk-surface-raised p-3"
+            className="flex items-start gap-3 border border-punk-border/30 bg-punk-surface-raised p-3"
           >
             <div className="h-12 w-12 bg-punk-surface-soft" />
             <div className="flex-1 space-y-2">

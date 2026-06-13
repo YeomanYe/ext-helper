@@ -65,7 +65,7 @@ export const RuleCard = React.memo(function RuleCard({
           <div
             className={cn(
               "w-2 h-2 border border-punk-bg-alt rounded-full",
-              isEnabled ? "bg-punk-success animate-pulse-neon" : "bg-punk-text-muted"
+              isEnabled ? "bg-punk-success shadow-neon-success" : "bg-punk-text-muted"
             )}
           />
           {/* Action buttons */}

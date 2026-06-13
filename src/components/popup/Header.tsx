@@ -1020,9 +1020,9 @@ export function Header({
   const setTheme = useUIStore((state) => state.setTheme)
   return (
     <header className="relative flex items-center justify-between border-b-2 border-punk-primary bg-punk-surface-raised px-4 py-3 shadow-punk-hard hud-corner">
-      {/* Decorative scanline */}
+      {/* Static accent wash */}
       <div className="absolute inset-0 overflow-hidden opacity-10 pointer-events-none">
-        <div className="w-full h-1 bg-punk-accent animate-scanline" />
+        <div className="w-full h-1 bg-punk-accent" />
       </div>
 
       {/* Logo and Title */}
@@ -1048,7 +1048,7 @@ export function Header({
               strokeWidth="2"
               fill="none"
             />
-            {/* E letter with pulse animation */}
+            {/* E letter */}
             <text
               x="20"
               y="20"
@@ -1058,7 +1058,6 @@ export function Header({
               fontSize="22"
               fontWeight="bold"
               fontFamily="monospace"
-              className="animate-pulse-neon"
             >
               E
             </text>
@@ -1210,9 +1209,9 @@ export function Footer({ totalCount, enabledCount }: FooterProps) {
         <span className="font-punk-body text-punk-accent text-sm">{percentage}%_ACTIVE</span>
       </div>
 
-      {/* Blinking indicator */}
+      {/* Live indicator */}
       <div className="flex items-center gap-2">
-        <div className="h-2 w-2 bg-punk-success animate-pulse shadow-neon-cyan rounded-full" />
+        <div className="h-2 w-2 bg-punk-success shadow-neon-cyan rounded-full" />
         <span className="font-punk-body text-punk-success text-xs">LIVE</span>
       </div>
     </footer>
