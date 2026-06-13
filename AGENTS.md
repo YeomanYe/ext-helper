@@ -11,8 +11,10 @@ This file provides guidance to Codex (Codex.ai/code) when working with code in t
 ```bash
 # Development
 pnpm dev            # Plasmo dev for Chrome MV3 (build/chrome-mv3-dev)
+pnpm dev:chrome:package # One-shot Chrome MV3 dev package (build/chrome-mv3-dev)
 pnpm dev:firefox    # Plasmo dev watcher for Firefox MV2 (build/firefox-mv2-dev)
 pnpm dev:firefox:package # One-shot Firefox MV2 dev package (build/firefox-mv2-dev)
+pnpm dev:extension  # One-shot Chrome + Firefox extension dev packages
 pnpm dev:web        # Vite dev server on port 4173 (web preview with mock data)
 pnpm dev:all        # Build Firefox dev package once, then run Chrome dev + web + website
 pnpm build          # Plasmo production build

@@ -38,8 +38,10 @@ Requires Node 20+ and pnpm 9+.
 pnpm install
 
 pnpm dev          # Plasmo dev for Chrome MV3 — build/chrome-mv3-dev
+pnpm dev:chrome:package # One-shot Chrome MV3 dev package — build/chrome-mv3-dev
 pnpm dev:firefox  # Plasmo dev watcher for Firefox MV2 — build/firefox-mv2-dev
 pnpm dev:firefox:package # One-shot Firefox MV2 dev package — build/firefox-mv2-dev
+pnpm dev:extension # One-shot Chrome + Firefox extension dev packages
 pnpm dev:web      # Vite web preview with mock data on :4173
 pnpm dev:website  # Marketing site (website/)
 pnpm dev:all      # Build Firefox dev package once, then run Chrome dev + web + website

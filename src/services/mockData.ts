@@ -173,7 +173,8 @@ export const MOCK_GROUPS: Group[] = [
 
 // Check if running in browser extension or dev mode
 export function isDevMode(): boolean {
-  return typeof window !== "undefined" && !window.location.href.includes("chrome-extension")
+  if (typeof window === "undefined") return false
+  return window.location.protocol === "http:" || window.location.protocol === "https:"
 }
 
 // ============================================================
