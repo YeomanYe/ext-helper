@@ -27,13 +27,13 @@ import {
 } from "lucide-react"
 import { cn } from "@/utils"
 import { Switch } from "@/components/common/Switch"
+import { shouldFocusSearchFromFindShortcut } from "@/components/popup/searchShortcut"
 import { isDevMode } from "@/services/mockData"
 import { browserAdapter } from "@/services/browser/adapter"
 import { preferencesRepo } from "@/services/preferencesRepo"
 import { detectChromeLocalAiStatus, testAiProvider } from "@/services/aiProvider"
 import { useUIStore } from "@/stores/uiStore"
 import { defaultAiSettings, normalizeAiSettings } from "@/services/aiSettings"
-import { DEFAULT_RECOMMENDATION_API_BASE_URL } from "@/services/siteRecommendationService"
 import {
   getModelProviderPresetForSettings,
   modelProviderPresets,
@@ -85,6 +85,7 @@ interface SearchBarProps {
   activeFilter?: FilterType
   onFilterChange?: (filter: FilterType) => void
   filters?: { value: FilterType; label: string }[]
+  enableFindShortcut?: boolean
 }
 
 export function SearchBar({
@@ -94,10 +95,27 @@ export function SearchBar({
   activeFilter = "all",
   onFilterChange,
   filters = BASE_FILTERS,
+  enableFindShortcut = false,
 }: SearchBarProps) {
   const [showDropdown, setShowDropdown] = React.useState(false)
   const [dropUp, setDropUp] = React.useState(false)
   const buttonRef = React.useRef<HTMLButtonElement>(null)
+  const inputRef = React.useRef<HTMLInputElement>(null)
+
+  React.useEffect(() => {
+    if (!enableFindShortcut || typeof document === "undefined") return
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (!shouldFocusSearchFromFindShortcut(event)) return
+
+      event.preventDefault()
+      inputRef.current?.focus()
+      inputRef.current?.select()
+    }
+
+    document.addEventListener("keydown", handleKeyDown)
+    return () => document.removeEventListener("keydown", handleKeyDown)
+  }, [enableFindShortcut])
 
   const handleToggle = () => {
     if (!showDropdown && buttonRef.current) {
@@ -183,6 +201,7 @@ export function SearchBar({
           $
         </span>
         <input
+          ref={inputRef}
           id="extension-search"
           name="extension-search"
           type="text"

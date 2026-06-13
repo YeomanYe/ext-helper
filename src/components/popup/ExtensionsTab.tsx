@@ -150,6 +150,7 @@ export function ExtensionsTab() {
           activeFilter={filter}
           onFilterChange={setFilter}
           filters={MAIN_FILTERS}
+          enableFindShortcut
         />
       </div>
 
