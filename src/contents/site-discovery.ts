@@ -115,34 +115,34 @@ function createStyles(): HTMLStyleElement {
     :host {
       all: initial;
       color-scheme: dark;
-      --eh-primary: #7c3aed;
-      --eh-primary-rgb: 124 58 237;
-      --eh-secondary: #a78bfa;
-      --eh-cta: #f43f5e;
-      --eh-cta-rgb: 244 63 94;
-      --eh-accent: #22d3ee;
-      --eh-accent-rgb: 34 211 238;
+      --eh-primary: #2563eb;
+      --eh-primary-rgb: 37 99 235;
+      --eh-secondary: #60a5fa;
+      --eh-cta: #fb7185;
+      --eh-cta-rgb: 251 113 133;
+      --eh-accent: #38bdf8;
+      --eh-accent-rgb: 56 189 248;
       --eh-success: #10b981;
       --eh-success-rgb: 16 185 129;
       --eh-warning: #fbbf24;
       --eh-warning-rgb: 251 191 36;
-      --eh-bg: #0f0f23;
-      --eh-bg-rgb: 15 15 35;
-      --eh-bg-alt: #1a1a2e;
-      --eh-surface-soft: #11162b;
-      --eh-surface-soft-rgb: 17 22 43;
-      --eh-surface-raised: #1a1a2e;
-      --eh-surface-inset: #0b1020;
-      --eh-border: #7c3aed;
-      --eh-border-rgb: 124 58 237;
-      --eh-text-primary: #e2e8f0;
-      --eh-text-secondary: #94a3b8;
-      --eh-text-muted: #78859b;
+      --eh-bg: #06111f;
+      --eh-bg-rgb: 6 17 31;
+      --eh-bg-alt: #0b1b33;
+      --eh-surface-soft: #0e223d;
+      --eh-surface-soft-rgb: 14 34 61;
+      --eh-surface-raised: #102844;
+      --eh-surface-inset: #030a14;
+      --eh-border: #3b82f6;
+      --eh-border-rgb: 59 130 246;
+      --eh-text-primary: #e6f3ff;
+      --eh-text-secondary: #a7bdd5;
+      --eh-text-muted: #7188a3;
       --eh-shadow-hard: 8px 8px 0 rgb(0 0 0 / 0.45);
       --eh-shadow-panel:
-        0 0 18px rgb(var(--eh-primary-rgb) / 0.28),
+        0 0 18px rgb(var(--eh-accent-rgb) / 0.2),
         0 12px 32px rgb(0 0 0 / 0.45);
-      --eh-scanline: rgb(0 0 0 / 0.16);
+      --eh-scanline: rgb(103 232 249 / 0.045);
       font-family: "Noto Sans SC", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     }
 
@@ -439,6 +439,8 @@ function createStyles(): HTMLStyleElement {
       border: 1px solid rgb(var(--eh-accent-rgb) / 0.46);
       border-radius: 0;
       background:
+        radial-gradient(circle at 8% 0%, rgb(var(--eh-primary-rgb) / 0.16), transparent 38%),
+        radial-gradient(circle at 100% 18%, rgb(var(--eh-accent-rgb) / 0.1), transparent 34%),
         repeating-linear-gradient(
           0deg,
           transparent 0,

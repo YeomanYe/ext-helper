@@ -56,7 +56,7 @@ export default {
         ],
       },
       boxShadow: {
-        "neon-purple":
+        "neon-primary":
           "0 0 5px rgb(var(--punk-primary-rgb) / 0.55), 0 0 20px rgb(var(--punk-primary-rgb) / 0.35), 0 0 40px rgb(var(--punk-primary-rgb) / 0.25)",
         "neon-pink":
           "0 0 5px rgb(var(--punk-neon-pink-rgb) / 0.55), 0 0 20px rgb(var(--punk-neon-pink-rgb) / 0.35), 0 0 40px rgb(var(--punk-neon-pink-rgb) / 0.25)",

@@ -4,47 +4,47 @@
 
 :root {
   /* Punk Color System */
-  --punk-primary: #00a86b;
-  --punk-primary-rgb: 0 168 107;
-  --punk-secondary: #22c98a;
-  --punk-secondary-rgb: 34 201 138;
-  --punk-cta: #f43f5e;
-  --punk-cta-rgb: 244 63 94;
-  --punk-accent: #22d3ee;
-  --punk-accent-rgb: 34 211 238;
-  --punk-success: #10b981;
-  --punk-success-rgb: 16 185 129;
-  --punk-warning: #fbbf24;
-  --punk-warning-rgb: 251 191 36;
-  --punk-error: #f43f5e;
-  --punk-error-rgb: 244 63 94;
-  --punk-bg: #0c1512;
-  --punk-bg-rgb: 12 21 18;
-  --punk-bg-alt: #111f1a;
-  --punk-bg-alt-rgb: 17 31 26;
-  --punk-border: #00a86b;
-  --punk-border-rgb: 0 168 107;
-  --punk-text-primary: #e5f4ec;
-  --punk-text-primary-rgb: 229 244 236;
-  --punk-text-secondary: #a7bdb2;
-  --punk-text-secondary-rgb: 167 189 178;
-  --punk-text-muted: #6f877a;
-  --punk-text-muted-rgb: 111 135 122;
-  --punk-neon-pink: #f97316;
-  --punk-neon-pink-rgb: 249 115 22;
-  --punk-neon-cyan: #00ffff;
-  --punk-neon-cyan-rgb: 0 255 255;
-  --punk-neon-yellow: #fbbf24;
-  --punk-neon-yellow-rgb: 251 191 36;
-  --punk-surface-soft: #10201b;
-  --punk-surface-soft-rgb: 16 32 27;
-  --punk-surface-raised: #162822;
-  --punk-surface-raised-rgb: 22 40 34;
-  --punk-surface-inset: #08110e;
-  --punk-surface-inset-rgb: 8 17 14;
+  --punk-primary: #2563eb;
+  --punk-primary-rgb: 37 99 235;
+  --punk-secondary: #60a5fa;
+  --punk-secondary-rgb: 96 165 250;
+  --punk-cta: #fb7185;
+  --punk-cta-rgb: 251 113 133;
+  --punk-accent: #38bdf8;
+  --punk-accent-rgb: 56 189 248;
+  --punk-success: #2dd4bf;
+  --punk-success-rgb: 45 212 191;
+  --punk-warning: #facc15;
+  --punk-warning-rgb: 250 204 21;
+  --punk-error: #fb7185;
+  --punk-error-rgb: 251 113 133;
+  --punk-bg: #06111f;
+  --punk-bg-rgb: 6 17 31;
+  --punk-bg-alt: #0b1b33;
+  --punk-bg-alt-rgb: 11 27 51;
+  --punk-border: #3b82f6;
+  --punk-border-rgb: 59 130 246;
+  --punk-text-primary: #e6f3ff;
+  --punk-text-primary-rgb: 230 243 255;
+  --punk-text-secondary: #a7bdd5;
+  --punk-text-secondary-rgb: 167 189 213;
+  --punk-text-muted: #7188a3;
+  --punk-text-muted-rgb: 113 136 163;
+  --punk-neon-pink: #93c5fd;
+  --punk-neon-pink-rgb: 147 197 253;
+  --punk-neon-cyan: #67e8f9;
+  --punk-neon-cyan-rgb: 103 232 249;
+  --punk-neon-yellow: #facc15;
+  --punk-neon-yellow-rgb: 250 204 21;
+  --punk-surface-soft: #0e223d;
+  --punk-surface-soft-rgb: 14 34 61;
+  --punk-surface-raised: #102844;
+  --punk-surface-raised-rgb: 16 40 68;
+  --punk-surface-inset: #030a14;
+  --punk-surface-inset-rgb: 3 10 20;
   --punk-hard-shadow: 8px 8px 0 rgb(0 0 0 / 0.45);
   --punk-panel-shadow:
-    0 0 calc(18px * var(--punk-glow-strength)) rgb(var(--punk-primary-rgb) / 0.28),
+    0 0 calc(18px * var(--punk-glow-strength)) rgb(var(--punk-accent-rgb) / 0.2),
     0 12px 32px rgb(0 0 0 / 0.45);
   --punk-glow-strength: 1;
 }
@@ -155,7 +155,15 @@ body {
 body {
   font-family:
     "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "JetBrains Mono", Menlo, monospace;
-  background-color: var(--punk-bg);
+  background:
+    radial-gradient(circle at 12% -8%, rgb(var(--punk-primary-rgb) / 0.18), transparent 34%),
+    radial-gradient(circle at 96% 18%, rgb(var(--punk-accent-rgb) / 0.12), transparent 32%),
+    linear-gradient(
+      180deg,
+      var(--punk-bg-alt) 0%,
+      var(--punk-bg) 46%,
+      var(--punk-surface-inset) 100%
+    );
   color: var(--punk-text-primary);
   overflow: hidden;
 }
