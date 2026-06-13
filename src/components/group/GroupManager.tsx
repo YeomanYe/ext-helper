@@ -34,8 +34,8 @@ const GROUP_COLORS = [
   "#22C55E", // green
   "#14B8A6", // teal
   "#3B82F6", // blue
-  "#8B5CF6", // purple
-  "#EC4899", // pink
+  "#06B6D4", // cyan
+  "#84CC16", // lime
 ]
 
 export function GroupManager({

@@ -6,10 +6,10 @@
 
 :root {
   /* Punk Color System */
-  --punk-primary: #7c3aed;
-  --punk-primary-rgb: 124 58 237;
-  --punk-secondary: #a78bfa;
-  --punk-secondary-rgb: 167 139 250;
+  --punk-primary: #00a86b;
+  --punk-primary-rgb: 0 168 107;
+  --punk-secondary: #22c98a;
+  --punk-secondary-rgb: 34 201 138;
   --punk-cta: #f43f5e;
   --punk-cta-rgb: 244 63 94;
   --punk-accent: #22d3ee;
@@ -20,36 +20,36 @@
   --punk-warning-rgb: 251 191 36;
   --punk-error: #f43f5e;
   --punk-error-rgb: 244 63 94;
-  --punk-bg: #0f0f23;
-  --punk-bg-rgb: 15 15 35;
-  --punk-bg-alt: #1a1a2e;
-  --punk-bg-alt-rgb: 26 26 46;
-  --punk-border: #7c3aed;
-  --punk-border-rgb: 124 58 237;
-  --punk-text-primary: #e2e8f0;
-  --punk-text-primary-rgb: 226 232 240;
-  --punk-text-secondary: #94a3b8;
-  --punk-text-secondary-rgb: 148 163 184;
-  --punk-text-muted: #78859b;
-  --punk-text-muted-rgb: 120 133 155;
-  --punk-neon-pink: #ff00ff;
-  --punk-neon-pink-rgb: 255 0 255;
+  --punk-bg: #0c1512;
+  --punk-bg-rgb: 12 21 18;
+  --punk-bg-alt: #111f1a;
+  --punk-bg-alt-rgb: 17 31 26;
+  --punk-border: #00a86b;
+  --punk-border-rgb: 0 168 107;
+  --punk-text-primary: #e5f4ec;
+  --punk-text-primary-rgb: 229 244 236;
+  --punk-text-secondary: #a7bdb2;
+  --punk-text-secondary-rgb: 167 189 178;
+  --punk-text-muted: #6f877a;
+  --punk-text-muted-rgb: 111 135 122;
+  --punk-neon-pink: #f97316;
+  --punk-neon-pink-rgb: 249 115 22;
   --punk-neon-cyan: #00ffff;
   --punk-neon-cyan-rgb: 0 255 255;
-  --punk-neon-yellow: #ffff00;
-  --punk-neon-yellow-rgb: 255 255 0;
-  --punk-surface-soft: #11162b;
-  --punk-surface-soft-rgb: 17 22 43;
-  --punk-surface-raised: #1a1a2e;
-  --punk-surface-raised-rgb: 26 26 46;
-  --punk-surface-inset: #0b1020;
-  --punk-surface-inset-rgb: 11 16 32;
+  --punk-neon-yellow: #fbbf24;
+  --punk-neon-yellow-rgb: 251 191 36;
+  --punk-surface-soft: #10201b;
+  --punk-surface-soft-rgb: 16 32 27;
+  --punk-surface-raised: #162822;
+  --punk-surface-raised-rgb: 22 40 34;
+  --punk-surface-inset: #08110e;
+  --punk-surface-inset-rgb: 8 17 14;
   --punk-hard-shadow: 8px 8px 0 rgb(0 0 0 / 0.45);
   --punk-panel-shadow:
     0 0 calc(18px * var(--punk-glow-strength)) rgb(var(--punk-primary-rgb) / 0.28),
     0 12px 32px rgb(0 0 0 / 0.45);
   --punk-scanline-color: rgba(0, 0, 0, 0.15);
-  --punk-flicker-color: rgba(124, 58, 237, 0.03);
+  --punk-flicker-color: rgba(0, 168, 107, 0.025);
   --punk-glow-strength: 1;
 }
 
@@ -217,7 +217,6 @@ body::after {
   background: var(--punk-flicker-color);
   pointer-events: none;
   z-index: 9998;
-  animation: flicker 0.15s infinite;
 }
 
 /* Scrollbar Styling */

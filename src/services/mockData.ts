@@ -161,7 +161,7 @@ export const MOCK_GROUPS: Group[] = [
   {
     id: "group-3",
     name: "\u8BBE\u8BA1",
-    color: "#8B5CF6",
+    color: "#06B6D4",
     icon: "palette",
     extensionIds: ["ext-7", "ext-8", "ext-15"],
     createdAt: Date.now() - 86400000 * 3,
