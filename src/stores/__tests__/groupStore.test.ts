@@ -36,6 +36,18 @@ const baseGroups: Group[] = [
   },
 ]
 
+const thirdGroup: Group = {
+  id: "g3",
+  name: "Three",
+  color: "#333",
+  icon: "folder",
+  extensionIds: [],
+  createdAt: 1,
+  updatedAt: 1,
+  isExpanded: true,
+  order: 2,
+}
+
 describe("groupStore", () => {
   beforeEach(async () => {
     vi.resetModules()
@@ -331,6 +343,50 @@ describe("groupStore", () => {
       await useGroupStore.getState().removeFromGroup("g1", "a")
 
       expect(useGroupStore.getState().groups[0].extensionIds).toEqual(["a"])
+    })
+  })
+
+  // ============================================================
+  // reorderGroup
+  // ============================================================
+  describe("reorderGroup", () => {
+    beforeEach(() => {
+      repo.fetchAll.mockResolvedValue([...baseGroups, thirdGroup])
+    })
+
+    it("normal: should move a group after the drop target and normalize orders", async () => {
+      const { useGroupStore } = await import("../groupStore")
+      await useGroupStore.getState().fetchGroups()
+
+      await useGroupStore.getState().reorderGroup("g1", "g3", "after")
+
+      const groups = useGroupStore.getState().groups
+      expect(groups.map((group) => group.id)).toEqual(["g2", "g3", "g1"])
+      expect(groups.map((group) => group.order)).toEqual([0, 1, 2])
+
+      const savedGroups = repo.saveAll.mock.calls[0][0] as Group[]
+      expect(savedGroups.map((group) => group.id)).toEqual(["g2", "g3", "g1"])
+      expect(savedGroups.map((group) => group.order)).toEqual([0, 1, 2])
+    })
+
+    it("edge: should not persist when source and target are the same group", async () => {
+      const { useGroupStore } = await import("../groupStore")
+      await useGroupStore.getState().fetchGroups()
+
+      await useGroupStore.getState().reorderGroup("g1", "g1", "before")
+
+      expect(useGroupStore.getState().groups.map((group) => group.id)).toEqual(["g1", "g2", "g3"])
+      expect(repo.saveAll).not.toHaveBeenCalled()
+    })
+
+    it("abnormal: should rollback on reorder failure", async () => {
+      repo.saveAll.mockRejectedValue(new Error("reorder failed"))
+      const { useGroupStore } = await import("../groupStore")
+      await useGroupStore.getState().fetchGroups()
+
+      await useGroupStore.getState().reorderGroup("g1", "g3", "after")
+
+      expect(useGroupStore.getState().groups.map((group) => group.id)).toEqual(["g1", "g2", "g3"])
     })
   })
 

@@ -36,6 +36,8 @@ export interface Group {
   order: number
 }
 
+export type GroupDropPosition = "before" | "after"
+
 export type FilterType =
   | "all"
   | "enabled"
@@ -246,6 +248,11 @@ export interface GroupStore {
   toggleGroupExpanded: (id: string) => void
   addToGroup: (groupId: string, extId: string) => Promise<void>
   removeFromGroup: (groupId: string, extId: string) => Promise<void>
+  reorderGroup: (
+    sourceGroupId: string,
+    targetGroupId: string,
+    position?: GroupDropPosition
+  ) => Promise<void>
   setDraggedExtension: (id: string | null) => void
 }
 

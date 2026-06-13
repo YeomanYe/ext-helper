@@ -5,7 +5,7 @@ import { GroupModal, GroupsBar } from "@/components/group"
 import { useExtensionStore, useFilteredExtensions, useGroupStore, useUIStore } from "@/stores"
 import { browserAdapter } from "@/services/browser/adapter"
 import { isDevMode } from "@/services/mockData"
-import type { Group } from "@/types"
+import type { Group, GroupDropPosition } from "@/types"
 import { logger } from "@/utils/logger"
 
 export function ExtensionsTab() {
@@ -33,6 +33,7 @@ export function ExtensionsTab() {
   const removeFromGroup = useGroupStore((s) => s.removeFromGroup)
   const updateGroup = useGroupStore((s) => s.updateGroup)
   const deleteGroup = useGroupStore((s) => s.deleteGroup)
+  const reorderGroup = useGroupStore((s) => s.reorderGroup)
 
   const viewMode = useUIStore((s) => s.viewMode)
 
@@ -122,6 +123,14 @@ export function ExtensionsTab() {
     [setExtensionsEnabled]
   )
 
+  const handleReorderGroup = React.useCallback(
+    (sourceGroupId: string, targetGroupId: string, position: GroupDropPosition) => {
+      if (useExtensionStore.getState().bisectSession.active) return
+      void reorderGroup(sourceGroupId, targetGroupId, position)
+    },
+    [reorderGroup]
+  )
+
   const enabledCount = filteredExtensions.filter((e) => e.enabled).length
 
   const gridClass =
@@ -160,6 +169,7 @@ export function ExtensionsTab() {
         onSelectGroup={setSelectedGroupId}
         onToggleGroup={handleToggleGroup}
         onCreateGroup={() => setShowCreateModal(true)}
+        onReorderGroup={handleReorderGroup}
       />
 
       {/* Extension List */}

@@ -1,15 +1,25 @@
-import { Bot, Folder, Power, PowerOff } from "lucide-react"
+import type { DragEventHandler } from "react"
+import { Bot, Folder, GripVertical, Power, PowerOff } from "lucide-react"
 import { cn } from "@/utils"
 import type { Group } from "@/types"
 import { GROUP_ICON_MAP } from "./groupVisuals"
+
+type GroupChipDragState = "idle" | "dragging" | "over-before" | "over-after"
 
 interface GroupChipProps {
   group: Group
   extensionCount: number
   allEnabled: boolean
   disabled?: boolean
+  draggable?: boolean
+  dragState?: GroupChipDragState
   onClick: () => void
   onToggle: () => void
+  onDragStart?: DragEventHandler<HTMLDivElement>
+  onDragOver?: DragEventHandler<HTMLDivElement>
+  onDragLeave?: DragEventHandler<HTMLDivElement>
+  onDrop?: DragEventHandler<HTMLDivElement>
+  onDragEnd?: DragEventHandler<HTMLDivElement>
 }
 
 export function GroupChip({
@@ -17,9 +27,17 @@ export function GroupChip({
   extensionCount,
   allEnabled,
   disabled = false,
+  draggable = false,
+  dragState = "idle",
   onClick,
   onToggle,
+  onDragStart,
+  onDragOver,
+  onDragLeave,
+  onDrop,
+  onDragEnd,
 }: GroupChipProps) {
+  const canDrag = draggable && !disabled
   const displayIcon = group.iconUrl ? (
     <img src={group.iconUrl} className="w-full h-full object-cover" alt="" />
   ) : (
@@ -32,10 +50,30 @@ export function GroupChip({
         "flex items-center gap-2 px-3 py-2 transition-all duration-200 cursor-pointer",
         "border border-punk-border/50 bg-punk-surface-raised",
         "hover:border-punk-primary hover:shadow-punk-hard",
-        "active:shadow-punk-panel"
+        "active:shadow-punk-panel",
+        canDrag && "cursor-grab active:cursor-grabbing",
+        dragState === "dragging" && "opacity-60 border-punk-neon-cyan shadow-punk-hard",
+        dragState === "over-before" &&
+          "border-l-4 border-l-punk-neon-cyan ring-1 ring-punk-neon-cyan/50",
+        dragState === "over-after" &&
+          "border-r-4 border-r-punk-neon-cyan ring-1 ring-punk-neon-cyan/50"
       )}
       onClick={onClick}
+      draggable={canDrag}
+      onDragStart={canDrag ? onDragStart : undefined}
+      onDragOver={canDrag ? onDragOver : undefined}
+      onDragLeave={canDrag ? onDragLeave : undefined}
+      onDrop={canDrag ? onDrop : undefined}
+      onDragEnd={canDrag ? onDragEnd : undefined}
+      aria-grabbed={dragState === "dragging"}
+      data-group-id={group.id}
     >
+      {canDrag && (
+        <GripVertical
+          className="h-3.5 w-3.5 flex-shrink-0 text-punk-text-muted/50"
+          aria-hidden="true"
+        />
+      )}
       {group.iconUrl ? (
         <img src={group.iconUrl} className="h-5 w-5 object-cover flex-shrink-0" alt="" />
       ) : (

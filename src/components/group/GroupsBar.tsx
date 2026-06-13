@@ -1,7 +1,7 @@
 import * as React from "react"
 import { MoreHorizontal, Plus, Search, X } from "lucide-react"
 import { cn } from "@/utils"
-import type { Extension, Group } from "@/types"
+import type { Extension, Group, GroupDropPosition } from "@/types"
 import { CreateGroupChip, GroupChip } from "@/components/group/GroupChips"
 
 interface GroupsBarProps {
@@ -11,6 +11,11 @@ interface GroupsBarProps {
   onSelectGroup: (groupId: string) => void
   onToggleGroup: (group: Group) => void
   onCreateGroup: () => void
+  onReorderGroup?: (
+    sourceGroupId: string,
+    targetGroupId: string,
+    position: GroupDropPosition
+  ) => void
 }
 
 export function GroupsBar({
@@ -20,25 +25,50 @@ export function GroupsBar({
   onSelectGroup,
   onToggleGroup,
   onCreateGroup,
+  onReorderGroup,
 }: GroupsBarProps) {
   const [showMore, setShowMore] = React.useState(false)
   const [overflowSearch, setOverflowSearch] = React.useState("")
+  const [draggedGroupId, setDraggedGroupId] = React.useState<string | null>(null)
+  const [dragOverGroup, setDragOverGroup] = React.useState<{
+    id: string
+    position: GroupDropPosition
+  } | null>(null)
   const searchInputRef = React.useRef<HTMLInputElement>(null)
   const [visibleCount, setVisibleCount] = React.useState(-1)
   const containerRef = React.useRef<HTMLDivElement>(null)
   const moreRef = React.useRef<HTMLDivElement>(null)
 
-  const chipData = groups.map((group) => {
-    const groupExtensions = extensions.filter((ext) => group.extensionIds.includes(ext.id))
-    const count = groupExtensions.length
-    const allEnabled = count > 0 && groupExtensions.every((ext) => ext.enabled)
-    return { group, count, allEnabled }
-  })
+  const orderedGroups = React.useMemo(
+    () =>
+      [...groups].sort((a, b) => {
+        const orderDiff = a.order - b.order
+        if (orderDiff !== 0) return orderDiff
 
-  // Reset measurement when group count changes
+        const createdAtDiff = a.createdAt - b.createdAt
+        if (createdAtDiff !== 0) return createdAtDiff
+
+        return a.id.localeCompare(b.id)
+      }),
+    [groups]
+  )
+  const groupOrderKey = orderedGroups.map((group) => `${group.id}:${group.order}`).join("|")
+
+  const chipData = React.useMemo(
+    () =>
+      orderedGroups.map((group) => {
+        const groupExtensions = extensions.filter((ext) => group.extensionIds.includes(ext.id))
+        const count = groupExtensions.length
+        const allEnabled = count > 0 && groupExtensions.every((ext) => ext.enabled)
+        return { group, count, allEnabled }
+      }),
+    [extensions, orderedGroups]
+  )
+
+  // Reset measurement when group order changes
   React.useEffect(() => {
     setVisibleCount(-1)
-  }, [groups.length])
+  }, [groupOrderKey])
 
   // Measure BEFORE browser paints
   React.useLayoutEffect(() => {
@@ -75,7 +105,7 @@ export function GroupsBar({
       // Keep all chips that fit in 2 rows; +more button uses flex-1 to fill remaining space
       setVisibleCount(Math.max(thirdRowStartIndex, 1))
     }
-  })
+  }, [chipData.length, visibleCount])
 
   // Close dropdown on outside click
   React.useEffect(() => {
@@ -99,6 +129,101 @@ export function GroupsBar({
     }
   }, [showMore])
 
+  const canReorderGroups = Boolean(onReorderGroup) && !disabled
+
+  const getDropPosition = React.useCallback(
+    (event: React.DragEvent<HTMLDivElement>): GroupDropPosition => {
+      const rect = event.currentTarget.getBoundingClientRect()
+      return event.clientX < rect.left + rect.width / 2 ? "before" : "after"
+    },
+    []
+  )
+
+  const clearGroupDragState = React.useCallback(() => {
+    setDraggedGroupId(null)
+    setDragOverGroup(null)
+  }, [])
+
+  const handleGroupDragStart = React.useCallback(
+    (groupId: string) => (event: React.DragEvent<HTMLDivElement>) => {
+      if (!canReorderGroups) {
+        event.preventDefault()
+        return
+      }
+
+      setDraggedGroupId(groupId)
+      event.dataTransfer.effectAllowed = "move"
+      event.dataTransfer.setData("application/x-ext-helper-group-id", groupId)
+      event.dataTransfer.setData("text/plain", groupId)
+    },
+    [canReorderGroups]
+  )
+
+  const handleGroupDragOver = React.useCallback(
+    (groupId: string) => (event: React.DragEvent<HTMLDivElement>) => {
+      if (!canReorderGroups || !draggedGroupId || draggedGroupId === groupId) {
+        setDragOverGroup(null)
+        return
+      }
+
+      event.preventDefault()
+      event.dataTransfer.dropEffect = "move"
+
+      const position = getDropPosition(event)
+      setDragOverGroup((current) =>
+        current?.id === groupId && current.position === position
+          ? current
+          : { id: groupId, position }
+      )
+    },
+    [canReorderGroups, draggedGroupId, getDropPosition]
+  )
+
+  const handleGroupDragLeave = React.useCallback(
+    (groupId: string) => (event: React.DragEvent<HTMLDivElement>) => {
+      if (event.currentTarget.contains(event.relatedTarget as Node | null)) return
+      setDragOverGroup((current) => (current?.id === groupId ? null : current))
+    },
+    []
+  )
+
+  const handleGroupDrop = React.useCallback(
+    (groupId: string) => (event: React.DragEvent<HTMLDivElement>) => {
+      if (!canReorderGroups || !onReorderGroup) return
+
+      event.preventDefault()
+      const sourceGroupId =
+        draggedGroupId ||
+        event.dataTransfer.getData("application/x-ext-helper-group-id") ||
+        event.dataTransfer.getData("text/plain")
+
+      if (sourceGroupId && sourceGroupId !== groupId) {
+        const position =
+          dragOverGroup?.id === groupId ? dragOverGroup.position : getDropPosition(event)
+        onReorderGroup(sourceGroupId, groupId, position)
+      }
+
+      clearGroupDragState()
+    },
+    [
+      canReorderGroups,
+      clearGroupDragState,
+      dragOverGroup,
+      draggedGroupId,
+      getDropPosition,
+      onReorderGroup,
+    ]
+  )
+
+  const getGroupDragState = React.useCallback(
+    (groupId: string) => {
+      if (draggedGroupId === groupId) return "dragging"
+      if (dragOverGroup?.id !== groupId) return "idle"
+      return dragOverGroup.position === "before" ? "over-before" : "over-after"
+    },
+    [dragOverGroup, draggedGroupId]
+  )
+
   const isMeasuring = visibleCount === -1
   const needsCollapse = !isMeasuring && visibleCount < chipData.length
   const displayChips = isMeasuring ? chipData : chipData.slice(0, visibleCount)
@@ -120,8 +245,15 @@ export function GroupsBar({
             extensionCount={count}
             allEnabled={allEnabled}
             disabled={disabled}
+            draggable={canReorderGroups}
+            dragState={getGroupDragState(group.id)}
             onClick={() => onSelectGroup(group.id)}
             onToggle={() => onToggleGroup(group)}
+            onDragStart={handleGroupDragStart(group.id)}
+            onDragOver={handleGroupDragOver(group.id)}
+            onDragLeave={handleGroupDragLeave(group.id)}
+            onDrop={handleGroupDrop(group.id)}
+            onDragEnd={clearGroupDragState}
           />
         ))}
 
@@ -214,12 +346,19 @@ export function GroupsBar({
                         extensionCount={count}
                         allEnabled={allEnabled}
                         disabled={disabled}
+                        draggable={canReorderGroups}
+                        dragState={getGroupDragState(group.id)}
                         onClick={() => {
                           onSelectGroup(group.id)
                           setShowMore(false)
                           setOverflowSearch("")
                         }}
                         onToggle={() => onToggleGroup(group)}
+                        onDragStart={handleGroupDragStart(group.id)}
+                        onDragOver={handleGroupDragOver(group.id)}
+                        onDragLeave={handleGroupDragLeave(group.id)}
+                        onDrop={handleGroupDrop(group.id)}
+                        onDragEnd={clearGroupDragState}
                       />
                     ))
                   ) : (
