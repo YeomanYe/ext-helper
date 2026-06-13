@@ -79,7 +79,10 @@ interface RawExtensionInfo {
   version: string
   versionName?: string
   enabled: boolean
-  icons?: Array<{ url: string }>
+  icons?: Array<{ size?: number; url?: string }>
+  iconUrl?: string | null
+  iconURL?: string | null
+  icon64URL?: string | null
   type: string
   permissions?: string[]
   hostPermissions?: string[]
@@ -93,6 +96,28 @@ interface RawExtensionInfo {
   updateUrl?: string
 }
 
+function isRenderableIconUrl(value: unknown): value is string {
+  if (typeof value !== "string") return false
+  const url = value.trim()
+  if (!url) return false
+
+  return /^(?:https?:|data:|blob:|chrome:|chrome-extension:|moz-extension:)/i.test(url)
+}
+
+function getExtensionIconUrl(raw: RawExtensionInfo): string | null {
+  const managementIcon = raw.icons
+    ?.filter((icon) => isRenderableIconUrl(icon.url))
+    .sort((a, b) => (b.size ?? 0) - (a.size ?? 0))[0]?.url
+
+  return (
+    managementIcon ??
+    (isRenderableIconUrl(raw.icon64URL) ? raw.icon64URL : null) ??
+    (isRenderableIconUrl(raw.iconURL) ? raw.iconURL : null) ??
+    (isRenderableIconUrl(raw.iconUrl) ? raw.iconUrl : null) ??
+    null
+  )
+}
+
 function formatExtension(ext: ExtensionInfo): Extension {
   const raw = ext as unknown as RawExtensionInfo
   return {
@@ -102,7 +127,7 @@ function formatExtension(ext: ExtensionInfo): Extension {
     version: raw.version,
     versionName: raw.versionName ?? null,
     enabled: raw.enabled,
-    iconUrl: raw.icons?.[0]?.url ?? null,
+    iconUrl: getExtensionIconUrl(raw),
     type: raw.type as Extension["type"],
     permissions: raw.permissions ?? [],
     hostPermissions: raw.hostPermissions ?? [],
