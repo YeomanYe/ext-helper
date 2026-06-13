@@ -5,8 +5,10 @@
   "author": "Tony Ye (https://github.com/YeomanYe)",
   "type": "module",
   "scripts": {
-    "dev": "plasmo dev",
-    "dev:all": "concurrently \"plasmo dev\" \"vite --config vite.config.ts --force\" \"vite --config vite.website.config.ts --force\"",
+    "dev": "plasmo dev --target=chrome-mv3",
+    "dev:firefox": "plasmo dev --target=firefox-mv2",
+    "dev:firefox:package": "plasmo build --target=firefox-mv2 --tag=dev",
+    "dev:all": "pnpm dev:firefox:package && concurrently \"pnpm dev\" \"vite --config vite.config.ts --force\" \"vite --config vite.website.config.ts --force\"",
     "dev:web": "vite --config vite.config.ts --force",
     "dev:hmr": "vite dev --config vite.config.ts",
     "build": "plasmo build",
