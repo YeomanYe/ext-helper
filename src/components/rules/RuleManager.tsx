@@ -5,11 +5,16 @@ import { useRuleStore } from "@/stores/ruleStore"
 import { useExtensionStore } from "@/stores/extensionStore"
 import { useGroupStore } from "@/stores/groupStore"
 import { useUIStore } from "@/stores/uiStore"
+import {
+  shouldEnableFindShortcutForSurface,
+  useFindShortcutFocus,
+} from "@/components/popup/searchShortcut"
 import { RuleList } from "./RuleList"
 import { RuleEditor } from "./RuleEditor"
 import type { Rule } from "@/rules/types"
 
 type RuleFilterType = "all" | "enabled" | "disabled"
+type RuleInput = Omit<Rule, "id" | "createdAt" | "updatedAt" | "triggerCount">
 
 const FILTERS: { value: RuleFilterType; label: string }[] = [
   { value: "all", label: "ALL" },
@@ -111,6 +116,9 @@ function RuleSearchBar({
   filter: RuleFilterType
   onFilterChange: (v: RuleFilterType) => void
 }) {
+  const inputRef = React.useRef<HTMLInputElement>(null)
+  useFindShortcutFocus(inputRef, shouldEnableFindShortcutForSurface("rules"))
+
   return (
     <div className="flex items-center gap-3 px-3 py-1.5 border-b border-punk-border/30">
       <RuleFilterDropdown value={filter} onChange={onFilterChange} />
@@ -120,6 +128,7 @@ function RuleSearchBar({
           $
         </span>
         <input
+          ref={inputRef}
           type="text"
           value={value}
           onChange={(e) => onChange(e.target.value)}
@@ -155,7 +164,7 @@ export function RuleManager() {
 
   React.useEffect(() => {
     fetchRules()
-  }, [])
+  }, [fetchRules])
 
   const filteredRules = React.useMemo(() => {
     let result = rules
@@ -188,7 +197,7 @@ export function RuleManager() {
     setShowEditor(true)
   }
 
-  const handleSaveRule = async (ruleData: any) => {
+  const handleSaveRule = async (ruleData: RuleInput) => {
     if (editingRule) {
       await updateRule(editingRule.id, ruleData)
     } else {

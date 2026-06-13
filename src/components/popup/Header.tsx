@@ -27,7 +27,7 @@ import {
 } from "lucide-react"
 import { cn } from "@/utils"
 import { Switch } from "@/components/common/Switch"
-import { shouldFocusSearchFromFindShortcut } from "@/components/popup/searchShortcut"
+import { useFindShortcutFocus } from "@/components/popup/searchShortcut"
 import { isDevMode } from "@/services/mockData"
 import { browserAdapter } from "@/services/browser/adapter"
 import { preferencesRepo } from "@/services/preferencesRepo"
@@ -101,21 +101,7 @@ export function SearchBar({
   const [dropUp, setDropUp] = React.useState(false)
   const buttonRef = React.useRef<HTMLButtonElement>(null)
   const inputRef = React.useRef<HTMLInputElement>(null)
-
-  React.useEffect(() => {
-    if (!enableFindShortcut || typeof document === "undefined") return
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (!shouldFocusSearchFromFindShortcut(event)) return
-
-      event.preventDefault()
-      inputRef.current?.focus()
-      inputRef.current?.select()
-    }
-
-    document.addEventListener("keydown", handleKeyDown)
-    return () => document.removeEventListener("keydown", handleKeyDown)
-  }, [enableFindShortcut])
+  useFindShortcutFocus(inputRef, enableFindShortcut)
 
   const handleToggle = () => {
     if (!showDropdown && buttonRef.current) {

@@ -1,3 +1,5 @@
+import * as React from "react"
+
 interface FindShortcutEvent {
   key: string
   ctrlKey: boolean
@@ -6,6 +8,10 @@ interface FindShortcutEvent {
   shiftKey: boolean
   target: EventTarget | null
 }
+
+export type FindShortcutSurface = "extensions" | "rules" | "logs"
+
+const AUTO_CAPTURE_FIND_SHORTCUT_SURFACES = new Set<FindShortcutSurface>(["extensions", "rules"])
 
 function isEditableTarget(target: EventTarget | null): boolean {
   if (!target || typeof target !== "object") return false
@@ -33,4 +39,28 @@ export function shouldFocusSearchFromFindShortcut(event: FindShortcutEvent): boo
     !event.shiftKey &&
     !isEditableTarget(event.target)
   )
+}
+
+export function shouldEnableFindShortcutForSurface(surface: FindShortcutSurface): boolean {
+  return AUTO_CAPTURE_FIND_SHORTCUT_SURFACES.has(surface)
+}
+
+export function useFindShortcutFocus(
+  inputRef: React.RefObject<HTMLInputElement>,
+  enabled: boolean
+): void {
+  React.useEffect(() => {
+    if (!enabled || typeof document === "undefined") return
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (!shouldFocusSearchFromFindShortcut(event)) return
+
+      event.preventDefault()
+      inputRef.current?.focus()
+      inputRef.current?.select()
+    }
+
+    document.addEventListener("keydown", handleKeyDown)
+    return () => document.removeEventListener("keydown", handleKeyDown)
+  }, [enabled, inputRef])
 }
