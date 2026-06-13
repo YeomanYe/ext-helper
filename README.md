@@ -8,10 +8,10 @@ A browser extension manager for Chrome, Firefox, and Edge. Organize extensions i
 
 ## Screenshots
 
-| Card View | Bisect Debugger | Auto Rules |
-|---|---|---|
+| Card View                                                    | Bisect Debugger                                                      | Auto Rules                                                     |
+| ------------------------------------------------------------ | -------------------------------------------------------------------- | -------------------------------------------------------------- |
 | ![Card View](website/public/screenshots/screenshot-card.png) | ![Bisect Debugger](website/public/screenshots/screenshot-bisect.png) | ![Auto Rules](website/public/screenshots/screenshot-rules.png) |
-| Color-coded groups, at-a-glance status | Binary search finds the culprit in log₂(n) steps | Domain + schedule conditions toggle extensions automatically |
+| Color-coded groups, at-a-glance status                       | Binary search finds the culprit in log₂(n) steps                     | Domain + schedule conditions toggle extensions automatically   |
 
 ## Features
 
@@ -41,7 +41,7 @@ pnpm dev          # Plasmo dev for Chrome MV3 — build/chrome-mv3-dev
 pnpm dev:chrome:package # One-shot Chrome MV3 dev package — build/chrome-mv3-dev
 pnpm dev:firefox  # Plasmo dev watcher for Firefox MV2 — build/firefox-mv2-dev
 pnpm dev:firefox:package # One-shot Firefox MV2 dev package — build/firefox-mv2-dev
-pnpm dev:extension # One-shot Chrome + Firefox extension dev packages
+pnpm dev:extension # Plasmo dev watchers for Chrome MV3 + Firefox MV2
 pnpm dev:web      # Vite web preview with mock data on :4173
 pnpm dev:website  # Marketing site (website/)
 pnpm dev:all      # Build Firefox dev package once, then run Chrome dev + web + website

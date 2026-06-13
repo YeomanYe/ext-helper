@@ -14,7 +14,7 @@ pnpm dev            # Plasmo dev for Chrome MV3 (build/chrome-mv3-dev)
 pnpm dev:chrome:package # One-shot Chrome MV3 dev package (build/chrome-mv3-dev)
 pnpm dev:firefox    # Plasmo dev watcher for Firefox MV2 (build/firefox-mv2-dev)
 pnpm dev:firefox:package # One-shot Firefox MV2 dev package (build/firefox-mv2-dev)
-pnpm dev:extension  # One-shot Chrome + Firefox extension dev packages
+pnpm dev:extension  # Plasmo dev watchers for Chrome MV3 + Firefox MV2
 pnpm dev:web        # Vite dev server on port 4173 (web preview with mock data)
 pnpm dev:all        # Build Firefox dev package once, then run Chrome dev + web + website
 pnpm build          # Plasmo production build
@@ -34,6 +34,7 @@ pnpm format:check   # Prettier check (no write)
 ### Dual Runtime Modes
 
 The app runs in two modes controlled by `isDevMode()` from `src/services/mockData.ts`:
+
 - **Extension mode** (`pnpm dev`): Uses Plasmo framework, real `chrome.management.*` APIs via `browserAdapter`
 - **Web preview mode** (`pnpm dev:web`): Uses Vite, `devStorage` (localStorage-backed in-memory store) with mock data. No browser extension APIs available.
 
@@ -47,6 +48,7 @@ All data access goes through repository classes (`src/services/*Repo.ts`) that b
 ### State Management
 
 Zustand stores in `src/stores/`:
+
 - **extensionStore** — Extensions list, filter/search/sort, undo/redo history (snapshot-based), bisect session
 - **groupStore** — Extension groups with CRUD, drag-and-drop
 - **ruleStore** — Automation rules CRUD
@@ -61,6 +63,7 @@ Binary search to find a problematic extension (`src/stores/bisectUtils.ts`, `ext
 ### Rule Engine
 
 `src/rules/` — Automation system that enables/disables extensions based on conditions:
+
 - **ConditionGroup**: domains (with match modes: exact/contains/wildcard/regex) + optional schedule (days + time range)
 - **Actions**: enable/disable individual extensions or entire groups
 - **Background service** (`src/background/index.ts`): Listens to tab URL changes and alarms to trigger rules automatically
@@ -68,6 +71,7 @@ Binary search to find a problematic extension (`src/stores/bisectUtils.ts`, `ext
 ### Repository Pattern
 
 `src/services/` — Data access layer:
+
 - `extensionsRepo` — Extension CRUD + bisect session persistence
 - `groupsRepo` — Group CRUD
 - `rulesRepo` — Rule CRUD
@@ -87,6 +91,7 @@ Binary search to find a problematic extension (`src/stores/bisectUtils.ts`, `ext
 ### Filter System
 
 `FilterType` in `src/types/index.ts` supports:
+
 - `"all"` / `"enabled"` / `"disabled"` — basic status filters
 - `"in-group"` — extensions that belong to at least one group (main popup) / in current group (group panel)
 - `"not-in-group"` — extensions with no group assignment (main popup) / not in current group (group panel)
@@ -117,6 +122,7 @@ Tailwind CSS with a custom "punk" design system. Classes prefixed with `punk-` (
 ## Icon Assets
 
 Only two files needed in `assets/`:
+
 - `icon.png` — source icon, used by production builds directly
 - `icon.development.png` — same design, tells Plasmo to skip grayscale in dev builds
 
