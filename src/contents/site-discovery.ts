@@ -566,6 +566,17 @@ function createStyles(): HTMLStyleElement {
       color: var(--eh-cta);
     }
 
+    .eh-sticky {
+      flex: 0 0 auto;
+      padding: 12px 14px 0;
+      border-bottom: 1px solid rgb(var(--eh-accent-rgb) / 0.18);
+      background: var(--eh-surface-raised);
+    }
+
+    :host([data-theme="light"]) .eh-sticky {
+      border-bottom-color: rgb(var(--eh-border-rgb) / 0.28);
+    }
+
     .eh-body {
       flex: 1 1 auto;
       min-height: 0;
@@ -650,10 +661,9 @@ function createStyles(): HTMLStyleElement {
       display: flex;
       align-items: center;
       gap: 4px;
-      border-bottom: 1px solid rgb(var(--eh-border-rgb) / 0.3);
       background: transparent;
-      margin-top: 14px;
-      padding: 8px 10px 0;
+      margin-top: 10px;
+      padding: 0 0 0;
     }
 
     .eh-tab {
@@ -754,7 +764,7 @@ function createStyles(): HTMLStyleElement {
       width: 38px;
       height: 38px;
       border-radius: 0;
-      background: var(--eh-surface-soft);
+      background: transparent;
       color: var(--eh-accent);
       font: 900 13px/1 "JetBrains Mono", monospace;
       letter-spacing: 0.04em;
@@ -872,7 +882,7 @@ function createStyles(): HTMLStyleElement {
     .eh-footer {
       flex: 0 0 auto;
       border-top: 1px solid rgb(var(--eh-accent-rgb) / 0.16);
-      padding: 12px 14px;
+      padding: 6px 14px;
       background: rgb(var(--eh-bg-rgb) / 0.34);
     }
 
@@ -907,7 +917,6 @@ function createStyles(): HTMLStyleElement {
       align-items: center;
       justify-content: space-between;
       gap: 10px;
-      margin-top: 12px;
     }
 
     .eh-auth-copy {
@@ -1240,6 +1249,7 @@ function createRecommendedCard(
 
 function renderResult(
   body: HTMLElement,
+  sticky: HTMLElement,
   footer: HTMLElement,
   result: SiteDiscoveryResult,
   iconBridge: IconBridge,
@@ -1254,6 +1264,7 @@ function renderResult(
     activePanelId?: string
   } = {}
 ): void {
+  sticky.replaceChildren()
   body.replaceChildren()
   footer.replaceChildren()
   const selectedPanelId = options.activePanelId ?? "eh-panel-installed"
@@ -1272,7 +1283,7 @@ function renderResult(
     <div class="eh-stat"><strong>${recommendedCount}</strong><span>recommended</span></div>
     <div class="eh-stat"><strong>${pointsText}</strong><span>points</span></div>
   `
-  body.append(summary)
+  sticky.append(summary)
 
   const tabs = document.createElement("div")
   tabs.className = "eh-tabs"
@@ -1352,19 +1363,8 @@ function renderResult(
   }
 
   wireTabs([installedTab, recommendedTab], [installedSection, recommendationSection])
-  body.append(tabs, installedSection, recommendationSection)
-
-  const queryTitle = document.createElement("p")
-  queryTitle.className = "eh-query"
-  queryTitle.textContent = "Explore more"
-  const queryList = document.createElement("div")
-  queryList.className = "eh-query-list"
-  result.exploreQueries.forEach((query) => {
-    const chip = document.createElement("span")
-    chip.className = "eh-chip"
-    chip.textContent = query
-    queryList.append(chip)
-  })
+  sticky.append(tabs)
+  body.append(installedSection, recommendationSection)
 
   const footerRow = document.createElement("div")
   footerRow.className = "eh-footer-row"
@@ -1403,7 +1403,7 @@ function renderResult(
   }
 
   footerRow.append(authCopy, actionGroup)
-  footer.append(queryTitle, queryList, footerRow)
+  footer.append(footerRow)
 }
 
 function renderState(body: HTMLElement, message: string): void {
@@ -1426,9 +1426,9 @@ function createLoadingState(message: string): HTMLElement {
   return state
 }
 
-function getActivePanelId(body: HTMLElement): string | undefined {
+function getActivePanelId(sticky: HTMLElement): string | undefined {
   return (
-    body
+    sticky
       .querySelector<HTMLButtonElement>('.eh-tab[aria-selected="true"]')
       ?.getAttribute("aria-controls") ?? undefined
   )
@@ -1555,13 +1555,7 @@ function updatePanelPosition(panel: HTMLElement, trigger: HTMLElement): void {
     Math.max(margin, window.innerWidth - panelWidth - margin)
   )
   const preferredY = triggerRect.top - panelHeight - gap
-  const y =
-    preferredY >= margin
-      ? preferredY
-      : Math.min(
-          triggerRect.bottom + gap,
-          Math.max(margin, window.innerHeight - panelHeight - margin)
-        )
+  const y = Math.max(margin, preferredY)
 
   panel.style.setProperty("--eh-panel-x", `${Math.round(x)}px`)
   panel.style.setProperty("--eh-panel-y", `${Math.round(y)}px`)
@@ -1638,15 +1632,15 @@ function mount(): void {
     <header class="eh-header">
       <div>
         <p class="eh-eyebrow">Current site discovery</p>
-        <h2 class="eh-title">Installed extensions for this site</h2>
-        <p class="eh-subtitle">Metadata match / local inventory</p>
       </div>
       <button class="eh-close" type="button" aria-label="Close">&times;</button>
     </header>
+    <div class="eh-sticky"></div>
     <div class="eh-body"></div>
     <footer class="eh-footer"></footer>
   `
 
+  const sticky = panel.querySelector<HTMLElement>(".eh-sticky")!
   const body = panel.querySelector<HTMLElement>(".eh-body")!
   const footer = panel.querySelector<HTMLElement>(".eh-footer")!
   const close = panel.querySelector<HTMLButtonElement>(".eh-close")!
@@ -1704,6 +1698,7 @@ function mount(): void {
   }
 
   const loadPanel = async () => {
+    sticky.replaceChildren()
     renderLoadingState(body, "Scanning installed extensions for this site...")
     footer.replaceChildren()
     const response = await requestDiscovery().catch((error) => ({
@@ -1713,6 +1708,7 @@ function mount(): void {
     if (response.success) {
       renderResult(
         body,
+        sticky,
         footer,
         response.result,
         iconBridge,
@@ -1747,6 +1743,7 @@ function mount(): void {
           }
       renderResult(
         body,
+        sticky,
         footer,
         response.result,
         iconBridge,
@@ -1760,7 +1757,7 @@ function mount(): void {
             void handleSignOut()
           },
         },
-        { activePanelId: getActivePanelId(body) }
+        { activePanelId: getActivePanelId(sticky) }
       )
     } else {
       renderState(body, response.error)
@@ -1769,6 +1766,7 @@ function mount(): void {
   }
 
   const handleLogin = async (provider: SiteAuthProvider) => {
+    sticky.replaceChildren()
     renderState(body, `Opening ${provider} login...`)
     footer.replaceChildren()
     const response = await requestLogin(provider).catch((error) => ({
@@ -1783,6 +1781,7 @@ function mount(): void {
   }
 
   const handleSignOut = async () => {
+    sticky.replaceChildren()
     renderState(body, "Signing out...")
     footer.replaceChildren()
     const response = await requestSignOut().catch((error) => ({

@@ -79,3 +79,4 @@ release/
 .worktrees/
 **/.wrangler/
 artifacts/
+.agent/

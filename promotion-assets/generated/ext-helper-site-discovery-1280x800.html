@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Ext Helper Site Discovery</title>
+    <style>
+      :root {
+        --paper: #f5f1e7;
+        --paper-strong: #fffdf5;
+        --paper-sunk: #ede5cf;
+        --ink: #16120f;
+        --ink-2: #403a33;
+        --muted: #6f675c;
+        --green: #00a870;
+        --green-dark: #008f5a;
+        --pink: #ff2a6d;
+        --line: rgba(17, 17, 17, 0.18);
+      }
+
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+
+      html, body {
+        width: 1280px;
+        height: 800px;
+        overflow: hidden;
+        background:
+          linear-gradient(155deg, #fffdf5 0%, var(--paper) 55%, #e7dfcf 100%);
+        color: var(--ink);
+        font-family: "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+      }
+
+      /* subtle grid + scanlines, very punk-light */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(0, 168, 112, 0.05) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(0, 168, 112, 0.04) 1px, transparent 1px);
+        background-size: 36px 36px;
+        pointer-events: none;
+      }
+
+      body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: repeating-linear-gradient(
+          0deg,
+          rgba(22, 18, 15, 0.025),
+          rgba(22, 18, 15, 0.025) 1px,
+          transparent 1px,
+          transparent 3px
+        );
+        pointer-events: none;
+      }
+
+      .canvas {
+        position: relative;
+        width: 1280px;
+        height: 800px;
+        padding: 32px;
+      }
+
+      /* outer punk frame */
+      .frame {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        border: 2px solid var(--ink);
+        background:
+          linear-gradient(180deg, rgba(255,255,255,0.55), rgba(255,255,255,0.15)),
+          var(--paper-strong);
+        box-shadow:
+          8px 8px 0 rgba(17, 17, 17, 0.12),
+          0 0 0 1px rgba(17, 17, 17, 0.06);
+      }
+
+      .frame::before,
+      .frame::after {
+        content: "";
+        position: absolute;
+        width: 22px;
+        height: 22px;
+        border-color: var(--green);
+        border-style: solid;
+      }
+      .frame::before {
+        top: 14px; left: 14px;
+        border-width: 3px 0 0 3px;
+      }
+      .frame::after {
+        right: 14px; bottom: 14px;
+        border-width: 0 3px 3px 0;
+      }
+
+      .layout {
+        position: relative;
+        display: grid;
+        grid-template-columns: 380px 1fr;
+        height: 100%;
+        gap: 24px;
+        padding: 40px 44px;
+      }
+
+      /* ── left copy column ── */
+      .copy {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-width: 0;
+        padding: 6px 0 4px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .app-icon {
+        width: 52px;
+        height: 52px;
+        display: grid;
+        place-items: center;
+        border: 3px solid var(--ink);
+        background: var(--paper-strong);
+        color: var(--ink);
+        font-family: "Courier New", monospace;
+        font-size: 32px;
+        font-weight: 900;
+        line-height: 1;
+        box-shadow: 4px 4px 0 rgba(17, 17, 17, 0.12);
+      }
+
+      .brand-text {
+        line-height: 1.5;
+      }
+
+      .brand-text .name {
+        font-size: 11px;
+        font-weight: 900;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .brand-text .feature {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 4px;
+        font-size: 13px;
+        font-weight: 900;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--green-dark);
+      }
+
+      .brand-text .feature::before {
+        content: "";
+        width: 14px;
+        height: 2px;
+        background: var(--green);
+      }
+
+      h1 {
+        margin-top: 36px;
+        font-family: "Courier New", monospace;
+        font-size: 50px;
+        font-weight: 900;
+        line-height: 0.96;
+        letter-spacing: -0.01em;
+        text-transform: uppercase;
+        color: var(--ink);
+      }
+
+      h1 em {
+        font-style: normal;
+        color: transparent;
+        background: linear-gradient(95deg, var(--pink) 0%, var(--green-dark) 90%);
+        -webkit-background-clip: text;
+        background-clip: text;
+      }
+
+      .lede {
+        margin-top: 22px;
+        font-size: 16px;
+        line-height: 1.55;
+        font-weight: 500;
+        color: var(--ink-2);
+      }
+
+      .features {
+        margin-top: 26px;
+        display: flex;
+        flex-direction: column;
+        gap: 9px;
+      }
+
+      .feat {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 14px;
+        border: 2px solid var(--ink);
+        background: rgba(255, 255, 255, 0.55);
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--ink);
+      }
+
+      .feat-num {
+        font-family: "Courier New", monospace;
+        font-size: 13px;
+        font-weight: 900;
+        color: var(--pink);
+        min-width: 22px;
+      }
+
+      .tagline {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 28px;
+        padding: 12px 14px;
+        border: 2px solid var(--pink);
+        background: rgba(255, 42, 109, 0.06);
+        font-size: 11px;
+        font-weight: 900;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--pink);
+      }
+
+      .tagline-arrow {
+        font-family: "Courier New", monospace;
+        font-weight: 900;
+      }
+
+      /* ── right stage ── */
+      .stage {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 0;
+      }
+
+      .browser {
+        position: relative;
+        width: 780px;
+        border: 2px solid var(--ink);
+        background: var(--paper-strong);
+        box-shadow:
+          8px 8px 0 rgba(17, 17, 17, 0.16),
+          0 18px 50px rgba(66, 54, 36, 0.18);
+      }
+
+      .browser-bar {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        height: 32px;
+        padding: 0 12px;
+        border-bottom: 2px solid var(--ink);
+        background: var(--paper-sunk);
+      }
+
+      .traffic {
+        display: flex;
+        gap: 6px;
+      }
+      .traffic span {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        border: 1px solid rgba(17, 17, 17, 0.4);
+      }
+      .traffic span:nth-child(1) { background: #ff5f57; }
+      .traffic span:nth-child(2) { background: #febc2e; }
+      .traffic span:nth-child(3) { background: #28c840; }
+
+      .url-bar {
+        flex: 1;
+        max-width: 380px;
+        margin: 0 auto;
+        height: 20px;
+        padding: 0 10px;
+        background: var(--paper-strong);
+        border: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-family: "Courier New", monospace;
+        font-size: 11px;
+        color: var(--muted);
+      }
+
+      .url-lock {
+        width: 7px;
+        height: 7px;
+        border: 1.5px solid var(--green-dark);
+      }
+
+      .browser-content {
+        background: var(--paper-strong);
+        display: block;
+        line-height: 0;
+      }
+
+      .browser-content img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+
+      /* annotation pointing to the floating panel inside screenshot */
+      .anno {
+        position: absolute;
+        top: 56px;
+        right: -38px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        z-index: 3;
+      }
+
+      .anno-label {
+        padding: 8px 12px;
+        border: 2px solid var(--pink);
+        background: var(--paper-strong);
+        color: var(--pink);
+        font-size: 10px;
+        font-weight: 900;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        white-space: nowrap;
+        box-shadow: 3px 3px 0 rgba(255, 42, 109, 0.25);
+      }
+
+      .anno-arrow {
+        width: 40px;
+        height: 2px;
+        background: var(--pink);
+        position: relative;
+      }
+      .anno-arrow::before {
+        content: "";
+        position: absolute;
+        top: -5px;
+        left: 0;
+        width: 0;
+        height: 0;
+        border-top: 6px solid transparent;
+        border-bottom: 6px solid transparent;
+        border-right: 9px solid var(--pink);
+      }
+
+      /* corner cyber stickers */
+      .sticker {
+        position: absolute;
+        bottom: -14px;
+        left: 40px;
+        padding: 7px 14px;
+        background: var(--ink);
+        color: var(--paper-strong);
+        font-family: "Courier New", monospace;
+        font-size: 11px;
+        font-weight: 900;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="canvas">
+      <section class="frame">
+        <div class="layout">
+          <!-- left: copy -->
+          <section class="copy">
+            <div>
+              <div class="brand">
+                <div class="app-icon">E</div>
+                <div class="brand-text">
+                  <div class="name">Ext Helper</div>
+                  <div class="feature">Site Discovery</div>
+                </div>
+              </div>
+
+              <h1>Tools that fit <em>the page you're on</em></h1>
+
+              <p class="lede">
+                A floating panel surfaces installed extensions matching this site,
+                plus cloud recommendations you haven't tried — without leaving the page.
+              </p>
+
+              <div class="features">
+                <div class="feat"><span class="feat-num">01</span> Installed matches</div>
+                <div class="feat"><span class="feat-num">02</span> Cloud recommendations</div>
+                <div class="feat"><span class="feat-num">03</span> Drag to dock anywhere</div>
+              </div>
+            </div>
+
+            <div class="tagline">
+              <span class="tagline-arrow">▌</span>
+              <span>No sign-in · 3 / day free · 1000+ sites</span>
+            </div>
+          </section>
+
+          <!-- right: browser with full screenshot -->
+          <section class="stage">
+            <div class="browser">
+              <div class="browser-bar">
+                <div class="traffic"><span></span><span></span><span></span></div>
+                <div class="url-bar">
+                  <div class="url-lock"></div>
+                  github.com / tonytone11 / ext-helper
+                </div>
+              </div>
+              <div class="browser-content">
+                <img src="../../website/public/screenshots/screenshot-content-panel.jpg" alt="" />
+              </div>
+
+              <div class="sticker">Works on any site →</div>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

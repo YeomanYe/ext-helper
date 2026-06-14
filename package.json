@@ -73,9 +73,9 @@
     "vitest": "^2.1.0"
   },
   "manifest": {
-    "name": "Ext Helper",
+    "name": "Ext Helper - AI Extension Manager",
     "version": "2.0.0",
-    "description": "Browser extension manager with enable/disable and grouping",
+    "description": "AI-powered extension manager with site discovery, smart recommendations, grouping & automation.",
     "action": {
       "default_popup": "popup.html"
     },

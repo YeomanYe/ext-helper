@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "ExtHelper",
-  "version": "1.2.0",
-  "description": "Browser extension manager with enable/disable and grouping",
+  "name": "Ext Helper - AI Extension Manager",
+  "version": "2.0.0",
+  "description": "AI-powered extension manager with site discovery, smart recommendations, grouping & automation.",
   "default_locale": "en",
   "icons": {
     "16": "icon-16.png",
