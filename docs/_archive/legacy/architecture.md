@@ -452,6 +452,22 @@ class DevStorage {
 
 ---
 
+## 8.5 Filter System
+
+`FilterType`（`src/types/index.ts`）的过滤选项与两套常量：
+
+- `"all"` / `"enabled"` / `"disabled"` — 基础状态过滤
+- `"in-group"` — 属于至少一个分组（主 popup）/ 在当前分组内（分组面板）
+- `"not-in-group"` — 无任何分组（主 popup）/ 不在当前分组（分组面板）
+- `"favorites"` — 预留
+
+- `MAIN_FILTERS`（全部 5 项）— 主 popup 的 SearchBar 使用
+- `GROUP_PANEL_FILTERS`（含 in-cur / not-cur 标签）— GroupEditorPanel 使用
+
+两个常量数组从 `src/components/popup/` 导出，新增过滤项时同步更新两处。
+
+---
+
 ## 9. 总结
 
 本架构采用**分层 + Repository + 适配器**模式：
