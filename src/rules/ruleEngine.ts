@@ -4,9 +4,9 @@
 
 import type {
   Action,
-  Condition,
   ConditionGroup,
   ConditionOperator,
+  MatchMode,
   Rule,
   ScheduleCondition,
 } from "./types"
@@ -15,6 +15,11 @@ import { browserAdapter } from "@/services/browser/adapter"
 import { groupsRepo } from "@/services/groupsRepo"
 import { rulesRepo } from "@/services/rulesRepo"
 import { logger } from "@/utils/logger"
+
+// 旧版持久化条件的数据形状（migration 前）。仅下方「兼容旧数据」评估方法消费；
+// 新数据模型用 ConditionGroup（patterns 复数）。旧 domain 条件是单数 pattern。
+type LegacyDomainCondition = { type: "domain"; pattern: string; matchMode: MatchMode }
+type LegacyCondition = LegacyDomainCondition | ScheduleCondition
 
 export class RuleEngine {
   /**
@@ -52,17 +57,18 @@ export class RuleEngine {
    * 评估域名条件（兼容旧数据）
    */
   evaluateDomainConditions(
-    conditions: Condition[],
+    conditions: LegacyCondition[],
     operator: ConditionOperator,
     url: string
   ): boolean {
-    const domainConditions = conditions.filter((c) => c.type === "domain")
+    const domainConditions = conditions.filter(
+      (c): c is LegacyDomainCondition => c.type === "domain"
+    )
     if (domainConditions.length === 0) return false
 
-    const results = domainConditions.map((condition) => {
-      if (condition.type !== "domain") return false
-      return domainMatcher.matches(condition.pattern, condition.matchMode, url)
-    })
+    const results = domainConditions.map((condition) =>
+      domainMatcher.matches(condition.pattern, condition.matchMode, url)
+    )
 
     return this.combineResults(results, operator)
   }
@@ -70,14 +76,13 @@ export class RuleEngine {
   /**
    * 评估时间表条件（兼容旧数据）
    */
-  evaluateScheduleConditions(conditions: Condition[], operator: ConditionOperator): boolean {
-    const scheduleConditions = conditions.filter((c) => c.type === "schedule")
+  evaluateScheduleConditions(conditions: LegacyCondition[], operator: ConditionOperator): boolean {
+    const scheduleConditions = conditions.filter(
+      (c): c is ScheduleCondition => c.type === "schedule"
+    )
     if (scheduleConditions.length === 0) return false
 
-    const results = scheduleConditions.map((condition) => {
-      if (condition.type !== "schedule") return false
-      return this.isScheduleMatch(condition as ScheduleCondition)
-    })
+    const results = scheduleConditions.map((condition) => this.isScheduleMatch(condition))
 
     return this.combineResults(results, operator)
   }
@@ -85,23 +90,21 @@ export class RuleEngine {
   /**
    * 评估所有条件（兼容旧数据）
    */
-  evaluateConditions(conditions: Condition[], operator: ConditionOperator, url?: string): boolean {
+  evaluateConditions(
+    conditions: LegacyCondition[],
+    operator: ConditionOperator,
+    url?: string
+  ): boolean {
     const results: boolean[] = []
 
     const domainResults = conditions
-      .filter((c) => c.type === "domain")
-      .map((c) => {
-        if (c.type !== "domain") return false
-        return url ? domainMatcher.matches(c.pattern, c.matchMode, url) : false
-      })
+      .filter((c): c is LegacyDomainCondition => c.type === "domain")
+      .map((c) => (url ? domainMatcher.matches(c.pattern, c.matchMode, url) : false))
     results.push(...domainResults)
 
     const scheduleResults = conditions
-      .filter((c) => c.type === "schedule")
-      .map((c) => {
-        if (c.type !== "schedule") return false
-        return this.isScheduleMatch(c as ScheduleCondition)
-      })
+      .filter((c): c is ScheduleCondition => c.type === "schedule")
+      .map((c) => this.isScheduleMatch(c))
     results.push(...scheduleResults)
 
     if (results.length === 0) return false

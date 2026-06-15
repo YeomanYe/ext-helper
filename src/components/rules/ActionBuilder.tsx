@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Power, Folder, X } from "lucide-react"
+import { Folder } from "lucide-react"
 import { cn } from "@/utils"
 import { SearchBar, ACTION_FILTERS } from "@/components/popup"
 import type { Action } from "@/rules/types"
@@ -112,40 +112,6 @@ export function ActionBuilder({ actions, onChange }: ActionBuilderProps) {
       onChange(newActions)
     }
   }
-
-  // Combine all items for compact view
-  const allItems = React.useMemo(() => {
-    const extItems = filteredExtensions.map((ext) => ({
-      id: ext.id,
-      type: "extension" as const,
-      name: ext.name,
-      iconUrl: ext.iconUrl,
-      isEnabled: enabledExtensions.includes(ext.id),
-      isDisabled: disabledExtensions.includes(ext.id),
-      onEnable: () => toggleExtensionEnable(ext.id),
-      onDisable: () => toggleExtensionDisable(ext.id),
-    }))
-
-    const groupItems = filteredGroups.map((grp) => ({
-      id: grp.id,
-      type: "group" as const,
-      name: grp.name,
-      color: grp.color,
-      isEnabled: enabledGroups.includes(grp.id),
-      isDisabled: disabledGroups.includes(grp.id),
-      onEnable: () => toggleGroupEnable(grp.id),
-      onDisable: () => toggleGroupDisable(grp.id),
-    }))
-
-    return [...extItems, ...groupItems]
-  }, [
-    filteredExtensions,
-    filteredGroups,
-    enabledExtensions,
-    disabledExtensions,
-    enabledGroups,
-    disabledGroups,
-  ])
 
   return (
     <div className="space-y-2">

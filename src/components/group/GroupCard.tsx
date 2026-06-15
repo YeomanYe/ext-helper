@@ -1,14 +1,5 @@
 import * as React from "react"
-import {
-  ChevronDown,
-  ChevronRight,
-  Folder,
-  MoreVertical,
-  Plus,
-  Pencil,
-  Trash2,
-  Edit2,
-} from "lucide-react"
+import { ChevronDown, ChevronRight, Folder, MoreVertical, Plus, Trash2, Edit2 } from "lucide-react"
 import { ExtensionCard } from "@/components/extension"
 import { cn } from "@/utils"
 import type { Group, Extension } from "@/types"

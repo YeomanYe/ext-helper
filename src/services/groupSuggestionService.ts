@@ -109,7 +109,7 @@ const recordMapToSuggestionItems = (record: Record<string, unknown>) =>
       if (valueRecord) return { id: key, ...valueRecord }
       return null
     })
-    .filter((item): item is Record<string, unknown> => item !== null)
+    .filter((item): item is NonNullable<typeof item> => item !== null)
 
 const extractJsonCandidateText = (text: string) => {
   const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/i)
@@ -158,7 +158,7 @@ const collectObjectItemsFromText = (text: string): Record<string, unknown>[] => 
 
       return looksLikeSuggestionRecord(record) ? record : null
     })
-    .filter((item): item is Record<string, unknown> => item !== null)
+    .filter((item): item is NonNullable<typeof item> => item !== null)
 }
 
 const collectArrayStringItemsFromText = (text: string): { id: string; name: string }[] => {
@@ -268,7 +268,7 @@ function normalizeSuggestions(value: unknown): { id?: string; name?: string; rea
         reason: typeof reason === "string" ? reason : undefined,
       }
     })
-    .filter((item): item is { id?: string; name?: string; reason?: string } => item !== null)
+    .filter((item): item is NonNullable<typeof item> => item !== null)
 }
 
 const normalizeLookupKey = (value: string) => value.trim().toLowerCase()

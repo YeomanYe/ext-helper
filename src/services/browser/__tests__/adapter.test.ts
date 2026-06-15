@@ -27,6 +27,11 @@ function createExtensionInfo(enabled: boolean): chrome.management.ExtensionInfo 
     installType: "normal",
     permissions: [],
     hostPermissions: [],
+    mayDisable: true,
+    offlineEnabled: false,
+    optionsUrl: "",
+    shortName: "Test Extension",
+    isApp: false,
   } as chrome.management.ExtensionInfo
 }
 

@@ -1,16 +1,5 @@
 import { createPortal } from "react-dom"
-import {
-  Package,
-  Shield,
-  Globe,
-  X,
-  ExternalLink,
-  Wifi,
-  WifiOff,
-  Lock,
-  Unlock,
-  AlertTriangle,
-} from "lucide-react"
+import { Package, Shield, Globe, X, ExternalLink, AlertTriangle } from "lucide-react"
 import { cn } from "@/utils"
 import type { Extension } from "@/types"
 

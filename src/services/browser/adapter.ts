@@ -371,10 +371,14 @@ async function launchWebAuthFlow({
   url: string
   interactive: boolean
 }): Promise<string> {
-  return withBrowserError(
+  const redirectUrl = await withBrowserError(
     () => browser.identity.launchWebAuthFlow({ url, interactive }),
     "Failed to complete login"
   )
+  if (!redirectUrl) {
+    throw new BrowserError("Failed to complete login", "No redirect URL returned")
+  }
+  return redirectUrl
 }
 
 export const browserAdapter = {
