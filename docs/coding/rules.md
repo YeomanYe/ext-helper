@@ -27,3 +27,21 @@
 ## 样式
 
 - 只用 `punk-` 设计系统类，**不写魔法色值**，详见 [`../ui/rules.md`](../ui/rules.md)。
+
+## changeset 提交门禁
+
+**改了会进扩展产物的东西（源码 / 入口 / manifest 权限等）→ 提交前先跑 `pnpm changeset`。**
+由 pre-commit 的 `scripts/check-changeset.mjs` 强制，没有对应 changeset 就拦下提交。
+
+- **粒度**：一个功能 / 一个用户可见改动一条 changeset，跟着 commit 走，不要攒到发布前。
+- **判定逻辑**（白名单减法，避免漏判）：暂存文件**默认都需要 changeset**，
+  只对纯文档 / 配置 / 脚本 / `website/` / 依赖清单等放行。所以根目录 `popup.tsx`、
+  `resources/`、`package.json` 里的 manifest 权限字段改动都会被拦——它们确实影响用户。
+- **bypass**：trivial 改动（typo / 纯文档 / WIP）用
+  `CHANGESET_SKIP=1 git commit ...`（只跳过本门禁，lint-staged/typecheck 照跑）；
+  `git commit --no-verify` 会跳过全部 hook，慎用。
+- 命令：`pnpm changeset`（选 minor/patch + 写一句面向用户的说明）。
+
+发布时由 `pnpm version-packages` 把所有 changeset 汇总进 `CHANGELOG.md` 并升版本号，
+细节见 [`../../CONTRIBUTING.md`](../../CONTRIBUTING.md) 的「版本与发布」。
+
