@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/).
 
+## [2.1.0] - Unreleased
+
+### Added
+
+- 分组支持拖拽排序(`group-drag-reorder`): 分组列表可直接拖动调整顺序。
+- 规则面板 `find` 快捷键聚焦搜索(`rules-find-shortcut`): 规则页自动捕获 `find` 快捷键并聚焦到搜索框。
+- 深色主题新增「深蓝」配色变体(`deep-blue-theme`)。
+
+### Fixed
+
+- 修复 popup 闪烁效果。
+- 优化深色主题配色。
+- 修复 Firefox 扩展图标归一化与运行时识别。
+- 设置页 API base URL 占位文案改为通用文案。
+
 ## [2.0.0] - 2026-05-31
 
 ### Added
