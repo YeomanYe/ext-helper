@@ -1,5 +1,6 @@
 import type { AiSettings, RecommendationQuota } from "@/types"
 import { promptAiProvider } from "@/services/aiProvider"
+import { logger } from "@/utils/logger"
 
 type JsonRecord = Record<string, unknown>
 
@@ -403,11 +404,9 @@ async function fetchAiSiteRecommendations({
         structuredOutput: AI_RECOMMENDATION_STRUCTURED_OUTPUT,
       }
     )
-    // eslint-disable-next-line no-console
-    console.log("[RecommendationAI] Raw AI response", { url, response })
+    logger.log("[RecommendationAI] Raw AI response", { url, response })
     const result = normalizeAiResult(response, url, limit)
-    // eslint-disable-next-line no-console
-    console.log("[RecommendationAI] Normalized result", result)
+    logger.log("[RecommendationAI] Normalized result", result)
     return quota ? { ...result, quota } : result
   } catch (error) {
     return {

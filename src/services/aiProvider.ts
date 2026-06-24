@@ -369,21 +369,18 @@ async function promptAnthropicCompatible(
   })
   if (!response.ok) throw await createProviderHttpError(response)
   const responsePayload = await response.json()
-  // eslint-disable-next-line no-console
-  console.log("[AI][anthropic-compatible] raw response payload", responsePayload)
+  logger.log("[AI][anthropic-compatible] raw response payload", responsePayload)
   const structuredOutput = extractStructuredOutputFromProviderResponse(
     responsePayload,
     options?.structuredOutput
   )
   if (structuredOutput !== null) {
-    // eslint-disable-next-line no-console
-    console.log("[AI][anthropic-compatible] structured output extracted", structuredOutput)
+    logger.log("[AI][anthropic-compatible] structured output extracted", structuredOutput)
     logStructuredOutput(structuredOutput, options)
     return structuredOutput
   }
   const extractedText = extractTextFromProviderResponse(responsePayload)
-  // eslint-disable-next-line no-console
-  console.log("[AI][anthropic-compatible] fallback text extraction", extractedText)
+  logger.log("[AI][anthropic-compatible] fallback text extraction", extractedText)
   return parseAiProviderOutput(extractedText, options)
 }
 

@@ -197,8 +197,7 @@ class RuleBackgroundService {
               aiSettings: aiSettings ?? undefined,
               installedExtensions: msg.installedExtensions,
             })
-            // eslint-disable-next-line no-console
-            console.log("[RecommendationBackground] Site recommendations result", {
+            logger.log("[RecommendationBackground] Site recommendations result", {
               url: msg.url,
               cloudEnabled,
               aiConfigured: Boolean(aiSettings),

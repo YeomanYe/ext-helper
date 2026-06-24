@@ -1,3 +1,16 @@
+// ARCHITECTURE NOTE: this content script intentionally uses `chrome.*` APIs
+// directly (chrome.storage / chrome.runtime.getURL / chrome.runtime.sendMessage /
+// chrome.storage.onChanged) instead of going through src/services/browser/adapter.ts.
+//
+// Why the layered "adapter is the only boundary touching chrome.*" invariant does
+// NOT apply here: content scripts run in an isolated world injected into arbitrary
+// pages. They cannot reliably load the webextension-polyfill / shared adapter module
+// (different bundling context, no guarantee the cross-browser `browser` global is
+// present), and the surface they need is small and well-scoped (storage read +
+// runtime messaging + getURL). Routing these through the adapter would add coupling
+// and bundle weight for no behavioral benefit. The adapter remains the single
+// boundary for the extension's privileged contexts (popup/background); content
+// scripts are the documented exception. Keep `chrome.*` usage here minimal.
 import type { SiteDiscoveryResult } from "@/services/siteDiscoveryService"
 import type { SiteRecommendationResult } from "@/services/siteRecommendationService"
 import { getRecommendationQuotaPointsText } from "@/services/siteRecommendationQuota"
