@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { RuleEngine } from "../ruleEngine"
-import type { ScheduleCondition, Action } from "../types"
+import type { ScheduleCondition, Action, ConditionGroup } from "../types"
 
 const adapter = vi.hoisted(() => ({
   setExtensionEnabled: vi.fn(),
@@ -110,6 +110,43 @@ describe("RuleEngine", () => {
         endTime: "23:59",
       }
       expect(engine.isScheduleMatch(schedule)).toBe(false)
+    })
+  })
+
+  describe("evaluateConditionGroup schedule", () => {
+    // 回归保护：ConditionGroup.schedule 是内联结构（无 type 判别字段），
+    // 早先 background/index.ts 用 `as any` 绕过类型不匹配。改为共享 ScheduleSpec
+    // 后该路径在类型与运行时都应正确，无需 cast。
+    it("normal: should match when inline schedule (no type field) matches", () => {
+      const today = new Date().getDay()
+      const group: ConditionGroup = {
+        id: "g-1",
+        domains: [],
+        matchMode: "exact",
+        schedule: { days: [today], startTime: "00:00", endTime: "23:59" },
+      }
+      expect(engine.evaluateConditionGroup(group, "https://example.com")).toBe(true)
+    })
+
+    it("normal: should not match when inline schedule day doesn't match", () => {
+      const today = new Date().getDay()
+      const group: ConditionGroup = {
+        id: "g-2",
+        domains: [],
+        matchMode: "exact",
+        schedule: { days: [(today + 1) % 7], startTime: "00:00", endTime: "23:59" },
+      }
+      expect(engine.evaluateConditionGroup(group, "https://example.com")).toBe(false)
+    })
+
+    it("normal: should match all sites when schedule is null", () => {
+      const group: ConditionGroup = {
+        id: "g-3",
+        domains: [],
+        matchMode: "exact",
+        schedule: null,
+      }
+      expect(engine.evaluateConditionGroup(group, "https://example.com")).toBe(true)
     })
   })
 

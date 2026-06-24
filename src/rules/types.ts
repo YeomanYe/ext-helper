@@ -15,12 +15,17 @@ export interface DomainCondition {
   matchMode: MatchMode
 }
 
-// 时间表条件 (合并时间和星期)
-export interface ScheduleCondition {
-  type: "schedule"
+// 时间表的结构形状（星期 + 起止时间）。被 ScheduleCondition（带 type 判别）
+// 与 ConditionGroup.schedule（内联无 type）共用，是 isScheduleMatch 实际消费的字段集。
+export interface ScheduleSpec {
   days: number[] // 0=周日, 1=周一, ..., 6=周六
   startTime: string // "HH:mm" 格式
   endTime: string // "HH:mm" 格式
+}
+
+// 时间表条件 (合并时间和星期)
+export interface ScheduleCondition extends ScheduleSpec {
+  type: "schedule"
 }
 
 // 条件组：域名列表 + 时间条件（视觉和逻辑上分组）
@@ -28,11 +33,7 @@ export interface ConditionGroup {
   id: string // 条件组唯一ID
   domains: string[] // 多个域名
   matchMode: MatchMode // 匹配模式（适用于所有域名）
-  schedule: {
-    days: number[]
-    startTime: string
-    endTime: string
-  } | null // 可选，不设置表示不限时间
+  schedule: ScheduleSpec | null // 可选，不设置表示不限时间
 }
 
 // 联合条件类型（兼容旧数据）

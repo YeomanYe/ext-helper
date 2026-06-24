@@ -9,6 +9,7 @@ import type {
   MatchMode,
   Rule,
   ScheduleCondition,
+  ScheduleSpec,
 } from "./types"
 import { domainMatcher } from "./domainMatcher"
 import { browserAdapter } from "@/services/browser/adapter"
@@ -37,7 +38,7 @@ export class RuleEngine {
     if (!domainMatch) return false
 
     if (!group.schedule) return true
-    return this.isScheduleMatch(group.schedule as ScheduleCondition)
+    return this.isScheduleMatch(group.schedule)
   }
 
   /**
@@ -138,7 +139,7 @@ export class RuleEngine {
     return days.includes(today)
   }
 
-  isScheduleMatch(schedule: ScheduleCondition): boolean {
+  isScheduleMatch(schedule: ScheduleSpec): boolean {
     const today = new Date().getDay()
     if (!schedule.days.includes(today)) return false
     return this.isWithinTimeRange(schedule.startTime, schedule.endTime)

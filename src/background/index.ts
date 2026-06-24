@@ -349,7 +349,7 @@ class RuleBackgroundService {
       // 仅评估 schedule，不管域名（时间到了就触发）
       const shouldTrigger = rule.conditionGroups.some((g) => {
         if (!g.schedule) return false
-        return ruleEngine.isScheduleMatch(g.schedule as any)
+        return ruleEngine.isScheduleMatch(g.schedule)
       })
 
       if (shouldTrigger) {
