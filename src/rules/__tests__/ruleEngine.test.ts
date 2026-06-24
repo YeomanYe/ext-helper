@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest"
-import { RuleEngine } from "../ruleEngine"
+import { RuleEngine, type LegacyCondition } from "../ruleEngine"
 import type { ScheduleCondition, Action, ConditionGroup } from "../types"
 
 const adapter = vi.hoisted(() => ({
@@ -152,18 +152,22 @@ describe("RuleEngine", () => {
 
   describe("evaluateConditions", () => {
     it("normal: should evaluate domain conditions with URL", () => {
-      const conditions: any[] = [{ type: "domain", pattern: "github.com", matchMode: "exact" }]
+      const conditions: LegacyCondition[] = [
+        { type: "domain", pattern: "github.com", matchMode: "exact" },
+      ]
       expect(engine.evaluateConditions(conditions, "AND", "https://github.com")).toBe(true)
     })
 
     it("normal: should return false for domain conditions without URL", () => {
-      const conditions: any[] = [{ type: "domain", pattern: "github.com", matchMode: "exact" }]
+      const conditions: LegacyCondition[] = [
+        { type: "domain", pattern: "github.com", matchMode: "exact" },
+      ]
       expect(engine.evaluateConditions(conditions, "AND")).toBe(false)
     })
 
     it("normal: should combine with AND operator", () => {
       const today = new Date().getDay()
-      const conditions: any[] = [
+      const conditions: LegacyCondition[] = [
         { type: "domain", pattern: "github.com", matchMode: "exact" },
         { type: "schedule", days: [today], startTime: "00:00", endTime: "23:59" },
       ]
@@ -172,7 +176,7 @@ describe("RuleEngine", () => {
 
     it("normal: should combine with OR operator", () => {
       const today = new Date().getDay()
-      const conditions: any[] = [
+      const conditions: LegacyCondition[] = [
         { type: "domain", pattern: "nonexistent.com", matchMode: "exact" },
         { type: "schedule", days: [today], startTime: "00:00", endTime: "23:59" },
       ]
@@ -186,7 +190,7 @@ describe("RuleEngine", () => {
 
   describe("evaluateDomainConditions", () => {
     it("normal: should evaluate multiple domain conditions with AND", () => {
-      const conditions: any[] = [
+      const conditions: LegacyCondition[] = [
         { type: "domain", pattern: "github.com", matchMode: "contains" },
         { type: "domain", pattern: "github", matchMode: "contains" },
       ]
@@ -194,7 +198,7 @@ describe("RuleEngine", () => {
     })
 
     it("normal: should evaluate multiple domain conditions with OR", () => {
-      const conditions: any[] = [
+      const conditions: LegacyCondition[] = [
         { type: "domain", pattern: "github.com", matchMode: "exact" },
         { type: "domain", pattern: "gitlab.com", matchMode: "exact" },
       ]
@@ -202,7 +206,7 @@ describe("RuleEngine", () => {
     })
 
     it("edge: should return false when no domain conditions exist", () => {
-      const conditions: any[] = [
+      const conditions: LegacyCondition[] = [
         { type: "schedule", days: [1], startTime: "09:00", endTime: "17:00" },
       ]
       expect(engine.evaluateDomainConditions(conditions, "AND", "https://github.com")).toBe(false)

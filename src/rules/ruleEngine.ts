@@ -19,8 +19,8 @@ import { logger } from "@/utils/logger"
 
 // 旧版持久化条件的数据形状（migration 前）。仅下方「兼容旧数据」评估方法消费；
 // 新数据模型用 ConditionGroup（patterns 复数）。旧 domain 条件是单数 pattern。
-type LegacyDomainCondition = { type: "domain"; pattern: string; matchMode: MatchMode }
-type LegacyCondition = LegacyDomainCondition | ScheduleCondition
+export type LegacyDomainCondition = { type: "domain"; pattern: string; matchMode: MatchMode }
+export type LegacyCondition = LegacyDomainCondition | ScheduleCondition
 
 export class RuleEngine {
   /**
