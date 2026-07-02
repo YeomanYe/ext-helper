@@ -588,6 +588,71 @@ describe("extensionStore", () => {
 
       expect(store.getState().error).toBe("Failed to start bisect")
     })
+
+    it("normal: excludes whitelisted ids from candidates", async () => {
+      const exts = [
+        makeExtension({ id: "a", enabled: true }),
+        makeExtension({ id: "b", enabled: true }),
+        makeExtension({ id: "c", enabled: true }),
+      ]
+      const store = await createStore(exts)
+      await store.getState().startBisect(["b"])
+
+      const session = store.getState().bisectSession
+      expect(session.allCandidateIds.sort()).toEqual(["a", "c"])
+    })
+
+    it("edge: refuses to start when whitelist leaves fewer than 2 candidates", async () => {
+      const exts = [
+        makeExtension({ id: "a", enabled: true }),
+        makeExtension({ id: "b", enabled: true }),
+      ]
+      const store = await createStore(exts)
+      await store.getState().startBisect(["b"])
+
+      expect(store.getState().bisectSession.active).toBe(false)
+      expect(store.getState().error).toBe(
+        "Need at least two non-whitelisted enabled extensions to start bisect"
+      )
+    })
+
+    it("normal: whitelisted extensions keep their baseline enabled state after start", async () => {
+      const exts = [
+        makeExtension({ id: "a", enabled: true }),
+        makeExtension({ id: "b", enabled: true }),
+        makeExtension({ id: "c", enabled: true }),
+      ]
+      const store = await createStore(exts)
+      await store.getState().startBisect(["c"])
+
+      const c = store.getState().extensions.find((e) => e.id === "c")
+      expect(c?.enabled).toBe(true)
+    })
+
+    it("edge: whitelisted but currently disabled extension stays disabled", async () => {
+      const exts = [
+        makeExtension({ id: "a", enabled: true }),
+        makeExtension({ id: "b", enabled: true }),
+        makeExtension({ id: "c", enabled: false }),
+      ]
+      const store = await createStore(exts)
+      await store.getState().startBisect(["c"])
+
+      const c = store.getState().extensions.find((e) => e.id === "c")
+      expect(c?.enabled).toBe(false)
+    })
+
+    it("edge: unknown ids in whitelist are ignored gracefully", async () => {
+      const exts = [
+        makeExtension({ id: "a", enabled: true }),
+        makeExtension({ id: "b", enabled: true }),
+      ]
+      const store = await createStore(exts)
+      await store.getState().startBisect(["does-not-exist"])
+
+      expect(store.getState().bisectSession.active).toBe(true)
+      expect(store.getState().bisectSession.allCandidateIds.sort()).toEqual(["a", "b"])
+    })
   })
 
   // ── markBisectGood ───────────────────────────────────────────────────

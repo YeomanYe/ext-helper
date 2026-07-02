@@ -14,6 +14,7 @@ interface ExtensionsActionsMenuProps {
   onBisectGood: () => void
   onBisectBad: () => void
   onCancelBisect: () => void
+  onManageBisectWhitelist: () => void
   onEnableAll: () => void
   onDisableAll: () => void
   onUndo: () => void
@@ -32,6 +33,7 @@ export function ExtensionsActionsMenu({
   onBisectGood,
   onBisectBad,
   onCancelBisect,
+  onManageBisectWhitelist,
   onEnableAll,
   onDisableAll,
   onUndo,
@@ -65,16 +67,27 @@ export function ExtensionsActionsMenu({
       {open && (
         <div className="absolute right-0 top-full z-50 mt-1 w-40 border border-punk-border bg-punk-surface-raised shadow-punk-panel">
           {!isBisectActive && (
-            <button
-              onClick={() => {
-                onStartBisect()
-                setOpen(false)
-              }}
-              disabled={enabledExtensionCount < 2}
-              className="w-full px-3 py-2 text-left font-punk-heading text-[11px] uppercase tracking-wider text-punk-text-secondary transition-colors hover:bg-punk-surface-soft hover:text-punk-text-primary disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              Start Bisect
-            </button>
+            <>
+              <button
+                onClick={() => {
+                  onStartBisect()
+                  setOpen(false)
+                }}
+                disabled={enabledExtensionCount < 2}
+                className="w-full px-3 py-2 text-left font-punk-heading text-[11px] uppercase tracking-wider text-punk-text-secondary transition-colors hover:bg-punk-surface-soft hover:text-punk-text-primary disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Start Bisect
+              </button>
+              <button
+                onClick={() => {
+                  onManageBisectWhitelist()
+                  setOpen(false)
+                }}
+                className="w-full px-3 py-2 text-left font-punk-heading text-[11px] uppercase tracking-wider text-punk-text-secondary transition-colors hover:bg-punk-surface-soft hover:text-punk-text-primary"
+              >
+                Manage Bisect Whitelist
+              </button>
+            </>
           )}
           {isBisectActive && !isBisectResolved && (
             <>

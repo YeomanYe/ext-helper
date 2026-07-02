@@ -1,5 +1,12 @@
 import * as React from "react"
-import { Header, Footer, ExtensionsActionsMenu, ImportExportDialog } from "@/components/popup"
+import {
+  Header,
+  Footer,
+  ExtensionsActionsMenu,
+  ImportExportDialog,
+  BisectWhitelistDialog,
+} from "@/components/popup"
+import type { BisectWhitelistDialogMode } from "@/components/popup/BisectWhitelistDialog"
 import { ExtensionsTab } from "@/components/popup/ExtensionsTab"
 import { UsageLogTab } from "@/components/popup/UsageLogTab"
 import { RuleManager } from "@/components/rules"
@@ -26,6 +33,7 @@ export function PopupPage() {
   const fetchRules = useRuleStore((s) => s.fetchRules)
   const fetchUsageLog = useUsageLogStore((s) => s.fetchUsageLog)
 
+  const extensions = useExtensionStore((s) => s.extensions)
   const totalExtensionsEnabled = useExtensionStore(
     (s) => s.extensions.filter((e) => e.enabled).length
   )
@@ -49,8 +57,26 @@ export function PopupPage() {
   const filteredExtensions = useFilteredExtensions()
   const filteredEnabledCount = filteredExtensions.filter((e) => e.enabled).length
 
+  const bisectWhitelist = useUIStore((s) => s.bisectWhitelist)
+  const setBisectWhitelist = useUIStore((s) => s.setBisectWhitelist)
+
   const [activeTab, setActiveTab] = React.useState<TabType>("extensions")
   const [importExportMode, setImportExportMode] = React.useState<ImportExportMode | null>(null)
+  const [bisectDialogMode, setBisectDialogMode] = React.useState<BisectWhitelistDialogMode | null>(
+    null
+  )
+
+  const handleStartBisectClicked = () => setBisectDialogMode("start-bisect")
+  const handleManageWhitelistClicked = () => setBisectDialogMode("edit")
+  const handleDialogCancel = () => setBisectDialogMode(null)
+  const handleDialogConfirm = async (ids: string[]) => {
+    await setBisectWhitelist(ids)
+    const mode = bisectDialogMode
+    setBisectDialogMode(null)
+    if (mode === "start-bisect") {
+      await startBisect(ids)
+    }
+  }
 
   React.useEffect(() => {
     initializeUIStore()
@@ -83,6 +109,14 @@ export function PopupPage() {
         mode={importExportMode ?? "import"}
         onClose={() => setImportExportMode(null)}
         onImported={handleImportExportImported}
+      />
+      <BisectWhitelistDialog
+        open={bisectDialogMode !== null}
+        mode={bisectDialogMode ?? "edit"}
+        extensions={extensions}
+        initialWhitelist={bisectWhitelist}
+        onConfirm={(ids) => void handleDialogConfirm(ids)}
+        onCancel={handleDialogCancel}
       />
 
       {/* Tab Bar */}
@@ -130,7 +164,8 @@ export function PopupPage() {
               canRedo={canRedo}
               undoCount={undoCount}
               redoCount={redoCount}
-              onStartBisect={() => void startBisect()}
+              onStartBisect={handleStartBisectClicked}
+              onManageBisectWhitelist={handleManageWhitelistClicked}
               onBisectGood={() => void markBisectGood()}
               onBisectBad={() => void markBisectBad()}
               onCancelBisect={() => void cancelBisect()}

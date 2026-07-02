@@ -112,6 +112,7 @@ export interface Preferences {
   aiSettings?: AiSettings
   recommendationApiBaseUrl?: string
   cloudRecommendationEnabled?: boolean
+  bisectWhitelist?: string[]
 }
 
 export interface RecommendationQuota {
@@ -221,7 +222,7 @@ export interface ExtensionStore {
   setExtensionsEnabled: (ids: string[], enabled: boolean) => Promise<void>
   undoExtensions: () => Promise<void>
   redoExtensions: () => Promise<void>
-  startBisect: () => Promise<void>
+  startBisect: (whitelist?: string[]) => Promise<void>
   markBisectGood: () => Promise<void>
   markBisectBad: () => Promise<void>
   cancelBisect: () => Promise<void>
@@ -261,11 +262,13 @@ export interface UIStore {
   compactMode: boolean
   showDisabled: boolean
   viewMode: ViewMode
+  bisectWhitelist: string[]
   lastUpdate: number
   setTheme: (theme: "light" | "dark" | "system") => void
   toggleCompactMode: () => void
   toggleShowDisabled: () => void
   setViewMode: (mode: ViewMode) => void
+  setBisectWhitelist: (ids: string[]) => Promise<void>
 }
 
 // Re-export rule types

@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/).
 - 分组支持拖拽排序(`group-drag-reorder`): 分组列表可直接拖动调整顺序。
 - 规则面板 `find` 快捷键聚焦搜索(`rules-find-shortcut`): 规则页自动捕获 `find` 快捷键并聚焦到搜索框。
 - 深色主题新增「深蓝」配色变体(`deep-blue-theme`)。
+- 二分调试白名单(`bisect-whitelist`): ACTIONS 菜单新增「Manage Bisect Whitelist」入口；「Start Bisect」改为先弹出白名单确认对话框，可临时增减并持久化为偏好；白名单中的扩展在整轮二分会话中保持基线状态，适合保护密码管理器、输入法、翻译工具等始终需要在线的扩展。
 
 ### Fixed
 

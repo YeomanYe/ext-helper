@@ -236,17 +236,23 @@ export const useExtensionStore = create<ExtensionStoreState>((set, get) => ({
     })
   },
 
-  startBisect: async () => {
+  startBisect: async (whitelist: string[] = []) => {
     const state = get()
     if (state.bisectSession.active) return
 
     const baselineExtensions = cloneExtensions(state.extensions)
+    const whitelistSet = new Set(whitelist)
     const candidateIds = baselineExtensions
-      .filter((extension) => extension.enabled)
+      .filter((extension) => extension.enabled && !whitelistSet.has(extension.id))
       .map((extension) => extension.id)
 
     if (candidateIds.length < 2) {
-      set({ error: "Need at least two enabled extensions to start bisect" })
+      set({
+        error:
+          whitelist.length > 0
+            ? "Need at least two non-whitelisted enabled extensions to start bisect"
+            : "Need at least two enabled extensions to start bisect",
+      })
       return
     }
 

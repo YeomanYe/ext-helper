@@ -5,7 +5,7 @@ import { applyThemeDom } from "@/utils/theme"
 import { logger } from "@/utils/logger"
 
 type PreferenceUpdates = Partial<
-  Pick<Preferences, "theme" | "compactMode" | "showDisabled" | "viewMode">
+  Pick<Preferences, "theme" | "compactMode" | "showDisabled" | "viewMode" | "bisectWhitelist">
 >
 
 export const useUIStore = create<UIStore>((set, get) => ({
@@ -13,6 +13,7 @@ export const useUIStore = create<UIStore>((set, get) => ({
   compactMode: false,
   showDisabled: true,
   viewMode: "compact",
+  bisectWhitelist: [],
   lastUpdate: Date.now(),
 
   setTheme: async (theme: Preferences["theme"]) => {
@@ -56,6 +57,15 @@ export const useUIStore = create<UIStore>((set, get) => ({
       logger.error("Failed to save view mode preference:", error)
     }
   },
+
+  setBisectWhitelist: async (ids: string[]) => {
+    set({ bisectWhitelist: ids, lastUpdate: Date.now() })
+    try {
+      await preferencesRepo.save({ bisectWhitelist: ids })
+    } catch (error) {
+      logger.error("Failed to save bisect whitelist preference:", error)
+    }
+  },
 }))
 
 // Initialize theme on load
@@ -78,6 +88,9 @@ export async function initializeUIStore() {
       }
       if (prefs.viewMode) {
         nextState.viewMode = prefs.viewMode as ViewMode
+      }
+      if (Array.isArray(prefs.bisectWhitelist)) {
+        nextState.bisectWhitelist = prefs.bisectWhitelist
       }
 
       useUIStore.setState(nextState)

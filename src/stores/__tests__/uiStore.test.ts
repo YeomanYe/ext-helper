@@ -238,6 +238,45 @@ describe("uiStore", () => {
   })
 
   // ----------------------------------------------------------------
+  // setBisectWhitelist
+  // ----------------------------------------------------------------
+  describe("setBisectWhitelist", () => {
+    it("normal: updates state and persists to preferencesRepo", async () => {
+      const { useUIStore } = await import("../uiStore")
+      await useUIStore.getState().setBisectWhitelist(["ext-a", "ext-b"])
+
+      expect(useUIStore.getState().bisectWhitelist).toEqual(["ext-a", "ext-b"])
+      expect(repo.save).toHaveBeenCalledWith({ bisectWhitelist: ["ext-a", "ext-b"] })
+    })
+
+    it("normal: initializeUIStore hydrates bisectWhitelist from prefs", async () => {
+      repo.fetch.mockResolvedValueOnce({
+        bisectWhitelist: ["ext-c"],
+      })
+
+      const { initializeUIStore, useUIStore } = await import("../uiStore")
+      await initializeUIStore()
+
+      expect(useUIStore.getState().bisectWhitelist).toEqual(["ext-c"])
+    })
+
+    it("abnormal: should handle save failure gracefully", async () => {
+      repo.save.mockRejectedValueOnce(new Error("save error"))
+      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {})
+
+      const { useUIStore } = await import("../uiStore")
+      await useUIStore.getState().setBisectWhitelist(["ext-a"])
+
+      expect(useUIStore.getState().bisectWhitelist).toEqual(["ext-a"])
+      expect(consoleSpy).toHaveBeenCalledWith(
+        "Failed to save bisect whitelist preference:",
+        expect.any(Error)
+      )
+      consoleSpy.mockRestore()
+    })
+  })
+
+  // ----------------------------------------------------------------
   // initializeUIStore
   // ----------------------------------------------------------------
   describe("initializeUIStore", () => {

@@ -13,6 +13,7 @@ type StoredPreferences = Partial<{
   aiSettings: AiSettings
   recommendationApiBaseUrl: string
   cloudRecommendationEnabled: boolean
+  bisectWhitelist: string[]
 }>
 
 export const preferencesRepo = {
