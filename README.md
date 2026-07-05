@@ -2,7 +2,7 @@
 
 ![Ext Helper — Tame the chaos. Bisect. Group. Automate.](website/public/hero-poster.png)
 
-A browser extension manager for Chrome, Firefox, and Edge. Organize extensions into groups, automate enable/disable with rules, debug conflicts with binary-search bisect, and undo/redo changes instantly.
+A browser extension manager for Chrome and Edge. Organize extensions into groups, automate enable/disable with rules, debug conflicts with binary-search bisect, and undo/redo changes instantly.
 
 [Website](https://yeomanye.github.io/ext-helper/) · [Report an issue](https://github.com/YeomanYe/ext-helper/issues) · [Donate via PayPal](https://www.paypal.com/paypalme/yeomanye)
 
@@ -21,14 +21,14 @@ A browser extension manager for Chrome, Firefox, and Edge. Organize extensions i
 - **Bisect debugger** — binary-search through enabled extensions to isolate one that breaks a site
 - **Snapshot undo / redo** — every mutation is reversible
 - **Optimistic UI** with rollback on failure
-- **Cross-browser** — Chrome, Edge, Firefox (built on Plasmo)
+- **Cross-browser** — Chrome and Edge MV3 builds (built on Plasmo)
 - **Punk-themed** design system with light / dark modes
 
 ## Install
 
 [**Install from the Chrome Web Store →**](https://chromewebstore.google.com/detail/ext-helper/bnoomkhaemojkbmdmniifkijjaiiomfl)
 
-Edge Add-ons and Firefox Add-ons coming soon. You can also load from source — see [Development](#development).
+Edge Add-ons support is packaged from the same source. You can also load from source — see [Development](#development).
 
 ## Development
 
@@ -37,16 +37,20 @@ Requires Node 20+ and pnpm 9+.
 ```bash
 pnpm install
 
-pnpm dev          # Plasmo dev for Chrome MV3 — build/chrome-mv3-dev
+pnpm dev          # Alias for pnpm dev:chrome
+pnpm dev:chrome   # Plasmo dev for Chrome MV3 — build/chrome-mv3-dev
+pnpm dev:edge     # Plasmo dev for Edge MV3 — build/edge-mv3-dev
 pnpm dev:chrome:package # One-shot Chrome MV3 dev package — build/chrome-mv3-dev
-pnpm dev:firefox  # Plasmo dev watcher for Firefox MV2 — build/firefox-mv2-dev
-pnpm dev:firefox:package # One-shot Firefox MV2 dev package — build/firefox-mv2-dev
-pnpm dev:extension # Plasmo dev watchers for Chrome MV3 + Firefox MV2
+pnpm dev:edge:package   # One-shot Edge MV3 dev package — build/edge-mv3-dev
+pnpm dev:extension # Plasmo dev watchers for Chrome MV3 + Edge MV3
 pnpm dev:web      # Vite web preview with mock data on :4173
 pnpm dev:website  # Marketing site (website/)
-pnpm dev:all      # Build Firefox dev package once, then run Chrome dev + web + website
+pnpm dev:all      # Chrome dev + Edge dev + web + website
 
-pnpm build            # Extension production build
+pnpm build            # Chrome + Edge production builds
+pnpm build:chrome     # Chrome MV3 production build
+pnpm build:edge       # Edge MV3 production build
+pnpm package          # Chrome + Edge zipped store packages
 pnpm build:website    # Marketing site production build
 
 pnpm test          # Vitest watch

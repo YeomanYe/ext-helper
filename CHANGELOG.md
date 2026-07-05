@@ -4,21 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/).
 
-## [2.1.0] - Unreleased
+## [2.1.0] - 2026-07-05
 
 ### Added
 
-- 分组支持拖拽排序(`group-drag-reorder`): 分组列表可直接拖动调整顺序。
-- 规则面板 `find` 快捷键聚焦搜索(`rules-find-shortcut`): 规则页自动捕获 `find` 快捷键并聚焦到搜索框。
-- 深色主题新增「深蓝」配色变体(`deep-blue-theme`)。
-- 二分调试白名单(`bisect-whitelist`): ACTIONS 菜单新增「Manage Bisect Whitelist」入口；「Start Bisect」改为先弹出白名单确认对话框，可临时增减并持久化为偏好；白名单中的扩展在整轮二分会话中保持基线状态，适合保护密码管理器、输入法、翻译工具等始终需要在线的扩展。
+- 二分调试白名单(`bisect-whitelist`): 「Start Bisect」前可选择需要保护的扩展，并将偏好持久化；白名单中的扩展会在整轮二分过程中保持原状态，适合保护密码管理器、输入法、翻译工具等关键扩展。
+
+### Changed
+
+- 白名单管理入口移到 Header 设置菜单，ACTIONS 菜单只保留二分流程入口，配置和执行操作更清晰。
 
 ### Fixed
 
-- 修复 popup 闪烁效果。
-- 优化深色主题配色。
-- 修复 Firefox 扩展图标归一化与运行时识别。
-- 设置页 API base URL 占位文案改为通用文案。
+- 生产构建不再向浏览器控制台输出 AI 原始响应，避免泄露已安装扩展清单或当前访问 URL。
 
 ## [2.0.0] - 2026-05-31
 

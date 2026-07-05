@@ -17,10 +17,15 @@
 ### 1. 构建扩展包
 
 ```bash
-pnpm build
+pnpm package
 ```
 
-这将生成 `build/chrome-mv3-prod/` 目录，包含完整的扩展文件。
+这将生成 Chrome 与 Edge 的生产目录和商店上传 zip：
+
+- `build/chrome-mv3-prod/`
+- `build/edge-mv3-prod/`
+- `build/chrome-mv3-prod.zip`
+- `build/edge-mv3-prod.zip`
 
 ### 2. Chrome Web Store 发布
 
@@ -29,7 +34,7 @@ pnpm build
 #### 步骤:
 1. 登录 Google 开发者账号
 2. 选择 "Ext Helper" 扩展（或创建新列表）
-3. 进入 **Package** 标签，上传新版本的扩展包（zip 格式）
+3. 进入 **Package** 标签，上传 `build/chrome-mv3-prod.zip`
 4. 进入 **Store listing** 标签，更新以下内容：
    - **Short description** (132 字符以内):
      ```
@@ -79,7 +84,7 @@ pnpm build
 #### 步骤:
 1. 登录 Microsoft Partner Center 账号
 2. 选择 "Ext Helper" 扩展（或创建新列表）
-3. 进入 **Package** 标签，上传新版本的扩展包（zip 格式）
+3. 进入 **Package** 标签，上传 `build/edge-mv3-prod.zip`
 4. 进入 **Listings** 标签，更新以下内容：
    - **Name**: Ext Helper - AI Extension Manager
    - **Short description**:
@@ -117,8 +122,8 @@ pnpm build
 
 1. 等待审查（通常 24-48 小时）
 2. 审查通过后，检查：
-   - Chrome Web Store: https://chromewebstore.google.com/detail/ext-helper-ai-extension
-   - Edge Add-ons: https://microsoftedge.microsoft.com/addons/detail/ext-helper-ai-extension
+   - Chrome Web Store: https://chromewebstore.google.com/detail/ext-helper/bnoomkhaemojkbmdmniifkijjaiiomfl
+   - Edge Add-ons: 在 Partner Center 审查通过后的公开 listing URL
 3. 确认描述、截图、版本号都正确显示
 
 ## 版本更新记录

@@ -21,9 +21,11 @@
 
 ```bash
 pnpm dev            # Plasmo dev（Chrome MV3）
-pnpm dev:firefox    # Plasmo dev（Firefox MV2）
+pnpm dev:edge       # Plasmo dev（Edge MV3）
+pnpm dev:extension  # Plasmo dev（Chrome MV3 + Edge MV3）
 pnpm dev:web        # Vite web 预览模式（mock 数据，无扩展 API）
-pnpm build          # Plasmo 生产构建
+pnpm build          # Plasmo 生产构建（Chrome MV3 + Edge MV3）
+pnpm package        # 生成 Chrome + Edge 商店上传 zip
 
 pnpm lint           # ESLint 检查（lint:fix 自动修）
 pnpm typecheck      # tsc --noEmit 类型检查
@@ -57,7 +59,7 @@ Conventional Commits（`commitlint.config.js` 强制，commit-msg 钩子校验�
 ## 版本与发布
 
 用 [changesets](https://github.com/changesets/changesets) 管版本号与 CHANGELOG（本项目 `private`，
-**不发 npm**；扩展产物走 Chrome Web Store / Firefox AMO）：
+**不发 npm**；扩展产物走 Chrome Web Store / Microsoft Edge Add-ons）：
 
 1. 改完功能：`pnpm changeset` 记录变更（选 major/minor/patch + 写说明）。
    - **粒度**：一个功能 / 一个用户可见改动一条，跟着 commit 走；不要攒到发布前。
@@ -66,4 +68,4 @@ Conventional Commits（`commitlint.config.js` 强制，commit-msg 钩子校验�
      只跳过本门禁；`git commit --no-verify` 跳过全部 hook，慎用。
 2. 准备发版：`pnpm version-packages` 应用 changeset → 升顶层 `version` + **自动同步 `manifest.version`**
    （`scripts/sync-manifest-version.mjs`）+ 更新 `CHANGELOG.md`
-3. `pnpm build` 产出扩展包，按 [`PUBLISH_GUIDE.md`](PUBLISH_GUIDE.md) 上架
+3. `pnpm package` 产出 Chrome + Edge 上传包，按 [`PUBLISH_GUIDE.md`](PUBLISH_GUIDE.md) 上架

@@ -8,7 +8,7 @@
 
 应用同时跑在两种模式，由 `isDevMode()`（`src/services/mockData.ts`）切换：
 
-- **扩展模式**（`pnpm dev` / 生产）：Plasmo + 真实 `chrome.management.*` 等浏览器 API
+- **扩展模式**（`pnpm dev` / `pnpm dev:edge` / 生产）：Plasmo + 真实 `chrome.management.*` 等浏览器 API
 - **Web 预览模式**（`pnpm dev:web`）：Vite + `devStorage`（localStorage in-memory mock），**没有任何扩展 API**
 
 **硬规则**：
@@ -23,10 +23,10 @@
   **禁止**在业务代码里裸调 `chrome.*` / `browser.*`。
 - 新增浏览器能力 → 先在 adapter 暴露统一方法，再在上层用。
 
-## 3. MV3 / MV2 差异
+## 3. MV3 / 浏览器差异
 
-- Chrome 走 **Manifest V3**（`--target=chrome-mv3`），Firefox 走 **MV2**（`--target=firefox-mv2`）。
-- background（MV3 service worker vs MV2 persistent page）、API 可用性差异**收敛进 adapter**，
+- Chrome / Edge 走 **Manifest V3**（`--target=chrome-mv3` / `--target=edge-mv3`）。
+- background service worker、Chrome/Edge API 可用性差异**收敛进 adapter**，
   不在功能代码里写 `if (chrome) ... else ...`。
 - 规则引擎后台逻辑在 `src/background/index.ts`（监听 tab URL 变化 + alarms 触发规则），改它两端都要验。
 

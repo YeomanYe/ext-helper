@@ -1,6 +1,6 @@
 {
   "name": "ext-helper",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Browser extension manager with enable/disable and grouping",
   "author": "Tony Ye (https://github.com/YeomanYe)",
   "type": "module",
@@ -10,16 +10,24 @@
     "node": ">=18"
   },
   "scripts": {
-    "dev": "plasmo dev --target=chrome-mv3",
+    "dev": "pnpm dev:chrome",
+    "dev:chrome": "plasmo dev --target=chrome-mv3",
+    "dev:edge": "plasmo dev --target=edge-mv3",
     "dev:chrome:package": "plasmo build --target=chrome-mv3 --tag=dev",
+    "dev:edge:package": "plasmo build --target=edge-mv3 --tag=dev",
     "dev:firefox": "plasmo dev --target=firefox-mv2",
     "dev:firefox:package": "plasmo build --target=firefox-mv2 --tag=dev",
-    "dev:extension": "concurrently -n chrome,firefox -c cyan,magenta \"pnpm dev\" \"sleep 6 && pnpm dev:firefox\"",
-    "dev:all": "pnpm dev:firefox:package && concurrently \"pnpm dev\" \"vite --config vite.config.ts --force\" \"vite --config vite.website.config.ts --force\"",
+    "dev:extension": "concurrently -n chrome,edge -c cyan,blue \"pnpm dev:chrome\" \"sleep 6 && pnpm dev:edge\"",
+    "dev:all": "concurrently -n chrome,edge,web,website -c cyan,blue,green,yellow \"pnpm dev:chrome\" \"sleep 6 && pnpm dev:edge\" \"vite --config vite.config.ts --force\" \"vite --config vite.website.config.ts --force\"",
     "dev:web": "vite --config vite.config.ts --force",
     "dev:hmr": "vite dev --config vite.config.ts",
-    "build": "plasmo build",
+    "build": "pnpm build:chrome && pnpm build:edge",
+    "build:chrome": "plasmo build --target=chrome-mv3",
+    "build:edge": "plasmo build --target=edge-mv3",
     "build:web": "vite build --config vite.config.ts",
+    "package": "pnpm package:chrome && pnpm package:edge",
+    "package:chrome": "plasmo build --target=chrome-mv3 --zip",
+    "package:edge": "plasmo build --target=edge-mv3 --zip",
     "preview": "vite dev --config vite.config.ts && vite preview",
     "test": "vitest",
     "lint": "eslint src --max-warnings=0",
@@ -76,7 +84,7 @@
   },
   "manifest": {
     "name": "Ext Helper - AI Extension Manager",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "description": "AI-powered extension manager with site discovery, smart recommendations, grouping & automation.",
     "action": {
       "default_popup": "popup.html"
