@@ -1,6 +1,6 @@
 import * as React from "react"
 import { createPortal } from "react-dom"
-import { Package, Search } from "lucide-react"
+import { Check, Package, Search } from "lucide-react"
 import type { Extension } from "@/types"
 import { cn } from "@/utils"
 import {
@@ -88,68 +88,70 @@ export function BisectWhitelistDialog({
           </div>
         </div>
 
-        <div className="flex-1 space-y-1 overflow-y-auto px-2 pb-2">
+        <div className="flex-1 overflow-y-auto px-3 pb-3">
           {visible.length === 0 && (
-            <p className="px-2 py-3 font-punk-body text-[10px] text-punk-text-muted">
+            <p className="px-1 py-3 font-punk-body text-[10px] text-punk-text-muted">
               No toggleable extensions found.
             </p>
           )}
           {visible.length > 0 && filtered.length === 0 && (
-            <p className="px-2 py-3 font-punk-body text-[10px] text-punk-text-muted">
+            <p className="px-1 py-3 font-punk-body text-[10px] text-punk-text-muted">
               No extensions match &quot;{query}&quot;.
             </p>
           )}
-          {filtered.map((ext) => {
-            const checked = selectedSet.has(ext.id)
-            return (
-              <button
-                key={ext.id}
-                type="button"
-                onClick={() => handleToggle(ext.id)}
-                aria-pressed={checked}
-                aria-label={ext.name}
-                className={cn(
-                  "flex w-full items-center gap-2 border px-2 py-1.5 text-left transition-colors",
-                  checked
-                    ? "border-punk-accent/70 bg-punk-accent/10"
-                    : "border-transparent hover:bg-punk-surface-soft"
-                )}
-              >
-                <div className="relative flex-shrink-0">
-                  {ext.iconUrl ? (
-                    <img src={ext.iconUrl} alt="" className="h-6 w-6 object-cover" loading="lazy" />
-                  ) : (
-                    <div className="flex h-6 w-6 items-center justify-center bg-punk-surface-soft">
-                      <Package className="h-3.5 w-3.5 text-punk-text-muted" />
-                    </div>
-                  )}
-                  <div
+          {filtered.length > 0 && (
+            <div className="grid grid-cols-4 gap-1.5">
+              {filtered.map((ext) => {
+                const checked = selectedSet.has(ext.id)
+                return (
+                  <button
+                    key={ext.id}
+                    type="button"
+                    onClick={() => handleToggle(ext.id)}
+                    aria-pressed={checked}
+                    aria-label={ext.name}
+                    title={ext.name}
                     className={cn(
-                      "absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full border border-punk-bg-alt",
-                      ext.enabled ? "bg-punk-success" : "bg-punk-text-muted"
+                      "relative flex flex-col items-center gap-1 border px-1 py-2 text-center transition-colors",
+                      checked
+                        ? "border-punk-accent bg-punk-accent/10"
+                        : "border-punk-border/40 bg-punk-surface-inset/40 hover:border-punk-accent/50 hover:bg-punk-surface-soft"
                     )}
-                  />
-                </div>
-                <span className="flex-1 truncate font-punk-body text-[11px] text-punk-text-primary">
-                  {ext.name}
-                </span>
-                {!ext.enabled && (
-                  <span className="font-punk-code text-[9px] uppercase text-punk-text-muted">
-                    OFF
-                  </span>
-                )}
-                <span
-                  className={cn(
-                    "h-3 w-3 shrink-0 border",
-                    checked
-                      ? "border-punk-accent bg-punk-accent"
-                      : "border-punk-border/60 bg-transparent"
-                  )}
-                  aria-hidden="true"
-                />
-              </button>
-            )
-          })}
+                  >
+                    <div className="relative">
+                      {ext.iconUrl ? (
+                        <img
+                          src={ext.iconUrl}
+                          alt=""
+                          className="h-8 w-8 object-cover"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="flex h-8 w-8 items-center justify-center bg-punk-surface-soft">
+                          <Package className="h-4 w-4 text-punk-text-muted" />
+                        </div>
+                      )}
+                      <div
+                        className={cn(
+                          "absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full border border-punk-bg-alt",
+                          ext.enabled ? "bg-punk-success" : "bg-punk-text-muted"
+                        )}
+                      />
+                    </div>
+                    <span className="line-clamp-2 w-full break-words font-punk-body text-[10px] leading-tight text-punk-text-primary">
+                      {ext.name}
+                    </span>
+                    {checked && (
+                      <Check
+                        className="absolute right-0.5 top-0.5 h-3 w-3 text-punk-accent"
+                        aria-hidden="true"
+                      />
+                    )}
+                  </button>
+                )
+              })}
+            </div>
+          )}
         </div>
 
         {tooFewCandidates && (
