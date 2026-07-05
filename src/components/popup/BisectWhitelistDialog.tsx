@@ -89,31 +89,43 @@ export function BisectWhitelistDialog({
           </div>
         </div>
 
-        <div className="max-h-24 overflow-y-auto border-y border-punk-border/30 bg-punk-surface-soft/70 px-3 py-2">
+        <div className="shrink-0 border-y border-punk-border/30 bg-punk-surface-soft/70 px-3 py-2">
+          <div className="mb-1 flex items-center justify-between">
+            <span className="font-punk-heading text-[10px] uppercase tracking-wider text-punk-text-muted">
+              Whitelisted ({selectedExtensions.length})
+            </span>
+            {selectedExtensions.length > 0 && (
+              <span className="font-punk-code text-[9px] uppercase tracking-wider text-punk-text-muted">
+                click icon to remove
+              </span>
+            )}
+          </div>
           {selectedExtensions.length === 0 ? (
-            <div className="flex h-8 items-center">
-              <span className="font-punk-heading text-[10px] uppercase tracking-wider text-punk-text-muted">
-                No whitelisted extensions
+            <div className="flex h-7 items-center">
+              <span className="font-punk-body text-[10px] text-punk-text-muted">
+                No extensions in whitelist yet.
               </span>
             </div>
           ) : (
-            <div className="flex flex-wrap gap-1.5">
-              {selectedExtensions.map((ext) => (
-                <button
-                  key={ext.id}
-                  type="button"
-                  onClick={() => handleToggle(ext.id)}
-                  aria-label={`Remove ${ext.name} from whitelist`}
-                  title={ext.name}
-                  className="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden border border-punk-success bg-punk-surface-raised transition-colors hover:border-punk-cta"
-                >
-                  {ext.iconUrl ? (
-                    <img src={ext.iconUrl} className="h-full w-full object-cover" alt="" />
-                  ) : (
-                    <Package className="h-3.5 w-3.5 text-punk-text-muted" />
-                  )}
-                </button>
-              ))}
+            <div className="max-h-32 overflow-y-auto">
+              <div className="flex flex-wrap gap-1.5">
+                {selectedExtensions.map((ext) => (
+                  <button
+                    key={ext.id}
+                    type="button"
+                    onClick={() => handleToggle(ext.id)}
+                    aria-label={`Remove ${ext.name} from whitelist`}
+                    title={ext.name}
+                    className="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden border border-punk-success bg-punk-surface-raised transition-colors hover:border-punk-cta"
+                  >
+                    {ext.iconUrl ? (
+                      <img src={ext.iconUrl} className="h-full w-full object-cover" alt="" />
+                    ) : (
+                      <Package className="h-3.5 w-3.5 text-punk-text-muted" />
+                    )}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
         </div>
