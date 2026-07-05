@@ -103,6 +103,7 @@ export function PopupPage() {
         viewMode={viewMode}
         onViewModeChange={setViewMode}
         onOpenImportExport={openImportExport}
+        onManageBisectWhitelist={handleManageWhitelistClicked}
       />
       <ImportExportDialog
         open={importExportMode !== null}
@@ -165,7 +166,6 @@ export function PopupPage() {
               undoCount={undoCount}
               redoCount={redoCount}
               onStartBisect={handleStartBisectClicked}
-              onManageBisectWhitelist={handleManageWhitelistClicked}
               onBisectGood={() => void markBisectGood()}
               onBisectBad={() => void markBisectBad()}
               onCancelBisect={() => void cancelBisect()}

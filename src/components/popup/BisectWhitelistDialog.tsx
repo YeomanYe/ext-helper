@@ -1,9 +1,11 @@
 import * as React from "react"
 import { createPortal } from "react-dom"
+import { Package, Search } from "lucide-react"
 import type { Extension } from "@/types"
 import { cn } from "@/utils"
 import {
   countCandidates,
+  filterExtensionsByQuery,
   toggleSelection,
   visibleExtensions,
 } from "./bisectWhitelistDialog.helpers"
@@ -28,15 +30,20 @@ export function BisectWhitelistDialog({
   onCancel,
 }: BisectWhitelistDialogProps) {
   const [selected, setSelected] = React.useState<string[]>(initialWhitelist)
+  const [query, setQuery] = React.useState("")
 
   React.useEffect(() => {
-    if (open) setSelected(initialWhitelist)
+    if (open) {
+      setSelected(initialWhitelist)
+      setQuery("")
+    }
   }, [open, initialWhitelist])
 
   if (!open) return null
   if (typeof document === "undefined") return null
 
   const visible = visibleExtensions(extensions)
+  const filtered = filterExtensionsByQuery(visible, query)
   const selectedSet = new Set(selected)
   const tooFewCandidates = mode === "start-bisect" && countCandidates(extensions, selected) < 2
 
@@ -51,39 +58,79 @@ export function BisectWhitelistDialog({
       onClick={onCancel}
     >
       <div
-        className="w-96 max-h-[80vh] flex flex-col border border-punk-primary bg-punk-surface-raised shadow-punk-panel"
+        className="flex max-h-[80vh] w-[26rem] flex-col border border-punk-primary bg-punk-surface-raised shadow-punk-panel"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center gap-2 px-4 py-3 border-b border-punk-primary">
-          <h3 className="flex-1 font-punk-heading text-[10px] text-punk-text-primary uppercase tracking-wider">
+        <div className="flex items-center gap-2 border-b border-punk-primary px-4 py-3">
+          <h3 className="flex-1 font-punk-heading text-[10px] uppercase tracking-wider text-punk-text-primary">
             {title}
           </h3>
+          <span className="font-punk-code text-[10px] uppercase tracking-wider text-punk-text-muted">
+            {selected.length}/{visible.length}
+          </span>
         </div>
 
-        <p className="px-4 py-2 font-punk-body text-[10px] text-punk-text-secondary leading-relaxed">
+        <p className="px-4 py-2 font-punk-body text-[10px] leading-relaxed text-punk-text-secondary">
           Whitelisted extensions stay in their current state and are excluded from bisect.
         </p>
 
-        <div className="flex-1 overflow-y-auto px-2 py-1">
+        <div className="px-3 pb-2">
+          <div className="flex items-center gap-2 border border-punk-border/40 bg-punk-surface-inset/70 px-2 py-1.5 focus-within:border-punk-accent/70">
+            <Search className="h-3.5 w-3.5 shrink-0 text-punk-text-muted" />
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search extensions..."
+              aria-label="Search extensions"
+              className="w-full bg-transparent font-punk-body text-[11px] text-punk-text-primary placeholder:text-punk-text-muted focus:outline-none"
+            />
+          </div>
+        </div>
+
+        <div className="flex-1 space-y-1 overflow-y-auto px-2 pb-2">
           {visible.length === 0 && (
             <p className="px-2 py-3 font-punk-body text-[10px] text-punk-text-muted">
               No toggleable extensions found.
             </p>
           )}
-          {visible.map((ext) => {
+          {visible.length > 0 && filtered.length === 0 && (
+            <p className="px-2 py-3 font-punk-body text-[10px] text-punk-text-muted">
+              No extensions match &quot;{query}&quot;.
+            </p>
+          )}
+          {filtered.map((ext) => {
             const checked = selectedSet.has(ext.id)
             return (
-              <label
+              <button
                 key={ext.id}
-                className="flex items-center gap-2 px-2 py-1.5 hover:bg-punk-surface-soft cursor-pointer"
+                type="button"
+                onClick={() => handleToggle(ext.id)}
+                aria-pressed={checked}
+                aria-label={ext.name}
+                className={cn(
+                  "flex w-full items-center gap-2 border px-2 py-1.5 text-left transition-colors",
+                  checked
+                    ? "border-punk-accent/70 bg-punk-accent/10"
+                    : "border-transparent hover:bg-punk-surface-soft"
+                )}
               >
-                <input
-                  type="checkbox"
-                  checked={checked}
-                  onChange={() => handleToggle(ext.id)}
-                  aria-label={ext.name}
-                />
-                <span className="flex-1 font-punk-body text-[11px] text-punk-text-primary truncate">
+                <div className="relative flex-shrink-0">
+                  {ext.iconUrl ? (
+                    <img src={ext.iconUrl} alt="" className="h-6 w-6 object-cover" loading="lazy" />
+                  ) : (
+                    <div className="flex h-6 w-6 items-center justify-center bg-punk-surface-soft">
+                      <Package className="h-3.5 w-3.5 text-punk-text-muted" />
+                    </div>
+                  )}
+                  <div
+                    className={cn(
+                      "absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full border border-punk-bg-alt",
+                      ext.enabled ? "bg-punk-success" : "bg-punk-text-muted"
+                    )}
+                  />
+                </div>
+                <span className="flex-1 truncate font-punk-body text-[11px] text-punk-text-primary">
                   {ext.name}
                 </span>
                 {!ext.enabled && (
@@ -91,21 +138,30 @@ export function BisectWhitelistDialog({
                     OFF
                   </span>
                 )}
-              </label>
+                <span
+                  className={cn(
+                    "h-3 w-3 shrink-0 border",
+                    checked
+                      ? "border-punk-accent bg-punk-accent"
+                      : "border-punk-border/60 bg-transparent"
+                  )}
+                  aria-hidden="true"
+                />
+              </button>
             )
           })}
         </div>
 
         {tooFewCandidates && (
-          <p className="px-4 py-2 font-punk-body text-[10px] text-punk-warning border-t border-punk-warning/40">
+          <p className="border-t border-punk-warning/40 px-4 py-2 font-punk-body text-[10px] text-punk-warning">
             Need at least 2 candidates; remove items from the whitelist.
           </p>
         )}
 
-        <div className="flex justify-end gap-2 px-4 py-3 border-t border-punk-border/30">
+        <div className="flex justify-end gap-2 border-t border-punk-border/30 px-4 py-3">
           <button
             onClick={onCancel}
-            className="px-4 py-2 font-punk-heading text-[13px] text-punk-text-muted uppercase tracking-wider hover:text-punk-text-primary"
+            className="px-4 py-2 font-punk-heading text-[13px] uppercase tracking-wider text-punk-text-muted hover:text-punk-text-primary"
           >
             Cancel
           </button>
@@ -113,7 +169,7 @@ export function BisectWhitelistDialog({
             onClick={() => onConfirm(selected)}
             disabled={tooFewCandidates}
             className={cn(
-              "px-4 py-2 font-punk-heading text-[13px] uppercase tracking-wider text-white bg-punk-primary hover:bg-punk-primary/90 transition-all",
+              "bg-punk-primary px-4 py-2 font-punk-heading text-[13px] uppercase tracking-wider text-white transition-all hover:bg-punk-primary/90",
               "disabled:cursor-not-allowed disabled:opacity-50"
             )}
           >

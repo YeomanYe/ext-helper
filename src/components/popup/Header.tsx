@@ -6,6 +6,7 @@ import {
   ChevronDown,
   FileText,
   Settings,
+  ShieldCheck,
   Upload,
   Download,
   Bot,
@@ -1005,12 +1006,14 @@ interface HeaderProps {
   viewMode?: ViewMode
   onViewModeChange?: (mode: ViewMode) => void
   onOpenImportExport?: (mode: "import" | "export") => void
+  onManageBisectWhitelist?: () => void
 }
 
 export function Header({
   viewMode = "compact",
   onViewModeChange,
   onOpenImportExport,
+  onManageBisectWhitelist,
 }: HeaderProps) {
   const version = useExtensionVersion()
   const [showSettingsMenu, setShowSettingsMenu] = React.useState(false)
@@ -1145,6 +1148,19 @@ export function Header({
                   <Download className="h-3.5 w-3.5" />
                   EXPORT
                 </button>
+                {onManageBisectWhitelist && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onManageBisectWhitelist()
+                      setShowSettingsMenu(false)
+                    }}
+                    className="flex w-full items-center gap-2 px-3 py-2 text-left font-punk-heading text-[13px] uppercase tracking-wider text-punk-text-secondary transition-all duration-150 hover:bg-punk-surface-soft hover:text-punk-text-primary"
+                  >
+                    <ShieldCheck className="h-3.5 w-3.5" />
+                    BISECT WHITELIST
+                  </button>
+                )}
                 <button
                   type="button"
                   onClick={() => {

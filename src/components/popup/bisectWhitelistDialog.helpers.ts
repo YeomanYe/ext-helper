@@ -23,3 +23,13 @@ export function countCandidates(extensions: Extension[], whitelist: string[]): n
 export function toggleSelection(selection: string[], id: string): string[] {
   return selection.includes(id) ? selection.filter((x) => x !== id) : [...selection, id]
 }
+
+/**
+ * Case-insensitive substring match on extension name; empty query keeps the
+ * full list. Kept pure so it's testable without a renderer.
+ */
+export function filterExtensionsByQuery(extensions: Extension[], query: string): Extension[] {
+  const trimmed = query.trim().toLowerCase()
+  if (!trimmed) return extensions
+  return extensions.filter((e) => e.name.toLowerCase().includes(trimmed))
+}

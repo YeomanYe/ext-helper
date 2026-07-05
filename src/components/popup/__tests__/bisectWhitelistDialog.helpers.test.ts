@@ -4,6 +4,7 @@ import {
   visibleExtensions,
   countCandidates,
   toggleSelection,
+  filterExtensionsByQuery,
 } from "@/components/popup/bisectWhitelistDialog.helpers"
 
 function makeExt(over: Partial<Extension>): Extension {
@@ -76,5 +77,31 @@ describe("toggleSelection", () => {
     const next = toggleSelection(sel, "b")
     expect(next).not.toBe(sel)
     expect(sel).toEqual(["a"])
+  })
+})
+
+describe("filterExtensionsByQuery", () => {
+  it("normal: returns full list when query is empty", () => {
+    const exts = [makeExt({ id: "a", name: "Alpha" }), makeExt({ id: "b", name: "Bravo" })]
+    expect(filterExtensionsByQuery(exts, "").map((e) => e.id)).toEqual(["a", "b"])
+  })
+
+  it("normal: case-insensitive substring match on name", () => {
+    const exts = [
+      makeExt({ id: "a", name: "Alpha Reader" }),
+      makeExt({ id: "b", name: "Bravo" }),
+      makeExt({ id: "c", name: "alphabet" }),
+    ]
+    expect(filterExtensionsByQuery(exts, "ALPH").map((e) => e.id)).toEqual(["a", "c"])
+  })
+
+  it("edge: whitespace-only query returns full list", () => {
+    const exts = [makeExt({ id: "a", name: "Alpha" })]
+    expect(filterExtensionsByQuery(exts, "   ").map((e) => e.id)).toEqual(["a"])
+  })
+
+  it("edge: returns empty when nothing matches", () => {
+    const exts = [makeExt({ id: "a", name: "Alpha" })]
+    expect(filterExtensionsByQuery(exts, "zzz")).toEqual([])
   })
 })
