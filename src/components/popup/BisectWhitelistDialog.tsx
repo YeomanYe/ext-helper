@@ -89,7 +89,7 @@ export function BisectWhitelistDialog({
           </div>
         </div>
 
-        <div className="flex gap-2 overflow-x-auto border-y border-punk-border/30 bg-punk-surface-soft/70 px-3 py-2">
+        <div className="max-h-24 overflow-y-auto border-y border-punk-border/30 bg-punk-surface-soft/70 px-3 py-2">
           {selectedExtensions.length === 0 ? (
             <div className="flex h-8 items-center">
               <span className="font-punk-heading text-[10px] uppercase tracking-wider text-punk-text-muted">
@@ -97,22 +97,24 @@ export function BisectWhitelistDialog({
               </span>
             </div>
           ) : (
-            selectedExtensions.map((ext) => (
-              <button
-                key={ext.id}
-                type="button"
-                onClick={() => handleToggle(ext.id)}
-                aria-label={`Remove ${ext.name} from whitelist`}
-                title={ext.name}
-                className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden border border-punk-success bg-punk-surface-raised transition-colors hover:border-punk-cta"
-              >
-                {ext.iconUrl ? (
-                  <img src={ext.iconUrl} className="h-full w-full object-cover" alt="" />
-                ) : (
-                  <Package className="h-4 w-4 text-punk-text-muted" />
-                )}
-              </button>
-            ))
+            <div className="flex flex-wrap gap-1.5">
+              {selectedExtensions.map((ext) => (
+                <button
+                  key={ext.id}
+                  type="button"
+                  onClick={() => handleToggle(ext.id)}
+                  aria-label={`Remove ${ext.name} from whitelist`}
+                  title={ext.name}
+                  className="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden border border-punk-success bg-punk-surface-raised transition-colors hover:border-punk-cta"
+                >
+                  {ext.iconUrl ? (
+                    <img src={ext.iconUrl} className="h-full w-full object-cover" alt="" />
+                  ) : (
+                    <Package className="h-3.5 w-3.5 text-punk-text-muted" />
+                  )}
+                </button>
+              ))}
+            </div>
           )}
         </div>
 
