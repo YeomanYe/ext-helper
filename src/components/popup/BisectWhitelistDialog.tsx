@@ -1,6 +1,6 @@
 import * as React from "react"
 import { createPortal } from "react-dom"
-import { Check, Package, Search, X } from "lucide-react"
+import { Check, Package, Search } from "lucide-react"
 import type { Extension } from "@/types"
 import { cn } from "@/utils"
 import {
@@ -89,49 +89,32 @@ export function BisectWhitelistDialog({
           </div>
         </div>
 
-        {selectedExtensions.length > 0 && (
-          <div className="border-t border-punk-border/30 bg-punk-surface-inset/30 px-3 py-2">
-            <div className="mb-1.5 flex items-center justify-between">
-              <span className="font-punk-heading text-[9px] uppercase tracking-wider text-punk-text-muted">
-                Whitelisted ({selectedExtensions.length})
+        <div className="flex gap-2 overflow-x-auto border-y border-punk-border/30 bg-punk-surface-soft/70 px-3 py-2">
+          {selectedExtensions.length === 0 ? (
+            <div className="flex h-8 items-center">
+              <span className="font-punk-heading text-[10px] uppercase tracking-wider text-punk-text-muted">
+                No whitelisted extensions
               </span>
+            </div>
+          ) : (
+            selectedExtensions.map((ext) => (
               <button
+                key={ext.id}
                 type="button"
-                onClick={() => setSelected([])}
-                className="font-punk-heading text-[9px] uppercase tracking-wider text-punk-text-muted transition-colors hover:text-punk-cta"
+                onClick={() => handleToggle(ext.id)}
+                aria-label={`Remove ${ext.name} from whitelist`}
+                title={ext.name}
+                className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden border border-punk-success bg-punk-surface-raised transition-colors hover:border-punk-cta"
               >
-                Clear
+                {ext.iconUrl ? (
+                  <img src={ext.iconUrl} className="h-full w-full object-cover" alt="" />
+                ) : (
+                  <Package className="h-4 w-4 text-punk-text-muted" />
+                )}
               </button>
-            </div>
-            <div className="flex max-h-16 flex-wrap gap-1 overflow-y-auto">
-              {selectedExtensions.map((ext) => (
-                <button
-                  key={ext.id}
-                  type="button"
-                  onClick={() => handleToggle(ext.id)}
-                  aria-label={`Remove ${ext.name} from whitelist`}
-                  title={`Remove ${ext.name}`}
-                  className="group flex max-w-full items-center gap-1 border border-punk-accent/50 bg-punk-accent/10 px-1.5 py-0.5 transition-colors hover:border-punk-cta/60 hover:bg-punk-cta/10"
-                >
-                  {ext.iconUrl ? (
-                    <img
-                      src={ext.iconUrl}
-                      alt=""
-                      className="h-3.5 w-3.5 shrink-0 object-cover"
-                      loading="lazy"
-                    />
-                  ) : (
-                    <Package className="h-3.5 w-3.5 shrink-0 text-punk-text-muted" />
-                  )}
-                  <span className="max-w-[8rem] truncate font-punk-body text-[10px] text-punk-text-primary">
-                    {ext.name}
-                  </span>
-                  <X className="h-3 w-3 shrink-0 text-punk-text-muted group-hover:text-punk-cta" />
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
+            ))
+          )}
+        </div>
 
         <div className="flex-1 overflow-y-auto px-3 pb-3 pt-2">
           {visible.length === 0 && (
