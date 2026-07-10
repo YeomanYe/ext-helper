@@ -63,7 +63,7 @@ const FEATURES: Feature[] = [
     id: "bisect",
     tag: "Debug",
     title: "Bisect Debugger",
-    desc: "Binary search algorithm to find the problematic extension causing issues. Mark halves as good or bad — narrows to the culprit in log₂(n) steps.",
+    desc: "Binary search to find the problematic extension in log₂(n) steps. Protect critical extensions with a whitelist — password managers, input methods, and translators stay on during the entire process.",
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="#f43f5e" strokeWidth="2" aria-hidden="true">
         <circle cx="11" cy="11" r="8" />
@@ -74,14 +74,79 @@ const FEATURES: Feature[] = [
     ),
   },
   {
+    id: "site-discovery",
+    tag: "Discovery",
+    title: "Site Extension Discovery",
+    desc: "An AI-powered panel surfaces which of your installed extensions work on the current website. Cloud-suggested recommendations show relevant extensions you haven't installed yet — ranked by community signal.",
+    large: true,
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="#34d399" strokeWidth="2" aria-hidden="true">
+        <circle cx="12" cy="12" r="10" />
+        <line x1="2" y1="12" x2="22" y2="12" />
+        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+      </svg>
+    ),
+  },
+  {
+    id: "ai-groups",
+    tag: "AI",
+    title: "AI Group Suggestions",
+    desc: "Let an LLM pick the right extensions for a group. Click the robot icon in any group panel and AI recommends candidates based on extension names, descriptions, and permissions.",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="#c084fc" strokeWidth="2" aria-hidden="true">
+        <rect x="3" y="11" width="18" height="10" rx="2" />
+        <circle cx="12" cy="5" r="2" />
+        <path d="M12 7v4" />
+        <line x1="8" y1="16" x2="8" y2="16" />
+        <line x1="16" y1="16" x2="16" y2="16" />
+      </svg>
+    ),
+  },
+  {
+    id: "usage-log",
+    tag: "Analytics",
+    title: "Usage Log",
+    desc: "Full timestamped history of every enable, disable, install, and uninstall event. Per-extension stats show exactly what changed and when.",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fbbf24" strokeWidth="2" aria-hidden="true">
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+      </svg>
+    ),
+  },
+  {
     id: "history",
     tag: "Safety",
     title: "Undo / Redo History",
     desc: "Full snapshot-based history of all extension state changes. Instantly revert any mistake — never lose your extension configuration again.",
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="#fbbf24" strokeWidth="2" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fb923c" strokeWidth="2" aria-hidden="true">
         <path d="M3 7v6h6" />
         <path d="M3 13A9 9 0 1 0 6 6.3" />
+      </svg>
+    ),
+  },
+  {
+    id: "import-export",
+    tag: "Backup",
+    title: "Config & Log Import / Export",
+    desc: "Back up and restore groups, rules, preferences, and usage logs. Import with preview and confirmation so you always know what's coming in.",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="#38bdf8" strokeWidth="2" aria-hidden="true">
+        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+        <polyline points="7 10 12 15 17 10" />
+        <line x1="12" y1="15" x2="12" y2="3" />
+        <polyline points="17 4 12 9 7 4" transform="translate(0 -1)" opacity="0.5" />
+      </svg>
+    ),
+  },
+  {
+    id: "theme-toggle",
+    tag: "Personalization",
+    title: "Theme Toggle",
+    desc: "Dark, light, or follow system. Punk-themed design system with a deep-blue dark variant — switch instantly without page reload.",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2" aria-hidden="true">
+        <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
       </svg>
     ),
   },

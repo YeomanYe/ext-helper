@@ -2,7 +2,7 @@
 
 ![Ext Helper — Tame the chaos. Bisect. Group. Automate.](website/public/hero-poster.png)
 
-A browser extension manager for Chrome and Edge. Organize extensions into groups, automate enable/disable with rules, debug conflicts with binary-search bisect, and undo/redo changes instantly.
+A browser extension manager for Chrome, Firefox, and Edge. Organize extensions into groups, automate enable/disable with rules, debug conflicts with binary-search bisect, discover site-relevant extensions with AI, and undo/redo changes instantly.
 
 [Website](https://yeomanye.github.io/ext-helper/) · [Report an issue](https://github.com/YeomanYe/ext-helper/issues) · [Donate via PayPal](https://www.paypal.com/paypalme/yeomanye)
 
@@ -16,19 +16,23 @@ A browser extension manager for Chrome and Edge. Organize extensions into groups
 ## Features
 
 - **Enable / disable** any installed extension from a unified popup
-- **Groups** — color-coded collections with drag-and-drop and bulk toggle
+- **Groups** — color-coded collections with drag-and-drop reorder and bulk toggle
 - **Automation rules** — conditions on domain (exact / contains / wildcard / regex) and schedule (days + time range) that enable or disable extensions or whole groups
-- **Bisect debugger** — binary-search through enabled extensions to isolate one that breaks a site
+- **Bisect debugger** — binary-search through enabled extensions to isolate one that breaks a site, with a **whitelist** to protect critical extensions during testing
+- **Site extension discovery** — AI-powered panel that surfaces installed extensions applicable to the current website, plus **cloud-suggested** recommendations for extensions you don't have yet
+- **AI group suggestions** — let an LLM pick the right extensions for a group based on name, description, and permissions
+- **Usage log** — timestamped history of every enable / disable / install / uninstall event with per-extension stats
+- **Config & log import / export** — back up and restore groups, rules, preferences, and usage logs
 - **Snapshot undo / redo** — every mutation is reversible
-- **Optimistic UI** with rollback on failure
-- **Cross-browser** — Chrome and Edge MV3 builds (built on Plasmo)
-- **Punk-themed** design system with light / dark modes
+- **Theme toggle** — dark / light / system modes with a punk-themed design system
+- **Find shortcut** — press <kbd>/</kbd> to jump to search anywhere in the popup
+- **Cross-browser** — Chrome, Firefox, and Edge MV3 builds (built on Plasmo)
 
 ## Install
 
 [**Install from the Chrome Web Store →**](https://chromewebstore.google.com/detail/ext-helper/bnoomkhaemojkbmdmniifkijjaiiomfl)
 
-Edge Add-ons support is packaged from the same source. You can also load from source — see [Development](#development).
+Edge Add-ons support is packaged from the same source. Firefox Add-ons are also available. You can also load from source — see [Development](#development).
 
 ## Development
 
@@ -65,10 +69,8 @@ See [`CLAUDE.md`](CLAUDE.md) for a deeper tour of the architecture, and `docs/` 
 
 See [`TODO.md`](TODO.md).
 
-- [ ] Extension usage log — track enable/disable/install/uninstall history and usage stats
 - [ ] Cloud sync — store groups, rules, and preferences in the cloud with multi-device sync
-- [ ] Site-aware extension picker — on the current website, surface which of your installed extensions actually work here (host permissions, matches, prior usage)
-- [ ] Cloud-suggested extensions — query a cloud catalog for extensions that target the current website's domain, ranked by community signal
+- [ ] Style pack switching — swap the punk aesthetic for other visual themes (minimal, skeuomorphic, cartoon)
 
 ## Support
 

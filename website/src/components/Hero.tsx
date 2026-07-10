@@ -67,7 +67,7 @@ function PopupMockup() {
         </div>
 
         <div className="mockup-tabs">
-          {["Extensions", "Groups", "Rules"].map((tab, i) => (
+          {["Extensions", "Groups", "Rules", "Logs"].map((tab, i) => (
             <div key={tab} className={`mockup-tab${i === 0 ? " active" : ""}`}>
               {tab}
             </div>
@@ -129,8 +129,8 @@ export default function Hero() {
 
             <p className="hero-desc">
               Organize, automate, and debug all your browser extensions from one powerful dashboard.
-              Custom groups, domain-based rules, and binary search debugging — built for power
-              users.
+              Custom groups, domain-based rules, AI-powered site discovery, and binary search
+              debugging — built for power users.
             </p>
 
             <div className="hero-actions">

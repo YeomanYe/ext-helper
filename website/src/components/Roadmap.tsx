@@ -11,18 +11,6 @@ interface RoadmapItem {
 
 const ITEMS: RoadmapItem[] = [
   {
-    id: "activity-log",
-    tag: "Analytics",
-    title: "Extension Activity Log",
-    desc: "Full history of every enable, disable, install, and uninstall event — timestamped and searchable so you always know what changed.",
-    tagColor: "#fbbf24",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="#fbbf24" strokeWidth="2" aria-hidden="true">
-        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-      </svg>
-    ),
-  },
-  {
     id: "cross-browser-sync",
     tag: "Sync",
     title: "Cross-Browser Sync",
@@ -37,27 +25,18 @@ const ITEMS: RoadmapItem[] = [
     ),
   },
   {
-    id: "site-aware-picker",
-    tag: "Context",
-    title: "Site-Aware Extension Picker",
-    desc: "On any website, instantly see which of your installed extensions actually work here — based on host permissions, content-script matches, and how you've used them before.",
-    tagColor: "#34d399",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="#34d399" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <circle cx="11" cy="11" r="7" />
-        <line x1="21" y1="21" x2="16.65" y2="16.65" />
-      </svg>
-    ),
-  },
-  {
-    id: "cloud-suggestions",
-    tag: "Discovery",
-    title: "Cloud-Suggested Extensions",
-    desc: "Query a curated cloud catalog for extensions that target the current website's domain — ranked by community signal so you discover the best tool for the page you're on.",
+    id: "style-pack-switching",
+    tag: "Design",
+    title: "Style Pack Switching",
+    desc: "Swap the current punk aesthetic for other visual themes — minimal, skeuomorphic, cartoon. Style packs stay orthogonal to dark / light mode, so every theme works in both.",
     tagColor: "#f472b6",
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="#f472b6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <path d="M18 10h-1.26A8 8 0 109 20h9a5 5 0 000-10z" />
+        <circle cx="13.5" cy="6.5" r="2.5" />
+        <circle cx="19" cy="13" r="2.5" />
+        <circle cx="6" cy="12" r="2.5" />
+        <circle cx="10" cy="20" r="2.5" />
+        <path d="M12 2a10 10 0 0 0 0 20 2.5 2.5 0 0 0 2-4 2.5 2.5 0 0 1 2-4h2a4 4 0 0 0 4-4 10 10 0 0 0-10-8z" />
       </svg>
     ),
   },
