@@ -11,6 +11,7 @@ build/
 out/
 target/
 .plasmo/
+.popup-patch-entry.tsx
 *.egg-info__pycache__/
 *.pyc
 *.pyo

@@ -6,6 +6,19 @@
 
 - 300810f: 新增主题强调色切换：在设置菜单中可选择 violet / cyan / emerald / rose / amber 等主色调，覆盖品牌主色变量，对所有明暗主题生效；偏好随 preferences 持久化并支持导入导出。
 
+### Patch Changes
+
+- Fix production popup crash (`Cannot find module 'react/jsx-runtime'`).
+
+  Plasmo 0.90.5 production build emits a popup bundle that externalizes react,
+  react-dom, and every `@/` business module to a sibling shared bundle that is
+  never generated — so the shipped popup dies the instant it loads. Dev builds
+  are unaffected, which is why this slipped through to v2.1.0.
+
+  Workaround: post-build step re-bundles popup with Vite into a self-contained
+  IIFE and rewrites `popup.html` to reference the new asset names. See
+  `scripts/patch-popup-react.mjs`.
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/).
