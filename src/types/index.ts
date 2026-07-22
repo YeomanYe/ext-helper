@@ -51,6 +51,12 @@ export type FilterType =
   | "no-any-group"
 export type SortType = "name" | "enabled" | "recentlyUsed"
 export type ViewMode = "compact" | "card" | "detail"
+
+/**
+ * 主题强调色（主色调）。`default` 为项目原生蓝，其余为预设调色板，
+ * 定义在 `src/styles/globals.css` 的 `html[data-accent="..."]` 块中。
+ */
+export type AccentColor = "default" | "violet" | "cyan" | "emerald" | "rose" | "amber"
 export type BisectPhase = "idle" | "running" | "resolved" | "cancelled"
 export type UsageLogAction = "enabled" | "disabled" | "installed" | "uninstalled"
 export type UsageLogSource = "popup" | "browser" | "background"
@@ -105,6 +111,7 @@ export interface BisectSession {
 
 export interface Preferences {
   theme: "light" | "dark" | "system"
+  accentColor?: AccentColor
   compactMode: boolean
   showDisabled: boolean
   sortBy: SortType
@@ -166,6 +173,7 @@ export type ImportExportPreferences = Partial<
   Pick<
     Preferences,
     | "theme"
+    | "accentColor"
     | "compactMode"
     | "showDisabled"
     | "viewMode"
@@ -259,12 +267,14 @@ export interface GroupStore {
 
 export interface UIStore {
   theme: "light" | "dark" | "system"
+  accentColor: AccentColor
   compactMode: boolean
   showDisabled: boolean
   viewMode: ViewMode
   bisectWhitelist: string[]
   lastUpdate: number
   setTheme: (theme: "light" | "dark" | "system") => void
+  setAccentColor: (accent: AccentColor) => void
   toggleCompactMode: () => void
   toggleShowDisabled: () => void
   setViewMode: (mode: ViewMode) => void

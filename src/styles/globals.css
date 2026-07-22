@@ -479,3 +479,54 @@ button.punk-btn-primary:active {
 .aspect-video {
   aspect-ratio: 16 / 9;
 }
+
+/* ============================================
+   ACCENT COLOR OVERRIDES (主题强调色)
+   覆盖品牌主色变量，对所有明暗主题生效。
+   `default` 不覆盖（使用项目原生蓝）。
+   预设清单需与 src/utils/theme.ts 的 ACCENT_PRESETS 同步。
+   ============================================ */
+html[data-accent="violet"] {
+  --punk-primary: #8b5cf6;
+  --punk-primary-rgb: 139 92 246;
+  --punk-secondary: #c4b5fd;
+  --punk-secondary-rgb: 196 181 253;
+  --punk-border: #8b5cf6;
+  --punk-border-rgb: 139 92 246;
+}
+
+html[data-accent="cyan"] {
+  --punk-primary: #06b6d4;
+  --punk-primary-rgb: 6 182 212;
+  --punk-secondary: #22d3ee;
+  --punk-secondary-rgb: 34 211 238;
+  --punk-border: #06b6d4;
+  --punk-border-rgb: 6 182 212;
+}
+
+html[data-accent="emerald"] {
+  --punk-primary: #10b981;
+  --punk-primary-rgb: 16 185 129;
+  --punk-secondary: #34d399;
+  --punk-secondary-rgb: 52 211 153;
+  --punk-border: #10b981;
+  --punk-border-rgb: 16 185 129;
+}
+
+html[data-accent="rose"] {
+  --punk-primary: #f43f5e;
+  --punk-primary-rgb: 244 63 94;
+  --punk-secondary: #fb7185;
+  --punk-secondary-rgb: 251 113 133;
+  --punk-border: #f43f5e;
+  --punk-border-rgb: 244 63 94;
+}
+
+html[data-accent="amber"] {
+  --punk-primary: #f59e0b;
+  --punk-primary-rgb: 245 158 11;
+  --punk-secondary: #fbbf24;
+  --punk-secondary-rgb: 251 191 36;
+  --punk-border: #f59e0b;
+  --punk-border-rgb: 245 158 11;
+}

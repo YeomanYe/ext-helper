@@ -1,4 +1,4 @@
-import type { AiSettings, Preferences, ViewMode } from "@/types"
+import type { AccentColor, AiSettings, Preferences, ViewMode } from "@/types"
 import { browserAdapter } from "@/services/browser/adapter"
 import { devStorage } from "@/services/devStorage"
 import { isDevMode } from "@/services/mockData"
@@ -7,6 +7,7 @@ const PREFERENCES_STORAGE_KEY = "ext-helper-preferences"
 
 type StoredPreferences = Partial<{
   theme: Preferences["theme"]
+  accentColor: AccentColor
   compactMode: boolean
   showDisabled: boolean
   viewMode: ViewMode

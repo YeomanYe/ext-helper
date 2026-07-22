@@ -1,4 +1,5 @@
 import type {
+  AccentColor,
   Group,
   ImportExportDomain,
   ImportExportPayload,
@@ -11,6 +12,7 @@ import { groupsRepo } from "@/services/groupsRepo"
 import { preferencesRepo } from "@/services/preferencesRepo"
 import { rulesRepo } from "@/services/rulesRepo"
 import { usageLogRepo } from "@/services/usageLogRepo"
+import { ACCENT_VALUES } from "@/utils/theme"
 
 export const IMPORT_EXPORT_SCHEMA_VERSION = 1
 
@@ -109,6 +111,13 @@ const validatePreferences = (value: unknown): ImportExportPreferences => {
       throw new ImportExportError("preferences.theme is invalid")
     }
     preferences.theme = value.theme
+  }
+  if (value.accentColor !== undefined) {
+    const accent = value.accentColor as AccentColor
+    if (!ACCENT_VALUES.includes(accent)) {
+      throw new ImportExportError("preferences.accentColor is invalid")
+    }
+    preferences.accentColor = accent
   }
   if (value.compactMode !== undefined) {
     assertBoolean(value.compactMode, "preferences.compactMode")
@@ -216,6 +225,7 @@ export async function createExportPayload({
     const preferences = await preferencesRepo.fetch()
     data.preferences = {
       ...(preferences.theme !== undefined ? { theme: preferences.theme } : {}),
+      ...(preferences.accentColor !== undefined ? { accentColor: preferences.accentColor } : {}),
       ...(preferences.compactMode !== undefined ? { compactMode: preferences.compactMode } : {}),
       ...(preferences.showDisabled !== undefined ? { showDisabled: preferences.showDisabled } : {}),
       ...(preferences.viewMode !== undefined ? { viewMode: preferences.viewMode } : {}),

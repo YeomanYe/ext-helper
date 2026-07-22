@@ -40,7 +40,8 @@ import {
   modelProviderPresets,
   type ModelProviderPreset,
 } from "@/services/modelProviders"
-import type { AiSettings, FilterType, Preferences, ViewMode } from "@/types"
+import type { AiSettings, AccentColor, FilterType, Preferences, ViewMode } from "@/types"
+import { ACCENT_PRESETS } from "@/utils/theme"
 
 function useExtensionVersion(): string {
   const [version, setVersion] = React.useState("1.0.0")
@@ -1021,6 +1022,8 @@ export function Header({
   const [showCloudRecommendation, setShowCloudRecommendation] = React.useState(false)
   const theme = useUIStore((state) => state.theme)
   const setTheme = useUIStore((state) => state.setTheme)
+  const accentColor = useUIStore((state) => state.accentColor)
+  const setAccentColor = useUIStore((state) => state.setAccentColor)
   return (
     <header className="relative flex items-center justify-between border-b-2 border-punk-primary bg-punk-surface-raised px-4 py-3 shadow-punk-hard hud-corner">
       {/* Static accent wash */}
@@ -1123,6 +1126,30 @@ export function Header({
                         <Icon className="h-3.5 w-3.5 shrink-0" />
                         <span>{label}</span>
                       </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="border-b border-punk-border/40 px-3 py-2">
+                  <div className="mb-2 font-punk-heading text-[11px] uppercase tracking-wider text-punk-text-muted">
+                    ACCENT COLOR
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    {ACCENT_PRESETS.map(({ value, swatch }) => (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => setAccentColor(value as AccentColor)}
+                        aria-label={`Accent color ${value}`}
+                        aria-pressed={accentColor === value}
+                        title={value}
+                        className={cn(
+                          "h-6 w-6 shrink-0 border transition-all duration-200",
+                          accentColor === value
+                            ? "scale-110 border-punk-text-primary ring-1 ring-punk-text-primary/60"
+                            : "border-punk-border/40 hover:scale-110"
+                        )}
+                        style={{ backgroundColor: swatch }}
+                      />
                     ))}
                   </div>
                 </div>

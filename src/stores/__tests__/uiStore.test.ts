@@ -40,6 +40,7 @@ describe("uiStore", () => {
             remove: removeFn,
             toggle: toggleFn,
           },
+          dataset: {} as Record<string, string>,
         },
       },
       configurable: true,
@@ -109,6 +110,45 @@ describe("uiStore", () => {
       // State should still be updated even though save failed
       expect(useUIStore.getState().theme).toBe("dark")
       expect(consoleSpy).toHaveBeenCalledWith("Failed to save theme preference:", expect.any(Error))
+      consoleSpy.mockRestore()
+    })
+  })
+
+  // ----------------------------------------------------------------
+  // setAccentColor
+  // ----------------------------------------------------------------
+  describe("setAccentColor", () => {
+    it("normal: should set accent color and apply data-accent", async () => {
+      const { useUIStore } = await import("../uiStore")
+      await useUIStore.getState().setAccentColor("violet")
+
+      expect(useUIStore.getState().accentColor).toBe("violet")
+      expect(document.documentElement.dataset.accent).toBe("violet")
+      expect(repo.save).toHaveBeenCalledWith({ accentColor: "violet" })
+    })
+
+    it("normal: default accent should clear data-accent", async () => {
+      const { useUIStore } = await import("../uiStore")
+      document.documentElement.dataset.accent = "cyan"
+      await useUIStore.getState().setAccentColor("default")
+
+      expect(useUIStore.getState().accentColor).toBe("default")
+      expect(document.documentElement.dataset.accent).toBeUndefined()
+      expect(repo.save).toHaveBeenCalledWith({ accentColor: "default" })
+    })
+
+    it("abnormal: should handle save failure gracefully", async () => {
+      repo.save.mockRejectedValueOnce(new Error("storage full"))
+      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {})
+
+      const { useUIStore } = await import("../uiStore")
+      await useUIStore.getState().setAccentColor("rose")
+
+      expect(useUIStore.getState().accentColor).toBe("rose")
+      expect(consoleSpy).toHaveBeenCalledWith(
+        "Failed to save accent color preference:",
+        expect.any(Error)
+      )
       consoleSpy.mockRestore()
     })
   })
@@ -324,6 +364,18 @@ describe("uiStore", () => {
       expect(window.matchMedia).toHaveBeenCalledWith("(prefers-color-scheme: dark)")
       expect(toggleFn).toHaveBeenCalledWith("dark", true)
       expect(setAttributeFn).toHaveBeenCalledWith("data-theme", "system")
+    })
+
+    it("normal: should hydrate accent color from preferences", async () => {
+      repo.fetch.mockResolvedValueOnce({
+        accentColor: "emerald",
+      })
+
+      const { initializeUIStore, useUIStore } = await import("../uiStore")
+      await initializeUIStore()
+
+      expect(useUIStore.getState().accentColor).toBe("emerald")
+      expect(document.documentElement.dataset.accent).toBe("emerald")
     })
 
     it("edge: should handle missing/empty preferences", async () => {

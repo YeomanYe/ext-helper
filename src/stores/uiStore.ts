@@ -1,15 +1,19 @@
 import { create } from "zustand"
-import type { Preferences, UIStore, ViewMode } from "@/types"
+import type { AccentColor, Preferences, UIStore, ViewMode } from "@/types"
 import { preferencesRepo } from "@/services/preferencesRepo"
-import { applyThemeDom } from "@/utils/theme"
+import { applyAccentColorDom, applyThemeDom, DEFAULT_ACCENT } from "@/utils/theme"
 import { logger } from "@/utils/logger"
 
 type PreferenceUpdates = Partial<
-  Pick<Preferences, "theme" | "compactMode" | "showDisabled" | "viewMode" | "bisectWhitelist">
+  Pick<
+    Preferences,
+    "theme" | "accentColor" | "compactMode" | "showDisabled" | "viewMode" | "bisectWhitelist"
+  >
 >
 
 export const useUIStore = create<UIStore>((set, get) => ({
   theme: "system",
+  accentColor: DEFAULT_ACCENT,
   compactMode: false,
   showDisabled: true,
   viewMode: "compact",
@@ -23,6 +27,16 @@ export const useUIStore = create<UIStore>((set, get) => ({
       await preferencesRepo.save({ theme })
     } catch (error) {
       logger.error("Failed to save theme preference:", error)
+    }
+  },
+
+  setAccentColor: async (accentColor: AccentColor) => {
+    set({ accentColor, lastUpdate: Date.now() })
+    applyAccentColorDom(accentColor)
+    try {
+      await preferencesRepo.save({ accentColor })
+    } catch (error) {
+      logger.error("Failed to save accent color preference:", error)
     }
   },
 
@@ -80,6 +94,9 @@ export async function initializeUIStore() {
       if (prefs.theme) {
         nextState.theme = prefs.theme
       }
+      if (prefs.accentColor) {
+        nextState.accentColor = prefs.accentColor
+      }
       if (prefs.compactMode !== undefined) {
         nextState.compactMode = prefs.compactMode
       }
@@ -95,8 +112,10 @@ export async function initializeUIStore() {
 
       useUIStore.setState(nextState)
       applyThemeDom(nextState.theme ?? useUIStore.getState().theme)
+      applyAccentColorDom(nextState.accentColor ?? useUIStore.getState().accentColor)
     } else {
       applyThemeDom(useUIStore.getState().theme)
+      applyAccentColorDom(useUIStore.getState().accentColor)
     }
   } catch (error) {
     logger.error("Failed to initialize UI store:", error)
